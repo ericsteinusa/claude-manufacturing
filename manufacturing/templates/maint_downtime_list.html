@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Downtime{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Downtime" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/maint/wo/" class="btn">Work Orders</a>
-<a href="/maint/equipment/" class="btn">Equipment</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/maint/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/maint/equipment/" class="btn">{% trans "Equipment" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -53,29 +54,29 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Equipment Downtime</h2>
+    <h2>{% trans "Equipment Downtime" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/maint/downtime/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/maint/downtime/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in downtime_statuses %}
             <a href="/maint/downtime/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
         </div>
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
-            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="Search…">
-            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
+            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search…' %}">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
         </form>
     </div>
 
     {% if downtime_records %}
     <table class="list-table">
         <thead><tr>
-            <th>Equipment</th><th>Category</th><th>Reason</th>
-            <th>Date</th><th>Hours</th><th>Cost</th><th>Status</th>
+            <th>{% trans "Equipment" %}</th><th>{% trans "Category" %}</th><th>{% trans "Reason" %}</th>
+            <th>{% trans "Date" %}</th><th>{% trans "Hours" %}</th><th>{% trans "Cost" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for d in downtime_records %}
@@ -93,47 +94,47 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No downtime records found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No downtime records found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Log Downtime Event</h3>
+        <h3>{% trans "Log Downtime Event" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Equipment *</label>
+                    <label>{% trans "Equipment *" %}</label>
                     <input type="text" name="equipment" required>
                 </div>
                 <div class="form-row">
-                    <label>Category</label>
+                    <label>{% trans "Category" %}</label>
                     <select name="category">
                         {% for c in downtime_categories %}<option>{{ c }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Date</label>
+                    <label>{% trans "Date" %}</label>
                     <input type="date" name="down_date">
                 </div>
                 <div class="form-row">
-                    <label>Hours Down</label>
+                    <label>{% trans "Hours Down" %}</label>
                     <input type="text" name="hours" placeholder="0.0">
                 </div>
                 <div class="form-row">
-                    <label>Cost ($)</label>
+                    <label>{% trans "Cost ($)" %}</label>
                     <input type="number" name="cost" step="0.01" min="0" placeholder="0.00">
                 </div>
                 <div class="form-row full">
-                    <label>Reason</label>
+                    <label>{% trans "Reason" %}</label>
                     <textarea name="reason" rows="2"></textarea>
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="2"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Log Event</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Log Event" %}</button>
         </form>
     </div>
     {% endif %}

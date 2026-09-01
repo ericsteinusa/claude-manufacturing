@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}PM Schedule{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "PM Schedule" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/maint/wo/" class="btn">Work Orders</a>
-<a href="/maint/equipment/" class="btn">Equipment</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/maint/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/maint/equipment/" class="btn">{% trans "Equipment" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -48,29 +49,29 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Preventive Maintenance Schedule</h2>
+    <h2>{% trans "Preventive Maintenance Schedule" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/maint/schedule/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/maint/schedule/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in schedule_statuses %}
             <a href="/maint/schedule/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
         </div>
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
-            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="Search…">
-            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
+            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search…' %}">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
         </form>
     </div>
 
     {% if schedules %}
     <table class="list-table">
         <thead><tr>
-            <th>Task</th><th>Equipment</th><th>Frequency</th>
-            <th>Assigned To</th><th>Last Done</th><th>Next Due</th><th>Status</th>
+            <th>{% trans "Task" %}</th><th>{% trans "Equipment" %}</th><th>{% trans "Frequency" %}</th>
+            <th>{% trans "Assigned To" %}</th><th>{% trans "Last Done" %}</th><th>{% trans "Next Due" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for s in schedules %}
@@ -90,50 +91,50 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No schedule items found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No schedule items found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add PM Task</h3>
+        <h3>{% trans "Add PM Task" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Task *</label>
-                    <input type="text" name="task" required placeholder="e.g. Oil change">
+                    <label>{% trans "Task *" %}</label>
+                    <input type="text" name="task" required placeholder="{% trans 'e.g. Oil change' %}">
                 </div>
                 <div class="form-row">
-                    <label>Equipment</label>
+                    <label>{% trans "Equipment" %}</label>
                     <input type="text" name="equipment">
                 </div>
                 <div class="form-row">
-                    <label>Frequency</label>
+                    <label>{% trans "Frequency" %}</label>
                     <select name="frequency">
                         {% for f in frequencies %}<option>{{ f }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Assigned To</label>
+                    <label>{% trans "Assigned To" %}</label>
                     <select name="assigned_to">
-                        <option value="">— Unassigned —</option>
+                        <option value="">{% trans "— Unassigned —" %}</option>
                         {% for m in mechanics %}<option>{{ m.name }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Last Done</label>
+                    <label>{% trans "Last Done" %}</label>
                     <input type="date" name="last_done">
                 </div>
                 <div class="form-row">
-                    <label>Next Due</label>
+                    <label>{% trans "Next Due" %}</label>
                     <input type="date" name="next_due">
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="2"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Add PM Task</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Add PM Task" %}</button>
         </form>
     </div>
     {% endif %}

@@ -814,6 +814,80 @@ Finance department (10) + the full Quality department (12) + the full
 Production department (13, plus the 2 already-translated htmx
 templates)) out of ~450 total.
 
+Also fully translated: the entire **Maintenance department**
+(`maint_downtime_list.html`/`_detail.html`, `maint_equipment_list.html`/
+`_detail.html`, `maint_inspection_list.html`/`_detail.html`,
+`maint_mechanics_list.html`/`maint_mechanic_detail.html`,
+`maint_parts_list.html`/`maint_part_detail.html`,
+`maint_schedule_list.html`/`_detail.html`, `maint_wo_list.html`/
+`_detail.html`, `maint_labor_report.html`, `maint_oee_report.html` —
+16 templates, the fourteenth "whole department" pass; `maint_dashboard
+.html`/`maint_dashboard_kpis.html` were already translated in the
+original htmx-templates pass and are not recounted here). Deliberately
+excluded, matching the established "translate the link, not yet the
+target" precedent (Quality's SPC/COA/Control-Plans/Compliance,
+Accounting's separate Finance department): the dashboard's links out
+to `/maint/apm/` (Asset Performance Management), `/predictive-
+maintenance/`, and `/maint/routes/`, none of which are part of this
+16-template core. 114 unique strings per language, all simple (no new
+plurals — the one place a plural would have applied, the per-mechanic
+"N WO" badge in the Labor Time & Cost Report's `<details>` summary,
+reused the exact `%(counter)s WO`/`%(counter)s WOs` msgid already
+translated by the Production department's own labor report, so
+`makemessages` merged it automatically with zero new translation work
+needed). Used `{% blocktrans with %}` for six dynamic titles ("WO
+#{num}", "WO #{num} — {title}", "Downtime #{num}", "Downtime:
+{equipment}", "Inspection #{num}", "Inspection: {area}", "PM Task
+#{num}", "PM Task: {task}" — several pages needed both an id-based
+`page_title` and a name-based `<h2>`, both wrapped). Found the same
+`{{ x }} WO{{ x|pluralize }}` untranslatable-filter pattern first
+documented in the Production pass, in `maint_labor_report.html`'s
+per-mechanic summary line — converted to `{% blocktrans count %}`,
+which is what let it merge with Production's existing translation
+instead of needing a fresh one. `manage.py makemessages` fuzzy-matched
+88 of the new strings against unrelated existing translations from
+other departments (same count as the Accounting pass, all handled from
+the start with the blank-the-msgstr-when-stripping-fuzzy technique
+established since that pass). One embedded-newline gotcha in the
+translation-application script itself (not the `.po` file): a
+`{% blocktrans %}` footnote in `maint_labor_report.html` wraps across
+a template line break, so its msgid contains a literal `\n` escape
+sequence (two characters, backslash and "n") rather than an actual
+newline byte — a translation dict built by typing a normal `\n` in the
+Python source produces a real newline at runtime, which silently fails
+to match the `.po` file's literal-backslash-n key and leaves the entry
+unapplied; fixed by writing the escape as `\\n` in the dict source so
+the runtime string also holds the literal two-character sequence,
+verified with a byte-level check before re-running the apply script.
+Full suite 3431 passed (unchanged), `manage.py check` clean,
+`compilemessages` clean, `msgfmt --check` clean on all three files,
+zero blank/duplicated entries confirmed programmatically (the
+recurring plural-concatenation false positives from earlier passes
+reappear here too, unrelated to this batch, since Maintenance added no
+new plurals). Verified end-to-end against the real dev server: the
+Maintenance Work Orders list + a completed WO's detail page (confirmed
+"OT n° 4 — ..." in French), Equipment list + a detail page, Downtime
+list, Mechanics list + a detail page (confirmed the hidden-compensation
+tooltip logic still renders for a full-access user), Parts list, PM
+Schedule list + an overdue task's detail page (confirmed the overdue
+notice and "Mark Complete" hint text in German), the Labor Time & Cost
+Report (confirmed the KPI cards and the reused "3 OT" per-mechanic
+plural badge), and the OEE Report (confirmed the doubled-`%%` "World-
+class = 85%" KPI sub-label and the blocktrans'd Availability/Quality
+sub-labels), in Spanish, French, and German with real sample data, no
+console errors. **Localization coverage is now 160 templates across
+three languages** (core shell + login + main dashboard + all 5 htmx
+templates + the full Legal department (10) + the full Marketing
+department (13) + the full Reports department (4) + the full Payroll
+department (8) + the full Time Clock department (7) + the full
+Customers/Credit department (7) + the full Engineering department
+(10) + the full Customer Service department (13) + the full
+Accounting department (13) + the full IT department (17) + the full
+Finance department (10) + the full Quality department (12) + the full
+Production department (13, plus the 2 already-translated htmx
+templates) + the full Maintenance department (16, plus the 2
+already-translated htmx templates)) out of ~450 total.
+
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Equipment{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Equipment" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/maint/wo/" class="btn">Work Orders</a>
-<a href="/maint/schedule/" class="btn">PM Schedule</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/maint/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/maint/schedule/" class="btn">{% trans "PM Schedule" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -53,29 +54,29 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Equipment</h2>
+    <h2>{% trans "Equipment" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/maint/equipment/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/maint/equipment/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in equipment_statuses %}
             <a href="/maint/equipment/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
         </div>
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
-            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="Search…">
-            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
+            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search…' %}">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
         </form>
     </div>
 
     {% if equipment %}
     <table class="list-table">
         <thead><tr>
-            <th>Name</th><th>Asset Tag</th><th>Location</th>
-            <th>Manufacturer</th><th>Last Service</th><th>Status</th>
+            <th>{% trans "Name" %}</th><th>{% trans "Asset Tag" %}</th><th>{% trans "Location" %}</th>
+            <th>{% trans "Manufacturer" %}</th><th>{% trans "Last Service" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for e in equipment %}
@@ -91,51 +92,51 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No equipment found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No equipment found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Equipment</h3>
+        <h3>{% trans "Add Equipment" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Name *</label>
+                    <label>{% trans "Name *" %}</label>
                     <input type="text" name="name" required>
                 </div>
                 <div class="form-row">
-                    <label>Asset Tag</label>
+                    <label>{% trans "Asset Tag" %}</label>
                     <input type="text" name="asset_tag">
                 </div>
                 <div class="form-row">
-                    <label>Location</label>
+                    <label>{% trans "Location" %}</label>
                     <input type="text" name="location">
                 </div>
                 <div class="form-row">
-                    <label>Manufacturer</label>
+                    <label>{% trans "Manufacturer" %}</label>
                     <input type="text" name="manufacturer">
                 </div>
                 <div class="form-row">
-                    <label>Install Date</label>
+                    <label>{% trans "Install Date" %}</label>
                     <input type="date" name="install_date">
                 </div>
                 <div class="form-row">
-                    <label>Last Service</label>
+                    <label>{% trans "Last Service" %}</label>
                     <input type="date" name="last_service">
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for st in equipment_statuses %}<option>{{ st }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="2"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Add Equipment</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Add Equipment" %}</button>
         </form>
     </div>
     {% endif %}

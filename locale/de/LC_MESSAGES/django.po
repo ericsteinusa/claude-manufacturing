@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 22:04+0000\n"
+"POT-Creation-Date: 2026-08-31 22:34+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -215,6 +215,22 @@ msgstr "Lohnabrechnung"
 #: manufacturing/templates/legal_litigation_detail.html:10
 #: manufacturing/templates/legal_litigation_list.html:13
 #: manufacturing/templates/maint_dashboard.html:17
+#: manufacturing/templates/maint_downtime_detail.html:8
+#: manufacturing/templates/maint_downtime_list.html:9
+#: manufacturing/templates/maint_equipment_detail.html:8
+#: manufacturing/templates/maint_equipment_list.html:9
+#: manufacturing/templates/maint_inspection_detail.html:8
+#: manufacturing/templates/maint_inspection_list.html:8
+#: manufacturing/templates/maint_labor_report.html:9
+#: manufacturing/templates/maint_mechanic_detail.html:8
+#: manufacturing/templates/maint_mechanics_list.html:8
+#: manufacturing/templates/maint_oee_report.html:9
+#: manufacturing/templates/maint_part_detail.html:8
+#: manufacturing/templates/maint_parts_list.html:8
+#: manufacturing/templates/maint_schedule_detail.html:8
+#: manufacturing/templates/maint_schedule_list.html:9
+#: manufacturing/templates/maint_wo_detail.html:8
+#: manufacturing/templates/maint_wo_list.html:11
 #: manufacturing/templates/marketing_dashboard.html:13
 #: manufacturing/templates/marketing_dashboard.html:60
 #: manufacturing/templates/mkt_ad_detail.html:10
@@ -428,6 +444,9 @@ msgstr "Letzte Buchungen"
 #: manufacturing/templates/gl_journals.html:57
 #: manufacturing/templates/it_asset_detail.html:253
 #: manufacturing/templates/it_dashboard.html:107
+#: manufacturing/templates/maint_downtime_detail.html:94
+#: manufacturing/templates/maint_downtime_list.html:79
+#: manufacturing/templates/maint_downtime_list.html:117
 #: manufacturing/templates/qa_inspection_detail.html:100
 #: manufacturing/templates/qa_inspection_list.html:81
 #: manufacturing/templates/tc_ot_report.html:87
@@ -624,6 +643,24 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/legal_litigation_detail.html:118
 #: manufacturing/templates/legal_litigation_list.html:93
 #: manufacturing/templates/legal_litigation_list.html:146
+#: manufacturing/templates/maint_downtime_detail.html:82
+#: manufacturing/templates/maint_downtime_list.html:79
+#: manufacturing/templates/maint_equipment_detail.html:78
+#: manufacturing/templates/maint_equipment_list.html:79
+#: manufacturing/templates/maint_equipment_list.html:129
+#: manufacturing/templates/maint_inspection_detail.html:111
+#: manufacturing/templates/maint_inspection_list.html:79
+#: manufacturing/templates/maint_labor_report.html:94
+#: manufacturing/templates/maint_mechanic_detail.html:55
+#: manufacturing/templates/maint_mechanics_list.html:75
+#: manufacturing/templates/maint_mechanics_list.html:120
+#: manufacturing/templates/maint_part_detail.html:108
+#: manufacturing/templates/maint_parts_list.html:78
+#: manufacturing/templates/maint_parts_list.html:136
+#: manufacturing/templates/maint_schedule_detail.html:97
+#: manufacturing/templates/maint_schedule_list.html:74
+#: manufacturing/templates/maint_wo_detail.html:100
+#: manufacturing/templates/maint_wo_list.html:81
 #: manufacturing/templates/marketing_dashboard.html:155
 #: manufacturing/templates/mkt_ad_detail.html:70
 #: manufacturing/templates/mkt_ad_detail.html:154
@@ -794,6 +831,7 @@ msgstr "HB"
 
 #: manufacturing/templates/ap_invoice_detail.html:54
 #: manufacturing/templates/ar_invoice_detail.html:54
+#: manufacturing/templates/maint_wo_detail.html:57
 #: manufacturing/templates/payroll_stub_detail.html:36
 #: manufacturing/templates/prod_shipping_detail.html:73
 #: manufacturing/templates/qa_inspection_detail.html:77
@@ -925,6 +963,13 @@ msgstr "Wechselkurs"
 #: manufacturing/templates/legal_compliance_detail.html:121
 #: manufacturing/templates/legal_contract_detail.html:142
 #: manufacturing/templates/legal_litigation_detail.html:134
+#: manufacturing/templates/maint_downtime_detail.html:136
+#: manufacturing/templates/maint_equipment_detail.html:145
+#: manufacturing/templates/maint_inspection_detail.html:165
+#: manufacturing/templates/maint_mechanic_detail.html:121
+#: manufacturing/templates/maint_part_detail.html:143
+#: manufacturing/templates/maint_schedule_detail.html:160
+#: manufacturing/templates/maint_wo_detail.html:206
 #: manufacturing/templates/mkt_ad_detail.html:190
 #: manufacturing/templates/mkt_campaign_detail.html:146
 #: manufacturing/templates/mkt_content_detail.html:138
@@ -983,6 +1028,9 @@ msgstr "Rechnungsnr."
 #: manufacturing/templates/legal_compliance_detail.html:109
 #: manufacturing/templates/legal_compliance_list.html:84
 #: manufacturing/templates/legal_compliance_list.html:133
+#: manufacturing/templates/maint_labor_report.html:94
+#: manufacturing/templates/maint_wo_detail.html:168
+#: manufacturing/templates/maint_wo_list.html:142
 #: manufacturing/templates/mkt_content_detail.html:71
 #: manufacturing/templates/mkt_content_detail.html:126
 #: manufacturing/templates/mkt_content_list.html:88
@@ -1096,6 +1144,20 @@ msgstr "Methode"
 #: manufacturing/templates/legal_litigation_detail.html:80
 #: manufacturing/templates/legal_litigation_detail.html:130
 #: manufacturing/templates/legal_litigation_list.html:154
+#: manufacturing/templates/maint_downtime_detail.html:126
+#: manufacturing/templates/maint_downtime_list.html:133
+#: manufacturing/templates/maint_equipment_detail.html:135
+#: manufacturing/templates/maint_equipment_list.html:135
+#: manufacturing/templates/maint_inspection_detail.html:155
+#: manufacturing/templates/maint_inspection_list.html:127
+#: manufacturing/templates/maint_mechanic_detail.html:111
+#: manufacturing/templates/maint_mechanics_list.html:132
+#: manufacturing/templates/maint_part_detail.html:133
+#: manufacturing/templates/maint_parts_list.html:142
+#: manufacturing/templates/maint_schedule_detail.html:150
+#: manufacturing/templates/maint_schedule_list.html:133
+#: manufacturing/templates/maint_wo_detail.html:196
+#: manufacturing/templates/maint_wo_list.html:150
 #: manufacturing/templates/mkt_ad_detail.html:116
 #: manufacturing/templates/mkt_ad_detail.html:186
 #: manufacturing/templates/mkt_ad_list.html:180
@@ -1157,6 +1219,7 @@ msgstr "Zahlung Erfassen"
 
 #: manufacturing/templates/ap_list.html:8
 #: manufacturing/templates/ar_list.html:8
+#: manufacturing/templates/maint_wo_list.html:9
 #: manufacturing/templates/payroll_history.html:12
 #: manufacturing/templates/qa_ncr_list.html:10
 #: manufacturing/templates/report_builder_detail.html:8
@@ -1165,6 +1228,7 @@ msgstr "CSV exportieren"
 
 #: manufacturing/templates/ap_list.html:9
 #: manufacturing/templates/ar_list.html:9
+#: manufacturing/templates/maint_wo_list.html:10
 #: manufacturing/templates/payroll_history.html:13
 #: manufacturing/templates/qa_ncr_list.html:11
 msgid "Export Excel"
@@ -1299,6 +1363,7 @@ msgstr "Filtern"
 #: manufacturing/templates/legal_governance_list.html:66
 #: manufacturing/templates/legal_ip_list.html:67
 #: manufacturing/templates/legal_litigation_list.html:81
+#: manufacturing/templates/maint_wo_list.html:73
 #: manufacturing/templates/mkt_ad_list.html:84
 #: manufacturing/templates/mkt_budget_list.html:75
 #: manufacturing/templates/mkt_campaign_list.html:79
@@ -1442,6 +1507,22 @@ msgstr "Abmelden"
 #: manufacturing/templates/eng_project_detail.html:8
 #: manufacturing/templates/eng_projects.html:6
 #: manufacturing/templates/eng_reports.html:6
+#: manufacturing/templates/maint_downtime_detail.html:7
+#: manufacturing/templates/maint_downtime_list.html:6
+#: manufacturing/templates/maint_equipment_detail.html:7
+#: manufacturing/templates/maint_equipment_list.html:6
+#: manufacturing/templates/maint_inspection_detail.html:7
+#: manufacturing/templates/maint_inspection_list.html:6
+#: manufacturing/templates/maint_labor_report.html:6
+#: manufacturing/templates/maint_mechanic_detail.html:7
+#: manufacturing/templates/maint_mechanics_list.html:6
+#: manufacturing/templates/maint_oee_report.html:6
+#: manufacturing/templates/maint_part_detail.html:7
+#: manufacturing/templates/maint_parts_list.html:6
+#: manufacturing/templates/maint_schedule_detail.html:7
+#: manufacturing/templates/maint_schedule_list.html:6
+#: manufacturing/templates/maint_wo_detail.html:7
+#: manufacturing/templates/maint_wo_list.html:6
 #: manufacturing/templates/payroll_deductions.html:6
 #: manufacturing/templates/payroll_history.html:6
 #: manufacturing/templates/payroll_pay_rates.html:6
@@ -1469,6 +1550,13 @@ msgstr "Betrieb"
 #: manufacturing/templates/base.html:483
 #: manufacturing/templates/maint_dashboard.html:6
 #: manufacturing/templates/maint_dashboard.html:125
+#: manufacturing/templates/maint_downtime_list.html:7
+#: manufacturing/templates/maint_equipment_list.html:7
+#: manufacturing/templates/maint_inspection_list.html:7
+#: manufacturing/templates/maint_labor_report.html:73
+#: manufacturing/templates/maint_mechanics_list.html:7
+#: manufacturing/templates/maint_parts_list.html:7
+#: manufacturing/templates/maint_schedule_list.html:7
 #: manufacturing/templates/prod_daily_report.html:10
 #: manufacturing/templates/prod_dashboard.html:6
 #: manufacturing/templates/prod_dashboard.html:58
@@ -1578,6 +1666,9 @@ msgstr "Konstruktion"
 
 #: manufacturing/templates/base.html:558
 #: manufacturing/templates/dashboard_kpis.html:24
+#: manufacturing/templates/maint_oee_report.html:90
+#: manufacturing/templates/maint_oee_report.html:120
+#: manufacturing/templates/maint_oee_report.html:166
 msgid "Quality"
 msgstr "Qualität"
 
@@ -1736,6 +1827,9 @@ msgid "Email"
 msgstr "E-Mail"
 
 #: manufacturing/templates/credit_account_detail.html:82
+#: manufacturing/templates/maint_mechanic_detail.html:91
+#: manufacturing/templates/maint_mechanics_list.html:75
+#: manufacturing/templates/maint_mechanics_list.html:116
 msgid "Phone"
 msgstr "Telefon"
 
@@ -1774,6 +1868,9 @@ msgstr "Geändert von"
 #: manufacturing/templates/cs_returns_detail.html:110
 #: manufacturing/templates/cs_returns_list.html:80
 #: manufacturing/templates/cs_returns_list.html:113
+#: manufacturing/templates/maint_downtime_detail.html:118
+#: manufacturing/templates/maint_downtime_list.html:78
+#: manufacturing/templates/maint_downtime_list.html:129
 #: manufacturing/templates/prod_returns_detail.html:69
 #: manufacturing/templates/prod_returns_detail.html:111
 #: manufacturing/templates/prod_returns_list.html:82
@@ -1847,6 +1944,10 @@ msgstr "Inkassoaktivitäten"
 #: manufacturing/templates/legal_litigation_detail.html:106
 #: manufacturing/templates/legal_litigation_list.html:91
 #: manufacturing/templates/legal_litigation_list.html:134
+#: manufacturing/templates/maint_inspection_detail.html:99
+#: manufacturing/templates/maint_inspection_list.html:78
+#: manufacturing/templates/maint_inspection_list.html:113
+#: manufacturing/templates/maint_wo_list.html:80
 #: manufacturing/templates/mkt_content_detail.html:59
 #: manufacturing/templates/mkt_content_detail.html:98
 #: manufacturing/templates/mkt_content_list.html:85
@@ -1910,6 +2011,7 @@ msgstr "Kreditkonten"
 #: manufacturing/templates/legal_governance_list.html:59
 #: manufacturing/templates/legal_ip_list.html:60
 #: manufacturing/templates/legal_litigation_list.html:68
+#: manufacturing/templates/maint_labor_report.html:60
 #: manufacturing/templates/mkt_ad_list.html:71
 #: manufacturing/templates/mkt_budget_list.html:62
 #: manufacturing/templates/mkt_campaign_list.html:66
@@ -2262,6 +2364,7 @@ msgstr "Offene Tickets"
 #: manufacturing/templates/it_task_list.html:87
 #: manufacturing/templates/legal_compliance_list.html:85
 #: manufacturing/templates/legal_dashboard.html:83
+#: manufacturing/templates/maint_inspection_list.html:79
 #: manufacturing/templates/mkt_analytics.html:143
 #: manufacturing/templates/prod_performance_report.html:60
 #: manufacturing/templates/prod_performance_report.html:83
@@ -2488,6 +2591,9 @@ msgstr "Tage offen"
 #: manufacturing/templates/it_ticket_detail.html:157
 #: manufacturing/templates/it_ticket_list.html:67
 #: manufacturing/templates/it_ticket_list.html:125
+#: manufacturing/templates/maint_wo_detail.html:132
+#: manufacturing/templates/maint_wo_list.html:81
+#: manufacturing/templates/maint_wo_list.html:115
 msgid "Priority"
 msgstr "Priorität"
 
@@ -2581,6 +2687,8 @@ msgstr "Artikel bearbeiten"
 #: manufacturing/templates/legal_dashboard.html:142
 #: manufacturing/templates/legal_ip_list.html:74
 #: manufacturing/templates/legal_ip_list.html:103
+#: manufacturing/templates/maint_labor_report.html:94
+#: manufacturing/templates/maint_wo_list.html:80
 #: manufacturing/templates/mkt_content_detail.html:94
 #: manufacturing/templates/mkt_content_list.html:84
 #: manufacturing/templates/mkt_content_list.html:118
@@ -2605,6 +2713,12 @@ msgstr "Titel"
 #: manufacturing/templates/finance_budget_detail.html:152
 #: manufacturing/templates/legal_governance_list.html:73
 #: manufacturing/templates/legal_governance_list.html:105
+#: manufacturing/templates/maint_downtime_detail.html:70
+#: manufacturing/templates/maint_downtime_list.html:78
+#: manufacturing/templates/maint_downtime_list.html:111
+#: manufacturing/templates/maint_part_detail.html:63
+#: manufacturing/templates/maint_parts_list.html:77
+#: manufacturing/templates/maint_parts_list.html:114
 #: manufacturing/templates/mkt_budget_list.html:82
 #: manufacturing/templates/mkt_budget_list.html:120
 #: manufacturing/templates/payroll_deductions.html:56
@@ -2736,6 +2850,13 @@ msgstr "Verbesserungspläne"
 #: manufacturing/templates/legal_compliance_list.html:14
 #: manufacturing/templates/legal_contract_list.html:14
 #: manufacturing/templates/legal_litigation_list.html:14
+#: manufacturing/templates/maint_downtime_list.html:10
+#: manufacturing/templates/maint_equipment_list.html:10
+#: manufacturing/templates/maint_inspection_list.html:9
+#: manufacturing/templates/maint_mechanics_list.html:9
+#: manufacturing/templates/maint_oee_report.html:8
+#: manufacturing/templates/maint_parts_list.html:9
+#: manufacturing/templates/maint_schedule_list.html:10
 #: manufacturing/templates/mkt_ad_list.html:15
 #: manufacturing/templates/mkt_campaign_list.html:12
 #: manufacturing/templates/mkt_lead_list.html:12
@@ -2764,6 +2885,12 @@ msgstr "CSV"
 #: manufacturing/templates/legal_compliance_list.html:15
 #: manufacturing/templates/legal_contract_list.html:15
 #: manufacturing/templates/legal_litigation_list.html:15
+#: manufacturing/templates/maint_downtime_list.html:11
+#: manufacturing/templates/maint_equipment_list.html:11
+#: manufacturing/templates/maint_inspection_list.html:10
+#: manufacturing/templates/maint_mechanics_list.html:10
+#: manufacturing/templates/maint_parts_list.html:10
+#: manufacturing/templates/maint_schedule_list.html:11
 #: manufacturing/templates/mkt_ad_list.html:16
 #: manufacturing/templates/mkt_campaign_list.html:13
 #: manufacturing/templates/mkt_lead_list.html:13
@@ -2872,6 +2999,13 @@ msgstr "CS-Verbesserungspläne"
 #: manufacturing/templates/eng_projects.html:52
 #: manufacturing/templates/eng_projects.html:59
 #: manufacturing/templates/gl_journals.html:40
+#: manufacturing/templates/maint_downtime_list.html:63
+#: manufacturing/templates/maint_equipment_list.html:63
+#: manufacturing/templates/maint_inspection_list.html:63
+#: manufacturing/templates/maint_mechanics_list.html:60
+#: manufacturing/templates/maint_parts_list.html:62
+#: manufacturing/templates/maint_schedule_list.html:58
+#: manufacturing/templates/maint_wo_list.html:64
 #: manufacturing/templates/qa_audit_list.html:59
 #: manufacturing/templates/qa_capa_list.html:67
 #: manufacturing/templates/qa_inspection_list.html:63
@@ -3537,6 +3671,7 @@ msgstr "Nummer"
 #: manufacturing/templates/eng_reports.html:101
 #: manufacturing/templates/it_ticket_list.html:70
 #: manufacturing/templates/maint_dashboard.html:84
+#: manufacturing/templates/maint_wo_list.html:81
 msgid "Due"
 msgstr "Fällig"
 
@@ -3670,6 +3805,7 @@ msgstr "Beginn"
 
 #: manufacturing/templates/eng_project_detail.html:129
 #: manufacturing/templates/eng_tasks_list.html:89
+#: manufacturing/templates/maint_schedule_list.html:73
 msgid "Task"
 msgstr "Aufgabe"
 
@@ -3696,6 +3832,11 @@ msgstr "Aufgabe"
 #: manufacturing/templates/it_ticket_detail.html:165
 #: manufacturing/templates/it_ticket_list.html:71
 #: manufacturing/templates/it_ticket_list.html:133
+#: manufacturing/templates/maint_schedule_detail.html:121
+#: manufacturing/templates/maint_schedule_list.html:74
+#: manufacturing/templates/maint_schedule_list.html:118
+#: manufacturing/templates/maint_wo_detail.html:144
+#: manufacturing/templates/maint_wo_list.html:81
 msgid "Assigned To"
 msgstr "Zugewiesen an"
 
@@ -3739,6 +3880,13 @@ msgstr "Aufgabe speichern"
 #: manufacturing/templates/gl_accounts.html:115
 #: manufacturing/templates/it_incident_detail.html:82
 #: manufacturing/templates/it_task_detail.html:98
+#: manufacturing/templates/maint_downtime_detail.html:137
+#: manufacturing/templates/maint_equipment_detail.html:146
+#: manufacturing/templates/maint_inspection_detail.html:166
+#: manufacturing/templates/maint_mechanic_detail.html:122
+#: manufacturing/templates/maint_part_detail.html:144
+#: manufacturing/templates/maint_schedule_detail.html:161
+#: manufacturing/templates/maint_wo_detail.html:207
 #: manufacturing/templates/payroll_pay_rates.html:131
 #: manufacturing/templates/qa_audit_detail.html:156
 #: manufacturing/templates/qa_capa_detail.html:143
@@ -3903,6 +4051,10 @@ msgstr ""
 
 #: manufacturing/templates/eng_task_detail.html:80
 #: manufacturing/templates/eng_tasks_list.html:136
+#: manufacturing/templates/maint_schedule_detail.html:124
+#: manufacturing/templates/maint_schedule_list.html:120
+#: manufacturing/templates/maint_wo_detail.html:147
+#: manufacturing/templates/maint_wo_list.html:133
 msgid "— Unassigned —"
 msgstr "— Nicht zugewiesen —"
 
@@ -3933,6 +4085,7 @@ msgid "Describe the task"
 msgstr "Beschreiben Sie die Aufgabe"
 
 #: manufacturing/templates/eng_tasks_list.html:127
+#: manufacturing/templates/maint_part_detail.html:123
 #: manufacturing/templates/prod_returns_detail.html:102
 #: manufacturing/templates/prod_returns_list.html:117
 #: manufacturing/templates/prod_shipping_detail.html:97
@@ -4077,6 +4230,8 @@ msgstr "Prüfer"
 #: manufacturing/templates/finance_audit_list.html:138
 #: manufacturing/templates/it_task_detail.html:80
 #: manufacturing/templates/it_task_list.html:139
+#: manufacturing/templates/maint_inspection_detail.html:131
+#: manufacturing/templates/maint_inspection_list.html:123
 #: manufacturing/templates/qa_audit_detail.html:121
 #: manufacturing/templates/qa_audit_list.html:113
 msgid "Scheduled Date"
@@ -4086,6 +4241,8 @@ msgstr "Geplantes Datum"
 #: manufacturing/templates/it_repairs_detail.html:88
 #: manufacturing/templates/legal_compliance_detail.html:70
 #: manufacturing/templates/legal_compliance_detail.html:113
+#: manufacturing/templates/maint_inspection_detail.html:139
+#: manufacturing/templates/maint_wo_detail.html:176
 #: manufacturing/templates/qa_audit_detail.html:129
 #: manufacturing/templates/qa_capa_detail.html:124
 msgid "Completed Date"
@@ -4094,6 +4251,7 @@ msgstr "Abschlussdatum"
 #: manufacturing/templates/finance_audit_detail.html:111
 #: manufacturing/templates/finance_audit_list.html:88
 #: manufacturing/templates/it_task_detail.html:111
+#: manufacturing/templates/maint_inspection_list.html:79
 #: manufacturing/templates/qa_audit_list.html:70
 msgid "Scheduled"
 msgstr "Geplant"
@@ -4720,6 +4878,8 @@ msgstr "Kapitalflussrechnung (Indirekte Methode)"
 
 #: manufacturing/templates/gl_cash_flow_statement.html:55
 #: manufacturing/templates/gl_income_statement.html:53
+#: manufacturing/templates/maint_labor_report.html:57
+#: manufacturing/templates/maint_oee_report.html:62
 #: manufacturing/templates/prod_labor_report.html:57
 #: manufacturing/templates/tc_ot_report.html:49
 #: manufacturing/templates/tc_schedule.html:50
@@ -5236,6 +5396,12 @@ msgstr "Name des Lieferanten"
 #: manufacturing/templates/it_network_detail.html:145
 #: manufacturing/templates/it_network_list.html:73
 #: manufacturing/templates/it_network_list.html:138
+#: manufacturing/templates/maint_equipment_detail.html:90
+#: manufacturing/templates/maint_equipment_list.html:78
+#: manufacturing/templates/maint_equipment_list.html:113
+#: manufacturing/templates/maint_part_detail.html:75
+#: manufacturing/templates/maint_parts_list.html:78
+#: manufacturing/templates/maint_parts_list.html:120
 #: manufacturing/templates/tc_device_form.html:97
 #: manufacturing/templates/tc_device_list.html:41
 msgid "Location"
@@ -5323,6 +5489,9 @@ msgstr "Suche nach Kennung / Marke / Modell…"
 #: manufacturing/templates/it_software_detail.html:111
 #: manufacturing/templates/it_software_list.html:61
 #: manufacturing/templates/it_software_list.html:109
+#: manufacturing/templates/maint_equipment_detail.html:70
+#: manufacturing/templates/maint_equipment_list.html:78
+#: manufacturing/templates/maint_equipment_list.html:109
 msgid "Asset Tag"
 msgstr "Anlagenkennung"
 
@@ -5483,6 +5652,13 @@ msgstr "Alle Schweregrade"
 #: manufacturing/templates/it_incident_list.html:52
 #: manufacturing/templates/it_task_list.html:53
 #: manufacturing/templates/it_ticket_list.html:53
+#: manufacturing/templates/maint_downtime_list.html:70
+#: manufacturing/templates/maint_equipment_list.html:70
+#: manufacturing/templates/maint_inspection_list.html:70
+#: manufacturing/templates/maint_mechanics_list.html:67
+#: manufacturing/templates/maint_parts_list.html:69
+#: manufacturing/templates/maint_schedule_list.html:65
+#: manufacturing/templates/maint_wo_list.html:71
 #: manufacturing/templates/qa_capa_list.html:75
 #: manufacturing/templates/qa_inspection_list.html:71
 #: manufacturing/templates/qa_ncr_list.html:77
@@ -5554,6 +5730,8 @@ msgstr "Genutzte Plätze / Gesamt"
 
 #: manufacturing/templates/it_license_detail.html:86
 #: manufacturing/templates/it_license_list.html:67
+#: manufacturing/templates/maint_downtime_list.html:79
+#: manufacturing/templates/maint_labor_report.html:140
 #: manufacturing/templates/prod_labor_report.html:139
 msgid "Cost"
 msgstr "Kosten"
@@ -5596,6 +5774,8 @@ msgstr "Genutzte Plätze"
 
 #: manufacturing/templates/it_license_detail.html:147
 #: manufacturing/templates/it_license_list.html:136
+#: manufacturing/templates/maint_downtime_detail.html:110
+#: manufacturing/templates/maint_downtime_list.html:125
 msgid "Cost ($)"
 msgstr "Kosten ($)"
 
@@ -5689,6 +5869,9 @@ msgstr "Gerätetyp"
 #: manufacturing/templates/it_network_detail.html:81
 #: manufacturing/templates/it_network_detail.html:137
 #: manufacturing/templates/it_network_list.html:130
+#: manufacturing/templates/maint_equipment_detail.html:98
+#: manufacturing/templates/maint_equipment_list.html:79
+#: manufacturing/templates/maint_equipment_list.html:117
 msgid "Manufacturer"
 msgstr "Hersteller"
 
@@ -5852,6 +6035,8 @@ msgstr "Software Nr. %(num)s"
 #: manufacturing/templates/it_software_detail.html:115
 #: manufacturing/templates/it_software_list.html:62
 #: manufacturing/templates/it_software_list.html:113
+#: manufacturing/templates/maint_equipment_detail.html:106
+#: manufacturing/templates/maint_equipment_list.html:121
 msgid "Install Date"
 msgstr "Installationsdatum"
 
@@ -5924,6 +6109,9 @@ msgid "Task #"
 msgstr "Aufgaben-Nr."
 
 #: manufacturing/templates/it_task_detail.html:106
+#: manufacturing/templates/maint_equipment_list.html:78
+#: manufacturing/templates/maint_mechanics_list.html:75
+#: manufacturing/templates/maint_parts_list.html:77
 #: manufacturing/templates/marketing_dashboard.html:149
 #: manufacturing/templates/mkt_campaign_detail.html:98
 #: manufacturing/templates/mkt_campaign_list.html:86
@@ -6429,11 +6617,27 @@ msgstr "Instandhaltungs-Dashboard"
 
 #: manufacturing/templates/maint_dashboard.html:7
 #: manufacturing/templates/maint_dashboard.html:129
+#: manufacturing/templates/maint_downtime_list.html:8
+#: manufacturing/templates/maint_downtime_list.html:78
+#: manufacturing/templates/maint_equipment_list.html:3
+#: manufacturing/templates/maint_equipment_list.html:57
+#: manufacturing/templates/maint_labor_report.html:94
+#: manufacturing/templates/maint_schedule_detail.html:89
+#: manufacturing/templates/maint_schedule_list.html:8
+#: manufacturing/templates/maint_schedule_list.html:73
+#: manufacturing/templates/maint_schedule_list.html:108
+#: manufacturing/templates/maint_wo_detail.html:112
+#: manufacturing/templates/maint_wo_list.html:7
+#: manufacturing/templates/maint_wo_list.html:80
+#: manufacturing/templates/maint_wo_list.html:121
 msgid "Equipment"
 msgstr "Anlagen"
 
 #: manufacturing/templates/maint_dashboard.html:8
 #: manufacturing/templates/maint_dashboard.html:133
+#: manufacturing/templates/maint_equipment_list.html:8
+#: manufacturing/templates/maint_schedule_list.html:3
+#: manufacturing/templates/maint_wo_list.html:8
 msgid "PM Schedule"
 msgstr "Wartungsplan"
 
@@ -6448,6 +6652,7 @@ msgstr "Inspektionen"
 
 #: manufacturing/templates/maint_dashboard.html:10
 #: manufacturing/templates/maint_dashboard.html:141
+#: manufacturing/templates/maint_downtime_list.html:3
 msgid "Downtime"
 msgstr "Ausfallzeit"
 
@@ -6458,10 +6663,13 @@ msgstr "Ersatzteile"
 
 #: manufacturing/templates/maint_dashboard.html:12
 #: manufacturing/templates/maint_dashboard.html:149
+#: manufacturing/templates/maint_mechanics_list.html:3
+#: manufacturing/templates/maint_mechanics_list.html:54
 msgid "Mechanics"
 msgstr "Mechaniker"
 
 #: manufacturing/templates/maint_dashboard.html:13
+#: manufacturing/templates/maint_oee_report.html:121
 msgid "OEE"
 msgstr "OEE"
 
@@ -6520,6 +6728,8 @@ msgid "Downtime Hours by Category (last 3 mo)"
 msgstr "Ausfallstunden nach Kategorie (letzte 3 Monate)"
 
 #: manufacturing/templates/maint_dashboard.html:153
+#: manufacturing/templates/maint_oee_report.html:3
+#: manufacturing/templates/maint_oee_report.html:51
 msgid "OEE Report"
 msgstr "OEE-Bericht"
 
@@ -6555,6 +6765,778 @@ msgstr "Aktive Ausfallereignisse"
 #: manufacturing/templates/maint_dashboard_kpis.html:29
 msgid "OEE (month to date)"
 msgstr "OEE (laufender Monat)"
+
+#: manufacturing/templates/maint_downtime_detail.html:3
+#, python-format
+msgid "Downtime #%(num)s"
+msgstr "Ausfallzeit Nr. %(num)s"
+
+#: manufacturing/templates/maint_downtime_detail.html:6
+msgid "All Downtime"
+msgstr "Alle Ausfallzeiten"
+
+#: manufacturing/templates/maint_downtime_detail.html:40
+#, python-format
+msgid "Downtime: %(equipment)s"
+msgstr "Ausfallzeit: %(equipment)s"
+
+#: manufacturing/templates/maint_downtime_detail.html:46
+#: manufacturing/templates/qa_inspection_detail.html:209
+msgid "Resolve"
+msgstr "Beheben"
+
+#: manufacturing/templates/maint_downtime_detail.html:50
+msgid "Mark Resolved"
+msgstr "Als Behoben Markieren"
+
+#: manufacturing/templates/maint_downtime_detail.html:56
+msgid "Downtime Details"
+msgstr "Details zur Ausfallzeit"
+
+#: manufacturing/templates/maint_downtime_detail.html:62
+#: manufacturing/templates/maint_downtime_list.html:107
+msgid "Equipment *"
+msgstr "Ausrüstung *"
+
+#: manufacturing/templates/maint_downtime_detail.html:102
+#: manufacturing/templates/maint_downtime_list.html:121
+msgid "Hours Down"
+msgstr "Ausfallstunden"
+
+#: manufacturing/templates/maint_downtime_list.html:57
+msgid "Equipment Downtime"
+msgstr "Anlagenausfallzeit"
+
+#: manufacturing/templates/maint_downtime_list.html:71
+#: manufacturing/templates/maint_equipment_list.html:71
+#: manufacturing/templates/maint_inspection_list.html:71
+#: manufacturing/templates/maint_labor_report.html:65
+#: manufacturing/templates/maint_mechanics_list.html:68
+#: manufacturing/templates/maint_oee_report.html:64
+#: manufacturing/templates/maint_parts_list.html:70
+#: manufacturing/templates/maint_schedule_list.html:66
+#: manufacturing/templates/maint_wo_list.html:72
+#: manufacturing/templates/payroll_pay_rates.html:57
+#: manufacturing/templates/prod_labor_report.html:65
+#: manufacturing/templates/qa_capa_list.html:76
+#: manufacturing/templates/qa_inspection_list.html:72
+#: manufacturing/templates/qa_ncr_list.html:78
+#: manufacturing/templates/qa_supplier_list.html:76
+msgid "Go"
+msgstr "Los"
+
+#: manufacturing/templates/maint_downtime_list.html:79
+#: manufacturing/templates/time_clock_attendance.html:88
+#: manufacturing/templates/time_clock_hours.html:63
+#: manufacturing/templates/time_clock_status.html:91
+msgid "Hours"
+msgstr "Stunden"
+
+#: manufacturing/templates/maint_downtime_list.html:97
+msgid "No downtime records found."
+msgstr "Keine Ausfallzeit-Datensätze gefunden."
+
+#: manufacturing/templates/maint_downtime_list.html:102
+msgid "Log Downtime Event"
+msgstr "Ausfallereignis Erfassen"
+
+#: manufacturing/templates/maint_downtime_list.html:137
+msgid "Log Event"
+msgstr "Ereignis Erfassen"
+
+#: manufacturing/templates/maint_equipment_detail.html:6
+msgid "All Equipment"
+msgstr "Alle Ausrüstung"
+
+#: manufacturing/templates/maint_equipment_detail.html:57
+msgid "Equipment Details"
+msgstr "Ausrüstungsdetails"
+
+#: manufacturing/templates/maint_equipment_detail.html:62
+#: manufacturing/templates/maint_equipment_list.html:105
+#: manufacturing/templates/maint_mechanic_detail.html:47
+#: manufacturing/templates/maint_mechanics_list.html:100
+#: manufacturing/templates/maint_part_detail.html:47
+#: manufacturing/templates/maint_parts_list.html:106
+msgid "Name *"
+msgstr "Name *"
+
+#: manufacturing/templates/maint_equipment_detail.html:114
+#: manufacturing/templates/maint_equipment_list.html:79
+#: manufacturing/templates/maint_equipment_list.html:125
+msgid "Last Service"
+msgstr "Letzter Service"
+
+#: manufacturing/templates/maint_equipment_detail.html:122
+msgid "Parent Equipment"
+msgstr "Übergeordnete Ausrüstung"
+
+#: manufacturing/templates/maint_equipment_detail.html:125
+msgid "— Top level —"
+msgstr "— Oberste Ebene —"
+
+#: manufacturing/templates/maint_equipment_detail.html:154
+msgid "Sub-Equipment"
+msgstr "Unterausrüstung"
+
+#: manufacturing/templates/maint_equipment_detail.html:163
+msgid "Spare Parts On File For This Equipment"
+msgstr "Für Diese Ausrüstung Hinterlegte Ersatzteile"
+
+#: manufacturing/templates/maint_equipment_detail.html:165
+#, python-format
+msgid "qty %(qty)s"
+msgstr "Menge %(qty)s"
+
+#: manufacturing/templates/maint_equipment_list.html:95
+msgid "No equipment found."
+msgstr "Keine Ausrüstung gefunden."
+
+#: manufacturing/templates/maint_equipment_list.html:100
+#: manufacturing/templates/maint_equipment_list.html:139
+msgid "Add Equipment"
+msgstr "Ausrüstung Hinzufügen"
+
+#: manufacturing/templates/maint_inspection_detail.html:3
+#, python-format
+msgid "Inspection #%(num)s"
+msgstr "Inspektion Nr. %(num)s"
+
+#: manufacturing/templates/maint_inspection_detail.html:6
+#: manufacturing/templates/qa_inspection_detail.html:6
+msgid "All Inspections"
+msgstr "Alle Inspektionen"
+
+#: manufacturing/templates/maint_inspection_detail.html:54
+#, python-format
+msgid "Inspection: %(area)s"
+msgstr "Inspektion: %(area)s"
+
+#: manufacturing/templates/maint_inspection_detail.html:57
+msgid "This inspection is past its scheduled date."
+msgstr "Diese Inspektion hat ihr geplantes Datum überschritten."
+
+#: manufacturing/templates/maint_inspection_detail.html:62
+msgid "Complete Inspection"
+msgstr "Inspektion Abschließen"
+
+#: manufacturing/templates/maint_inspection_detail.html:68
+#: manufacturing/templates/maint_inspection_detail.html:147
+#: manufacturing/templates/maint_inspection_list.html:79
+#: manufacturing/templates/qa_audit_detail.html:137
+#: manufacturing/templates/qa_inspection_detail.html:104
+#: manufacturing/templates/qa_inspection_list.html:81
+#: manufacturing/templates/qa_reports.html:184
+msgid "Result"
+msgstr "Ergebnis"
+
+#: manufacturing/templates/maint_inspection_detail.html:69
+msgid "Pass / Fail / Notes"
+msgstr "Bestanden / Nicht Bestanden / Notizen"
+
+#: manufacturing/templates/maint_inspection_detail.html:73
+#: manufacturing/templates/mkt_research_detail.html:89
+#: manufacturing/templates/mkt_research_detail.html:149
+#: manufacturing/templates/qa_audit_detail.html:62
+#: manufacturing/templates/qa_audit_detail.html:145
+msgid "Findings"
+msgstr "Ergebnisse"
+
+#: manufacturing/templates/maint_inspection_detail.html:77
+#: manufacturing/templates/maint_schedule_detail.html:64
+#: manufacturing/templates/maint_wo_detail.html:80
+#: manufacturing/templates/qa_audit_detail.html:68
+msgid "Mark Complete"
+msgstr "Als Abgeschlossen Markieren"
+
+#: manufacturing/templates/maint_inspection_detail.html:85
+#: manufacturing/templates/qa_inspection_detail.html:89
+msgid "Inspection Details"
+msgstr "Inspektionsdetails"
+
+#: manufacturing/templates/maint_inspection_detail.html:91
+#: manufacturing/templates/maint_inspection_list.html:109
+msgid "Area *"
+msgstr "Bereich *"
+
+#: manufacturing/templates/maint_inspection_detail.html:123
+#: manufacturing/templates/maint_inspection_list.html:78
+#: manufacturing/templates/maint_inspection_list.html:119
+#: manufacturing/templates/qa_inspection_detail.html:96
+#: manufacturing/templates/qa_inspection_list.html:80
+#: manufacturing/templates/qa_inspection_list.html:132
+msgid "Inspector"
+msgstr "Inspektor"
+
+#: manufacturing/templates/maint_inspection_list.html:3
+#: manufacturing/templates/maint_inspection_list.html:57
+msgid "Safety Inspections"
+msgstr "Sicherheitsinspektionen"
+
+#: manufacturing/templates/maint_inspection_list.html:78
+msgid "Area"
+msgstr "Bereich"
+
+#: manufacturing/templates/maint_inspection_list.html:99
+#: manufacturing/templates/qa_inspection_list.html:104
+msgid "No inspections found."
+msgstr "Keine Inspektionen gefunden."
+
+#: manufacturing/templates/maint_inspection_list.html:104
+msgid "Schedule Inspection"
+msgstr "Inspektion Planen"
+
+#: manufacturing/templates/maint_inspection_list.html:110
+msgid "e.g. Welding Bay"
+msgstr "z. B. Schweißbereich"
+
+#: manufacturing/templates/maint_inspection_list.html:131
+#: manufacturing/templates/prod_dashboard.html:7
+#: manufacturing/templates/prod_reports.html:7
+#: manufacturing/templates/prod_schedule.html:7
+#: manufacturing/templates/prod_shipping_detail.html:8
+#: manufacturing/templates/prod_shipping_list.html:7
+#: manufacturing/templates/report_builder_list.html:23
+#: manufacturing/templates/tc_schedule.html:3
+msgid "Schedule"
+msgstr "Zeitplan"
+
+#: manufacturing/templates/maint_labor_report.html:3
+#: manufacturing/templates/prod_labor_report.html:3
+msgid "Labor Time & Cost Report"
+msgstr "Arbeitszeit- und Kostenbericht"
+
+#: manufacturing/templates/maint_labor_report.html:7
+#: manufacturing/templates/prod_labor_report.html:7
+msgid "WO CSV"
+msgstr "FA-CSV"
+
+#: manufacturing/templates/maint_labor_report.html:8
+msgid "Mechanic CSV"
+msgstr "Mechaniker-CSV"
+
+#: manufacturing/templates/maint_labor_report.html:46
+#: manufacturing/templates/prod_labor_report.html:46
+msgid "Labor Time &amp; Cost Report"
+msgstr "Arbeitszeit- und Kostenbericht"
+
+#: manufacturing/templates/maint_labor_report.html:49
+#: manufacturing/templates/maint_oee_report.html:54
+#: manufacturing/templates/prod_labor_report.html:49
+#: manufacturing/templates/reports_dashboard.html:241
+#: manufacturing/templates/time_clock_hours.html:45
+msgid "Today"
+msgstr "Heute"
+
+#: manufacturing/templates/maint_labor_report.html:50
+#: manufacturing/templates/maint_oee_report.html:55
+#: manufacturing/templates/prod_labor_report.html:50
+#: manufacturing/templates/time_clock_hours.html:47
+msgid "This Week"
+msgstr "Diese Woche"
+
+#: manufacturing/templates/maint_labor_report.html:51
+#: manufacturing/templates/maint_oee_report.html:56
+#: manufacturing/templates/prod_labor_report.html:51
+#: manufacturing/templates/time_clock_hours.html:49
+msgid "This Month"
+msgstr "Diesen Monat"
+
+#: manufacturing/templates/maint_labor_report.html:52
+#: manufacturing/templates/maint_oee_report.html:57
+#: manufacturing/templates/prod_labor_report.html:52
+msgid "This Quarter"
+msgstr "Dieses Quartal"
+
+#: manufacturing/templates/maint_labor_report.html:53
+#: manufacturing/templates/maint_oee_report.html:58
+#: manufacturing/templates/prod_labor_report.html:53
+msgid "This Year"
+msgstr "Dieses Jahr"
+
+#: manufacturing/templates/maint_labor_report.html:77
+msgid "Estimated / Actual Hours"
+msgstr "Geschätzte / Tatsächliche Stunden"
+
+#: manufacturing/templates/maint_labor_report.html:81
+#: manufacturing/templates/prod_labor_report.html:81
+msgid "Total Labor Cost (by WO)"
+msgstr "Gesamte Arbeitskosten (nach FA)"
+
+#: manufacturing/templates/maint_labor_report.html:85
+msgid "Mechanics with Tracked Time"
+msgstr "Mechaniker mit Erfasster Zeit"
+
+#: manufacturing/templates/maint_labor_report.html:90
+#: manufacturing/templates/prod_labor_report.html:90
+msgid "Work Order Time Variance"
+msgstr "Zeitabweichung der Fertigungsaufträge"
+
+#: manufacturing/templates/maint_labor_report.html:94
+#: manufacturing/templates/maint_labor_report.html:140
+#: manufacturing/templates/prod_daily_report.html:81
+#: manufacturing/templates/prod_dashboard.html:110
+#: manufacturing/templates/prod_labor_report.html:94
+#: manufacturing/templates/prod_labor_report.html:139
+#: manufacturing/templates/prod_reports.html:111
+#: manufacturing/templates/prod_schedule.html:66
+msgid "WO #"
+msgstr "FA-Nr."
+
+#: manufacturing/templates/maint_labor_report.html:95
+#: manufacturing/templates/maint_labor_report.html:127
+#: manufacturing/templates/maint_labor_report.html:140
+msgid "Est. Hrs"
+msgstr "Gesch. Std."
+
+#: manufacturing/templates/maint_labor_report.html:95
+#: manufacturing/templates/maint_labor_report.html:127
+#: manufacturing/templates/maint_labor_report.html:140
+#: manufacturing/templates/prod_labor_report.html:95
+#: manufacturing/templates/prod_labor_report.html:126
+#: manufacturing/templates/prod_labor_report.html:139
+msgid "Actual Hrs"
+msgstr "Ist-Std."
+
+#: manufacturing/templates/maint_labor_report.html:96
+#: manufacturing/templates/maint_labor_report.html:128
+#: manufacturing/templates/prod_labor_report.html:96
+#: manufacturing/templates/prod_labor_report.html:127
+msgid "Variance"
+msgstr "Abweichung"
+
+#: manufacturing/templates/maint_labor_report.html:96
+#: manufacturing/templates/maint_labor_report.html:128
+#: manufacturing/templates/prod_labor_report.html:96
+#: manufacturing/templates/prod_labor_report.html:127
+#, python-format
+msgid "Variance %%"
+msgstr "Abweichung %%"
+
+#: manufacturing/templates/maint_labor_report.html:97
+#: manufacturing/templates/prod_labor_report.html:97
+msgid "Labor Cost"
+msgstr "Arbeitskosten"
+
+#: manufacturing/templates/maint_labor_report.html:115
+msgid "No work orders with estimated/actual hours in this range."
+msgstr "Keine Arbeitsaufträge mit geschätzten/tatsächlichen Stunden in diesem Zeitraum."
+
+#: manufacturing/templates/maint_labor_report.html:122
+msgid "Labor by Mechanic"
+msgstr "Arbeitszeit nach Mechaniker"
+
+#: manufacturing/templates/maint_labor_report.html:126
+msgid "Mechanic"
+msgstr "Mechaniker"
+
+#: manufacturing/templates/maint_labor_report.html:126
+#: manufacturing/templates/prod_labor_report.html:125
+msgid "WO Count"
+msgstr "Anzahl FA"
+
+#: manufacturing/templates/maint_labor_report.html:129
+#: manufacturing/templates/maint_mechanic_detail.html:99
+#: manufacturing/templates/maint_mechanics_list.html:127
+msgid "Hourly Rate"
+msgstr "Stundensatz"
+
+#: manufacturing/templates/maint_labor_report.html:129
+#: manufacturing/templates/prod_labor_report.html:128
+msgid "Total Cost"
+msgstr "Gesamtkosten"
+
+#: manufacturing/templates/maint_labor_report.html:138
+#: manufacturing/templates/prod_labor_report.html:137
+#, python-format
+msgid "%(counter)s WO"
+msgid_plural "%(counter)s WOs"
+msgstr[0] "%(counter)s FA"
+msgstr[1] "%(counter)s FA"
+
+#: manufacturing/templates/maint_labor_report.html:163
+msgid "No attributable mechanic labor in this range."
+msgstr "Keine zuordenbare Mechanikerarbeit in diesem Zeitraum."
+
+#: manufacturing/templates/maint_labor_report.html:168
+msgid ""
+"Cost uses each mechanic's Hourly Rate (set on their profile) applied to "
+"actual\n"
+"            hours on work orders assigned to them by name."
+msgstr "Die Kosten verwenden den Stundensatz jedes Mechanikers (im Profil festgelegt), angewendet auf die tatsächlichen\n            Stunden bei Arbeitsaufträgen, die ihm namentlich zugewiesen sind."
+
+#: manufacturing/templates/maint_mechanic_detail.html:6
+msgid "All Mechanics"
+msgstr "Alle Mechaniker"
+
+#: manufacturing/templates/maint_mechanic_detail.html:42
+msgid "Mechanic Details"
+msgstr "Mechanikerdetails"
+
+#: manufacturing/templates/maint_mechanic_detail.html:67
+#: manufacturing/templates/maint_mechanics_list.html:75
+#: manufacturing/templates/maint_mechanics_list.html:104
+msgid "Trade"
+msgstr "Gewerk"
+
+#: manufacturing/templates/maint_mechanic_detail.html:79
+#: manufacturing/templates/maint_mechanics_list.html:75
+#: manufacturing/templates/maint_mechanics_list.html:110
+msgid "Shift"
+msgstr "Schicht"
+
+#: manufacturing/templates/maint_mechanic_detail.html:107
+msgid "Hidden — Payroll/HR only"
+msgstr "Ausgeblendet — Nur Lohnbuchhaltung/Personal"
+
+#: manufacturing/templates/maint_mechanic_detail.html:107
+msgid "Compensation fields are only visible to Payroll, Personnel, or HR roles"
+msgstr "Vergütungsfelder sind nur für die Rollen Lohnbuchhaltung, Personal oder HR sichtbar"
+
+#: manufacturing/templates/maint_mechanics_list.html:90
+msgid "No mechanics found."
+msgstr "Keine Mechaniker gefunden."
+
+#: manufacturing/templates/maint_mechanics_list.html:95
+#: manufacturing/templates/maint_mechanics_list.html:136
+msgid "Add Mechanic"
+msgstr "Mechaniker Hinzufügen"
+
+#: manufacturing/templates/maint_oee_report.html:7
+msgid "Downtime Log"
+msgstr "Ausfallzeit-Protokoll"
+
+#: manufacturing/templates/maint_oee_report.html:74
+msgid "Overall OEE"
+msgstr "Gesamt-OEE"
+
+#: manufacturing/templates/maint_oee_report.html:75
+#, python-format
+msgid "World-class = 85%%"
+msgstr "Weltklasse = 85%%"
+
+#: manufacturing/templates/maint_oee_report.html:80
+#: manufacturing/templates/maint_oee_report.html:156
+msgid "Availability"
+msgstr "Verfügbarkeit"
+
+#: manufacturing/templates/maint_oee_report.html:81
+#, python-format
+msgid "%(sched)sh sched / %(down)sh down"
+msgstr "%(sched)sh geplant / %(down)sh Ausfall"
+
+#: manufacturing/templates/maint_oee_report.html:85
+#: manufacturing/templates/maint_oee_report.html:161
+#: manufacturing/templates/prod_daily_report.html:9
+#: manufacturing/templates/prod_performance_report.html:9
+msgid "Performance"
+msgstr "Leistung"
+
+#: manufacturing/templates/maint_oee_report.html:86
+msgid "Std vs actual run hours"
+msgstr "Standard- vs. tatsächliche Laufstunden"
+
+#: manufacturing/templates/maint_oee_report.html:91
+#, python-format
+msgid "%(scrap)s scrap / %(total)s total units"
+msgstr "%(scrap)s Ausschuss / %(total)s Einheiten gesamt"
+
+#: manufacturing/templates/maint_oee_report.html:98
+msgid "OEE Weekly Trend (last 12 weeks)"
+msgstr "Wöchentlicher OEE-Trend (letzte 12 Wochen)"
+
+#: manufacturing/templates/maint_oee_report.html:102
+msgid "OEE by Workcenter"
+msgstr "OEE nach Arbeitsplatz"
+
+#: manufacturing/templates/maint_oee_report.html:109
+msgid "Availability / Performance / Quality by Workcenter"
+msgstr "Verfügbarkeit / Leistung / Qualität nach Arbeitsplatz"
+
+#: manufacturing/templates/maint_oee_report.html:113
+msgid "Workcenter Detail"
+msgstr "Arbeitsplatzdetail"
+
+#: manufacturing/templates/maint_oee_report.html:117
+msgid "Workcenter"
+msgstr "Arbeitsplatz"
+
+#: manufacturing/templates/maint_oee_report.html:118
+msgid "Avail."
+msgstr "Verf."
+
+#: manufacturing/templates/maint_oee_report.html:119
+msgid "Perf."
+msgstr "Leist."
+
+#: manufacturing/templates/maint_oee_report.html:144
+#: manufacturing/templates/prod_schedule_gantt.html:82
+msgid "No active workcenters."
+msgstr "Keine aktiven Arbeitsplätze."
+
+#: manufacturing/templates/maint_oee_report.html:153
+msgid "How OEE is Calculated"
+msgstr "Wie der OEE Berechnet Wird"
+
+#: manufacturing/templates/maint_oee_report.html:157
+msgid "(Scheduled Hours − Downtime) ÷ Scheduled Hours"
+msgstr "(Geplante Stunden − Ausfallzeit) ÷ Geplante Stunden"
+
+#: manufacturing/templates/maint_oee_report.html:158
+msgid ""
+"Scheduled hours = workcenter capacity × calendar days. Downtime pulled from "
+"the downtime log by equipment name match."
+msgstr "Geplante Stunden = Arbeitsplatzkapazität × Kalendertage. Die Ausfallzeit wird durch Abgleich des Ausrüstungsnamens aus dem Ausfallzeit-Protokoll übernommen."
+
+#: manufacturing/templates/maint_oee_report.html:162
+msgid "Standard Hours ÷ Actual Hours"
+msgstr "Standardstunden ÷ Tatsächliche Stunden"
+
+#: manufacturing/templates/maint_oee_report.html:163
+msgid ""
+"From completed work order routing operations at each workcenter. Standard "
+"hours are set in the routing; actual hours are recorded at completion."
+msgstr "Aus abgeschlossenen Arbeitsplan-Operationen der Arbeitsaufträge an jedem Arbeitsplatz. Standardstunden werden im Arbeitsplan festgelegt; tatsächliche Stunden werden bei Abschluss erfasst."
+
+#: manufacturing/templates/maint_oee_report.html:167
+msgid "(Total Qty − Scrap) ÷ Total Qty"
+msgstr "(Gesamtmenge − Ausschuss) ÷ Gesamtmenge"
+
+#: manufacturing/templates/maint_oee_report.html:168
+msgid ""
+"Total quantity from work orders routed through this workcenter; scrap "
+"quantity recorded per routing step at completion."
+msgstr "Gesamtmenge der Arbeitsaufträge, die durch diesen Arbeitsplatz geleitet wurden; Ausschussmenge wird pro Arbeitsplanschritt bei Abschluss erfasst."
+
+#: manufacturing/templates/maint_part_detail.html:6
+msgid "All Parts"
+msgstr "Alle Teile"
+
+#: manufacturing/templates/maint_part_detail.html:42
+msgid "Part Details"
+msgstr "Teiledetails"
+
+#: manufacturing/templates/maint_part_detail.html:55
+#: manufacturing/templates/maint_parts_list.html:110
+msgid "Part Number"
+msgstr "Teilenummer"
+
+#: manufacturing/templates/maint_part_detail.html:83
+#: manufacturing/templates/maint_parts_list.html:124
+msgid "Quantity"
+msgstr "Menge"
+
+#: manufacturing/templates/maint_part_detail.html:91
+#: manufacturing/templates/maint_parts_list.html:128
+msgid "Reorder Level"
+msgstr "Meldebestand"
+
+#: manufacturing/templates/maint_part_detail.html:99
+#: manufacturing/templates/maint_parts_list.html:132
+msgid "Unit Cost ($)"
+msgstr "Stückkosten ($)"
+
+#: manufacturing/templates/maint_part_detail.html:120
+msgid "Fits Equipment"
+msgstr "Passend Für Ausrüstung"
+
+#: manufacturing/templates/maint_parts_list.html:3
+#: manufacturing/templates/maint_parts_list.html:56
+msgid "Maintenance Parts"
+msgstr "Wartungsteile"
+
+#: manufacturing/templates/maint_parts_list.html:77
+msgid "Part #"
+msgstr "Teile-Nr."
+
+#: manufacturing/templates/maint_parts_list.html:78
+#: manufacturing/templates/prod_daily_report.html:84
+#: manufacturing/templates/prod_schedule.html:69
+#: manufacturing/templates/prod_shipping_detail.html:153
+#: manufacturing/templates/prod_shipping_detail.html:180
+msgid "Qty"
+msgstr "Menge"
+
+#: manufacturing/templates/maint_parts_list.html:78
+#: manufacturing/templates/reports_dashboard.html:201
+msgid "Reorder At"
+msgstr "Meldebestand"
+
+#: manufacturing/templates/maint_parts_list.html:78
+msgid "Unit Cost"
+msgstr "Stückkosten"
+
+#: manufacturing/templates/maint_parts_list.html:96
+msgid "No parts found."
+msgstr "Keine Teile gefunden."
+
+#: manufacturing/templates/maint_parts_list.html:101
+#: manufacturing/templates/maint_parts_list.html:146
+msgid "Add Part"
+msgstr "Teil Hinzufügen"
+
+#: manufacturing/templates/maint_schedule_detail.html:3
+#, python-format
+msgid "PM Task #%(num)s"
+msgstr "IH-Aufgabe Nr. %(num)s"
+
+#: manufacturing/templates/maint_schedule_detail.html:6
+msgid "All PM Tasks"
+msgstr "Alle IH-Aufgaben"
+
+#: manufacturing/templates/maint_schedule_detail.html:57
+#, python-format
+msgid "PM Task: %(task)s"
+msgstr "IH-Aufgabe: %(task)s"
+
+#: manufacturing/templates/maint_schedule_detail.html:60
+msgid "This PM task is past its due date."
+msgstr "Diese IH-Aufgabe hat ihr Fälligkeitsdatum überschritten."
+
+#: manufacturing/templates/maint_schedule_detail.html:65
+msgid "Stamps today's date as last_done and sets status to Completed."
+msgstr "Setzt das heutige Datum als last_done und den Status auf Abgeschlossen."
+
+#: manufacturing/templates/maint_schedule_detail.html:69
+msgid "Mark Done"
+msgstr "Als Erledigt Markieren"
+
+#: manufacturing/templates/maint_schedule_detail.html:75
+msgid "Task Details"
+msgstr "Aufgabendetails"
+
+#: manufacturing/templates/maint_schedule_detail.html:81
+#: manufacturing/templates/maint_schedule_list.html:104
+msgid "Task *"
+msgstr "Aufgabe *"
+
+#: manufacturing/templates/maint_schedule_detail.html:109
+#: manufacturing/templates/maint_schedule_list.html:73
+#: manufacturing/templates/maint_schedule_list.html:112
+#: manufacturing/templates/report_builder_detail.html:65
+msgid "Frequency"
+msgstr "Häufigkeit"
+
+#: manufacturing/templates/maint_schedule_detail.html:134
+#: manufacturing/templates/maint_schedule_list.html:74
+#: manufacturing/templates/maint_schedule_list.html:125
+msgid "Last Done"
+msgstr "Zuletzt Erledigt"
+
+#: manufacturing/templates/maint_schedule_detail.html:142
+#: manufacturing/templates/maint_schedule_list.html:74
+#: manufacturing/templates/maint_schedule_list.html:129
+msgid "Next Due"
+msgstr "Nächste Fälligkeit"
+
+#: manufacturing/templates/maint_schedule_list.html:52
+msgid "Preventive Maintenance Schedule"
+msgstr "Vorbeugender Wartungsplan"
+
+#: manufacturing/templates/maint_schedule_list.html:94
+msgid "No schedule items found."
+msgstr "Keine Planelemente gefunden."
+
+#: manufacturing/templates/maint_schedule_list.html:99
+#: manufacturing/templates/maint_schedule_list.html:137
+msgid "Add PM Task"
+msgstr "IH-Aufgabe Hinzufügen"
+
+#: manufacturing/templates/maint_schedule_list.html:105
+msgid "e.g. Oil change"
+msgstr "z. B. Ölwechsel"
+
+#: manufacturing/templates/maint_wo_detail.html:3
+#, python-format
+msgid "WO #%(num)s"
+msgstr "AA Nr. %(num)s"
+
+#: manufacturing/templates/maint_wo_detail.html:6
+msgid "All WOs"
+msgstr "Alle AA"
+
+#: manufacturing/templates/maint_wo_detail.html:63
+#, python-format
+msgid "WO #%(num)s &mdash; %(title)s"
+msgstr "AA Nr. %(num)s &mdash; %(title)s"
+
+#: manufacturing/templates/maint_wo_detail.html:66
+msgid "This work order is past its due date."
+msgstr "Dieser Arbeitsauftrag hat sein Fälligkeitsdatum überschritten."
+
+#: manufacturing/templates/maint_wo_detail.html:70
+msgid "Complete Work Order"
+msgstr "Arbeitsauftrag Abschließen"
+
+#: manufacturing/templates/maint_wo_detail.html:75
+#: manufacturing/templates/maint_wo_detail.html:192
+msgid "Actual Hours"
+msgstr "Tatsächliche Stunden"
+
+#: manufacturing/templates/maint_wo_detail.html:78
+msgid "Time actually worked"
+msgstr "Tatsächlich gearbeitete Zeit"
+
+#: manufacturing/templates/maint_wo_detail.html:86
+msgid "Work Order Details"
+msgstr "Arbeitsauftragsdetails"
+
+#: manufacturing/templates/maint_wo_detail.html:92
+#: manufacturing/templates/maint_wo_list.html:111
+#: manufacturing/templates/qa_audit_detail.html:81
+#: manufacturing/templates/qa_audit_list.html:99
+#: manufacturing/templates/qa_capa_detail.html:68
+#: manufacturing/templates/qa_capa_list.html:114
+#: manufacturing/templates/qa_ncr_detail.html:69
+#: manufacturing/templates/qa_ncr_list.html:114
+msgid "Title *"
+msgstr "Titel *"
+
+#: manufacturing/templates/maint_wo_detail.html:120
+#: manufacturing/templates/maint_wo_list.html:125
+msgid "Work Type"
+msgstr "Arbeitsart"
+
+#: manufacturing/templates/maint_wo_detail.html:160
+#: manufacturing/templates/maint_wo_list.html:138
+msgid "Requested Date"
+msgstr "Angefordertes Datum"
+
+#: manufacturing/templates/maint_wo_detail.html:184
+#: manufacturing/templates/maint_wo_list.html:146
+msgid "Estimated Hours"
+msgstr "Geschätzte Stunden"
+
+#: manufacturing/templates/maint_wo_list.html:3
+#: manufacturing/templates/maint_wo_list.html:58
+msgid "Maintenance Work Orders"
+msgstr "Wartungsarbeitsaufträge"
+
+#: manufacturing/templates/maint_wo_list.html:101
+msgid "No work orders found."
+msgstr "Keine Arbeitsaufträge gefunden."
+
+#: manufacturing/templates/maint_wo_list.html:106
+#: manufacturing/templates/prod_dashboard.html:59
+#: manufacturing/templates/prod_schedule.html:93
+msgid "New Work Order"
+msgstr "Neuer Fertigungsauftrag"
+
+#: manufacturing/templates/maint_wo_list.html:112
+msgid "Describe the work needed"
+msgstr "Beschreiben Sie die erforderliche Arbeit"
+
+#: manufacturing/templates/maint_wo_list.html:131
+msgid "Assign To"
+msgstr "Zuweisen An"
+
+#: manufacturing/templates/maint_wo_list.html:147
+msgid "Suggested/standard time"
+msgstr "Vorgeschlagene/Standardzeit"
+
+#: manufacturing/templates/maint_wo_list.html:154
+msgid "Create Work Order"
+msgstr "Arbeitsauftrag Erstellen"
 
 #: manufacturing/templates/marketing_dashboard.html:3
 #: manufacturing/templates/marketing_dashboard.html:49
@@ -7083,13 +8065,6 @@ msgstr "Forschung Nr. %(id)s"
 msgid "Research Project"
 msgstr "Forschungsprojekt"
 
-#: manufacturing/templates/mkt_research_detail.html:89
-#: manufacturing/templates/mkt_research_detail.html:149
-#: manufacturing/templates/qa_audit_detail.html:62
-#: manufacturing/templates/qa_audit_detail.html:145
-msgid "Findings"
-msgstr "Ergebnisse"
-
 #: manufacturing/templates/mkt_research_detail.html:103
 msgid "Edit Project"
 msgstr "Projekt bearbeiten"
@@ -7333,15 +8308,6 @@ msgstr "Gehaltssätze der Mitarbeiter"
 #: manufacturing/templates/payroll_pay_rates.html:56
 msgid "Search by name…"
 msgstr "Nach Namen suchen…"
-
-#: manufacturing/templates/payroll_pay_rates.html:57
-#: manufacturing/templates/prod_labor_report.html:65
-#: manufacturing/templates/qa_capa_list.html:76
-#: manufacturing/templates/qa_inspection_list.html:72
-#: manufacturing/templates/qa_ncr_list.html:78
-#: manufacturing/templates/qa_supplier_list.html:76
-msgid "Go"
-msgstr "Los"
 
 #: manufacturing/templates/payroll_pay_rates.html:64
 msgid "Emp ID"
@@ -7658,11 +8624,6 @@ msgstr "Täglicher Produktionsbericht"
 msgid "Daily Report"
 msgstr "Tagesbericht"
 
-#: manufacturing/templates/prod_daily_report.html:9
-#: manufacturing/templates/prod_performance_report.html:9
-msgid "Performance"
-msgstr "Leistung"
-
 #: manufacturing/templates/prod_daily_report.html:52
 msgid "Report Date:"
 msgstr "Berichtsdatum:"
@@ -7692,15 +8653,6 @@ msgstr "Ausgehende Sendungen"
 msgid "Work Orders Due %(date)s"
 msgstr "Fällige Fertigungsaufträge %(date)s"
 
-#: manufacturing/templates/prod_daily_report.html:81
-#: manufacturing/templates/prod_dashboard.html:110
-#: manufacturing/templates/prod_labor_report.html:94
-#: manufacturing/templates/prod_labor_report.html:139
-#: manufacturing/templates/prod_reports.html:111
-#: manufacturing/templates/prod_schedule.html:66
-msgid "WO #"
-msgstr "FA-Nr."
-
 #: manufacturing/templates/prod_daily_report.html:83
 #: manufacturing/templates/prod_dashboard.html:112
 #: manufacturing/templates/prod_labor_report.html:94
@@ -7717,26 +8669,9 @@ msgstr "FA-Nr."
 msgid "Product"
 msgstr "Produkt"
 
-#: manufacturing/templates/prod_daily_report.html:84
-#: manufacturing/templates/prod_schedule.html:69
-#: manufacturing/templates/prod_shipping_detail.html:153
-#: manufacturing/templates/prod_shipping_detail.html:180
-msgid "Qty"
-msgstr "Menge"
-
 #: manufacturing/templates/prod_daily_report.html:98
 msgid "No work orders due on this date."
 msgstr "Keine Fertigungsaufträge an diesem Datum fällig."
-
-#: manufacturing/templates/prod_dashboard.html:7
-#: manufacturing/templates/prod_reports.html:7
-#: manufacturing/templates/prod_schedule.html:7
-#: manufacturing/templates/prod_shipping_detail.html:8
-#: manufacturing/templates/prod_shipping_list.html:7
-#: manufacturing/templates/report_builder_list.html:23
-#: manufacturing/templates/tc_schedule.html:3
-msgid "Schedule"
-msgstr "Zeitplan"
 
 #: manufacturing/templates/prod_dashboard.html:8
 #: manufacturing/templates/prod_dashboard.html:61
@@ -7771,11 +8706,6 @@ msgstr "Wiederholfertigung"
 #: manufacturing/templates/prod_dashboard.html:55
 msgid "Production Dashboard"
 msgstr "Produktions-Dashboard"
-
-#: manufacturing/templates/prod_dashboard.html:59
-#: manufacturing/templates/prod_schedule.html:93
-msgid "New Work Order"
-msgstr "Neuer Fertigungsauftrag"
 
 #: manufacturing/templates/prod_dashboard.html:60
 #: manufacturing/templates/prod_schedule.html:3
@@ -7904,88 +8834,23 @@ msgstr "Sendungsverfolgungsnr."
 msgid "No shipments found."
 msgstr "Keine Sendungen gefunden."
 
-#: manufacturing/templates/prod_labor_report.html:3
-msgid "Labor Time & Cost Report"
-msgstr "Arbeitszeit- und Kostenbericht"
-
-#: manufacturing/templates/prod_labor_report.html:7
-msgid "WO CSV"
-msgstr "FA-CSV"
-
 #: manufacturing/templates/prod_labor_report.html:8
 msgid "Person CSV"
 msgstr "Personen-CSV"
-
-#: manufacturing/templates/prod_labor_report.html:46
-msgid "Labor Time &amp; Cost Report"
-msgstr "Arbeitszeit- und Kostenbericht"
-
-#: manufacturing/templates/prod_labor_report.html:49
-#: manufacturing/templates/reports_dashboard.html:241
-#: manufacturing/templates/time_clock_hours.html:45
-msgid "Today"
-msgstr "Heute"
-
-#: manufacturing/templates/prod_labor_report.html:50
-#: manufacturing/templates/time_clock_hours.html:47
-msgid "This Week"
-msgstr "Diese Woche"
-
-#: manufacturing/templates/prod_labor_report.html:51
-#: manufacturing/templates/time_clock_hours.html:49
-msgid "This Month"
-msgstr "Diesen Monat"
-
-#: manufacturing/templates/prod_labor_report.html:52
-msgid "This Quarter"
-msgstr "Dieses Quartal"
-
-#: manufacturing/templates/prod_labor_report.html:53
-msgid "This Year"
-msgstr "Dieses Jahr"
 
 #: manufacturing/templates/prod_labor_report.html:77
 msgid "Std / Actual Hours"
 msgstr "Soll-/Ist-Stunden"
 
-#: manufacturing/templates/prod_labor_report.html:81
-msgid "Total Labor Cost (by WO)"
-msgstr "Gesamte Arbeitskosten (nach FA)"
-
 #: manufacturing/templates/prod_labor_report.html:85
 msgid "Personnel with Tracked Time"
 msgstr "Personal mit Erfasster Zeit"
-
-#: manufacturing/templates/prod_labor_report.html:90
-msgid "Work Order Time Variance"
-msgstr "Zeitabweichung der Fertigungsaufträge"
 
 #: manufacturing/templates/prod_labor_report.html:95
 #: manufacturing/templates/prod_labor_report.html:126
 #: manufacturing/templates/prod_labor_report.html:139
 msgid "Std Hrs"
 msgstr "Soll-Std."
-
-#: manufacturing/templates/prod_labor_report.html:95
-#: manufacturing/templates/prod_labor_report.html:126
-#: manufacturing/templates/prod_labor_report.html:139
-msgid "Actual Hrs"
-msgstr "Ist-Std."
-
-#: manufacturing/templates/prod_labor_report.html:96
-#: manufacturing/templates/prod_labor_report.html:127
-msgid "Variance"
-msgstr "Abweichung"
-
-#: manufacturing/templates/prod_labor_report.html:96
-#: manufacturing/templates/prod_labor_report.html:127
-#, python-format
-msgid "Variance %%"
-msgstr "Abweichung %%"
-
-#: manufacturing/templates/prod_labor_report.html:97
-msgid "Labor Cost"
-msgstr "Arbeitskosten"
 
 #: manufacturing/templates/prod_labor_report.html:114
 msgid "No work orders with routing operations in this range."
@@ -7999,21 +8864,6 @@ msgstr "Arbeitszeit nach Person"
 msgid "Person"
 msgstr "Person"
 
-#: manufacturing/templates/prod_labor_report.html:125
-msgid "WO Count"
-msgstr "Anzahl FA"
-
-#: manufacturing/templates/prod_labor_report.html:128
-msgid "Total Cost"
-msgstr "Gesamtkosten"
-
-#: manufacturing/templates/prod_labor_report.html:137
-#, python-format
-msgid "%(counter)s WO"
-msgid_plural "%(counter)s WOs"
-msgstr[0] "%(counter)s FA"
-msgstr[1] "%(counter)s FA"
-
 #: manufacturing/templates/prod_labor_report.html:161
 msgid "No attributable labor in this range."
 msgstr "Keine zuordenbare Arbeitszeit in diesem Zeitraum."
@@ -8025,7 +8875,11 @@ msgid ""
 "            \"Completed By\" or the work order's \"Assigned To\". Salaried "
 "or unmatched personnel\n"
 "            show hours only."
-msgstr "Kosten werden nur für stundenweise bezahlte Mitarbeiter angezeigt, deren Name mit «Abgeschlossen von» des Arbeitsgangs oder «Zugewiesen an» des Fertigungsauftrags übereinstimmt. Gehaltsempfänger oder nicht zugeordnetes Personal zeigen nur Stunden an."
+msgstr ""
+"Kosten werden nur für stundenweise bezahlte Mitarbeiter angezeigt, deren "
+"Name mit «Abgeschlossen von» des Arbeitsgangs oder «Zugewiesen an» des "
+"Fertigungsauftrags übereinstimmt. Gehaltsempfänger oder nicht zugeordnetes "
+"Personal zeigen nur Stunden an."
 
 #: manufacturing/templates/prod_performance_report.html:3
 #: manufacturing/templates/prod_performance_report.html:41
@@ -8281,10 +9135,6 @@ msgstr "Keine geplanten Arbeitsgänge in diesem Zeitfenster."
 msgid "Workcenter Load"
 msgstr "Arbeitsplatzauslastung"
 
-#: manufacturing/templates/prod_schedule_gantt.html:82
-msgid "No active workcenters."
-msgstr "Keine aktiven Arbeitsplätze."
-
 #: manufacturing/templates/prod_shipping_detail.html:3
 #, python-format
 msgid "Shipment — %(num)s"
@@ -8393,29 +9243,9 @@ msgstr "Bestanden / Nicht Bestanden / Bedingt…"
 msgid "Key findings from the audit…"
 msgstr "Wichtigste Feststellungen des Audits…"
 
-#: manufacturing/templates/qa_audit_detail.html:68
-msgid "Mark Complete"
-msgstr "Als Abgeschlossen Markieren"
-
 #: manufacturing/templates/qa_audit_detail.html:75
 msgid "Audit Details"
 msgstr "Audit-Details"
-
-#: manufacturing/templates/qa_audit_detail.html:81
-#: manufacturing/templates/qa_audit_list.html:99
-#: manufacturing/templates/qa_capa_detail.html:68
-#: manufacturing/templates/qa_capa_list.html:114
-#: manufacturing/templates/qa_ncr_detail.html:69
-#: manufacturing/templates/qa_ncr_list.html:114
-msgid "Title *"
-msgstr "Titel *"
-
-#: manufacturing/templates/qa_audit_detail.html:137
-#: manufacturing/templates/qa_inspection_detail.html:104
-#: manufacturing/templates/qa_inspection_list.html:81
-#: manufacturing/templates/qa_reports.html:184
-msgid "Result"
-msgstr "Ergebnis"
 
 #: manufacturing/templates/qa_audit_list.html:3
 #: manufacturing/templates/qa_audit_list.html:53
@@ -8592,20 +9422,6 @@ msgstr "Kontrollpläne / FMEA"
 msgid "Regulatory Compliance"
 msgstr "Regulatorische Compliance"
 
-#: manufacturing/templates/qa_inspection_detail.html:6
-msgid "All Inspections"
-msgstr "Alle Inspektionen"
-
-#: manufacturing/templates/qa_inspection_detail.html:89
-msgid "Inspection Details"
-msgstr "Inspektionsdetails"
-
-#: manufacturing/templates/qa_inspection_detail.html:96
-#: manufacturing/templates/qa_inspection_list.html:80
-#: manufacturing/templates/qa_inspection_list.html:132
-msgid "Inspector"
-msgstr "Inspektor"
-
 #: manufacturing/templates/qa_inspection_detail.html:117
 msgid "Update Result"
 msgstr "Ergebnis Aktualisieren"
@@ -8664,10 +9480,6 @@ msgid_plural "Defects (%(counter)s)"
 msgstr[0] "Mangel (%(counter)s)"
 msgstr[1] "Mängel (%(counter)s)"
 
-#: manufacturing/templates/qa_inspection_detail.html:209
-msgid "Resolve"
-msgstr "Beheben"
-
 #: manufacturing/templates/qa_inspection_detail.html:218
 msgid "No defects logged."
 msgstr "Keine Mängel erfasst."
@@ -8722,10 +9534,6 @@ msgid "%(counter)s resolved"
 msgid_plural "%(counter)s resolved"
 msgstr[0] "%(counter)s behoben"
 msgstr[1] "%(counter)s behoben"
-
-#: manufacturing/templates/qa_inspection_list.html:104
-msgid "No inspections found."
-msgstr "Keine Inspektionen gefunden."
 
 #: manufacturing/templates/qa_inspection_list.html:109
 msgid "New Inspection"
@@ -9063,10 +9871,6 @@ msgstr ""
 msgid "Enabled"
 msgstr "Aktiviert"
 
-#: manufacturing/templates/report_builder_detail.html:65
-msgid "Frequency"
-msgstr "Häufigkeit"
-
 #: manufacturing/templates/report_builder_detail.html:73
 msgid "Recipients (comma-separated emails)"
 msgstr "Empfänger (durch Komma getrennte E-Mails)"
@@ -9271,10 +10075,6 @@ msgid "item at or below reorder point"
 msgid_plural "items at or below reorder point"
 msgstr[0] "Artikel am oder unter dem Meldebestand"
 msgstr[1] "Artikel am oder unter dem Meldebestand"
-
-#: manufacturing/templates/reports_dashboard.html:201
-msgid "Reorder At"
-msgstr "Meldebestand"
 
 #: manufacturing/templates/sf_tv.html:5 manufacturing/templates/sf_tv.html:38
 #, python-format
@@ -9669,12 +10469,6 @@ msgstr "Einstempeln"
 #: manufacturing/templates/time_clock_status.html:90
 msgid "Clock Out"
 msgstr "Ausstempeln"
-
-#: manufacturing/templates/time_clock_attendance.html:88
-#: manufacturing/templates/time_clock_hours.html:63
-#: manufacturing/templates/time_clock_status.html:91
-msgid "Hours"
-msgstr "Stunden"
 
 #: manufacturing/templates/time_clock_attendance.html:102
 #: manufacturing/templates/time_clock_hours.html:75

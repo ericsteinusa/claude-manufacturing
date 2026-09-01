@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ eq.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/equipment/" class="btn">All Equipment</a>
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/equipment/" class="btn">{% trans "All Equipment" %}</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -53,12 +54,12 @@
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="card">
-        <h3>Equipment Details</h3>
+        <h3>{% trans "Equipment Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Name *</label>
+                    <label>{% trans "Name *" %}</label>
                     {% if can_edit %}
                     <input type="text" name="name" value="{{ eq.name }}" required>
                     {% else %}
@@ -66,7 +67,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Asset Tag</label>
+                    <label>{% trans "Asset Tag" %}</label>
                     {% if can_edit %}
                     <input type="text" name="asset_tag" value="{{ eq.asset_tag|default:'' }}">
                     {% else %}
@@ -74,7 +75,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     {% if can_edit %}
                     <select name="status">
                         {% for st in equipment_statuses %}
@@ -86,7 +87,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Location</label>
+                    <label>{% trans "Location" %}</label>
                     {% if can_edit %}
                     <input type="text" name="location" value="{{ eq.location|default:'' }}">
                     {% else %}
@@ -94,7 +95,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Manufacturer</label>
+                    <label>{% trans "Manufacturer" %}</label>
                     {% if can_edit %}
                     <input type="text" name="manufacturer" value="{{ eq.manufacturer|default:'' }}">
                     {% else %}
@@ -102,7 +103,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Install Date</label>
+                    <label>{% trans "Install Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="install_date" value="{{ eq.install_date|default:'' }}">
                     {% else %}
@@ -110,7 +111,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Last Service</label>
+                    <label>{% trans "Last Service" %}</label>
                     {% if can_edit %}
                     <input type="date" name="last_service" value="{{ eq.last_service|default:'' }}">
                     {% else %}
@@ -118,10 +119,10 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Parent Equipment</label>
+                    <label>{% trans "Parent Equipment" %}</label>
                     {% if can_edit %}
                     <select name="parent_id">
-                        <option value="">— Top level —</option>
+                        <option value="">{% trans "— Top level —" %}</option>
                         {% for e in all_equipment %}
                         <option value="{{ e.id }}" {% if eq.parent_id == e.id %}selected{% endif %}>{{ e.name }}</option>
                         {% endfor %}
@@ -131,7 +132,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     {% if can_edit %}
                     <textarea name="notes" rows="4">{{ eq.notes|default:'' }}</textarea>
                     {% else %}
@@ -141,8 +142,8 @@
             </div>
             {% if can_edit %}
             <div class="btn-row">
-                <button type="submit" class="save-btn">Save Changes</button>
-                <a href="/maint/equipment/" style="color:#aad;font-size:13px;">Cancel</a>
+                <button type="submit" class="save-btn">{% trans "Save Changes" %}</button>
+                <a href="/maint/equipment/" style="color:#aad;font-size:13px;">{% trans "Cancel" %}</a>
             </div>
             {% endif %}
         </form>
@@ -150,7 +151,7 @@
 
     {% if children %}
     <div class="card">
-        <h3>Sub-Equipment</h3>
+        <h3>{% trans "Sub-Equipment" %}</h3>
         {% for c in children %}
         <div><a href="/maint/equipment/{{ c.id }}/">{{ c.name }}</a> <span style="color:#777;font-size:12px;">{{ c.status }}</span></div>
         {% endfor %}
@@ -159,9 +160,9 @@
 
     {% if parts %}
     <div class="card">
-        <h3>Spare Parts On File For This Equipment</h3>
+        <h3>{% trans "Spare Parts On File For This Equipment" %}</h3>
         {% for p in parts %}
-        <div><a href="/maint/parts/{{ p.id }}/">{{ p.name }}</a> <span style="color:#777;font-size:12px;">qty {{ p.quantity }}</span></div>
+        <div><a href="/maint/parts/{{ p.id }}/">{{ p.name }}</a> <span style="color:#777;font-size:12px;">{% blocktrans with qty=p.quantity %}qty {{ qty }}{% endblocktrans %}</span></div>
         {% endfor %}
     </div>
     {% endif %}
