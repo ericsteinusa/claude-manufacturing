@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load manufacturing_extras %}
 {% block page_title %}{% if so %}{{ so.so_number }}{% else %}{% trans "New Order" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
