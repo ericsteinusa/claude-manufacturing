@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Mechanics{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Mechanics" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/maint/wo/" class="btn">Work Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/maint/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -50,28 +51,28 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Mechanics</h2>
+    <h2>{% trans "Mechanics" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/maint/mechanics/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/maint/mechanics/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in mechanic_statuses %}
             <a href="/maint/mechanics/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
         </div>
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
-            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="Search…">
-            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
+            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search…' %}">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
         </form>
     </div>
 
     {% if mechanics %}
     <table class="list-table">
         <thead><tr>
-            <th>Name</th><th>Trade</th><th>Shift</th><th>Phone</th><th>Status</th>
+            <th>{% trans "Name" %}</th><th>{% trans "Trade" %}</th><th>{% trans "Shift" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for m in mechanics %}
@@ -86,53 +87,53 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No mechanics found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No mechanics found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Mechanic</h3>
+        <h3>{% trans "Add Mechanic" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Name *</label>
+                    <label>{% trans "Name *" %}</label>
                     <input type="text" name="name" required>
                 </div>
                 <div class="form-row">
-                    <label>Trade</label>
+                    <label>{% trans "Trade" %}</label>
                     <select name="trade">
                         {% for t in mechanic_trades %}<option>{{ t }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Shift</label>
+                    <label>{% trans "Shift" %}</label>
                     <select name="shift">
                         {% for s in mechanic_shifts %}<option>{{ s }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Phone</label>
+                    <label>{% trans "Phone" %}</label>
                     <input type="text" name="phone">
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for st in mechanic_statuses %}<option>{{ st }}</option>{% endfor %}
                     </select>
                 </div>
                 {% if can_view_comp %}
                 <div class="form-row">
-                    <label>Hourly Rate</label>
+                    <label>{% trans "Hourly Rate" %}</label>
                     <input type="number" name="hourly_rate" step="0.01" min="0" placeholder="0.00">
                 </div>
                 {% endif %}
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="2"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Add Mechanic</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Add Mechanic" %}</button>
         </form>
     </div>
     {% endif %}

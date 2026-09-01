@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Maintenance Parts{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Maintenance Parts" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/maint/wo/" class="btn">Work Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/maint/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -52,29 +53,29 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Maintenance Parts</h2>
+    <h2>{% trans "Maintenance Parts" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/maint/parts/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/maint/parts/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in part_statuses %}
             <a href="/maint/parts/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
         </div>
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
-            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="Search…">
-            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
+            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search…' %}">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
         </form>
     </div>
 
     {% if parts %}
     <table class="list-table">
         <thead><tr>
-            <th>Name</th><th>Part #</th><th>Category</th>
-            <th>Location</th><th>Qty</th><th>Reorder At</th><th>Unit Cost</th><th>Status</th>
+            <th>{% trans "Name" %}</th><th>{% trans "Part #" %}</th><th>{% trans "Category" %}</th>
+            <th>{% trans "Location" %}</th><th>{% trans "Qty" %}</th><th>{% trans "Reorder At" %}</th><th>{% trans "Unit Cost" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for p in parts %}
@@ -92,57 +93,57 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No parts found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No parts found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Part</h3>
+        <h3>{% trans "Add Part" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Name *</label>
+                    <label>{% trans "Name *" %}</label>
                     <input type="text" name="name" required>
                 </div>
                 <div class="form-row">
-                    <label>Part Number</label>
+                    <label>{% trans "Part Number" %}</label>
                     <input type="text" name="part_number">
                 </div>
                 <div class="form-row">
-                    <label>Category</label>
+                    <label>{% trans "Category" %}</label>
                     <select name="category">
                         {% for c in part_categories %}<option>{{ c }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Location</label>
+                    <label>{% trans "Location" %}</label>
                     <input type="text" name="location">
                 </div>
                 <div class="form-row">
-                    <label>Quantity</label>
+                    <label>{% trans "Quantity" %}</label>
                     <input type="text" name="quantity">
                 </div>
                 <div class="form-row">
-                    <label>Reorder Level</label>
+                    <label>{% trans "Reorder Level" %}</label>
                     <input type="text" name="reorder_level">
                 </div>
                 <div class="form-row">
-                    <label>Unit Cost ($)</label>
+                    <label>{% trans "Unit Cost ($)" %}</label>
                     <input type="number" name="unit_cost" step="0.01" min="0">
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for st in part_statuses %}<option>{{ st }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="2"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Add Part</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Add Part" %}</button>
         </form>
     </div>
     {% endif %}

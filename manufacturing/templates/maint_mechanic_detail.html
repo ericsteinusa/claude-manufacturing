@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ mechanic.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/mechanics/" class="btn">All Mechanics</a>
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/mechanics/" class="btn">{% trans "All Mechanics" %}</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,12 +39,12 @@
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="card">
-        <h3>Mechanic Details</h3>
+        <h3>{% trans "Mechanic Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Name *</label>
+                    <label>{% trans "Name *" %}</label>
                     {% if can_edit %}
                     <input type="text" name="name" value="{{ mechanic.name }}" required>
                     {% else %}
@@ -51,7 +52,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     {% if can_edit %}
                     <select name="status">
                         {% for st in mechanic_statuses %}
@@ -63,7 +64,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Trade</label>
+                    <label>{% trans "Trade" %}</label>
                     {% if can_edit %}
                     <select name="trade">
                         {% for t in mechanic_trades %}
@@ -75,7 +76,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Shift</label>
+                    <label>{% trans "Shift" %}</label>
                     {% if can_edit %}
                     <select name="shift">
                         {% for s in mechanic_shifts %}
@@ -87,7 +88,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Phone</label>
+                    <label>{% trans "Phone" %}</label>
                     {% if can_edit %}
                     <input type="text" name="phone" value="{{ mechanic.phone|default:'' }}">
                     {% else %}
@@ -95,7 +96,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Hourly Rate</label>
+                    <label>{% trans "Hourly Rate" %}</label>
                     {% if can_view_comp %}
                         {% if can_edit %}
                         <input type="number" name="hourly_rate" step="0.01" min="0" value="{{ mechanic.hourly_rate|default:'0' }}">
@@ -103,11 +104,11 @@
                         <input class="ro" readonly value="{{ mechanic.hourly_rate|default:'0' }}">
                         {% endif %}
                     {% else %}
-                    <input class="ro" readonly value="Hidden — Payroll/HR only" title="Compensation fields are only visible to Payroll, Personnel, or HR roles">
+                    <input class="ro" readonly value="{% trans 'Hidden — Payroll/HR only' %}" title="{% trans 'Compensation fields are only visible to Payroll, Personnel, or HR roles' %}">
                     {% endif %}
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     {% if can_edit %}
                     <textarea name="notes" rows="4">{{ mechanic.notes|default:'' }}</textarea>
                     {% else %}
@@ -117,8 +118,8 @@
             </div>
             {% if can_edit %}
             <div class="btn-row">
-                <button type="submit" class="save-btn">Save Changes</button>
-                <a href="/maint/mechanics/" style="color:#aad;font-size:13px;">Cancel</a>
+                <button type="submit" class="save-btn">{% trans "Save Changes" %}</button>
+                <a href="/maint/mechanics/" style="color:#aad;font-size:13px;">{% trans "Cancel" %}</a>
             </div>
             {% endif %}
         </form>

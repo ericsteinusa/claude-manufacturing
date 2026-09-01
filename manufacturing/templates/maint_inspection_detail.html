@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Inspection #{{ inspection.id }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=inspection.id %}Inspection #{{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/inspections/" class="btn">All Inspections</a>
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/inspections/" class="btn">{% trans "All Inspections" %}</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -50,30 +51,30 @@
         <img src="/barcode/img/MIN-{{ inspection.id }}/" alt="Barcode MIN-{{ inspection.id }}">
         <small>MIN-{{ inspection.id }}</small>
     </div>
-    <h2>Inspection: {{ inspection.area }}</h2>
+    <h2>{% blocktrans with area=inspection.area %}Inspection: {{ area }}{% endblocktrans %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
-    {% if inspection.is_overdue %}<div class="overdue-notice">&#9888; This inspection is past its scheduled date.</div>{% endif %}
+    {% if inspection.is_overdue %}<div class="overdue-notice">&#9888; {% trans "This inspection is past its scheduled date." %}</div>{% endif %}
 
     {% if inspection.status == 'Scheduled' or inspection.status == 'In Progress' %}
     {% if can_edit %}
     <div class="card" style="border-color:#1a6b1a;">
-        <h3 style="color:#1a6b1a;">Complete Inspection</h3>
+        <h3 style="color:#1a6b1a;">{% trans "Complete Inspection" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="complete">
             <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
                 <div style="display:flex;flex-direction:column;gap:4px;">
-                    <label style="font-size:12px;color:#555;font-weight:bold;">Result</label>
-                    <input type="text" name="result" placeholder="Pass / Fail / Notes"
+                    <label style="font-size:12px;color:#555;font-weight:bold;">{% trans "Result" %}</label>
+                    <input type="text" name="result" placeholder="{% trans 'Pass / Fail / Notes' %}"
                            style="padding:6px 10px;border:1px solid #ccc;border-radius:4px;font-size:13px;width:200px;">
                 </div>
                 <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:200px;">
-                    <label style="font-size:12px;color:#555;font-weight:bold;">Findings</label>
+                    <label style="font-size:12px;color:#555;font-weight:bold;">{% trans "Findings" %}</label>
                     <textarea name="notes" rows="2" style="padding:6px 10px;border:1px solid #ccc;
                         border-radius:4px;font-size:13px;resize:vertical;"></textarea>
                 </div>
-                <button type="submit" class="save-btn" style="background:#1a6b1a;">Mark Complete</button>
+                <button type="submit" class="save-btn" style="background:#1a6b1a;">{% trans "Mark Complete" %}</button>
             </div>
         </form>
     </div>
@@ -81,13 +82,13 @@
     {% endif %}
 
     <div class="card">
-        <h3>Inspection Details</h3>
+        <h3>{% trans "Inspection Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Area *</label>
+                    <label>{% trans "Area *" %}</label>
                     {% if can_edit %}
                     <input type="text" name="area" value="{{ inspection.area }}" required>
                     {% else %}
@@ -95,7 +96,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     {% if can_edit %}
                     <select name="inspection_type">
                         {% for t in inspection_types %}
@@ -107,7 +108,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     {% if can_edit %}
                     <select name="status">
                         {% for st in inspection_statuses %}
@@ -119,7 +120,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Inspector</label>
+                    <label>{% trans "Inspector" %}</label>
                     {% if can_edit %}
                     <input type="text" name="inspector" value="{{ inspection.inspector|default:'' }}">
                     {% else %}
@@ -127,7 +128,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Scheduled Date</label>
+                    <label>{% trans "Scheduled Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="scheduled_date" value="{{ inspection.scheduled_date|default:'' }}">
                     {% else %}
@@ -135,7 +136,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Completed Date</label>
+                    <label>{% trans "Completed Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="completed_date" value="{{ inspection.completed_date|default:'' }}">
                     {% else %}
@@ -143,7 +144,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Result</label>
+                    <label>{% trans "Result" %}</label>
                     {% if can_edit %}
                     <input type="text" name="result" value="{{ inspection.result|default:'' }}">
                     {% else %}
@@ -151,7 +152,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     {% if can_edit %}
                     <textarea name="notes" rows="4">{{ inspection.notes|default:'' }}</textarea>
                     {% else %}
@@ -161,8 +162,8 @@
             </div>
             {% if can_edit %}
             <div class="btn-row">
-                <button type="submit" class="save-btn">Save Changes</button>
-                <a href="/maint/inspections/" style="color:#aad;font-size:13px;">Cancel</a>
+                <button type="submit" class="save-btn">{% trans "Save Changes" %}</button>
+                <a href="/maint/inspections/" style="color:#aad;font-size:13px;">{% trans "Cancel" %}</a>
             </div>
             {% endif %}
         </form>

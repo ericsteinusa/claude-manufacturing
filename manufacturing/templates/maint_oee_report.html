@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}OEE Report{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "OEE Report" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/maint/downtime/" class="btn">Downtime Log</a>
-<a href="/maint/oee/export/?period={{ period }}&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ CSV</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/maint/downtime/" class="btn">{% trans "Downtime Log" %}</a>
+<a href="/maint/oee/export/?period={{ period }}&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -47,20 +48,20 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>OEE Report</h2>
+    <h2>{% trans "OEE Report" %}</h2>
 
     <div class="chip-row">
-        <a href="/maint/oee/?period=day"     class="chip {% if period == 'day' %}active{% endif %}">Today</a>
-        <a href="/maint/oee/?period=week"    class="chip {% if period == 'week' %}active{% endif %}">This Week</a>
-        <a href="/maint/oee/?period=month"   class="chip {% if period == 'month' %}active{% endif %}">This Month</a>
-        <a href="/maint/oee/?period=quarter" class="chip {% if period == 'quarter' %}active{% endif %}">This Quarter</a>
-        <a href="/maint/oee/?period=year"    class="chip {% if period == 'year' %}active{% endif %}">This Year</a>
+        <a href="/maint/oee/?period=day"     class="chip {% if period == 'day' %}active{% endif %}">{% trans "Today" %}</a>
+        <a href="/maint/oee/?period=week"    class="chip {% if period == 'week' %}active{% endif %}">{% trans "This Week" %}</a>
+        <a href="/maint/oee/?period=month"   class="chip {% if period == 'month' %}active{% endif %}">{% trans "This Month" %}</a>
+        <a href="/maint/oee/?period=quarter" class="chip {% if period == 'quarter' %}active{% endif %}">{% trans "This Quarter" %}</a>
+        <a href="/maint/oee/?period=year"    class="chip {% if period == 'year' %}active{% endif %}">{% trans "This Year" %}</a>
         <form method="get" action="/maint/oee/" class="date-form" style="margin-left:8px;">
             <input type="hidden" name="period" value="custom">
             <input type="date" name="date_from" value="{{ date_from }}" required>
-            <span style="font-size:13px;color:#888;">to</span>
+            <span style="font-size:13px;color:#888;">{% trans "to" %}</span>
             <input type="date" name="date_to" value="{{ date_to }}" required>
-            <button type="submit">Go</button>
+            <button type="submit">{% trans "Go" %}</button>
         </form>
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin:-4px 0 20px;">{{ start }} → {{ end }}</p>
@@ -70,54 +71,54 @@
         {% with oee=overall.oee_pct %}
         <div class="oee-kpi {% if oee >= 85 %}green{% elif oee >= 60 %}amber{% else %}red{% endif %}">
             <div class="num">{{ overall.oee_pct }}%</div>
-            <div class="lbl">Overall OEE</div>
-            <div class="sub">World-class = 85%</div>
+            <div class="lbl">{% trans "Overall OEE" %}</div>
+            <div class="sub">{% trans "World-class = 85%" %}</div>
         </div>
         {% endwith %}
         <div class="oee-kpi">
             <div class="num" style="color:#1d6fe8;">{{ overall.availability_pct }}%</div>
-            <div class="lbl">Availability</div>
-            <div class="sub">{{ overall.scheduled_hours }}h sched / {{ overall.downtime_hours }}h down</div>
+            <div class="lbl">{% trans "Availability" %}</div>
+            <div class="sub">{% blocktrans with sched=overall.scheduled_hours down=overall.downtime_hours %}{{ sched }}h sched / {{ down }}h down{% endblocktrans %}</div>
         </div>
         <div class="oee-kpi">
             <div class="num" style="color:#7c3aed;">{{ overall.performance_pct }}%</div>
-            <div class="lbl">Performance</div>
-            <div class="sub">Std vs actual run hours</div>
+            <div class="lbl">{% trans "Performance" %}</div>
+            <div class="sub">{% trans "Std vs actual run hours" %}</div>
         </div>
         <div class="oee-kpi">
             <div class="num" style="color:#059669;">{{ overall.quality_pct }}%</div>
-            <div class="lbl">Quality</div>
-            <div class="sub">{{ overall.total_scrap }} scrap / {{ overall.total_qty }} total units</div>
+            <div class="lbl">{% trans "Quality" %}</div>
+            <div class="sub">{% blocktrans with scrap=overall.total_scrap total=overall.total_qty %}{{ scrap }} scrap / {{ total }} total units{% endblocktrans %}</div>
         </div>
     </div>
 
     <!-- Charts -->
     <div class="two-col">
         <div class="card">
-            <h3>OEE Weekly Trend (last 12 weeks)</h3>
+            <h3>{% trans "OEE Weekly Trend (last 12 weeks)" %}</h3>
             <canvas id="chart-oee-trend" height="200"></canvas>
         </div>
         <div class="card">
-            <h3>OEE by Workcenter</h3>
+            <h3>{% trans "OEE by Workcenter" %}</h3>
             <canvas id="chart-oee-wc" height="200"></canvas>
         </div>
     </div>
 
     <div class="two-col">
         <div class="card">
-            <h3>Availability / Performance / Quality by Workcenter</h3>
+            <h3>{% trans "Availability / Performance / Quality by Workcenter" %}</h3>
             <canvas id="chart-oee-components" height="220"></canvas>
         </div>
         <div class="card" style="overflow-x:auto;">
-            <h3>Workcenter Detail</h3>
+            <h3>{% trans "Workcenter Detail" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Workcenter</th>
-                        <th>Avail.</th>
-                        <th>Perf.</th>
-                        <th>Quality</th>
-                        <th>OEE</th>
+                        <th>{% trans "Workcenter" %}</th>
+                        <th>{% trans "Avail." %}</th>
+                        <th>{% trans "Perf." %}</th>
+                        <th>{% trans "Quality" %}</th>
+                        <th>{% trans "OEE" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -140,7 +141,7 @@
                 </tr>
                 {% endif %}
                 {% empty %}
-                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No active workcenters.</td></tr>
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">{% trans "No active workcenters." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -149,22 +150,22 @@
 
     <!-- OEE Formula explanation -->
     <div class="card" style="margin-bottom:20px;">
-        <h3>How OEE is Calculated</h3>
+        <h3>{% trans "How OEE is Calculated" %}</h3>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:13px;">
             <div>
-                <strong style="color:#1d6fe8;">Availability</strong><br>
-                (Scheduled Hours − Downtime) ÷ Scheduled Hours<br>
-                <span style="color:#888;font-size:12px;">Scheduled hours = workcenter capacity × calendar days. Downtime pulled from the downtime log by equipment name match.</span>
+                <strong style="color:#1d6fe8;">{% trans "Availability" %}</strong><br>
+                {% trans "(Scheduled Hours − Downtime) ÷ Scheduled Hours" %}<br>
+                <span style="color:#888;font-size:12px;">{% trans "Scheduled hours = workcenter capacity × calendar days. Downtime pulled from the downtime log by equipment name match." %}</span>
             </div>
             <div>
-                <strong style="color:#7c3aed;">Performance</strong><br>
-                Standard Hours ÷ Actual Hours<br>
-                <span style="color:#888;font-size:12px;">From completed work order routing operations at each workcenter. Standard hours are set in the routing; actual hours are recorded at completion.</span>
+                <strong style="color:#7c3aed;">{% trans "Performance" %}</strong><br>
+                {% trans "Standard Hours ÷ Actual Hours" %}<br>
+                <span style="color:#888;font-size:12px;">{% trans "From completed work order routing operations at each workcenter. Standard hours are set in the routing; actual hours are recorded at completion." %}</span>
             </div>
             <div>
-                <strong style="color:#059669;">Quality</strong><br>
-                (Total Qty − Scrap) ÷ Total Qty<br>
-                <span style="color:#888;font-size:12px;">Total quantity from work orders routed through this workcenter; scrap quantity recorded per routing step at completion.</span>
+                <strong style="color:#059669;">{% trans "Quality" %}</strong><br>
+                {% trans "(Total Qty − Scrap) ÷ Total Qty" %}<br>
+                <span style="color:#888;font-size:12px;">{% trans "Total quantity from work orders routed through this workcenter; scrap quantity recorded per routing step at completion." %}</span>
             </div>
         </div>
     </div>

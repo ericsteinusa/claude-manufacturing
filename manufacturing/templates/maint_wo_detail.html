@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}WO #{{ wo.id }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=wo.id %}WO #{{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/wo/" class="btn">All WOs</a>
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/wo/" class="btn">{% trans "All WOs" %}</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -53,42 +54,42 @@
 
 {% block body %}
 <div class="content">
-<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="m-wrap">
     <div class="mwo-barcode">
         <img src="/barcode/img/MWO-{{ wo.id }}/" alt="Barcode MWO-{{ wo.id }}">
         <small>MWO-{{ wo.id }}</small>
     </div>
-    <h2>WO #{{ wo.id }} &mdash; {{ wo.title }}</h2>
+    <h2>{% blocktrans with num=wo.id title=wo.title %}WO #{{ num }} &mdash; {{ title }}{% endblocktrans %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
-    {% if wo.is_overdue %}<div class="overdue-notice">&#9888; This work order is past its due date.</div>{% endif %}
+    {% if wo.is_overdue %}<div class="overdue-notice">&#9888; {% trans "This work order is past its due date." %}</div>{% endif %}
 
     {% if wo.status not in 'Completed,Cancelled' and can_edit %}
     <div class="card" style="border-color:#1a6b1a;">
-        <h3 style="color:#1a6b1a;">Complete Work Order</h3>
+        <h3 style="color:#1a6b1a;">{% trans "Complete Work Order" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="complete">
             <div class="form-row" style="max-width:200px;margin-bottom:10px;">
-                <label>Actual Hours</label>
+                <label>{% trans "Actual Hours" %}</label>
                 <input type="number" name="actual_hours" step="0.1" min="0"
                        value="{{ wo.actual_hours|default:'' }}"
-                       placeholder="Time actually worked">
+                       placeholder="{% trans 'Time actually worked' %}">
             </div>
-            <button type="submit" class="ok-btn">Mark Complete</button>
+            <button type="submit" class="ok-btn">{% trans "Mark Complete" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Work Order Details</h3>
+        <h3>{% trans "Work Order Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-grid">
                 <div class="form-row span2">
-                    <label>Title *</label>
+                    <label>{% trans "Title *" %}</label>
                     {% if can_edit %}
                     <input type="text" name="title" value="{{ wo.title }}" required>
                     {% else %}
@@ -96,7 +97,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     {% if can_edit %}
                     <select name="status">
                         {% for st in wo_statuses %}
@@ -108,7 +109,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Equipment</label>
+                    <label>{% trans "Equipment" %}</label>
                     {% if can_edit %}
                     <input type="text" name="equipment" value="{{ wo.equipment|default:'' }}">
                     {% else %}
@@ -116,7 +117,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Work Type</label>
+                    <label>{% trans "Work Type" %}</label>
                     {% if can_edit %}
                     <select name="work_type">
                         {% for t in work_types %}
@@ -128,7 +129,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Priority</label>
+                    <label>{% trans "Priority" %}</label>
                     {% if can_edit %}
                     <select name="priority">
                         {% for p in priorities %}
@@ -140,10 +141,10 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Assigned To</label>
+                    <label>{% trans "Assigned To" %}</label>
                     {% if can_edit %}
                     <select name="assigned_to">
-                        <option value="">— Unassigned —</option>
+                        <option value="">{% trans "— Unassigned —" %}</option>
                         {% for m in mechanics %}
                         <option {% if wo.assigned_to == m.name %}selected{% endif %}>{{ m.name }}</option>
                         {% endfor %}
@@ -156,7 +157,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Requested Date</label>
+                    <label>{% trans "Requested Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="requested_date" value="{{ wo.requested_date|default:'' }}">
                     {% else %}
@@ -164,7 +165,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Due Date</label>
+                    <label>{% trans "Due Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="due_date" value="{{ wo.due_date|default:'' }}">
                     {% else %}
@@ -172,7 +173,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Completed Date</label>
+                    <label>{% trans "Completed Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="completed_date" value="{{ wo.completed_date|default:'' }}">
                     {% else %}
@@ -180,7 +181,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Estimated Hours</label>
+                    <label>{% trans "Estimated Hours" %}</label>
                     {% if can_edit %}
                     <input type="number" name="estimated_hours" step="0.1" min="0" value="{{ wo.estimated_hours|default:'' }}">
                     {% else %}
@@ -188,11 +189,11 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Actual Hours</label>
+                    <label>{% trans "Actual Hours" %}</label>
                     <input class="ro" readonly value="{{ wo.actual_hours|default:'—' }}">
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     {% if can_edit %}
                     <textarea name="notes" rows="4">{{ wo.notes|default:'' }}</textarea>
                     {% else %}
@@ -202,8 +203,8 @@
             </div>
             {% if can_edit %}
             <div class="btn-row">
-                <button type="submit" class="save-btn">Save Changes</button>
-                <a href="/maint/wo/" style="color:#aad;font-size:13px;">Cancel</a>
+                <button type="submit" class="save-btn">{% trans "Save Changes" %}</button>
+                <a href="/maint/wo/" style="color:#aad;font-size:13px;">{% trans "Cancel" %}</a>
             </div>
             {% endif %}
         </form>

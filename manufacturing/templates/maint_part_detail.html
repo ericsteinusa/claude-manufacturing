@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ part.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/parts/" class="btn">All Parts</a>
-<a href="/maint/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/parts/" class="btn">{% trans "All Parts" %}</a>
+<a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,12 +39,12 @@
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="card">
-        <h3>Part Details</h3>
+        <h3>{% trans "Part Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Name *</label>
+                    <label>{% trans "Name *" %}</label>
                     {% if can_edit %}
                     <input type="text" name="name" value="{{ part.name }}" required>
                     {% else %}
@@ -51,7 +52,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Part Number</label>
+                    <label>{% trans "Part Number" %}</label>
                     {% if can_edit %}
                     <input type="text" name="part_number" value="{{ part.part_number|default:'' }}">
                     {% else %}
@@ -59,7 +60,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Category</label>
+                    <label>{% trans "Category" %}</label>
                     {% if can_edit %}
                     <select name="category">
                         {% for c in part_categories %}
@@ -71,7 +72,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Location</label>
+                    <label>{% trans "Location" %}</label>
                     {% if can_edit %}
                     <input type="text" name="location" value="{{ part.location|default:'' }}">
                     {% else %}
@@ -79,7 +80,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Quantity</label>
+                    <label>{% trans "Quantity" %}</label>
                     {% if can_edit %}
                     <input type="text" name="quantity" value="{{ part.quantity|default:'' }}">
                     {% else %}
@@ -87,7 +88,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Reorder Level</label>
+                    <label>{% trans "Reorder Level" %}</label>
                     {% if can_edit %}
                     <input type="text" name="reorder_level" value="{{ part.reorder_level|default:'' }}">
                     {% else %}
@@ -95,7 +96,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Unit Cost ($)</label>
+                    <label>{% trans "Unit Cost ($)" %}</label>
                     {% if can_edit %}
                     <input type="number" name="unit_cost" step="0.01" min="0"
                            value="{{ part.unit_cost|default:'' }}">
@@ -104,7 +105,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     {% if can_edit %}
                     <select name="status">
                         {% for st in part_statuses %}
@@ -116,10 +117,10 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Fits Equipment</label>
+                    <label>{% trans "Fits Equipment" %}</label>
                     {% if can_edit %}
                     <select name="equipment_id">
-                        <option value="">— None —</option>
+                        <option value="">{% trans "— None —" %}</option>
                         {% for e in all_equipment %}
                         <option value="{{ e.id }}" {% if part.equipment_id == e.id %}selected{% endif %}>{{ e.name }}</option>
                         {% endfor %}
@@ -129,7 +130,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     {% if can_edit %}
                     <textarea name="notes" rows="4">{{ part.notes|default:'' }}</textarea>
                     {% else %}
@@ -139,8 +140,8 @@
             </div>
             {% if can_edit %}
             <div class="btn-row">
-                <button type="submit" class="save-btn">Save Changes</button>
-                <a href="/maint/parts/" style="color:#aad;font-size:13px;">Cancel</a>
+                <button type="submit" class="save-btn">{% trans "Save Changes" %}</button>
+                <a href="/maint/parts/" style="color:#aad;font-size:13px;">{% trans "Cancel" %}</a>
             </div>
             {% endif %}
         </form>
