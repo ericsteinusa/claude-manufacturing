@@ -4,6 +4,8 @@
 dashboard and menu views, and the lookup tables that map departments to it.
 """
 
+from django.utils.translation import gettext_lazy as _
+
 # Each item: (key, label, target)
 # target is a script filename (str = leaf) or a dict (sub-menu node).
 
@@ -1684,23 +1686,23 @@ DEPT_MENU_KEY = {
 }
 
 DASHBOARD_DEPARTMENTS = [
-    ('accounting', 'Accounting'),
-    ('customer_service', 'Customer Service'),
-    ('engineering', 'Engineering'),
-    ('information_tech', 'Information Tech'),
-    ('maintenance', 'Maintenance'),
-    ('marketing', 'Marketing'),
-    ('personnel', 'Personnel'),
-    ('production', 'Production'),
-    ('inventory', 'Inventory'),
-    ('purchasing', 'Purchasing'),
-    ('quality_assurance', 'Quality Assurance'),
-    ('sales', 'Sales'),
-    ('budget_management', 'Budget Management'),
-    ('finance', 'Finance'),
-    ('legal', 'Legal'),
-    ('risk_management', 'Risk Management'),
-    ('reports', 'Reports'),
+    ('accounting', _('Accounting')),
+    ('customer_service', _('Customer Service')),
+    ('engineering', _('Engineering')),
+    ('information_tech', _('Information Tech')),
+    ('maintenance', _('Maintenance')),
+    ('marketing', _('Marketing')),
+    ('personnel', _('Personnel')),
+    ('production', _('Production')),
+    ('inventory', _('Inventory')),
+    ('purchasing', _('Purchasing')),
+    ('quality_assurance', _('Quality Assurance')),
+    ('sales', _('Sales')),
+    ('budget_management', _('Budget Management')),
+    ('finance', _('Finance')),
+    ('legal', _('Legal')),
+    ('risk_management', _('Risk Management')),
+    ('reports', _('Reports')),
 ]
 
 # Menu node keys that are only shown to managers.
