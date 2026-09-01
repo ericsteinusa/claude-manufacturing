@@ -8,8 +8,10 @@ import {
   createRequisition, decideRequisition, getPendingRequisitions,
   getRequisitions, submitRequisition,
 } from '../../src/api/requisitions';
+import OfflineBanner from '../../src/components/OfflineBanner';
 import StatusBadge from '../../src/components/StatusBadge';
 import { useAuth } from '../../src/hooks/useAuth';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 
 export default function RequisitionsScreen() {
   const { user } = useAuth();
@@ -17,6 +19,8 @@ export default function RequisitionsScreen() {
   const [pendingReqs, setPendingReqs] = useState<any[]>([]);
   const [tab, setTab] = useState<'mine' | 'pending'>('mine');
   const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
   const [newModal, setNewModal] = useState(false);
   const [purpose, setPurpose] = useState('');
   const [saving, setSaving] = useState(false);
@@ -24,12 +28,28 @@ export default function RequisitionsScreen() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const myRes = await getRequisitions();
-      setReqs(myRes.data.data.requisitions);
+      // Read-only offline support: the list GETs fall back to the last
+      // cached response when there's no connection. Create/submit/decide
+      // are not queued in this pass — matching the Work Orders/Maintenance/
+      // Quality/Inventory/Costing list precedent (see mobile section of
+      // the root CLAUDE.md).
+      const myResult = await fetchWithOfflineCache(
+        'req_list_mine',
+        async () => (await getRequisitions()).data.data.requisitions,
+      );
+      setReqs(myResult.data);
+      let stale = myResult.isStale;
+      let staleAt = myResult.cachedAt;
       if (user?.is_manager) {
-        const pendRes = await getPendingRequisitions();
-        setPendingReqs(pendRes.data.data.requisitions);
+        const pendResult = await fetchWithOfflineCache(
+          'req_list_pending',
+          async () => (await getPendingRequisitions()).data.data.requisitions,
+        );
+        setPendingReqs(pendResult.data);
+        if (pendResult.isStale) { stale = true; staleAt = pendResult.cachedAt; }
       }
+      setIsStale(stale);
+      setCachedAt(staleAt);
     } catch {
       Alert.alert('Error', 'Could not load requisitions.');
     } finally {
@@ -81,6 +101,7 @@ export default function RequisitionsScreen() {
 
   return (
     <View style={styles.screen}>
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       <View style={styles.tabRow}>
         <TouchableOpacity
           style={[styles.tabBtn, tab === 'mine' && styles.tabBtnActive]}

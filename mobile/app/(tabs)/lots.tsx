@@ -6,7 +6,9 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { getLots, getLot, getLotExpiry, createLot, updateLotStatus } from '../../src/api/lots';
 import { getInventory } from '../../src/api/inventory';
+import OfflineBanner from '../../src/components/OfflineBanner';
 import StatusBadge from '../../src/components/StatusBadge';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 
 const LOT_STATUSES = ['available', 'quarantine', 'hold', 'consumed', 'rejected'];
 
@@ -23,6 +25,8 @@ export default function LotsScreen() {
   const [expiryAlerts, setExpiryAlerts] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
   const [selected, setSelected] = useState<any>(null);
   const [createModal, setCreateModal] = useState(false);
   const [statusModal, setStatusModal] = useState<{ lot: any } | null>(null);
@@ -38,12 +42,26 @@ export default function LotsScreen() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [lotsRes, expiryRes] = await Promise.all([
-        getLots(statusFilter ? { status: statusFilter } : undefined),
-        getLotExpiry(30),
+      // Read-only offline support: the lot list and expiry-alert banner
+      // fall back to their last cached response when there's no
+      // connection. The detail drill-down, product search, and create/
+      // status-update mutations are not cached or queued in this pass —
+      // matching the Work Orders/Maintenance/Quality/Inventory/Costing
+      // list precedent (see mobile section of the root CLAUDE.md).
+      const [lotsResult, expiryResult] = await Promise.all([
+        fetchWithOfflineCache(
+          `lots_list_${statusFilter}`,
+          async () => (await getLots(statusFilter ? { status: statusFilter } : undefined)).data.data.lots ?? [],
+        ),
+        fetchWithOfflineCache(
+          'lots_expiry_30',
+          async () => (await getLotExpiry(30)).data.data.alerts ?? [],
+        ),
       ]);
-      setLots(lotsRes.data.data.lots ?? []);
-      setExpiryAlerts(expiryRes.data.data.alerts ?? []);
+      setLots(lotsResult.data);
+      setExpiryAlerts(expiryResult.data);
+      setIsStale(lotsResult.isStale || expiryResult.isStale);
+      setCachedAt(lotsResult.isStale ? lotsResult.cachedAt : expiryResult.cachedAt);
     } catch {
       Alert.alert('Error', 'Could not load lots.');
     } finally {
@@ -124,6 +142,7 @@ export default function LotsScreen() {
 
   return (
     <View style={styles.screen}>
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       {expiryAlerts.length > 0 && (
         <View style={styles.expiryBanner}>
           <Text style={styles.expiryTxt}>
