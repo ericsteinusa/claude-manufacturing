@@ -207,10 +207,10 @@ def get_purch_reports(conn) -> dict:
     top_suppliers = conn.execute(
         "SELECT COALESCE(s.company_name, 'Unknown') AS supplier_name, "
         "COUNT(*) AS po_count, "
-        "COALESCE(SUM(poi.unit_price * poi.quantity), 0) AS total_value "
+        "COALESCE(SUM(poi.unit_price * poi.qty_ordered), 0) AS total_value "
         "FROM purchase_order po "
         "LEFT JOIN supplier s ON s.id = po.supplier_id "
-        "LEFT JOIN purchase_order_item poi ON poi.po_id = po.id "
+        "LEFT JOIN po_item poi ON poi.po_id = po.id "
         "WHERE po.status != 'cancelled' "
         "GROUP BY s.id, s.company_name "
         "ORDER BY po_count DESC LIMIT 8"
@@ -226,9 +226,9 @@ def get_purch_reports(conn) -> dict:
     ).fetchall()
 
     open_value = conn.execute(
-        "SELECT COALESCE(SUM(poi.unit_price * poi.quantity), 0) AS total "
+        "SELECT COALESCE(SUM(poi.unit_price * poi.qty_ordered), 0) AS total "
         "FROM purchase_order po "
-        "JOIN purchase_order_item poi ON poi.po_id = po.id "
+        "JOIN po_item poi ON poi.po_id = po.id "
         "WHERE po.status NOT IN ('received','cancelled')"
     ).fetchone()
 
