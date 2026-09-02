@@ -568,6 +568,7 @@ urlpatterns = [
     path('legal/employment/', views.legal_employment_list, name='legal_employment_list'),
     path('legal/governance/', views.legal_governance_list, name='legal_governance_list'),
     path('credit/', views.credit_dashboard, name='credit_dashboard'),
+    path('credit/kpis-fragment/', views.credit_dashboard_kpis_fragment, name='credit_dashboard_kpis_fragment'),
     path('credit/accounts/', views.credit_account_list, name='credit_account_list'),
     path('credit/accounts/<int:account_id>/', views.credit_account_detail, name='credit_account_detail'),
     path('credit/applications/', views.credit_application_list, name='credit_application_list'),

@@ -1368,12 +1368,12 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 12 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 13 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
-  `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`, and
-  `eng_dashboard.html`. Pattern to copy for the next page:
+  `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
+  `eng_dashboard.html`, and `credit_dashboard.html`. Pattern to copy for the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
@@ -1505,6 +1505,24 @@ to two new languages, it didn't mark any new template.
   and confirmed it appeared in the Recent ECRs table — then deleted it and confirmed it was gone;
   also confirmed the fragment renders correctly in Portuguese and Dutch with an active session in
   each.
+  `credit_dashboard.html`'s own version (`credit_dashboard_kpis_fragment` polling
+  `/credit/kpis-fragment/`) is the first one with no static charts to leave behind at all — the
+  entire body past the toolbar/dept-grid (all three KPI-row sections — Credit Accounts,
+  Applications, Collections — plus the Credit Accounts/Pending Applications/Open Collections
+  tables) is exactly the "manager watches a live queue" content, so the whole thing moved into the
+  fragment; the full-page template also needed its first-ever `extra_scripts` block added, just to
+  carry the htmx script tag, since this dashboard never had a Chart.js include to begin with. No
+  core-module refactor was needed: `credit_core.get_credit_dashboard(conn)`,
+  `list_credit_accounts()`, `list_credit_applications()`, and `list_collection_activities()` were
+  already small, independently-tested functions the full-page view already called directly (with
+  simple list-comprehension filtering for the "pending"/"open" subsets, not raw SQL) — the fifth
+  dashboard in a row not needing one. Full suite passes (3460, unchanged — no new core logic),
+  `manage.py check` and `ruff check .` both clean. Verified end-to-end via the Django test client:
+  hit `/credit/kpis-fragment/` directly (renders standalone with real data — Total Exposure:
+  $245,000); created a real credit application via `credit_core.create_credit_application`,
+  re-fetched the fragment, and confirmed it appeared in the Pending Applications table — then
+  deleted it and confirmed it was gone; also confirmed the fragment renders correctly in Portuguese
+  and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
