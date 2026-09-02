@@ -5,6 +5,7 @@
 
 {% block toolbar_left %}
 <a href="/sales/orders/" class="btn">{% trans "All Orders" %}</a>
+{% if so %}<a href="/edi/855/{{ so.id }}/download/" class="btn">{% trans "Download 855 (EDI)" %}</a>{% endif %}
 <a href="/sales/" class="btn">{% trans "Dashboard" %}</a>
 <a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
