@@ -94,6 +94,15 @@ def mkt_dashboard(request):
 
 
 @dept_required('marketing')
+def mkt_dashboard_kpis_fragment(request):
+    """htmx polling target for mkt_dashboard's Campaigns/Leads/Content KPI
+    rows + Recent Campaigns table."""
+    with get_db_connection() as conn:
+        data = get_marketing_dashboard(conn)
+    return render(request, 'marketing_dashboard_kpis.html', data)
+
+
+@dept_required('marketing')
 def mkt_campaign_list(request):
     status_f = request.GET.get('status', '').strip()
     channel_f = request.GET.get('channel', '').strip()

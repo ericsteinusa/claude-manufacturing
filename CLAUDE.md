@@ -1368,13 +1368,14 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 18 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 19 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
   `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, `sales_reports.html`,
-  `eng_reports.html`, `cs_reports.html`, and `sales_performance.html`. Pattern to copy for
+  `eng_reports.html`, `cs_reports.html`, `sales_performance.html`, and `marketing_dashboard.html`.
+  Pattern to copy for
   the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
@@ -1617,6 +1618,20 @@ to two new languages, it didn't mark any new template.
   appeared in the Target Attainment ranking table — then deleted it and confirmed it was gone;
   also confirmed the fragment renders correctly in Portuguese and Dutch with an active session in
   each.
+  `marketing_dashboard.html`'s own version (`mkt_dashboard_kpis_fragment` polling
+  `/mkt/kpis-fragment/`) picked the KPI row trio (Campaigns/Leads/Content) plus the Recent
+  Campaigns table — a marketing manager watching this page wants to see a new campaign go active
+  or a lead get qualified without a manual refresh, the same "time-sensitive queue" rationale as
+  every prior htmx pass, over the six static status/channel/source breakdown charts below it,
+  which stay static until reload. No core-module refactor was needed:
+  `marketing_core.get_marketing_dashboard(conn)` was already the single small, independently-
+  tested function backing this content — the tenth dashboard in a row not needing one. Full suite
+  passes (3460, unchanged — no new core logic), `manage.py check` and `ruff check .` both clean.
+  Verified end-to-end via the Django test client: hit `/mkt/kpis-fragment/` directly (renders
+  standalone with real data — Total Leads: 11); created a real active campaign via
+  `marketing_core.create_campaign`, re-fetched the fragment, and confirmed it appeared in the
+  Recent Campaigns table — then deleted it and confirmed it was gone; also confirmed the fragment
+  renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
