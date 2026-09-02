@@ -1329,11 +1329,11 @@ per template, stated plainly rather than implied as complete.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 7 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 8 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
-  (the main company dashboard), `purchasing_dashboard.html`, and `qa_dashboard.html`. Pattern to
-  copy for the next page:
+  (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`, and
+  `sales_dashboard.html`. Pattern to copy for the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
@@ -1377,6 +1377,23 @@ per template, stated plainly rather than implied as complete.
   `quality_core.create_ncr`, re-fetched the fragment, and confirmed "Open NCRs" incremented to 13
   with the critical sub-count to 5 — then deleted the test NCR and confirmed both reverted; also
   confirmed the fragment renders correctly in Spanish with an active Spanish session.
+  `sales_dashboard.html`'s version (`sales_dashboard_kpis_fragment` polling
+  `/sales/kpis-fragment/`) picked the KPI row (Confirmed/Shipped/Invoiced Orders, Total Order
+  Value, Open Quotes, Won Quote Value) plus the Recent Orders and Recent Quotes tables — a sales
+  manager watching this page wants to see an order confirm or a quote get won without a manual
+  refresh, the same "time-sensitive queue" rationale as Purchasing's PO-approval queue, over the
+  heavier revenue/customer/pipeline/leads/product/status charts below it, which stay static until
+  reload. No core-module refactor was needed here either: `sales_core.get_sales_dashboard(conn)`,
+  `list_sos(conn)`, and `list_quotes(conn)` were already small standalone, independently-tested
+  functions the full-page view already called directly, so the fragment view just calls the same
+  three rather than needing a new extracted helper. Full suite passes (3457, unchanged — no new
+  core logic), `manage.py check` clean. Verified end-to-end against a from-this-worktree dev
+  server instance: hit `/sales/kpis-fragment/` directly (renders standalone with real data —
+  Confirmed Orders: 6); created a real confirmed sales order via
+  `sales_orders_core.create_so` (status `'confirmed'`), re-fetched the fragment, and confirmed
+  "Confirmed Orders" incremented to 7 with the new order appearing at the top of the Recent
+  Orders table — then deleted the test order and confirmed the count reverted to 6; also
+  confirmed the fragment renders correctly in French with an active French session.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

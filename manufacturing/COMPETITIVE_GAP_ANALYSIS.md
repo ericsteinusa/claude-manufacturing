@@ -4691,3 +4691,28 @@ of them are on `locustfile.py`'s current page list and wouldn't have blocked thi
 This is exactly the kind of regression a per-PR gate is supposed to catch that a manual,
 occasionally-run job doesn't — concrete evidence for the "Full" promotion above, not just a
 process/trigger change.
+
+**2026-09-02, follow-up fix on a later PR:** the `loadtest` check failed again on an unrelated
+PR (htmx live-refresh on `sales_dashboard.html` — no `product`-table or query code touched at
+all), but this time on a **structural pipeline bug**, not a real regression: 1 login POST out of
+312 total requests failed transiently (0.32% — well under the 1% `--max-failure-rate` default),
+yet the job still failed. Root cause: Locust's own headless mode exits with code 1 whenever *any*
+single request fails during the run, regardless of what fraction of the total that is — a much
+blunter check than the percentage-based `check_thresholds.py` gate this pipeline was specifically
+built around (see the 2026-08-29 entry above). Because `scripts/loadtest/run.sh` runs under
+`set -eu` with the `locust` invocation as its last command, that blunt any-failure exit code
+propagated straight to the GitHub Actions step's own exit code, failing the whole job *before*
+"Check regression thresholds" (the next step, which would have correctly passed at 0.32% failure
+rate) ever got a chance to run. In practice this meant the per-PR gate would fail on *any* single
+transient flake anywhere in a multi-hundred-request run, no matter how far under the configured
+threshold the aggregate rate was — not a usable gate. Fixed with a single `|| true` on the
+`locust` invocation in `run.sh` (not `set +e` for the whole script, so a genuine setup failure —
+e.g. the locustfile itself missing — still fails loudly); `check_thresholds.py` downstream is now
+unambiguously the sole pass/fail gate, matching original intent. Verified locally: confirmed the
+`|| true` pattern doesn't get short-circuited by `set -eu` (a synthetic `false || true` under the
+same shell options), ran a real load test against a fresh dev server and confirmed `run.sh` exits
+0 on a clean run, then re-ran `check_thresholds.py` against the same results with an artificially
+strict `--max-p95-ms 1` and confirmed it still correctly fails (exit 1) — the actual gate logic
+is untouched, only the spurious extra gate locust's own exit code was providing got removed. Full
+suite (3457, unchanged), `manage.py check`, and `ruff check .` all clean — pure shell-script fix,
+no Python touched.

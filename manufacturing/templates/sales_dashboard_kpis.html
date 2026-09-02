@@ -1,0 +1,45 @@
+{% load i18n %}
+    <div class="kpi-row">
+        <div class="kpi"><div class="val">{{ dash.orders.confirmed|default:0 }}</div><div class="lbl">{% trans "Confirmed Orders" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.orders.shipped|default:0 }}</div><div class="lbl">{% trans "Shipped" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.orders.invoiced|default:0 }}</div><div class="lbl">{% trans "Invoiced" %}</div></div>
+        <div class="kpi"><div class="val money">${{ dash.orders.total_value|floatformat:0|default:0 }}</div><div class="lbl">{% trans "Total Order Value" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.quotes.sent|default:0 }}</div><div class="lbl">{% trans "Open Quotes" %}</div></div>
+        <div class="kpi"><div class="val money">${{ dash.quotes.won_value|floatformat:0|default:0 }}</div><div class="lbl">{% trans "Won Quote Value" %}</div></div>
+    </div>
+
+    <div class="two-col">
+        <div>
+            <div class="section-hdr">{% trans "Recent Orders" %}</div>
+            <table class="list-table">
+                <thead><tr><th>{% trans "SO #" %}</th><th>{% trans "Customer" %}</th><th>{% trans "Status" %}</th><th>{% trans "Total" %}</th></tr></thead>
+                <tbody>
+                {% for o in recent_orders %}
+                <tr onclick="location.href='/sales/orders/{{ o.id }}/'">
+                    <td>{{ o.so_number }}</td>
+                    <td>{{ o.company_name|default:o.first_name }}</td>
+                    <td><span class="badge st-{{ o.status }}">{{ o.status }}</span></td>
+                    <td>${{ o.total|floatformat:2 }}</td>
+                </tr>
+                {% empty %}<tr><td colspan="4" style="color:#888;">{% trans "No orders yet." %}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <div class="section-hdr">{% trans "Recent Quotes" %}</div>
+            <table class="list-table">
+                <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th></tr></thead>
+                <tbody>
+                {% for q in recent_quotes %}
+                <tr onclick="location.href='/sales/quotes/'">
+                    <td>{{ q.customer }}</td>
+                    <td>${{ q.amount|floatformat:2 }}</td>
+                    <td><span class="badge st-{{ q.status }}">{{ q.status }}</span></td>
+                </tr>
+                {% empty %}<tr><td colspan="3" style="color:#888;">{% trans "No quotes yet." %}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>

@@ -6187,6 +6187,21 @@ def sales_dashboard(request):
 
 
 @dept_required(_SALES_DEPT_KEYS)
+def sales_dashboard_kpis_fragment(request):
+    """htmx polling target for sales_dashboard's KPI row + Recent Orders/
+    Recent Quotes tables."""
+    with get_db_connection() as conn:
+        dash = get_sales_dashboard(conn)
+        recent_orders = list_sos(conn)[:8]
+        recent_quotes = list_quotes(conn)[:8]
+    return render(request, 'sales_dashboard_kpis.html', {
+        'dash': dash,
+        'recent_orders': recent_orders,
+        'recent_quotes': recent_quotes,
+    })
+
+
+@dept_required(_SALES_DEPT_KEYS)
 def sales_reports_view(request):
     period = request.GET.get('period', 'month')
     date_from = request.GET.get('date_from', '').strip()
