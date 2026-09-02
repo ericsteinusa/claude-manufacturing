@@ -1368,12 +1368,13 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 13 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 14 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
-  `eng_dashboard.html`, and `credit_dashboard.html`. Pattern to copy for the next page:
+  `eng_dashboard.html`, `credit_dashboard.html`, and `finance_dashboard.html`. Pattern to copy for
+  the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
@@ -1523,6 +1524,24 @@ to two new languages, it didn't mark any new template.
   re-fetched the fragment, and confirmed it appeared in the Pending Applications table — then
   deleted it and confirmed it was gone; also confirmed the fragment renders correctly in Portuguese
   and Dutch with an active session in each.
+  `finance_dashboard.html`'s own version (`fin_dashboard_kpis_fragment` polling
+  `/fin/kpis-fragment/`) picked the AP KPI row, AR KPI row, and Cash Flow KPI row (Cash Position,
+  Projected Balance 13wks, Net Change 13wks) plus the Recent Journal Entries table — the same
+  AP/AR/journals content as Accounting's own dashboard (this department shares
+  `_ACCOUNTING_DEPT_KEYS`/`finance_core.get_finance_dashboard()` with it) plus a cash-position KPI
+  row unique to Finance, over the static 13-week cash-forecast line chart, revenue/expense chart,
+  AR/AP aging charts, top-AR-customers chart, and invoice-status-mix chart below it — a
+  controller/CFO watching this page wants to see cash position or a new journal change without a
+  manual refresh, the same "time-sensitive queue" rationale as every prior htmx pass. No
+  core-module refactor was needed: `get_finance_dashboard(conn)`, `get_cash_position(conn)`, and
+  `get_cash_forecast_13wk(conn, starting_balance=...)` were already small, independently-tested
+  functions the full-page view already called directly — the sixth dashboard in a row not needing
+  one. Full suite passes (3460, unchanged — no new core logic), `manage.py check` and `ruff check .`
+  both clean. Verified end-to-end via the Django test client: hit `/fin/kpis-fragment/` directly
+  (renders standalone with real data — Cash Position: $805,200.00); created a real balanced GL
+  journal via `accounting_core.create_journal`, re-fetched the fragment, and confirmed it appeared
+  in the Recent Journal Entries table — then deleted it and confirmed it was gone; also confirmed
+  the fragment renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

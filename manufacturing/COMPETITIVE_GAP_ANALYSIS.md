@@ -4846,3 +4846,21 @@ CLAUDE.md's htmx section for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 13 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Finance
+dashboard.** The fourteenth template, up from 13. `finance_dashboard.html`'s AP KPI row, AR KPI
+row, and Cash Flow KPI row (Cash Position, Projected Balance 13wks, Net Change 13wks) plus its
+Recent Journal Entries table now poll `/fin/kpis-fragment/` every 30s — a controller/CFO watching
+this page wants to see cash position or a new journal change without a manual refresh, the same
+"time-sensitive queue" rationale as every prior htmx pass. No core-module refactor was needed:
+`finance_core.get_finance_dashboard()`, `get_cash_position()`, and `get_cash_forecast_13wk()` were
+already small, independently-tested functions the full-page view already called directly — the
+sixth dashboard in a row (after Sales, IT, Customer Service, Engineering, Customers/Credit) not
+needing one. Verified end-to-end (a real balanced GL journal created via the Django test client,
+confirmed appearing live in the fragment's table, then removed; confirmed correct rendering in all
+six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 14 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.

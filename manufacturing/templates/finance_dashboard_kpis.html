@@ -1,0 +1,84 @@
+{% load i18n %}
+    <div class="section-label">{% trans "Accounts Payable" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Open Invoices" %}</div>
+            <div class="val">{{ ap.open_count|default:0 }}</div>
+        </div>
+        <div class="kpi{% if ap.overdue_count %} red{% endif %}">
+            <div class="lbl">{% trans "Overdue" %}</div>
+            <div class="val">{{ ap.overdue_count|default:0 }}</div>
+        </div>
+        <div class="kpi{% if ap.total_outstanding %} yellow{% endif %}">
+            <div class="lbl">{% trans "Total Outstanding" %}</div>
+            <div class="val">${{ ap.total_outstanding|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">{% trans "Accounts Receivable" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Open Invoices" %}</div>
+            <div class="val">{{ ar.open_count|default:0 }}</div>
+        </div>
+        <div class="kpi{% if ar.overdue_count %} red{% endif %}">
+            <div class="lbl">{% trans "Overdue" %}</div>
+            <div class="val">{{ ar.overdue_count|default:0 }}</div>
+        </div>
+        <div class="kpi{% if ar.total_outstanding %} yellow{% endif %}">
+            <div class="lbl">{% trans "Total Outstanding" %}</div>
+            <div class="val">${{ ar.total_outstanding|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">{% trans "Cash Flow" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Cash Position" %}</div>
+            <div class="val">${{ cash_position|floatformat:2 }}</div>
+        </div>
+        <div class="kpi{% if cash_forecast_end < 0 %} red{% endif %}">
+            <div class="lbl">{% trans "Projected Balance (13 wks)" %}</div>
+            <div class="val">${{ cash_forecast_end|floatformat:2 }}</div>
+        </div>
+        <div class="kpi{% if cash_forecast_net_change < 0 %} red{% endif %}">
+            <div class="lbl">{% trans "Net Change (13 wks)" %}</div>
+            <div class="val">${{ cash_forecast_net_change|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>{% trans "Recent Journal Entries" %}</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Reference" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Lines" %}</th>
+                    <th>{% trans "Total Debit" %}</th>
+                    <th>{% trans "Status" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for j in recent_journals %}
+            <tr>
+                <td><a href="/gl/journals/{{ j.id }}/" style="color:var(--accent);">{{ j.journal_date }}</a></td>
+                <td>{{ j.reference|default:"—" }}</td>
+                <td>{{ j.description|default:"—"|truncatechars:60 }}</td>
+                <td>{{ j.line_count }}</td>
+                <td>${{ j.total_debit|floatformat:2 }}</td>
+                <td>
+                    {% if j.posted %}
+                        <span class="badge posted">{% trans "Posted" %}</span>
+                    {% else %}
+                        <span class="badge unposted">{% trans "Draft" %}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;">{% trans "No journal entries yet." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
