@@ -4919,3 +4919,19 @@ correct rendering in all six wired languages). See CLAUDE.md's htmx section for 
 
 **§6.1/§9.2 status:** still 🟡 Partial — 17 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Sales Performance
+dashboard.** The eighteenth template, up from 17. `sales_performance.html`'s two rep-ranking
+tables (Target Attainment, Revenue from Orders) now poll `/sales/performance/kpis-fragment/`
+every 30s — the third page in this series (after Credit, Engineering Reports) with nothing static
+to leave behind, so the whole page moved into the fragment verbatim. No core-module refactor was
+needed: `sales_core.get_sales_performance()` was already the single small, independently-tested
+function backing this entire page — the ninth dashboard in a row not needing one. Verified
+end-to-end (a real sales target created via the Django test client, confirmed the new rep
+appearing live in the ranking table, then removed; confirmed correct rendering in all six wired
+languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 18 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.

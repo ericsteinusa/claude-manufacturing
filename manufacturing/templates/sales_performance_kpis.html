@@ -1,0 +1,77 @@
+{% load i18n %}
+    <p class="section-head">{% trans "Rep Rankings — Target Attainment" %}</p>
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">{% trans "Rank" %}</th>
+                    <th>{% trans "Rep" %}</th>
+                    <th class="num">{% trans "Target" %}</th>
+                    <th class="num">{% trans "Actual" %}</th>
+                    <th class="num">{% trans "Variance" %}</th>
+                    <th>{% trans "Attainment" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rep_targets %}
+            <tr>
+                <td style="text-align:center;">
+                    {% if forloop.counter == 1 %}<span class="rank-medal">&#x1F947;</span>
+                    {% elif forloop.counter == 2 %}<span class="rank-medal">&#x1F948;</span>
+                    {% elif forloop.counter == 3 %}<span class="rank-medal">&#x1F949;</span>
+                    {% else %}{{ forloop.counter }}{% endif %}
+                </td>
+                <td><strong>{{ r.rep }}</strong></td>
+                <td class="num">${{ r.total_target|floatformat:0 }}</td>
+                <td class="num">${{ r.total_actual|floatformat:0 }}</td>
+                <td class="num {% if r.variance >= 0 %}pos{% else %}neg{% endif %}">
+                    {% if r.variance >= 0 %}+{% endif %}${{ r.variance|floatformat:0 }}
+                </td>
+                <td>
+                    {% if r.total_target %}
+                    <div class="pct-bar-wrap">
+                        <div class="pct-bar-outer">
+                            <div class="pct-bar-inner" style="width:{% if r.attainment_pct > 100 %}100{% else %}{{ r.attainment_pct }}{% endif %}%;"></div>
+                        </div>
+                        <span style="font-size:12px;white-space:nowrap;">{{ r.attainment_pct }}%</span>
+                    </div>
+                    {% else %}—{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% blocktrans %}No target data available. <a href="/sales/targets/">Add targets</a> to see rankings.{% endblocktrans %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p class="section-head">{% trans "Rep Rankings — Revenue from Orders" %}</p>
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">{% trans "Rank" %}</th>
+                    <th>{% trans "Rep" %}</th>
+                    <th class="num">{% trans "Orders" %}</th>
+                    <th class="num">{% trans "Revenue" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rep_orders %}
+            <tr>
+                <td style="text-align:center;">
+                    {% if forloop.counter == 1 %}<span class="rank-medal">&#x1F947;</span>
+                    {% elif forloop.counter == 2 %}<span class="rank-medal">&#x1F948;</span>
+                    {% elif forloop.counter == 3 %}<span class="rank-medal">&#x1F949;</span>
+                    {% else %}{{ forloop.counter }}{% endif %}
+                </td>
+                <td><strong>{{ r.sales_rep }}</strong></td>
+                <td class="num">{{ r.order_count }}</td>
+                <td class="num">${{ r.revenue|floatformat:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;text-align:center;">{% blocktrans %}No order data by rep yet. Orders are credited to whoever creates them — create an order on the <a href="/so/">Sales Orders</a> page to see rankings here.{% endblocktrans %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>

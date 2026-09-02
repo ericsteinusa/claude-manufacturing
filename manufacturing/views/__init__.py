@@ -8751,6 +8751,14 @@ def sales_performance(request):
 
 
 @dept_required(_SALES_DEPT_KEYS)
+def sales_performance_kpis_fragment(request):
+    """htmx polling target for sales_performance's rep-ranking tables."""
+    with get_db_connection() as conn:
+        data = get_sales_performance(conn)
+    return render(request, 'sales_performance_kpis.html', data)
+
+
+@dept_required(_SALES_DEPT_KEYS)
 def sales_performance_reviews(request):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     rep_f = request.GET.get('rep', '').strip()

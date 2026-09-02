@@ -396,6 +396,8 @@ urlpatterns = [
     path('sales/commissions/plans/', views.sales_commission_plans,
          name='sales_commission_plans'),
     path('sales/performance/', views.sales_performance, name='sales_performance'),
+    path('sales/performance/kpis-fragment/', views.sales_performance_kpis_fragment,
+         name='sales_performance_kpis_fragment'),
     path('sales/performance/reviews/', views.sales_performance_reviews,
          name='sales_performance_reviews'),
     path('sales/performance/coaching/', views.sales_coaching, name='sales_coaching'),
