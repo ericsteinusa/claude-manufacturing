@@ -6,8 +6,11 @@ CONTRACT_STATUSES = ('Active', 'Pending Renewal', 'Expired', 'Cancelled')
 CONTRACT_CATEGORIES = ('Services', 'Materials', 'Equipment', 'Software', 'Maintenance', 'Other')
 
 
-def get_purchasing_dashboard(conn) -> dict:
-    """Return dict with keys: pos, recent_pos.
+def get_purchasing_dashboard_kpis(conn) -> dict:
+    """Return dict with keys: pos, recent_pos — shared by
+    get_purchasing_dashboard() and the htmx polling fragment so the KPI
+    row + recent-POs table always match the full-page render's numbers,
+    computed once here rather than duplicated.
 
     pos: {draft, pending_approval, sent, partial, received, open, total}
     recent_pos: list of last 8 PO rows (id, po_number, order_date,
@@ -32,6 +35,18 @@ def get_purchasing_dashboard(conn) -> dict:
         "LEFT JOIN supplier s ON s.id = po.supplier_id "
         "ORDER BY po.id DESC LIMIT 8"
     ).fetchall()
+
+    return {
+        'pos': dict(po_row) if po_row else {},
+        'recent_pos': [dict(r) for r in recent_rows],
+    }
+
+
+def get_purchasing_dashboard(conn) -> dict:
+    """Return dict with keys: pos, recent_pos, po_status_chart,
+    spend_by_month, top_suppliers, po_trend, top_items, req_status.
+    """
+    kpis = get_purchasing_dashboard_kpis(conn)
 
     # PO status breakdown for doughnut chart
     status_rows = conn.execute(
@@ -86,8 +101,7 @@ def get_purchasing_dashboard(conn) -> dict:
     ).fetchall()
 
     return {
-        'pos': dict(po_row) if po_row else {},
-        'recent_pos': [dict(r) for r in recent_rows],
+        **kpis,
         'po_status_chart': [dict(r) for r in status_rows],
         'spend_by_month': [dict(r) for r in spend_rows],
         'top_suppliers': [dict(r) for r in top_supplier_rows],
