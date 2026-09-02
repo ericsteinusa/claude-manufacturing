@@ -1434,10 +1434,19 @@ per template, stated plainly rather than implied as complete.
   same "self-heal in the query path" pattern `get_product()` already used for
   just `created_by` before this fix generalized it. Five more modules
   (`bom_web_core.py`, `carbon_core.py`, `mrp_web_core.py`,
-  `cycle_count_core.py`, `costing_core.py`) reference the same columns without
-  any self-heal and share the identical latent bug, flagged separately rather
-  than fixed in the same pass since none of them are on the load test's
-  current page list.
+  `cycle_count_core.py`, `costing_core.py`) referenced the same columns
+  without any self-heal and shared the identical latent bug, despite not
+  being on the load test's page list — fixed in a follow-up pass:
+  `bom_web_core.py`/`mrp_web_core.py` import
+  `inventory_core._ensure_product_extra_columns` directly, while
+  `carbon_core.py`/`costing_core.py`/`cycle_count_core.py` already gate
+  their queries behind their own `ensure_*_tables(conn)` (called from every
+  view), so the missing `item_type`/`uom` `ALTER TABLE`s were added there
+  instead. Postgres DDL is transactional, so functions that must not commit
+  their own transaction (`create_product`/`update_product`/
+  `update_item_master`) just run the `ALTER`s without an explicit
+  `conn.commit()` — the caller's own commit persists them alongside the row
+  it's writing.
 - **Batch number generation.** The `_next_wo_num()` / `_next_req_num()` helpers
   compute the next `WO-<yr>-NNNN` / `REQ-<yr>-NNNN` via `COUNT(*)` on **their
   own fresh connection**. That collides when creating **several rows in one

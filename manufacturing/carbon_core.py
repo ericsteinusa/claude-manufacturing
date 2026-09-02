@@ -59,6 +59,15 @@ def ensure_carbon_tables(conn):
         "ALTER TABLE product ADD COLUMN IF NOT EXISTS "
         "kg_co2e_per_unit REAL DEFAULT 0"
     )
+    # A genuinely fresh Postgres deployment's `product` table (created via
+    # schema.py's/work_orders_core.py's own CREATE TABLE IF NOT EXISTS) has
+    # no item_type column — it's only added by seed_sample_products.py's own
+    # ALTER TABLE, a dev-only script never run in production. _get_bom_lines
+    # below selects p.item_type, so self-heal it here too.
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS "
+        "item_type TEXT DEFAULT 'buy'"
+    )
     conn.execute(
         "ALTER TABLE workcenter ADD COLUMN IF NOT EXISTS "
         "kg_co2e_per_hour REAL DEFAULT 0"
