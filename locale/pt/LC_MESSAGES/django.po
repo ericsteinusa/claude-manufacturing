@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 23:00+0000\n"
+"POT-Creation-Date: 2026-09-02 23:47+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
@@ -1108,6 +1108,7 @@ msgstr "G/L"
 
 #: manufacturing/templates/ap_invoice_detail.html:54
 #: manufacturing/templates/ar_invoice_detail.html:54
+#: manufacturing/templates/blanket_po_detail.html:54
 #: manufacturing/templates/maint_wo_detail.html:57
 #: manufacturing/templates/payroll_stub_detail.html:36
 #: manufacturing/templates/po_detail.html:90
@@ -1386,7 +1387,7 @@ msgstr "N.º de Cheque, etc."
 #: manufacturing/templates/ats_candidate_detail.html:69
 #: manufacturing/templates/ats_requisition_detail.html:91
 #: manufacturing/templates/benefit_plan_detail.html:122
-#: manufacturing/templates/blanket_po_detail.html:89
+#: manufacturing/templates/blanket_po_detail.html:100
 #: manufacturing/templates/blanket_po_new.html:50
 #: manufacturing/templates/blanket_po_release_new.html:44
 #: manufacturing/templates/coa_detail.html:40
@@ -3054,20 +3055,20 @@ msgstr "Ainda não há planos de benefícios."
 msgid "Back"
 msgstr "Voltar"
 
-#: manufacturing/templates/blanket_po_detail.html:51
+#: manufacturing/templates/blanket_po_detail.html:62
 #: manufacturing/templates/po_detail.html:104
 msgid "Supplier:"
 msgstr "Fornecedor:"
 
-#: manufacturing/templates/blanket_po_detail.html:52
+#: manufacturing/templates/blanket_po_detail.html:63
 msgid "Description:"
 msgstr "Descrição:"
 
-#: manufacturing/templates/blanket_po_detail.html:53
+#: manufacturing/templates/blanket_po_detail.html:64
 msgid "Validity:"
 msgstr "Validade:"
 
-#: manufacturing/templates/blanket_po_detail.html:56
+#: manufacturing/templates/blanket_po_detail.html:67
 #, python-format
 msgid ""
 "<b>Total Value:</b> $%(tot)s\n"
@@ -3076,7 +3077,7 @@ msgstr ""
 "<b>Valor Total:</b> $%(tot)s\n"
 "                    (Liberado: $%(rel)s, Restante: $%(rem)s)"
 
-#: manufacturing/templates/blanket_po_detail.html:59
+#: manufacturing/templates/blanket_po_detail.html:70
 #, python-format
 msgid ""
 "<b>Total Qty:</b> %(tot)s\n"
@@ -3085,35 +3086,35 @@ msgstr ""
 "<b>Qtd. Total:</b> %(tot)s\n"
 "                    (Liberado: %(rel)s, Restante: %(rem)s)"
 
-#: manufacturing/templates/blanket_po_detail.html:63
+#: manufacturing/templates/blanket_po_detail.html:74
 #: manufacturing/templates/pers_review_detail.html:112
 #: manufacturing/templates/pers_training_detail.html:109
 #: manufacturing/templates/po_detail.html:113
 msgid "Notes:"
 msgstr "Observações:"
 
-#: manufacturing/templates/blanket_po_detail.html:67
+#: manufacturing/templates/blanket_po_detail.html:78
 msgid "Cancel this blanket PO?"
 msgstr "Cancelar esta PO recorrente?"
 
-#: manufacturing/templates/blanket_po_detail.html:69
+#: manufacturing/templates/blanket_po_detail.html:80
 msgid "Cancel Blanket PO"
 msgstr "Cancelar PO Recorrente"
 
-#: manufacturing/templates/blanket_po_detail.html:76
+#: manufacturing/templates/blanket_po_detail.html:87
 msgid "Call-offs"
 msgstr "Liberações"
 
-#: manufacturing/templates/blanket_po_detail.html:78
+#: manufacturing/templates/blanket_po_detail.html:89
 #: manufacturing/templates/blanket_po_release_new.html:48
 msgid "Add Call-off"
 msgstr "Adicionar Liberação"
 
-#: manufacturing/templates/blanket_po_detail.html:85
+#: manufacturing/templates/blanket_po_detail.html:96
 msgid "Release #"
 msgstr "Nº da Liberação"
 
-#: manufacturing/templates/blanket_po_detail.html:86
+#: manufacturing/templates/blanket_po_detail.html:97
 #: manufacturing/templates/blanket_po_release_new.html:29
 #: manufacturing/templates/maint_parts_list.html:78
 #: manufacturing/templates/po_detail.html:166
@@ -3131,7 +3132,7 @@ msgstr "Nº da Liberação"
 msgid "Qty"
 msgstr "Qtd."
 
-#: manufacturing/templates/blanket_po_detail.html:87
+#: manufacturing/templates/blanket_po_detail.html:98
 #: manufacturing/templates/blanket_po_release_new.html:35
 #: manufacturing/templates/legal_contract_detail.html:67
 #: manufacturing/templates/legal_contract_list.html:91
@@ -3145,12 +3146,12 @@ msgstr "Qtd."
 msgid "Value"
 msgstr "Valor"
 
-#: manufacturing/templates/blanket_po_detail.html:88
+#: manufacturing/templates/blanket_po_detail.html:99
 #: manufacturing/templates/blanket_po_release_new.html:40
 msgid "Delivery Date"
 msgstr "Data de Entrega"
 
-#: manufacturing/templates/blanket_po_detail.html:105
+#: manufacturing/templates/blanket_po_detail.html:116
 msgid "No call-offs recorded yet."
 msgstr "Ainda não há liberações registradas."
 

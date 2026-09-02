@@ -9,6 +9,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn { display: none !important; }
+    body { background: white !important; }
+    .po-wrap { max-width: none; }
+}
 .po-wrap { width: 100%; max-width: 900px; }
 .po-card {
     background: white; border: 1.5px solid var(--border); border-radius: 6px;
@@ -41,6 +51,7 @@
 
 {% block body %}
 <div class="content">
+    <button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
     <div class="po-wrap">
         <div class="po-card">
             <div class="po-head">
