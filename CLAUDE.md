@@ -1368,14 +1368,15 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 23 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
   `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, `sales_reports.html`,
   `eng_reports.html`, `cs_reports.html`, `sales_performance.html`, `marketing_dashboard.html`,
-  `gl_dashboard.html`, `ar_list.html`, `ap_list.html`, and `ar_invoice_detail.html`. Pattern to
+  `gl_dashboard.html`, `ar_list.html`, `ap_list.html`, `ar_invoice_detail.html`, and
+  `ap_invoice_detail.html`. Pattern to
   copy for
   the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
@@ -1699,6 +1700,19 @@ to two new languages, it didn't mark any new template.
   `accounting_core.record_ar_payment`, re-fetched the fragment, and confirmed it appeared in the
   Payment History table — then deleted it and confirmed it was gone; also confirmed the fragment
   renders correctly in Portuguese and Dutch with an active session in each.
+  `ap_invoice_detail.html`'s own version (`ap_invoice_payments_fragment` polling
+  `/ap/<id>/payments-fragment/`) mirrors AR's exact shape — the same "Payment History table only,
+  both forms untouched" scoping, since AP/AR invoice detail pages are structurally
+  near-identical (Vendor/Paid vs. Customer/Received terminology, the same near-duplicate pattern
+  already established for the list pages). No core-module refactor was needed:
+  `accounting_core.list_ap_payments(conn, inv_id)` was already the exact function the full page
+  already called. Full suite passes (3460, unchanged — no new core logic), `manage.py check` and
+  `ruff check .` both clean. Verified end-to-end via the Django test client — including explicitly
+  confirming both forms' markup is present on the full page load and absent from the fragment
+  response: recorded a real payment via `accounting_core.record_ap_payment`, re-fetched the
+  fragment, and confirmed it appeared in the Payment History table — then deleted it and confirmed
+  it was gone; also confirmed the fragment renders correctly in Portuguese and Dutch with an
+  active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
