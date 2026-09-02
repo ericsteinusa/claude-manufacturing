@@ -5282,6 +5282,17 @@ def ap_invoice_detail(request, inv_id=None):
     return render(request, 'ap_invoice_detail.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
+def ap_invoice_payments_fragment(request, inv_id):
+    """htmx polling target for ap_invoice_detail's Payment History table only
+    -- deliberately excludes the Record Payment form and the status-change
+    form elsewhere on the page, since those hold in-progress user input that
+    a periodic innerHTML swap would silently discard."""
+    with get_db_connection() as conn:
+        payments = list_ap_payments(conn, inv_id)
+    return render(request, 'ap_invoice_payments_kpis.html', {'payments': payments})
+
+
 # ── Accounts Receivable ─────────────────────────────────────────────────────
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)

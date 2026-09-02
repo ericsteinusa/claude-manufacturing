@@ -5021,3 +5021,19 @@ all six wired languages). See CLAUDE.md's htmx section for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 23 of ~450 templates now. AP's own invoice detail page
 (`ap_invoice_detail.html`) is a natural next candidate, mirroring this exact pattern.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the AP invoice detail
+page.** The twenty-fourth template, up from 23 — mirrors AR invoice detail's exact shape.
+`ap_invoice_detail.html`'s read-only Payment History table now polls
+`/ap/<id>/payments-fragment/` every 30s, with the same scoping rationale: both live forms
+(status-change, Record Payment) stay outside the fragment untouched. No core-module refactor was
+needed: `accounting_core.list_ap_payments()` was already the exact function the full page already
+called. Verified end-to-end (explicitly confirmed both forms' markup is present on the full page
+and absent from the fragment response; a real payment recorded via the Django test client appeared
+live in the fragment's table, then was removed; confirmed correct rendering in all six wired
+languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 24 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.

@@ -1,0 +1,22 @@
+{% load i18n %}
+{% if payments %}
+<table class="list-table">
+    <thead><tr>
+        <th>{% trans "Date" %}</th><th>{% trans "Method" %}</th><th>{% trans "Reference" %}</th>
+        <th class="num">{% trans "Amount" %}</th><th>{% trans "Notes" %}</th>
+    </tr></thead>
+    <tbody>
+    {% for p in payments %}
+    <tr>
+        <td>{{ p.payment_date|default:"—" }}</td>
+        <td>{{ p.payment_method }}</td>
+        <td>{{ p.reference|default:"—" }}</td>
+        <td class="num">${{ p.amount|floatformat:2 }}</td>
+        <td>{{ p.notes|default:"" }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p style="color:#888;font-size:13px;">{% trans "No payments recorded." %}</p>
+{% endif %}
