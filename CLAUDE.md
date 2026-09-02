@@ -1368,13 +1368,13 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 17 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 18 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
   `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, `sales_reports.html`,
-  `eng_reports.html`, and `cs_reports.html`. Pattern to copy for
+  `eng_reports.html`, `cs_reports.html`, and `sales_performance.html`. Pattern to copy for
   the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
@@ -1601,6 +1601,22 @@ to two new languages, it didn't mark any new template.
   `cs_calls_core.create_ticket`, re-fetched the fragment, and confirmed Total Tickets incremented
   from 25 to 26 — then deleted it and confirmed it reverted to 25; also confirmed the fragment
   renders correctly in Portuguese and Dutch with an active session in each.
+  `sales_performance.html`'s own version (`sales_performance_kpis_fragment` polling
+  `/sales/performance/kpis-fragment/`) is the third page (after Credit and Engineering Reports)
+  with nothing static to leave behind — both ranking tables (Target Attainment, Revenue from
+  Orders) are exactly the "manager watches a live leaderboard" content, no query params or
+  Chart.js canvases involved, so the whole page moved into the fragment verbatim, needing its own
+  first-ever `extra_scripts` block just for the htmx tag. No core-module refactor was needed:
+  `sales_core.get_sales_performance()` was already the single small, independently-tested
+  function backing this entire page — the ninth dashboard in a row not needing one. Full suite
+  passes (3460, unchanged — no new core logic), `manage.py check` and `ruff check .` both clean
+  (the URL route line needed a manual wrap to stay under ruff's line-length limit — the only
+  formatting wrinkle in this pass). Verified end-to-end via the Django test client: hit
+  `/sales/performance/kpis-fragment/` directly (renders standalone with real data); created a real
+  sales target via `sales_core.create_target`, re-fetched the fragment, and confirmed the new rep
+  appeared in the Target Attainment ranking table — then deleted it and confirmed it was gone;
+  also confirmed the fragment renders correctly in Portuguese and Dutch with an active session in
+  each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
