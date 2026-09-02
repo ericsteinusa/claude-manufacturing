@@ -1368,12 +1368,12 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 10 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 11 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
-  `sales_dashboard.html`, `it_dashboard.html`, and `acct_dashboard.html`. Pattern to copy for the
-  next page:
+  `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, and `cs_dashboard.html`.
+  Pattern to copy for the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
@@ -1474,6 +1474,21 @@ to two new languages, it didn't mark any new template.
   `accounting_core.create_journal`, re-fetched the fragment, and confirmed it appeared at the top of
   the Recent Journal Entries table — then deleted it and confirmed it was gone; also confirmed the
   fragment renders correctly in Portuguese and Dutch with an active session in each.
+  `cs_dashboard.html`'s own version (`cs_dashboard_kpis_fragment` polling
+  `/cs-dash/kpis-fragment/`) picked the ticket KPI row (Open/Completed/Total 12mo/Completion
+  Rate/Avg Resolution/Avg Age Open) plus the Recent Tickets table — a CS manager watching this page
+  wants to see a new ticket land or the open count drop without a manual refresh, the same
+  "time-sensitive queue" rationale as every prior htmx pass, over the static ticket-trend,
+  open-vs-closed, return-status/reason, survey-score, and KB-status charts below it. No
+  core-module refactor was needed: `cs_calls_core.get_summary_stats(conn)` and
+  `list_tickets(conn)[:8]` were already small, independently-tested functions the full-page view
+  already called directly, the same shape as Sales' and IT's no-refactor cases. Full suite passes
+  (3460, unchanged — no new core logic), `manage.py check` and `ruff check .` both clean. Verified
+  end-to-end via the Django test client: hit `/cs-dash/kpis-fragment/` directly (renders standalone
+  with real data — Open Tickets: 8); created a real ticket via `cs_calls_core.create_ticket`,
+  re-fetched the fragment, and confirmed it appeared in the Recent Tickets table — then deleted it
+  and confirmed it was gone; also confirmed the fragment renders correctly in Portuguese and Dutch
+  with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

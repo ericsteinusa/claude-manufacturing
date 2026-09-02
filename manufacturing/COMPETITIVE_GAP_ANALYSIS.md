@@ -4792,3 +4792,20 @@ correct rendering in all six wired languages). See CLAUDE.md's htmx section for 
 live queue" candidates, picked for the same rationale, none touched yet: Customer Service
 (`cs_dashboard.html`, open ticket count) and Engineering (`eng_dashboard.html`, pending ECRs +
 overdue tasks).
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Customer Service
+dashboard.** The eleventh template, up from 10. `cs_dashboard.html`'s ticket KPI row
+(Open/Completed/Total/Completion Rate/Avg Resolution/Avg Age Open) plus its Recent Tickets table
+now poll `/cs-dash/kpis-fragment/` every 30s — a CS manager watching this page wants to see a new
+ticket land without a manual refresh, the same "time-sensitive queue" rationale as every prior
+htmx pass. No core-module refactor was needed: `cs_calls_core.get_summary_stats()`/`list_tickets()`
+were already small, independently-tested functions the full-page view already called directly, the
+same shape as Sales' and IT's no-refactor cases. Verified end-to-end (a real ticket created via the
+Django test client, confirmed appearing live in the fragment's table, then removed; confirmed
+correct rendering in all six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 11 of ~450 templates now. Remaining "manager watches a
+live queue" candidate, picked for the same rationale, not yet touched: Engineering
+(`eng_dashboard.html`, pending ECRs + overdue tasks).
