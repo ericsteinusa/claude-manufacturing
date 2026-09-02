@@ -4758,6 +4758,26 @@ def cs_reports(request):
 
 
 @dept_required(_CS_DEPT_KEYS)
+def cs_reports_kpis_fragment(request):
+    """htmx polling target for cs_reports' KPI cards + monthly volume table
+    + open/overdue summary, for whichever `days` period is currently shown."""
+    try:
+        days = int(request.GET.get('days', 365))
+    except ValueError:
+        days = 365
+    with get_db_connection() as conn:
+        stats = get_summary_stats(conn, days)
+        monthly = get_monthly_volume(conn, days)
+        open_tickets = list_tickets(conn, status='open')
+        overdue_count = sum(1 for t in open_tickets
+                            if t['priority'] in ('high', 'critical'))
+    return render(request, 'cs_reports_kpis.html', {
+        'stats': stats, 'monthly': monthly,
+        'open_count': len(open_tickets), 'overdue_count': overdue_count,
+    })
+
+
+@dept_required(_CS_DEPT_KEYS)
 def cs_plans(request):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_filter = request.GET.get('status', '').strip()
