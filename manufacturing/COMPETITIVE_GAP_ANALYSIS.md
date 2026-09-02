@@ -4716,3 +4716,38 @@ strict `--max-p95-ms 1` and confirmed it still correctly fails (exit 1) — the 
 is untouched, only the spurious extra gate locust's own exit code was providing got removed. Full
 suite (3457, unchanged), `manage.py check`, and `ruff check .` all clean — pure shell-script fix,
 no Python touched.
+
+---
+
+**2026-09-02, next gap: §6.11/§9.4 localization breadth — adding Portuguese and Dutch.**
+§9.4's own verdict named this app's single-language localization gap against MRPeasy ("MRPeasy
+alone ships more languages than this app's one") as one of only two dimensions still honestly
+scored as wide even against SMB-tier peers, the other being frontend modernity (§6.1). Since that
+pass this app had already grown from one added language to three (es/fr/de) across every one of
+the 17 departments' core and long-tail templates — this entry adds two more, **Portuguese** and
+**Dutch**, bringing the total to four added languages (six including English), directly narrowing
+(not yet closing — MRPeasy's own count is 13+) the specific gap §9.4 called out by name.
+
+Because every template `{% trans %}`/`{% blocktrans %}`-marked for es/fr/de was already
+extraction-ready, this pass needed zero new template edits — `manage.py makemessages -l pt`/`-l
+nl` against brand-new locale directories extracted the same 2,437 msgids (2,413 simple + 24
+plural) straight into empty `msgstr`s, no `msgmerge` fuzzy-matching at all since there was nothing
+prior to fuzzy-match against (a first for this series — every earlier language/department pass had
+to fight that gotcha). All 2,437 entries were translated into both languages by 18 parallel
+subagents (~140 entries/chunk, each agent producing pt+nl together so terminology stayed paired
+within a chunk), merged programmatically with correct msgid/plural matching, and written with
+proper `.po` escaping in one pass (no hand-typed multi-line `msgstr` continuations, so none of the
+historical wrapped-value/quote-escaping bugs applied here). `msgfmt --check` clean on both new
+files, zero blank/duplicated entries, full suite 3,457 passed unchanged, `manage.py check`/`ruff
+check .` clean. Verified end-to-end via the Django test client (logged in as the President sample
+user, `/i18n/setlang/` to pt and nl) against the main dashboard, Quality, Purchasing, Sales, Legal,
+and Personnel dashboards, a live plural ("9 overdue" → "9 atrasados"/"9 te laat"), and the language
+switcher listing both new options correctly. See CLAUDE.md's Localization section for full detail.
+
+**§6.11/§9.2 status:** still 🟡 Partial — the *breadth* gap (language count) is narrower, but the
+*depth* gap this document has always scored honestly (~250 of ~450 templates, mostly department
+long-tails like Consultants/Supplier Portal/Consignment/Skills-Matrix/ATS, still untranslated in
+*any* added language) is unchanged by this pass. Promoting to Full would need either finishing that
+remaining template coverage in the four existing languages, or matching MRPeasy's 13+ language
+count — this pass did neither on its own, it extended the existing four-language template coverage
+sideways to two more languages.
