@@ -1,0 +1,27 @@
+{% load i18n %}
+    <div class="kpi-grid">
+        <a href="/qa/ncr/?status=Open" class="kpi-card {% if counts.critical_ncrs %}danger{% elif counts.open_ncrs %}warn{% endif %}">
+            <div class="num">{{ counts.open_ncrs }}</div>
+            <div class="lbl">{% trans "Open NCRs" %}{% if counts.critical_ncrs %} &mdash; {% blocktrans count counter=counts.critical_ncrs %}{{ counter }} critical{% plural %}{{ counter }} critical{% endblocktrans %}{% endif %}</div>
+        </a>
+        <a href="/qa/capa/?status=Open" class="kpi-card {% if counts.overdue_capas %}danger{% elif counts.open_capas %}warn{% endif %}">
+            <div class="num">{{ counts.open_capas }}</div>
+            <div class="lbl">{% trans "Open CAPAs" %}{% if counts.overdue_capas %} &mdash; {% blocktrans count counter=counts.overdue_capas %}{{ counter }} overdue{% plural %}{{ counter }} overdue{% endblocktrans %}{% endif %}</div>
+        </a>
+        <a href="/qa/audits/" class="kpi-card {% if counts.open_audits %}warn{% endif %}">
+            <div class="num">{{ counts.open_audits }}</div>
+            <div class="lbl">{% trans "Active Audits" %}</div>
+        </a>
+        <a href="/qa/inspections/?result=pending" class="kpi-card {% if counts.pending_inspections %}warn{% endif %}">
+            <div class="num">{{ counts.pending_inspections }}</div>
+            <div class="lbl">{% trans "Pending Inspections" %}</div>
+        </a>
+        <a href="/qa/inspections/" class="kpi-card {% if counts.open_defects %}warn{% endif %}">
+            <div class="num">{{ counts.open_defects }}</div>
+            <div class="lbl">{% trans "Open Defects" %}</div>
+        </a>
+        <a href="/qa/suppliers/" class="kpi-card">
+            <div class="num" style="color:#333;">&#10003;</div>
+            <div class="lbl">{% trans "Supplier Quality" %}</div>
+        </a>
+    </div>

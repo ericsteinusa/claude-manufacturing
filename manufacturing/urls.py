@@ -288,6 +288,7 @@ urlpatterns = [
     path('maint/mechanics/<int:mech_id>/', views.maint_mechanic_detail,
          name='maint_mechanic_detail'),
     path('qa/', views.qa_dashboard, name='qa_dashboard'),
+    path('qa/kpis-fragment/', views.qa_dashboard_kpis_fragment, name='qa_dashboard_kpis_fragment'),
     path('qa/ncr/', views.qa_ncr_list, name='qa_ncr_list'),
     path('qa/ncr/export/', views.qa_ncr_export, name='qa_ncr_export'),
     path('qa/ncr/<int:ncr_id>/', views.qa_ncr_detail, name='qa_ncr_detail'),

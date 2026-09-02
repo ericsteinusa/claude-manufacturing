@@ -1329,10 +1329,11 @@ per template, stated plainly rather than implied as complete.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 6 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 7 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
-  (the main company dashboard), and `purchasing_dashboard.html`. Pattern to copy for the next page:
+  (the main company dashboard), `purchasing_dashboard.html`, and `qa_dashboard.html`. Pattern to
+  copy for the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
@@ -1362,6 +1363,20 @@ per template, stated plainly rather than implied as complete.
   table — genuine live data, not a cached partial — then deleted the test PO and confirmed the
   count reverted to 13; separately confirmed the fragment renders correctly in French when fetched
   with an active French session, matching `dashboard.html`'s own i18n/htmx-composition precedent.
+  `qa_dashboard.html`'s version (`qa_dashboard_kpis_fragment` polling `/qa/kpis-fragment/`) picked
+  the KPI grid alone (Open NCRs/CAPAs, critical/overdue sub-counts, Active Audits, Pending
+  Inspections, Open Defects) — a QA manager watching for a new critical NCR or an overdue CAPA
+  wants that without a manual refresh, the same rationale as Purchasing's PO-approval queue — over
+  the heavier Pareto/trend/results charts below it, which stay static until reload. No core-module
+  refactor was needed here, unlike Purchasing: `quality_core.get_dashboard_counts(conn)` was
+  already a small standalone function (a single query), already shared and independently tested, so
+  the fragment view just calls it directly rather than needing a new extracted helper. Full suite
+  passes (3438, unchanged — no new core logic), `manage.py check` clean. Verified end-to-end against
+  a from-this-worktree dev server instance: hit `/qa/kpis-fragment/` directly (renders standalone
+  with real data — Open NCRs: 12, 4 critical); created a real Critical-severity NCR via
+  `quality_core.create_ncr`, re-fetched the fragment, and confirmed "Open NCRs" incremented to 13
+  with the critical sub-count to 5 — then deleted the test NCR and confirmed both reverted; also
+  confirmed the fragment renders correctly in Spanish with an active Spanish session.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
