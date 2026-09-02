@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ plan.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/control-plans/" class="btn">Control Plans</a>
-<a href="/qa/fmea/risk-register/" class="btn">Risk Register</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/control-plans/" class="btn">{% trans "Control Plans" %}</a>
+<a href="/qa/fmea/risk-register/" class="btn">{% trans "Risk Register" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -24,13 +25,13 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">{{ plan.name }} ({{ plan.product_name }}, Rev {{ plan.revision }})
+    <div class="menu-title">{% blocktrans with name=plan.name product=plan.product_name rev=plan.revision %}{{ name }} ({{ product }}, Rev {{ rev }}){% endblocktrans %}
         {% if plan.status == 'active' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
         {% elif plan.status == 'superseded' %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Superseded</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Superseded" %}</span>
         {% else %}
-        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Draft</span>
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{% trans "Draft" %}</span>
         {% endif %}
     </div>
 
@@ -39,7 +40,7 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Status</h3>
+        <h3>{% trans "Status" %}</h3>
         <form method="post" style="display:flex;gap:10px;align-items:center;">
             {% csrf_token %}
             <input type="hidden" name="action" value="set_status">
@@ -48,27 +49,27 @@
                 <option value="{{ s }}" {% if s == plan.status %}selected{% endif %}>{{ s|title }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="btn">Update Status</button>
+            <button type="submit" class="btn">{% trans "Update Status" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Characteristics &amp; FMEA</h3>
+        <h3>{% trans "Characteristics &amp; FMEA" %}</h3>
         {% if items %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
                     <tr>
-                        <th>Seq</th>
-                        <th>Characteristic</th>
-                        <th>Spec</th>
-                        <th>Control Method</th>
+                        <th>{% trans "Seq" %}</th>
+                        <th>{% trans "Characteristic" %}</th>
+                        <th>{% trans "Spec" %}</th>
+                        <th>{% trans "Control Method" %}</th>
                         <th class="num">S</th>
                         <th class="num">O</th>
                         <th class="num">D</th>
                         <th class="num">RPN</th>
-                        <th>Risk</th>
+                        <th>{% trans "Risk" %}</th>
                         {% if can_edit %}<th></th>{% endif %}
                     </tr>
                 </thead>
@@ -88,7 +89,7 @@
                                 <input type="number" name="severity" min="1" max="10" value="{{ item.severity }}" style="width:48px;padding:3px;border:1.5px solid var(--border);border-radius:4px;">
                                 <input type="number" name="occurrence" min="1" max="10" value="{{ item.occurrence }}" style="width:48px;padding:3px;border:1.5px solid var(--border);border-radius:4px;">
                                 <input type="number" name="detection" min="1" max="10" value="{{ item.detection }}" style="width:48px;padding:3px;border:1.5px solid var(--border);border-radius:4px;">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Re-score</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Re-score" %}</button>
                             </form>
                         </td>
                         {% else %}
@@ -104,7 +105,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="delete_item">
                                 <input type="hidden" name="item_id" value="{{ item.id }}">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Remove" %}</button>
                             </form>
                         </td>
                         {% endif %}
@@ -114,51 +115,51 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No characteristics added yet.</div>
+        <div class="empty-state">{% trans "No characteristics added yet." %}</div>
         {% endif %}
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Characteristic</h3>
+        <h3>{% trans "Add Characteristic" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_item">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Operation Seq</label>
+                    <label>{% trans "Operation Seq" %}</label>
                     <input type="number" name="operation_seq" min="0">
                 </div>
                 <div class="form-row">
-                    <label>Characteristic *</label>
-                    <input type="text" name="characteristic" required placeholder="e.g. Bore Diameter">
+                    <label>{% trans "Characteristic *" %}</label>
+                    <input type="text" name="characteristic" required placeholder="{% trans 'e.g. Bore Diameter' %}">
                 </div>
                 <div class="form-row">
-                    <label>Specification</label>
-                    <input type="text" name="specification" placeholder="e.g. 25.0 ± 0.05 mm">
+                    <label>{% trans "Specification" %}</label>
+                    <input type="text" name="specification" placeholder="{% trans 'e.g. 25.0 ± 0.05 mm' %}">
                 </div>
                 <div class="form-row">
-                    <label>Control Method</label>
-                    <input type="text" name="control_method" placeholder="e.g. CMM, 100%">
+                    <label>{% trans "Control Method" %}</label>
+                    <input type="text" name="control_method" placeholder="{% trans 'e.g. CMM, 100%' %}">
                 </div>
                 <div class="form-row">
-                    <label>Severity (1-10)</label>
+                    <label>{% trans "Severity (1-10)" %}</label>
                     <input type="number" name="severity" min="1" max="10" value="1" required>
                 </div>
                 <div class="form-row">
-                    <label>Occurrence (1-10)</label>
+                    <label>{% trans "Occurrence (1-10)" %}</label>
                     <input type="number" name="occurrence" min="1" max="10" value="1" required>
                 </div>
                 <div class="form-row">
-                    <label>Detection (1-10)</label>
+                    <label>{% trans "Detection (1-10)" %}</label>
                     <input type="number" name="detection" min="1" max="10" value="1" required>
                 </div>
                 <div class="form-row">
-                    <label>Recommended Action</label>
-                    <input type="text" name="recommended_action" placeholder="Optional">
+                    <label>{% trans "Recommended Action" %}</label>
+                    <input type="text" name="recommended_action" placeholder="{% trans 'Optional' %}">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Add Characteristic</button>
+            <button type="submit" class="btn btn-primary">{% trans "Add Characteristic" %}</button>
         </form>
     </div>
     {% endif %}

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Generate Certificate of Analysis{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Generate Certificate of Analysis" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/coa/" class="btn">Certificates of Analysis</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/coa/" class="btn">{% trans "Certificates of Analysis" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,36 +18,36 @@
 {% block body %}
 <div class="content">
 <div class="coa-wrap">
-    <div class="menu-title">Generate Certificate of Analysis</div>
+    <div class="menu-title">{% trans "Generate Certificate of Analysis" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     <div class="card">
         <p style="font-size:12.5px;color:var(--text-muted);margin-top:0;">
-            Generates a CoA from whatever SPC measurements (Quality → SPC) are currently
+            {% blocktrans %}Generates a CoA from whatever SPC measurements (Quality → SPC) are currently
             recorded against the selected lot. A lot with no SPC measurements has nothing
-            to certify yet.
+            to certify yet.{% endblocktrans %}
         </p>
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Lot *</label>
+                <label>{% trans "Lot *" %}</label>
                 <select name="lot_id" required>
-                    <option value="">— Select a lot —</option>
+                    <option value="">{% trans "— Select a lot —" %}</option>
                     {% for lot in lots %}
                     <option value="{{ lot.id }}" {% if lot.id == preselect_lot_id %}selected{% endif %}>{{ lot.lot_number }} — {{ lot.product_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Issued By</label>
-                <input type="text" name="issued_by" placeholder="Inspector / QA signatory">
+                <label>{% trans "Issued By" %}</label>
+                <input type="text" name="issued_by" placeholder="{% trans 'Inspector / QA signatory' %}">
             </div>
             <div class="form-row">
-                <label>Notes</label>
-                <input type="text" name="notes" placeholder="Optional notes">
+                <label>{% trans "Notes" %}</label>
+                <input type="text" name="notes" placeholder="{% trans 'Optional notes' %}">
             </div>
-            <button type="submit" class="btn btn-primary">Generate Certificate</button>
+            <button type="submit" class="btn btn-primary">{% trans "Generate Certificate" %}</button>
         </form>
     </div>
 </div>

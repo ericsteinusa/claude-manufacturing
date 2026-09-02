@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 00:20+0000\n"
+"POT-Creation-Date: 2026-09-02 00:47+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -294,6 +294,17 @@ msgstr "Lohnabrechnung"
 #: manufacturing/templates/benefits_dashboard.html:8
 #: manufacturing/templates/blanket_po_detail.html:8
 #: manufacturing/templates/blanket_po_list.html:9
+#: manufacturing/templates/coa_detail.html:8
+#: manufacturing/templates/coa_list.html:7
+#: manufacturing/templates/coa_new.html:7
+#: manufacturing/templates/compliance_checklist_detail.html:8
+#: manufacturing/templates/compliance_checklist_list.html:8
+#: manufacturing/templates/compliance_template_detail.html:8
+#: manufacturing/templates/compliance_template_list.html:8
+#: manufacturing/templates/compliance_template_new.html:7
+#: manufacturing/templates/control_plan_detail.html:8
+#: manufacturing/templates/control_plan_list.html:8
+#: manufacturing/templates/control_plan_new.html:7
 #: manufacturing/templates/credit_account_detail.html:10
 #: manufacturing/templates/credit_account_list.html:10
 #: manufacturing/templates/credit_application_detail.html:10
@@ -486,6 +497,8 @@ msgstr "Lohnabrechnung"
 #: manufacturing/templates/sales_targets.html:9
 #: manufacturing/templates/sales_territories.html:10
 #: manufacturing/templates/sales_territory_performance.html:9
+#: manufacturing/templates/spc_list.html:8
+#: manufacturing/templates/spc_log.html:8
 #: manufacturing/templates/tc_ot_report.html:9
 #: manufacturing/templates/tc_schedule.html:10
 #: manufacturing/templates/termination_detail.html:10
@@ -693,6 +706,8 @@ msgstr "Referenz"
 #: manufacturing/templates/ats_requisition_new.html:42
 #: manufacturing/templates/benefit_plan_new.html:45
 #: manufacturing/templates/blanket_po_new.html:30
+#: manufacturing/templates/compliance_template_list.html:27
+#: manufacturing/templates/compliance_template_new.html:37
 #: manufacturing/templates/cs_escalations.html:67
 #: manufacturing/templates/cs_list.html:58
 #: manufacturing/templates/cs_plans.html:131
@@ -768,6 +783,11 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/benefit_plan_detail.html:56
 #: manufacturing/templates/benefits_dashboard.html:73
 #: manufacturing/templates/blanket_po_list.html:36
+#: manufacturing/templates/compliance_checklist_detail.html:48
+#: manufacturing/templates/compliance_checklist_list.html:16
+#: manufacturing/templates/compliance_checklist_list.html:27
+#: manufacturing/templates/control_plan_detail.html:43
+#: manufacturing/templates/control_plan_list.html:26
 #: manufacturing/templates/credit_account_detail.html:62
 #: manufacturing/templates/credit_account_detail.html:105
 #: manufacturing/templates/credit_account_detail.html:133
@@ -953,7 +973,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/purch_contract_detail.html:115
 #: manufacturing/templates/purch_contracts_list.html:86
 #: manufacturing/templates/purch_contracts_list.html:137
-#: manufacturing/templates/purchasing_dashboard.html:134
+#: manufacturing/templates/purchasing_dashboard_kpis.html:38
 #: manufacturing/templates/qa_audit_detail.html:89
 #: manufacturing/templates/qa_audit_list.html:70
 #: manufacturing/templates/qa_capa_detail.html:76
@@ -996,6 +1016,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/sales_territories.html:128
 #: manufacturing/templates/sales_territories.html:165
 #: manufacturing/templates/sales_territory_performance.html:40
+#: manufacturing/templates/spc_log.html:101
 #: manufacturing/templates/tc_device_form.html:221
 #: manufacturing/templates/tc_device_list.html:45
 #: manufacturing/templates/termination_list.html:72
@@ -1014,10 +1035,12 @@ msgid "Posted"
 msgstr "Gebucht"
 
 #: manufacturing/templates/acct_dashboard.html:128
+#: manufacturing/templates/control_plan_detail.html:34
+#: manufacturing/templates/control_plan_list.html:42
 #: manufacturing/templates/finance_dashboard.html:177
 #: manufacturing/templates/legal_dashboard.html:67
 #: manufacturing/templates/marketing_dashboard.html:102
-#: manufacturing/templates/purchasing_dashboard.html:75
+#: manufacturing/templates/purchasing_dashboard_kpis.html:12
 msgid "Draft"
 msgstr "Entwurf"
 
@@ -1345,6 +1368,8 @@ msgstr "Methode"
 #: manufacturing/templates/blanket_po_detail.html:89
 #: manufacturing/templates/blanket_po_new.html:50
 #: manufacturing/templates/blanket_po_release_new.html:44
+#: manufacturing/templates/coa_detail.html:40
+#: manufacturing/templates/coa_new.html:47
 #: manufacturing/templates/credit_account_detail.html:87
 #: manufacturing/templates/credit_account_detail.html:121
 #: manufacturing/templates/credit_account_list.html:136
@@ -1499,6 +1524,7 @@ msgstr "Methode"
 #: manufacturing/templates/sales_territories.html:80
 #: manufacturing/templates/sales_territories.html:136
 #: manufacturing/templates/sales_territories.html:173
+#: manufacturing/templates/spc_log.html:72
 #: manufacturing/templates/termination_detail.html:46
 #: manufacturing/templates/termination_list.html:141
 msgid "Notes"
@@ -1920,6 +1946,7 @@ msgstr "Neue Phase"
 #: manufacturing/templates/ats_candidate_detail.html:70
 #: manufacturing/templates/ats_requisition_detail.html:92
 #: manufacturing/templates/benefit_plan_detail.html:123
+#: manufacturing/templates/control_plan_detail.html:159
 #: manufacturing/templates/qa_ncr_list.html:131
 #: manufacturing/templates/req_detail.html:155
 msgid "Optional"
@@ -2024,6 +2051,10 @@ msgstr "Beantragt"
 #: manufacturing/templates/ats_requisition_detail.html:64
 #: manufacturing/templates/ats_requisition_list.html:49
 #: manufacturing/templates/benefits_dashboard.html:90
+#: manufacturing/templates/coa_list.html:54
+#: manufacturing/templates/compliance_checklist_list.html:42
+#: manufacturing/templates/compliance_template_list.html:34
+#: manufacturing/templates/control_plan_list.html:45
 #: manufacturing/templates/rfq_list.html:55
 msgid "Detail"
 msgstr "Detail"
@@ -2071,12 +2102,16 @@ msgstr "Name oder E-Mail suchen..."
 
 #: manufacturing/templates/ats_candidate_list.html:21
 #: manufacturing/templates/ats_requisition_list.html:27
+#: manufacturing/templates/coa_list.html:20
 #: manufacturing/templates/cs_list.html:44
 msgid "Search"
 msgstr "Suchen"
 
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/benefits_dashboard.html:73
+#: manufacturing/templates/compliance_checklist_list.html:27
+#: manufacturing/templates/compliance_template_list.html:27
+#: manufacturing/templates/control_plan_list.html:23
 #: manufacturing/templates/it_task_detail.html:106
 #: manufacturing/templates/maint_equipment_list.html:78
 #: manufacturing/templates/maint_mechanics_list.html:75
@@ -2286,6 +2321,9 @@ msgstr "Nicht Zugewiesen"
 
 #: manufacturing/templates/ats_requisition_detail.html:26
 #: manufacturing/templates/ats_requisition_list.html:41
+#: manufacturing/templates/compliance_checklist_detail.html:27
+#: manufacturing/templates/compliance_checklist_list.html:19
+#: manufacturing/templates/compliance_checklist_list.html:39
 #: manufacturing/templates/credit_dashboard.html:94
 #: manufacturing/templates/cs_dashboard.html:137
 #: manufacturing/templates/cs_list.html:81
@@ -2305,6 +2343,7 @@ msgid "Open"
 msgstr "Offen"
 
 #: manufacturing/templates/ats_requisition_detail.html:47
+#: manufacturing/templates/control_plan_detail.html:52
 #: manufacturing/templates/it_incident_detail.html:42
 #: manufacturing/templates/it_repairs_detail.html:112
 #: manufacturing/templates/it_repairs_detail.html:121
@@ -2686,6 +2725,8 @@ msgstr "Sozialleistungen"
 
 #: manufacturing/templates/benefit_plan_detail.html:25
 #: manufacturing/templates/benefits_dashboard.html:85
+#: manufacturing/templates/control_plan_detail.html:30
+#: manufacturing/templates/control_plan_list.html:38
 #: manufacturing/templates/finance_bank_rec_detail.html:74
 #: manufacturing/templates/finance_bank_rec_detail.html:94
 #: manufacturing/templates/finance_bank_rec_list.html:71
@@ -2814,6 +2855,8 @@ msgid "New Benefit Plan"
 msgstr "Neuer Sozialleistungsplan"
 
 #: manufacturing/templates/benefit_plan_new.html:29
+#: manufacturing/templates/compliance_template_new.html:29
+#: manufacturing/templates/control_plan_new.html:37
 #: manufacturing/templates/maint_equipment_detail.html:62
 #: manufacturing/templates/maint_equipment_list.html:105
 #: manufacturing/templates/maint_mechanic_detail.html:47
@@ -3091,6 +3134,8 @@ msgstr "Menge"
 #: manufacturing/templates/purch_contracts_list.html:85
 #: manufacturing/templates/report_builder_form.html:91
 #: manufacturing/templates/sales_contracts_list.html:83
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:101
 msgid "Value"
 msgstr "Wert"
 
@@ -3115,6 +3160,7 @@ msgid "New Blanket PO"
 msgstr "Neue Rahmenbestellung"
 
 #: manufacturing/templates/blanket_po_list.html:18
+#: manufacturing/templates/compliance_checklist_list.html:18
 #: manufacturing/templates/cs_plans.html:64
 #: manufacturing/templates/eng_ecrs.html:49
 #: manufacturing/templates/eng_projects.html:52
@@ -3155,7 +3201,7 @@ msgstr "Rahmen-Nr."
 #: manufacturing/templates/purch_contracts_list.html:119
 #: manufacturing/templates/purch_reports.html:67
 #: manufacturing/templates/purch_reports.html:123
-#: manufacturing/templates/purchasing_dashboard.html:131
+#: manufacturing/templates/purchasing_dashboard_kpis.html:35
 #: manufacturing/templates/qa_supplier_list.html:84
 msgid "Supplier"
 msgstr "Lieferant"
@@ -3331,6 +3377,592 @@ msgstr "Verbleibendes Guthaben: <b>$%(rem)s</b> von $%(tot)s"
 #, python-format
 msgid "Remaining balance: <b>%(rem)s</b> of %(tot)s units"
 msgstr "Verbleibendes Guthaben: <b>%(rem)s</b> von %(tot)s Einheiten"
+
+#: manufacturing/templates/coa_detail.html:6
+#: manufacturing/templates/coa_list.html:3
+#: manufacturing/templates/coa_list.html:15
+#: manufacturing/templates/coa_new.html:6
+#: manufacturing/templates/qa_dashboard.html:124
+msgid "Certificates of Analysis"
+msgstr "Analysenzertifikate"
+
+#: manufacturing/templates/coa_detail.html:7
+msgid "Download PDF"
+msgstr "PDF Herunterladen"
+
+#: manufacturing/templates/coa_detail.html:25
+#: manufacturing/templates/coa_detail.html:69
+#: manufacturing/templates/coa_list.html:47
+msgid "Pass"
+msgstr "Bestanden"
+
+#: manufacturing/templates/coa_detail.html:27
+#: manufacturing/templates/coa_detail.html:71
+#: manufacturing/templates/coa_list.html:49
+msgid "Fail"
+msgstr "Fehlgeschlagen"
+
+#: manufacturing/templates/coa_detail.html:29
+#: manufacturing/templates/coa_list.html:51
+#: manufacturing/templates/legal_dashboard.html:79
+#: manufacturing/templates/prod_tracking_dashboard.html:50
+#: manufacturing/templates/sales_commissions.html:70
+msgid "Pending"
+msgstr "Ausstehend"
+
+#: manufacturing/templates/coa_detail.html:34
+msgid "Certificate Header"
+msgstr "Zertifikatskopf"
+
+#: manufacturing/templates/coa_detail.html:36
+#: manufacturing/templates/coa_list.html:29
+#: manufacturing/templates/control_plan_list.html:24
+#: manufacturing/templates/po_detail.html:165
+#: manufacturing/templates/prod_daily_report.html:83
+#: manufacturing/templates/prod_dashboard.html:112
+#: manufacturing/templates/prod_labor_report.html:94
+#: manufacturing/templates/prod_performance_report.html:107
+#: manufacturing/templates/prod_reports.html:86
+#: manufacturing/templates/prod_reports.html:113
+#: manufacturing/templates/prod_schedule.html:68
+#: manufacturing/templates/prod_shipping_detail.html:152
+#: manufacturing/templates/qa_inspection_detail.html:92
+#: manufacturing/templates/qa_inspection_list.html:80
+#: manufacturing/templates/qa_inspection_list.html:114
+#: manufacturing/templates/qa_ncr_list.html:87
+#: manufacturing/templates/reports_dashboard.html:199
+#: manufacturing/templates/sales_demand.html:149
+#: manufacturing/templates/sales_order_detail.html:120
+#: manufacturing/templates/sales_order_detail.html:169
+#: manufacturing/templates/sales_reports.html:96
+#: manufacturing/templates/spc_list.html:41
+#: manufacturing/templates/spc_list.html:88
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:47
+msgid "Product"
+msgstr "Produkt"
+
+#: manufacturing/templates/coa_detail.html:37
+msgid "Lot Number"
+msgstr "Losnummer"
+
+#: manufacturing/templates/coa_detail.html:38
+msgid "Issued Date"
+msgstr "Ausstellungsdatum"
+
+#: manufacturing/templates/coa_detail.html:39
+#: manufacturing/templates/coa_list.html:32
+#: manufacturing/templates/coa_new.html:43
+msgid "Issued By"
+msgstr "Ausgestellt Von"
+
+#: manufacturing/templates/coa_detail.html:45
+msgid "Certified Characteristics"
+msgstr "Zertifizierte Merkmale"
+
+#: manufacturing/templates/coa_detail.html:51
+#: manufacturing/templates/control_plan_detail.html:65
+#: manufacturing/templates/spc_list.html:49
+#: manufacturing/templates/spc_list.html:88
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:55
+msgid "Characteristic"
+msgstr "Merkmal"
+
+#: manufacturing/templates/coa_detail.html:52
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:101
+msgid "Measured"
+msgstr "Gemessen"
+
+#: manufacturing/templates/coa_detail.html:53
+#: manufacturing/templates/rfq_detail.html:124
+#: manufacturing/templates/sales_performance.html:47
+#: manufacturing/templates/sales_targets.html:76
+#: manufacturing/templates/spc_list.html:53
+#: manufacturing/templates/spc_list.html:88
+msgid "Target"
+msgstr "Ziel"
+
+#: manufacturing/templates/coa_detail.html:56
+#: manufacturing/templates/coa_list.html:33
+#: manufacturing/templates/maint_inspection_detail.html:68
+#: manufacturing/templates/maint_inspection_detail.html:147
+#: manufacturing/templates/maint_inspection_list.html:79
+#: manufacturing/templates/qa_audit_detail.html:137
+#: manufacturing/templates/qa_inspection_detail.html:104
+#: manufacturing/templates/qa_inspection_list.html:81
+#: manufacturing/templates/qa_reports.html:184
+msgid "Result"
+msgstr "Ergebnis"
+
+#: manufacturing/templates/coa_detail.html:73
+msgid "No Spec"
+msgstr "Keine Spezifikation"
+
+#: manufacturing/templates/coa_detail.html:82
+msgid "No characteristics recorded."
+msgstr "Keine Merkmale erfasst."
+
+#: manufacturing/templates/coa_list.html:6
+#: manufacturing/templates/spc_list.html:6
+#: manufacturing/templates/spc_log.html:7
+msgid "Quality Home"
+msgstr "Qualität Startseite"
+
+#: manufacturing/templates/coa_list.html:9
+msgid "Generate CoA"
+msgstr "CoA Erstellen"
+
+#: manufacturing/templates/coa_list.html:18
+msgid "Search CoA #, product, or lot..."
+msgstr "CoA-Nr., Produkt oder Los suchen..."
+
+#: manufacturing/templates/coa_list.html:28
+msgid "CoA #"
+msgstr "CoA-Nr."
+
+#: manufacturing/templates/coa_list.html:30
+#: manufacturing/templates/spc_log.html:101
+msgid "Lot"
+msgstr "Los"
+
+#: manufacturing/templates/coa_list.html:31
+msgid "Issued"
+msgstr "Ausgestellt"
+
+#: manufacturing/templates/coa_list.html:61
+msgid "No certificates generated yet."
+msgstr "Noch keine Zertifikate erstellt."
+
+#: manufacturing/templates/coa_new.html:3
+#: manufacturing/templates/coa_new.html:21
+msgid "Generate Certificate of Analysis"
+msgstr "Analysezertifikat Erstellen"
+
+#: manufacturing/templates/coa_new.html:27
+msgid ""
+"Generates a CoA from whatever SPC measurements (Quality → SPC) are "
+"currently\n"
+"            recorded against the selected lot. A lot with no SPC "
+"measurements has nothing\n"
+"            to certify yet."
+msgstr ""
+
+#: manufacturing/templates/coa_new.html:34
+msgid "Lot *"
+msgstr "Los *"
+
+#: manufacturing/templates/coa_new.html:36
+msgid "— Select a lot —"
+msgstr "— Los Auswählen —"
+
+#: manufacturing/templates/coa_new.html:44
+msgid "Inspector / QA signatory"
+msgstr "Prüfer / QS-Unterzeichner"
+
+#: manufacturing/templates/coa_new.html:48
+#: manufacturing/templates/it_license_list.html:161
+#: manufacturing/templates/it_network_list.html:155
+#: manufacturing/templates/it_repairs_list.html:140
+#: manufacturing/templates/it_software_list.html:130
+#: manufacturing/templates/mkt_ad_list.html:181
+#: manufacturing/templates/mkt_research_list.html:166
+#: manufacturing/templates/sales_commissions.html:238
+msgid "Optional notes"
+msgstr "Optionale Notizen"
+
+#: manufacturing/templates/coa_new.html:50
+msgid "Generate Certificate"
+msgstr "Zertifikat Erstellen"
+
+#: manufacturing/templates/compliance_checklist_detail.html:6
+#: manufacturing/templates/compliance_template_detail.html:7
+#: manufacturing/templates/compliance_template_list.html:7
+msgid "Checklists"
+msgstr "Checklisten"
+
+#: manufacturing/templates/compliance_checklist_detail.html:7
+msgid "Templates"
+msgstr "Vorlagen"
+
+#: manufacturing/templates/compliance_checklist_detail.html:25
+#: manufacturing/templates/compliance_checklist_list.html:20
+#: manufacturing/templates/compliance_checklist_list.html:37
+msgid "Complete"
+msgstr "Abgeschlossen"
+
+#: manufacturing/templates/compliance_checklist_detail.html:31
+#, python-format
+msgid "Standard: %(standard)s · Owner: %(owner)s"
+msgstr "Norm: %(standard)s · Verantwortlicher: %(owner)s"
+
+#: manufacturing/templates/compliance_checklist_detail.html:38
+#, python-format
+msgid ""
+"Progress: %(percent)s%% (%(complete)s complete, %(na)s N/A of %(total)s)"
+msgstr ""
+
+#: manufacturing/templates/compliance_checklist_detail.html:43
+#: manufacturing/templates/compliance_template_detail.html:31
+msgid "Requirements"
+msgstr "Anforderungen"
+
+#: manufacturing/templates/compliance_checklist_detail.html:48
+#: manufacturing/templates/compliance_template_detail.html:35
+msgid "Clause"
+msgstr "Klausel"
+
+#: manufacturing/templates/compliance_checklist_detail.html:48
+#: manufacturing/templates/compliance_template_detail.html:35
+#: manufacturing/templates/legal_compliance_detail.html:89
+#: manufacturing/templates/legal_compliance_list.html:81
+#: manufacturing/templates/legal_compliance_list.html:113
+msgid "Requirement"
+msgstr "Anforderung"
+
+#: manufacturing/templates/compliance_checklist_detail.html:48
+msgid "Evidence"
+msgstr "Nachweis"
+
+#: manufacturing/templates/compliance_checklist_detail.html:65
+msgid "Evidence / notes"
+msgstr "Nachweis / Notizen"
+
+#: manufacturing/templates/compliance_checklist_detail.html:66
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: manufacturing/templates/compliance_checklist_detail.html:79
+msgid "No requirements on this checklist."
+msgstr "Keine Anforderungen in dieser Checkliste."
+
+#: manufacturing/templates/compliance_checklist_list.html:3
+#: manufacturing/templates/compliance_checklist_list.html:13
+msgid "Compliance Checklists"
+msgstr "Compliance-Checklisten"
+
+#: manufacturing/templates/compliance_checklist_list.html:6
+#: manufacturing/templates/compliance_template_detail.html:6
+#: manufacturing/templates/compliance_template_list.html:3
+#: manufacturing/templates/compliance_template_list.html:16
+#: manufacturing/templates/compliance_template_new.html:6
+msgid "Compliance Templates"
+msgstr "Compliance-Vorlagen"
+
+#: manufacturing/templates/compliance_checklist_list.html:7
+#: manufacturing/templates/compliance_template_list.html:6
+#: manufacturing/templates/control_plan_list.html:6
+#: manufacturing/templates/qa_dashboard.html:3
+#: manufacturing/templates/qa_reports.html:6
+msgid "QA Dashboard"
+msgstr "QS-Dashboard"
+
+#: manufacturing/templates/compliance_checklist_list.html:27
+msgid "Template"
+msgstr "Vorlage"
+
+#: manufacturing/templates/compliance_checklist_list.html:27
+#: manufacturing/templates/compliance_template_list.html:27
+#: manufacturing/templates/compliance_template_new.html:33
+msgid "Standard"
+msgstr "Norm"
+
+#: manufacturing/templates/compliance_checklist_list.html:27
+#: manufacturing/templates/compliance_template_detail.html:90
+#: manufacturing/templates/cs_plans.html:77
+#: manufacturing/templates/cs_plans.html:123
+#: manufacturing/templates/legal_compliance_detail.html:62
+#: manufacturing/templates/legal_compliance_detail.html:97
+#: manufacturing/templates/legal_compliance_list.html:83
+#: manufacturing/templates/legal_compliance_list.html:121
+#: manufacturing/templates/legal_contract_detail.html:79
+#: manufacturing/templates/legal_contract_detail.html:134
+#: manufacturing/templates/legal_contract_list.html:94
+#: manufacturing/templates/legal_contract_list.html:160
+#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/legal_employment_list.html:134
+#: manufacturing/templates/legal_governance_list.html:74
+#: manufacturing/templates/legal_governance_list.html:129
+#: manufacturing/templates/mkt_ad_detail.html:82
+#: manufacturing/templates/mkt_ad_detail.html:182
+#: manufacturing/templates/mkt_ad_list.html:176
+#: manufacturing/templates/mkt_campaign_detail.html:67
+#: manufacturing/templates/mkt_campaign_detail.html:126
+#: manufacturing/templates/mkt_campaign_list.html:89
+#: manufacturing/templates/mkt_campaign_list.html:150
+#: manufacturing/templates/mkt_lead_detail.html:72
+#: manufacturing/templates/mkt_lead_detail.html:115
+#: manufacturing/templates/mkt_lead_list.html:91
+#: manufacturing/templates/mkt_lead_list.html:141
+#: manufacturing/templates/mkt_research_detail.html:61
+#: manufacturing/templates/mkt_research_detail.html:121
+#: manufacturing/templates/mkt_research_list.html:91
+#: manufacturing/templates/mkt_research_list.html:137
+#: manufacturing/templates/qa_capa_detail.html:108
+#: manufacturing/templates/qa_capa_list.html:85
+#: manufacturing/templates/qa_capa_list.html:128
+#: manufacturing/templates/qa_ncr_detail.html:141
+#: manufacturing/templates/qa_ncr_list.html:87
+#: manufacturing/templates/qa_ncr_list.html:144
+#: manufacturing/templates/report_builder_detail.html:33
+#: manufacturing/templates/report_builder_list.html:24
+#: manufacturing/templates/sales_contracts_detail.html:129
+#: manufacturing/templates/sales_contracts_list.html:87
+#: manufacturing/templates/sales_leads_detail.html:115
+#: manufacturing/templates/sales_leads_list.html:87
+#: manufacturing/templates/sales_quotes.html:66
+#: manufacturing/templates/sales_quotes.html:116
+#: manufacturing/templates/sales_quotes.html:141
+msgid "Owner"
+msgstr "Verantwortlicher"
+
+#: manufacturing/templates/compliance_checklist_list.html:49
+msgid "No checklists yet. Instantiate one from a template."
+msgstr "Noch keine Checklisten. Erstellen Sie eine aus einer Vorlage."
+
+#: manufacturing/templates/compliance_template_detail.html:35
+#: manufacturing/templates/compliance_template_detail.html:68
+#: manufacturing/templates/cs_kb_detail.html:65
+#: manufacturing/templates/cs_kb_detail.html:103
+#: manufacturing/templates/cs_kb_list.html:82
+#: manufacturing/templates/cs_kb_list.html:119
+#: manufacturing/templates/eng_spec_detail.html:70
+#: manufacturing/templates/eng_spec_detail.html:109
+#: manufacturing/templates/eng_specs_list.html:87
+#: manufacturing/templates/eng_specs_list.html:125
+#: manufacturing/templates/finance_budget_detail.html:104
+#: manufacturing/templates/finance_budget_detail.html:152
+#: manufacturing/templates/legal_governance_list.html:73
+#: manufacturing/templates/legal_governance_list.html:105
+#: manufacturing/templates/maint_downtime_detail.html:70
+#: manufacturing/templates/maint_downtime_list.html:78
+#: manufacturing/templates/maint_downtime_list.html:111
+#: manufacturing/templates/maint_part_detail.html:63
+#: manufacturing/templates/maint_parts_list.html:77
+#: manufacturing/templates/maint_parts_list.html:114
+#: manufacturing/templates/mkt_budget_list.html:82
+#: manufacturing/templates/mkt_budget_list.html:120
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:87
+#: manufacturing/templates/purch_contract_detail.html:73
+#: manufacturing/templates/purch_contract_detail.html:114
+#: manufacturing/templates/purch_contracts_list.html:82
+#: manufacturing/templates/purch_contracts_list.html:128
+msgid "Category"
+msgstr "Kategorie"
+
+#: manufacturing/templates/compliance_template_detail.html:48
+msgid "No requirements added yet."
+msgstr "Noch keine Anforderungen hinzugefügt."
+
+#: manufacturing/templates/compliance_template_detail.html:54
+#: manufacturing/templates/compliance_template_detail.html:76
+msgid "Add Requirement"
+msgstr "Anforderung Hinzufügen"
+
+#: manufacturing/templates/compliance_template_detail.html:60
+msgid "Clause Ref"
+msgstr "Klausel-Ref."
+
+#: manufacturing/templates/compliance_template_detail.html:61
+msgid "e.g. 8.5.1"
+msgstr "z. B. 8.5.1"
+
+#: manufacturing/templates/compliance_template_detail.html:64
+msgid "Requirement *"
+msgstr "Anforderung *"
+
+#: manufacturing/templates/compliance_template_detail.html:72
+msgid "Sort Order"
+msgstr "Sortierreihenfolge"
+
+#: manufacturing/templates/compliance_template_detail.html:81
+msgid "Instantiate a Checklist"
+msgstr "Checkliste Erstellen"
+
+#: manufacturing/templates/compliance_template_detail.html:86
+msgid "Checklist Name *"
+msgstr "Checklistenname *"
+
+#: manufacturing/templates/compliance_template_detail.html:87
+msgid "e.g. Q3 2026 Internal Audit"
+msgstr "z. B. Internes Audit Q3 2026"
+
+#: manufacturing/templates/compliance_template_detail.html:91
+msgid "e.g. Dana R."
+msgstr "z. B. Dana R."
+
+#: manufacturing/templates/compliance_template_detail.html:93
+msgid "Create Checklist"
+msgstr "Checkliste Erstellen"
+
+#: manufacturing/templates/compliance_template_list.html:10
+msgid "New Template"
+msgstr "Neue Vorlage"
+
+#: manufacturing/templates/compliance_template_list.html:18
+msgid ""
+"Reusable requirement checklists for a named regulation or standard. The "
+"seeded ISO/FDA\n"
+"        templates are illustrative starter checklists — a small "
+"representative subset of clauses,\n"
+"        not the full standard. Consult the actual standard text and a "
+"qualified auditor for real\n"
+"        certification work."
+msgstr ""
+
+#: manufacturing/templates/compliance_template_list.html:41
+msgid "No compliance templates yet."
+msgstr "Noch keine Compliance-Vorlagen."
+
+#: manufacturing/templates/compliance_template_new.html:3
+#: manufacturing/templates/compliance_template_new.html:21
+msgid "New Compliance Template"
+msgstr "Neue Compliance-Vorlage"
+
+#: manufacturing/templates/compliance_template_new.html:30
+msgid "e.g. ISO 13485:2016 Internal Audit"
+msgstr "z. B. Internes Audit ISO 13485:2016"
+
+#: manufacturing/templates/compliance_template_new.html:34
+msgid "e.g. ISO 13485:2016"
+msgstr "z. B. ISO 13485:2016"
+
+#: manufacturing/templates/compliance_template_new.html:40
+msgid "Create Template"
+msgstr "Vorlage Erstellen"
+
+#: manufacturing/templates/control_plan_detail.html:6
+#: manufacturing/templates/control_plan_list.html:3
+#: manufacturing/templates/control_plan_list.html:16
+#: manufacturing/templates/control_plan_new.html:6
+msgid "Control Plans"
+msgstr "Kontrollpläne"
+
+#: manufacturing/templates/control_plan_detail.html:7
+#: manufacturing/templates/control_plan_list.html:7
+msgid "Risk Register"
+msgstr "Risikoregister"
+
+#: manufacturing/templates/control_plan_detail.html:28
+#, python-format
+msgid "%(name)s (%(product)s, Rev %(rev)s)"
+msgstr "%(name)s (%(product)s, Rev. %(rev)s)"
+
+#: manufacturing/templates/control_plan_detail.html:32
+#: manufacturing/templates/control_plan_list.html:40
+msgid "Superseded"
+msgstr "Ersetzt"
+
+#: manufacturing/templates/control_plan_detail.html:58
+msgid "Characteristics &amp; FMEA"
+msgstr "Merkmale und FMEA"
+
+#: manufacturing/templates/control_plan_detail.html:64
+msgid "Seq"
+msgstr "Nr."
+
+#: manufacturing/templates/control_plan_detail.html:66
+msgid "Spec"
+msgstr "Spez."
+
+#: manufacturing/templates/control_plan_detail.html:67
+#: manufacturing/templates/control_plan_detail.html:142
+msgid "Control Method"
+msgstr "Kontrollmethode"
+
+#: manufacturing/templates/control_plan_detail.html:72
+msgid "Risk"
+msgstr "Risiko"
+
+#: manufacturing/templates/control_plan_detail.html:92
+msgid "Re-score"
+msgstr "Neu Bewerten"
+
+#: manufacturing/templates/control_plan_detail.html:108
+#: manufacturing/templates/payroll_deductions.html:141
+#: manufacturing/templates/po_detail.html:202
+#: manufacturing/templates/rfq_detail.html:57
+msgid "Remove"
+msgstr "Entfernen"
+
+#: manufacturing/templates/control_plan_detail.html:118
+msgid "No characteristics added yet."
+msgstr "Noch keine Merkmale hinzugefügt."
+
+#: manufacturing/templates/control_plan_detail.html:124
+#: manufacturing/templates/control_plan_detail.html:162
+msgid "Add Characteristic"
+msgstr "Merkmal Hinzufügen"
+
+#: manufacturing/templates/control_plan_detail.html:130
+msgid "Operation Seq"
+msgstr "Vorgangsfolge"
+
+#: manufacturing/templates/control_plan_detail.html:134
+msgid "Characteristic *"
+msgstr "Merkmal *"
+
+#: manufacturing/templates/control_plan_detail.html:135
+msgid "e.g. Bore Diameter"
+msgstr "z. B. Bohrungsdurchmesser"
+
+#: manufacturing/templates/control_plan_detail.html:138
+msgid "Specification"
+msgstr "Spezifikation"
+
+#: manufacturing/templates/control_plan_detail.html:139
+msgid "e.g. 25.0 ± 0.05 mm"
+msgstr "z. B. 25.0 ± 0.05 mm"
+
+#: manufacturing/templates/control_plan_detail.html:143
+#, python-format
+msgid "e.g. CMM, 100%%"
+msgstr "z. B. KMG, 100%%"
+
+#: manufacturing/templates/control_plan_detail.html:146
+msgid "Severity (1-10)"
+msgstr "Schweregrad (1-10)"
+
+#: manufacturing/templates/control_plan_detail.html:150
+msgid "Occurrence (1-10)"
+msgstr "Auftretenswahrscheinlichkeit (1-10)"
+
+#: manufacturing/templates/control_plan_detail.html:154
+msgid "Detection (1-10)"
+msgstr "Entdeckung (1-10)"
+
+#: manufacturing/templates/control_plan_detail.html:158
+msgid "Recommended Action"
+msgstr "Empfohlene Maßnahme"
+
+#: manufacturing/templates/control_plan_list.html:10
+#: manufacturing/templates/control_plan_new.html:3
+#: manufacturing/templates/control_plan_new.html:21
+msgid "New Control Plan"
+msgstr "Neuer Kontrollplan"
+
+#: manufacturing/templates/control_plan_list.html:25
+#: manufacturing/templates/control_plan_new.html:41
+msgid "Revision"
+msgstr "Revision"
+
+#: manufacturing/templates/control_plan_list.html:52
+msgid "No control plans yet."
+msgstr "Noch keine Kontrollpläne."
+
+#: manufacturing/templates/control_plan_new.html:29
+msgid "Product *"
+msgstr "Produkt *"
+
+#: manufacturing/templates/control_plan_new.html:38
+msgid "e.g. Frame Assembly Control Plan"
+msgstr "z. B. Kontrollplan Rahmenmontage"
+
+#: manufacturing/templates/control_plan_new.html:44
+msgid "Create Control Plan"
+msgstr "Kontrollplan Erstellen"
 
 #: manufacturing/templates/credit_account_detail.html:3
 #, python-format
@@ -4116,35 +4748,6 @@ msgstr "Tickets"
 msgid "Edit Article"
 msgstr "Artikel bearbeiten"
 
-#: manufacturing/templates/cs_kb_detail.html:65
-#: manufacturing/templates/cs_kb_detail.html:103
-#: manufacturing/templates/cs_kb_list.html:82
-#: manufacturing/templates/cs_kb_list.html:119
-#: manufacturing/templates/eng_spec_detail.html:70
-#: manufacturing/templates/eng_spec_detail.html:109
-#: manufacturing/templates/eng_specs_list.html:87
-#: manufacturing/templates/eng_specs_list.html:125
-#: manufacturing/templates/finance_budget_detail.html:104
-#: manufacturing/templates/finance_budget_detail.html:152
-#: manufacturing/templates/legal_governance_list.html:73
-#: manufacturing/templates/legal_governance_list.html:105
-#: manufacturing/templates/maint_downtime_detail.html:70
-#: manufacturing/templates/maint_downtime_list.html:78
-#: manufacturing/templates/maint_downtime_list.html:111
-#: manufacturing/templates/maint_part_detail.html:63
-#: manufacturing/templates/maint_parts_list.html:77
-#: manufacturing/templates/maint_parts_list.html:114
-#: manufacturing/templates/mkt_budget_list.html:82
-#: manufacturing/templates/mkt_budget_list.html:120
-#: manufacturing/templates/payroll_deductions.html:56
-#: manufacturing/templates/payroll_deductions.html:87
-#: manufacturing/templates/purch_contract_detail.html:73
-#: manufacturing/templates/purch_contract_detail.html:114
-#: manufacturing/templates/purch_contracts_list.html:82
-#: manufacturing/templates/purch_contracts_list.html:128
-msgid "Category"
-msgstr "Kategorie"
-
 #: manufacturing/templates/cs_kb_detail.html:73
 #: manufacturing/templates/cs_kb_detail.html:104
 #: manufacturing/templates/cs_kb_list.html:83
@@ -4420,53 +5023,6 @@ msgstr "Ticket erstellen"
 #: manufacturing/templates/cs_plans.html:3
 msgid "CS Improvement Plans"
 msgstr "CS-Verbesserungspläne"
-
-#: manufacturing/templates/cs_plans.html:77
-#: manufacturing/templates/cs_plans.html:123
-#: manufacturing/templates/legal_compliance_detail.html:62
-#: manufacturing/templates/legal_compliance_detail.html:97
-#: manufacturing/templates/legal_compliance_list.html:83
-#: manufacturing/templates/legal_compliance_list.html:121
-#: manufacturing/templates/legal_contract_detail.html:79
-#: manufacturing/templates/legal_contract_detail.html:134
-#: manufacturing/templates/legal_contract_list.html:94
-#: manufacturing/templates/legal_contract_list.html:160
-#: manufacturing/templates/legal_employment_list.html:74
-#: manufacturing/templates/legal_employment_list.html:134
-#: manufacturing/templates/legal_governance_list.html:74
-#: manufacturing/templates/legal_governance_list.html:129
-#: manufacturing/templates/mkt_ad_detail.html:82
-#: manufacturing/templates/mkt_ad_detail.html:182
-#: manufacturing/templates/mkt_ad_list.html:176
-#: manufacturing/templates/mkt_campaign_detail.html:67
-#: manufacturing/templates/mkt_campaign_detail.html:126
-#: manufacturing/templates/mkt_campaign_list.html:89
-#: manufacturing/templates/mkt_campaign_list.html:150
-#: manufacturing/templates/mkt_lead_detail.html:72
-#: manufacturing/templates/mkt_lead_detail.html:115
-#: manufacturing/templates/mkt_lead_list.html:91
-#: manufacturing/templates/mkt_lead_list.html:141
-#: manufacturing/templates/mkt_research_detail.html:61
-#: manufacturing/templates/mkt_research_detail.html:121
-#: manufacturing/templates/mkt_research_list.html:91
-#: manufacturing/templates/mkt_research_list.html:137
-#: manufacturing/templates/qa_capa_detail.html:108
-#: manufacturing/templates/qa_capa_list.html:85
-#: manufacturing/templates/qa_capa_list.html:128
-#: manufacturing/templates/qa_ncr_detail.html:141
-#: manufacturing/templates/qa_ncr_list.html:87
-#: manufacturing/templates/qa_ncr_list.html:144
-#: manufacturing/templates/report_builder_detail.html:33
-#: manufacturing/templates/report_builder_list.html:24
-#: manufacturing/templates/sales_contracts_detail.html:129
-#: manufacturing/templates/sales_contracts_list.html:87
-#: manufacturing/templates/sales_leads_detail.html:115
-#: manufacturing/templates/sales_leads_list.html:87
-#: manufacturing/templates/sales_quotes.html:66
-#: manufacturing/templates/sales_quotes.html:116
-#: manufacturing/templates/sales_quotes.html:141
-msgid "Owner"
-msgstr "Verantwortlicher"
 
 #: manufacturing/templates/cs_plans.html:78
 #: manufacturing/templates/cs_plans.html:127
@@ -4843,7 +5399,7 @@ msgid "Open Work Orders"
 msgstr "Offene Fertigungsaufträge"
 
 #: manufacturing/templates/dashboard_kpis.html:17
-#: manufacturing/templates/purchasing_dashboard.html:67
+#: manufacturing/templates/purchasing_dashboard_kpis.html:4
 msgid "Open POs"
 msgstr "Offene Bestellungen"
 
@@ -6430,6 +6986,8 @@ msgstr "Gesamt Soll"
 
 #: manufacturing/templates/gl_dashboard.html:91
 #: manufacturing/templates/it_asset_detail.html:256
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:101
 msgid "By"
 msgstr "Von"
 
@@ -7257,16 +7815,6 @@ msgstr "z. B. Adobe"
 msgid "Optional — keep confidential"
 msgstr "Optional — vertraulich behandeln"
 
-#: manufacturing/templates/it_license_list.html:161
-#: manufacturing/templates/it_network_list.html:155
-#: manufacturing/templates/it_repairs_list.html:140
-#: manufacturing/templates/it_software_list.html:130
-#: manufacturing/templates/mkt_ad_list.html:181
-#: manufacturing/templates/mkt_research_list.html:166
-#: manufacturing/templates/sales_commissions.html:238
-msgid "Optional notes"
-msgstr "Optionale Notizen"
-
 #: manufacturing/templates/it_network_detail.html:3
 msgid "Device"
 msgstr "Gerät"
@@ -7702,12 +8250,6 @@ msgstr "Vorschrift"
 msgid "Edit Item"
 msgstr "Element bearbeiten"
 
-#: manufacturing/templates/legal_compliance_detail.html:89
-#: manufacturing/templates/legal_compliance_list.html:81
-#: manufacturing/templates/legal_compliance_list.html:113
-msgid "Requirement"
-msgstr "Anforderung"
-
 #: manufacturing/templates/legal_compliance_detail.html:93
 #: manufacturing/templates/legal_compliance_list.html:117
 msgid "Regulation / Standard"
@@ -7853,12 +8395,6 @@ msgstr "Verträge gesamt"
 #: manufacturing/templates/marketing_dashboard.html:98
 msgid "Total Items"
 msgstr "Elemente gesamt"
-
-#: manufacturing/templates/legal_dashboard.html:79
-#: manufacturing/templates/prod_tracking_dashboard.html:50
-#: manufacturing/templates/sales_commissions.html:70
-msgid "Pending"
-msgstr "Ausstehend"
 
 #: manufacturing/templates/legal_dashboard.html:91
 msgid "Total Cases"
@@ -8328,16 +8864,6 @@ msgstr "Diese Inspektion hat ihr geplantes Datum überschritten."
 #: manufacturing/templates/maint_inspection_detail.html:62
 msgid "Complete Inspection"
 msgstr "Inspektion Abschließen"
-
-#: manufacturing/templates/maint_inspection_detail.html:68
-#: manufacturing/templates/maint_inspection_detail.html:147
-#: manufacturing/templates/maint_inspection_list.html:79
-#: manufacturing/templates/qa_audit_detail.html:137
-#: manufacturing/templates/qa_inspection_detail.html:104
-#: manufacturing/templates/qa_inspection_list.html:81
-#: manufacturing/templates/qa_reports.html:184
-msgid "Result"
-msgstr "Ergebnis"
 
 #: manufacturing/templates/maint_inspection_detail.html:69
 msgid "Pass / Fail / Notes"
@@ -9705,12 +10231,6 @@ msgstr "Alle Mitarbeiter"
 msgid "Deduction"
 msgstr "Abzug"
 
-#: manufacturing/templates/payroll_deductions.html:141
-#: manufacturing/templates/po_detail.html:202
-#: manufacturing/templates/rfq_detail.html:57
-msgid "Remove"
-msgstr "Entfernen"
-
 #: manufacturing/templates/payroll_deductions.html:150
 msgid "No deduction assignments found."
 msgstr "Keine Abzugszuweisungen gefunden."
@@ -10421,27 +10941,6 @@ msgstr "Zur Genehmigungswarteschlange"
 msgid "Cancel this PO?"
 msgstr "Diese Bestellung stornieren?"
 
-#: manufacturing/templates/po_detail.html:165
-#: manufacturing/templates/prod_daily_report.html:83
-#: manufacturing/templates/prod_dashboard.html:112
-#: manufacturing/templates/prod_labor_report.html:94
-#: manufacturing/templates/prod_performance_report.html:107
-#: manufacturing/templates/prod_reports.html:86
-#: manufacturing/templates/prod_reports.html:113
-#: manufacturing/templates/prod_schedule.html:68
-#: manufacturing/templates/prod_shipping_detail.html:152
-#: manufacturing/templates/qa_inspection_detail.html:92
-#: manufacturing/templates/qa_inspection_list.html:80
-#: manufacturing/templates/qa_inspection_list.html:114
-#: manufacturing/templates/qa_ncr_list.html:87
-#: manufacturing/templates/reports_dashboard.html:199
-#: manufacturing/templates/sales_demand.html:149
-#: manufacturing/templates/sales_order_detail.html:120
-#: manufacturing/templates/sales_order_detail.html:169
-#: manufacturing/templates/sales_reports.html:96
-msgid "Product"
-msgstr "Produkt"
-
 #: manufacturing/templates/po_detail.html:167
 #: manufacturing/templates/po_detail.html:278
 #: manufacturing/templates/po_landed_cost_new.html:52
@@ -10522,7 +11021,7 @@ msgstr "Neue Bestellung"
 
 #: manufacturing/templates/po_form.html:46
 #: manufacturing/templates/po_list.html:38
-#: manufacturing/templates/purchasing_dashboard.html:132
+#: manufacturing/templates/purchasing_dashboard_kpis.html:36
 #: manufacturing/templates/sales_order_detail.html:65
 #: manufacturing/templates/sales_order_detail.html:106
 #: manufacturing/templates/sales_orders.html:74
@@ -10531,7 +11030,7 @@ msgid "Order Date"
 msgstr "Bestelldatum"
 
 #: manufacturing/templates/po_form.html:51
-#: manufacturing/templates/purchasing_dashboard.html:133
+#: manufacturing/templates/purchasing_dashboard_kpis.html:37
 msgid "Expected Date"
 msgstr "Erwartetes Datum"
 
@@ -10654,7 +11153,7 @@ msgid "Consignment"
 msgstr "Konsignation"
 
 #: manufacturing/templates/po_list.html:36
-#: manufacturing/templates/purchasing_dashboard.html:130
+#: manufacturing/templates/purchasing_dashboard_kpis.html:34
 msgid "PO #"
 msgstr "Bestell-Nr."
 
@@ -11339,7 +11838,7 @@ msgid "Supplier Portal"
 msgstr "Lieferantenportal"
 
 #: manufacturing/templates/purchasing_dashboard.html:55
-#: manufacturing/templates/purchasing_dashboard.html:71
+#: manufacturing/templates/purchasing_dashboard_kpis.html:8
 msgid "Pending Approval"
 msgstr "Genehmigung Ausstehend"
 
@@ -11347,47 +11846,47 @@ msgstr "Genehmigung Ausstehend"
 msgid "New Product"
 msgstr "Neues Produkt"
 
-#: manufacturing/templates/purchasing_dashboard.html:79
-msgid "Sent"
-msgstr "Gesendet"
-
-#: manufacturing/templates/purchasing_dashboard.html:83
-msgid "Partial Receipt"
-msgstr "Teilweiser Eingang"
-
-#: manufacturing/templates/purchasing_dashboard.html:87
-msgid "Total POs"
-msgstr "Bestellungen Gesamt"
-
-#: manufacturing/templates/purchasing_dashboard.html:94
+#: manufacturing/templates/purchasing_dashboard.html:71
 msgid "PO Status Breakdown"
 msgstr "Bestellstatus-Aufschlüsselung"
 
-#: manufacturing/templates/purchasing_dashboard.html:98
+#: manufacturing/templates/purchasing_dashboard.html:75
 msgid "Spend by Month (last 6 mo)"
 msgstr "Ausgaben nach Monat (letzte 6 Monate)"
 
-#: manufacturing/templates/purchasing_dashboard.html:105
+#: manufacturing/templates/purchasing_dashboard.html:82
 msgid "Top Suppliers by Spend"
 msgstr "Top-Lieferanten nach Ausgaben"
 
-#: manufacturing/templates/purchasing_dashboard.html:109
+#: manufacturing/templates/purchasing_dashboard.html:86
 msgid "PO Count by Month (last 6 mo)"
 msgstr "Anzahl Bestellungen nach Monat (letzte 6 Monate)"
 
-#: manufacturing/templates/purchasing_dashboard.html:116
+#: manufacturing/templates/purchasing_dashboard.html:93
 msgid "Top Items by Spend"
 msgstr "Top-Artikel nach Ausgaben"
 
-#: manufacturing/templates/purchasing_dashboard.html:120
+#: manufacturing/templates/purchasing_dashboard.html:97
 msgid "Requisition Status"
 msgstr "Anforderungsstatus"
 
-#: manufacturing/templates/purchasing_dashboard.html:126
+#: manufacturing/templates/purchasing_dashboard_kpis.html:16
+msgid "Sent"
+msgstr "Gesendet"
+
+#: manufacturing/templates/purchasing_dashboard_kpis.html:20
+msgid "Partial Receipt"
+msgstr "Teilweiser Eingang"
+
+#: manufacturing/templates/purchasing_dashboard_kpis.html:24
+msgid "Total POs"
+msgstr "Bestellungen Gesamt"
+
+#: manufacturing/templates/purchasing_dashboard_kpis.html:30
 msgid "Recent Purchase Orders"
 msgstr "Aktuelle Bestellungen"
 
-#: manufacturing/templates/purchasing_dashboard.html:147
+#: manufacturing/templates/purchasing_dashboard_kpis.html:51
 msgid "No purchase orders yet."
 msgstr "Noch keine Bestellungen."
 
@@ -11529,11 +12028,6 @@ msgstr "Optionale NCR-Verknüpfung"
 msgid "Create CAPA"
 msgstr "CAPA Erstellen"
 
-#: manufacturing/templates/qa_dashboard.html:3
-#: manufacturing/templates/qa_reports.html:6
-msgid "QA Dashboard"
-msgstr "QS-Dashboard"
-
 #: manufacturing/templates/qa_dashboard.html:10
 #: manufacturing/templates/qa_dashboard.html:67
 #: manufacturing/templates/qa_dashboard.html:112
@@ -11591,10 +12085,6 @@ msgstr "Korrekturmaßnahmen"
 #: manufacturing/templates/qa_dashboard.html:120
 msgid "SPC"
 msgstr "SPC"
-
-#: manufacturing/templates/qa_dashboard.html:124
-msgid "Certificates of Analysis"
-msgstr "Analysenzertifikate"
 
 #: manufacturing/templates/qa_dashboard.html:128
 msgid "Control Plans / FMEA"
@@ -12361,12 +12851,6 @@ msgstr "Zielpreis"
 #: manufacturing/templates/rfq_detail.html:114
 msgid "Quote Comparison"
 msgstr "Angebotsvergleich"
-
-#: manufacturing/templates/rfq_detail.html:124
-#: manufacturing/templates/sales_performance.html:47
-#: manufacturing/templates/sales_targets.html:76
-msgid "Target"
-msgstr "Ziel"
 
 #: manufacturing/templates/rfq_detail.html:128
 msgid "Winner"
@@ -13484,6 +13968,131 @@ msgstr "Kein Plan für diese Schicht festgelegt"
 #: manufacturing/templates/sf_tv_grid.html:28
 msgid "No active workcenters found."
 msgstr "Keine aktiven Arbeitsplätze gefunden."
+
+#: manufacturing/templates/spc_list.html:3
+#: manufacturing/templates/spc_list.html:30
+msgid "Statistical Process Control"
+msgstr "Statistische Prozesskontrolle"
+
+#: manufacturing/templates/spc_list.html:7
+#: manufacturing/templates/spc_log.html:76
+msgid "Log Measurement"
+msgstr "Messung Protokollieren"
+
+#: manufacturing/templates/spc_list.html:36
+msgid "Set Control Limit"
+msgstr "Kontrollgrenze Festlegen"
+
+#: manufacturing/templates/spc_list.html:50
+#: manufacturing/templates/spc_log.html:56
+msgid "e.g. Diameter (mm)"
+msgstr "z. B. Durchmesser (mm)"
+
+#: manufacturing/templates/spc_list.html:57
+msgid "Sigma"
+msgstr "Sigma"
+
+#: manufacturing/templates/spc_list.html:69
+msgid "Subgroup Size"
+msgstr "Untergruppengröße"
+
+#: manufacturing/templates/spc_list.html:77
+msgid "Save Control Limit"
+msgstr "Kontrollgrenze Speichern"
+
+#: manufacturing/templates/spc_list.html:83
+msgid "Active Control Limits"
+msgstr "Aktive Kontrollgrenzen"
+
+#: manufacturing/templates/spc_list.html:88
+msgid "Subgroup"
+msgstr "Untergruppe"
+
+#: manufacturing/templates/spc_list.html:93
+msgid "(any)"
+msgstr "(beliebig)"
+
+#: manufacturing/templates/spc_list.html:100
+msgid "Log / View"
+msgstr "Protokollieren / Anzeigen"
+
+#: manufacturing/templates/spc_list.html:107
+msgid "No control limits defined yet."
+msgstr "Noch keine Kontrollgrenzen definiert."
+
+#: manufacturing/templates/spc_list.html:112
+msgid "Out-of-Control Alerts"
+msgstr "Außer-Kontrolle-Warnungen"
+
+#: manufacturing/templates/spc_list.html:117
+msgid "Limits"
+msgstr "Grenzwerte"
+
+#: manufacturing/templates/spc_list.html:134
+msgid "No out-of-control measurements."
+msgstr "Keine außer Kontrolle geratenen Messungen."
+
+#: manufacturing/templates/spc_log.html:3
+#: manufacturing/templates/spc_log.html:36
+msgid "Log SPC Measurement"
+msgstr "SPC-Messung Protokollieren"
+
+#: manufacturing/templates/spc_log.html:6
+msgid "SPC Home"
+msgstr "SPC Startseite"
+
+#: manufacturing/templates/spc_log.html:42
+msgid "New Measurement"
+msgstr "Neue Messung"
+
+#: manufacturing/templates/spc_log.html:59
+msgid "Measured Value *"
+msgstr "Gemessener Wert *"
+
+#: manufacturing/templates/spc_log.html:63
+msgid "Lot (optional — required to later certify via CoA)"
+msgstr "Los (optional — später für Zertifizierung via CoA erforderlich)"
+
+#: manufacturing/templates/spc_log.html:65
+msgid "— No lot —"
+msgstr "— Kein Los —"
+
+#: manufacturing/templates/spc_log.html:83
+#, python-format
+msgid "Process Capability (Cpk) — %(characteristic)s"
+msgstr "Prozessfähigkeit (Cpk) — %(characteristic)s"
+
+#: manufacturing/templates/spc_log.html:87
+msgid "Mean"
+msgstr "Mittelwert"
+
+#: manufacturing/templates/spc_log.html:88
+msgid "Std Dev"
+msgstr "Std.-Abw."
+
+#: manufacturing/templates/spc_log.html:89
+msgid "Samples"
+msgstr "Proben"
+
+#: manufacturing/templates/spc_log.html:92
+msgid "Not enough data yet."
+msgstr "Noch nicht genug Daten."
+
+#: manufacturing/templates/spc_log.html:97
+msgid "Recent Measurements"
+msgstr "Neueste Messungen"
+
+#: manufacturing/templates/spc_log.html:108
+msgid "In Control"
+msgstr "Unter Kontrolle"
+
+#: manufacturing/templates/spc_log.html:110
+msgid "Out of Control"
+msgstr "Außer Kontrolle"
+
+#: manufacturing/templates/spc_log.html:122
+msgid "No measurements logged yet for this characteristic."
+msgstr "Noch keine Messungen für dieses Merkmal erfasst."
 
 #: manufacturing/templates/tc_device_form.html:3
 msgid "Add Time Clock"

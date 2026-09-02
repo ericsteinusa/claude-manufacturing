@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ checklist.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/compliance/checklists/" class="btn">Checklists</a>
-<a href="/qa/compliance/templates/" class="btn">Templates</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/compliance/checklists/" class="btn">{% trans "Checklists" %}</a>
+<a href="/qa/compliance/templates/" class="btn">{% trans "Templates" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -21,30 +22,30 @@
 <div class="cp-wrap">
     <div class="menu-title">{{ checklist.name }} — {{ checklist.template_name }}
         {% if checklist.status == 'complete' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Complete</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Complete" %}</span>
         {% else %}
-        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Open</span>
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{% trans "Open" %}</span>
         {% endif %}
     </div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Standard: {{ checklist.standard|default:"—" }} · Owner: {{ checklist.owner|default:"—" }}
+        {% blocktrans with standard=checklist.standard|default:"—" owner=checklist.owner|default:"—" %}Standard: {{ standard }} · Owner: {{ owner }}{% endblocktrans %}
     </p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Progress: {{ checklist.progress.percent }}% ({{ checklist.progress.complete }} complete, {{ checklist.progress.not_applicable }} N/A of {{ checklist.progress.total }})</h3>
+        <h3>{% blocktrans with percent=checklist.progress.percent complete=checklist.progress.complete na=checklist.progress.not_applicable total=checklist.progress.total %}Progress: {{ percent }}% ({{ complete }} complete, {{ na }} N/A of {{ total }}){% endblocktrans %}</h3>
         <div class="progress-bar"><div class="progress-fill" style="width:{{ checklist.progress.percent }}%;"></div></div>
     </div>
 
     <div class="card">
-        <h3>Requirements</h3>
+        <h3>{% trans "Requirements" %}</h3>
         {% if checklist.items %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
-                    <tr><th>Clause</th><th>Requirement</th><th>Status</th><th>Evidence</th>{% if can_edit %}<th></th>{% endif %}</tr>
+                    <tr><th>{% trans "Clause" %}</th><th>{% trans "Requirement" %}</th><th>{% trans "Status" %}</th><th>{% trans "Evidence" %}</th>{% if can_edit %}<th></th>{% endif %}</tr>
                 </thead>
                 <tbody>
                     {% for item in checklist.items %}
@@ -61,8 +62,8 @@
                                     <option value="{{ s }}" {% if s == item.status %}selected{% endif %}>{{ s|title }}</option>
                                     {% endfor %}
                                 </select>
-                                <input type="text" name="evidence_notes" value="{{ item.evidence_notes }}" placeholder="Evidence / notes" style="flex:1;">
-                                <button type="submit" class="btn" style="padding:3px 10px;font-size:11px;">Update</button>
+                                <input type="text" name="evidence_notes" value="{{ item.evidence_notes }}" placeholder="{% trans 'Evidence / notes' %}" style="flex:1;">
+                                <button type="submit" class="btn" style="padding:3px 10px;font-size:11px;">{% trans "Update" %}</button>
                             </form>
                         </td>
                         {% else %}
@@ -75,7 +76,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No requirements on this checklist.</div>
+        <div class="empty-state">{% trans "No requirements on this checklist." %}</div>
         {% endif %}
     </div>
 </div>

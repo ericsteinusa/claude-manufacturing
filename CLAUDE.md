@@ -763,6 +763,49 @@ the embedded Sampling Plans link), Supplier Quality list, and QA
 Reports (confirmed all KPI labels and section headers), in Spanish,
 French, and German with real sample data, no console errors.
 
+Also translated: the QA dashboard's four **SPC/CoA/Control Plans/
+Compliance** sub-features named as excluded above (`spc_list.html`,
+`spc_log.html`, `coa_list.html`, `coa_new.html`, `coa_detail.html`,
+`control_plan_list.html`, `control_plan_new.html`,
+`control_plan_detail.html`, `compliance_template_list.html`,
+`compliance_template_new.html`, `compliance_template_detail.html`,
+`compliance_checklist_list.html`, `compliance_checklist_detail.html` —
+13 templates, closing the "translate the link, not yet the target" gap
+this department was left with). 243 `{% trans %}`/`{% blocktrans %}`
+tags added by two parallel subagents (SPC+CoA, Control Plans+Compliance)
+given the established conventions verbatim — the same delegation
+approach first used for Personnel's recruiting/benefits/offboarding
+cluster. Kept `FMEA`, `Cpk`, `LCL`/`UCL`, and quality-standard names
+(`ISO 13485:2016`, etc.) untranslated where used as raw labels, matching
+the `NCR`/`CAPA`/`MRP`/`BOM`/`OEE` acronym precedent — single-letter
+`S`/`O`/`D` (Severity/Occurrence/Detection) column headers in the
+control plan's characteristics table also left as-is, matching `sf_tv
+.html`'s A/P/Q precedent for bare single-letter acronym headers. Found
+and fixed **two non-heading `default:"literal English"` fallbacks** the
+delegated agent correctly flagged rather than silently expanding, since
+its instructions scoped that fix to headings only — `spc_list.html`'s
+`{{ l.product_name|default:"(any)" }}` table cell and `spc_log.html`'s
+`{{ cpk.error|default:"Not enough data yet." }}` empty-state message —
+both genuinely meaningful English text, not non-linguistic placeholders
+like "—", so both got the same `{% if %}/{% else %}/{% trans %}`
+expansion as a heading would. `makemessages` fuzzy-matched 65 of the new
+strings against unrelated existing translations and left 49 more
+genuinely blank — both corrected by hand across all three languages;
+zero fuzzy/blank/duplicated entries confirmed programmatically after the
+fix. Full suite re-ran clean (3438, unchanged — template/locale-file
+work only), `manage.py check` clean, `msgfmt --check` clean on all three
+files. Verified end-to-end against a from-this-worktree dev server
+instance, using real seeded sample data rather than empty-state pages:
+the SPC limits list and measurement-log page, a real CoA's detail page
+(confirmed "Bestanden"/Pass, "Losnummer"/Lot Number, "Ausstellungsdatum"
+/Issued Date), a real control plan's detail page (confirmed "Merkmale
+und FMEA" with the FMEA acronym preserved), a real compliance
+template's detail page, and a real compliance checklist's detail page
+(confirmed the multi-variable `{% blocktrans with standard=... owner=
+... %}` binding renders correctly as "Norm: … · Verantwortlicher: …"),
+in German (plus spot-checks in Spanish and French on the list/new-form
+pages), no console errors.
+
 Also fully translated: the entire **Production department**
 (`prod_reports.html`, `prod_daily_report.html`,
 `prod_delivery_status.html`, `prod_labor_report.html`,

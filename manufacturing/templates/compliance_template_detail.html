@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ template.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/compliance/templates/" class="btn">Compliance Templates</a>
-<a href="/qa/compliance/checklists/" class="btn">Checklists</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/compliance/templates/" class="btn">{% trans "Compliance Templates" %}</a>
+<a href="/qa/compliance/checklists/" class="btn">{% trans "Checklists" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -27,11 +28,11 @@
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Requirements</h3>
+        <h3>{% trans "Requirements" %}</h3>
         {% if template.items %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Clause</th><th>Requirement</th><th>Category</th></tr></thead>
+                <thead><tr><th>{% trans "Clause" %}</th><th>{% trans "Requirement" %}</th><th>{% trans "Category" %}</th></tr></thead>
                 <tbody>
                     {% for item in template.items %}
                     <tr>
@@ -44,52 +45,52 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No requirements added yet.</div>
+        <div class="empty-state">{% trans "No requirements added yet." %}</div>
         {% endif %}
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Requirement</h3>
+        <h3>{% trans "Add Requirement" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_item">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Clause Ref</label>
-                    <input type="text" name="clause_ref" placeholder="e.g. 8.5.1">
+                    <label>{% trans "Clause Ref" %}</label>
+                    <input type="text" name="clause_ref" placeholder="{% trans 'e.g. 8.5.1' %}">
                 </div>
                 <div class="form-row">
-                    <label>Requirement *</label>
+                    <label>{% trans "Requirement *" %}</label>
                     <input type="text" name="requirement_text" required>
                 </div>
                 <div class="form-row">
-                    <label>Category</label>
+                    <label>{% trans "Category" %}</label>
                     <input type="text" name="category">
                 </div>
                 <div class="form-row">
-                    <label>Sort Order</label>
+                    <label>{% trans "Sort Order" %}</label>
                     <input type="number" name="sort_order" value="0">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Add Requirement</button>
+            <button type="submit" class="btn btn-primary">{% trans "Add Requirement" %}</button>
         </form>
     </div>
 
     <div class="card">
-        <h3>Instantiate a Checklist</h3>
+        <h3>{% trans "Instantiate a Checklist" %}</h3>
         <form method="post" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
             {% csrf_token %}
             <input type="hidden" name="action" value="create_checklist">
             <div class="form-row">
-                <label>Checklist Name *</label>
-                <input type="text" name="name" required placeholder="e.g. Q3 2026 Internal Audit">
+                <label>{% trans "Checklist Name *" %}</label>
+                <input type="text" name="name" required placeholder="{% trans 'e.g. Q3 2026 Internal Audit' %}">
             </div>
             <div class="form-row">
-                <label>Owner</label>
-                <input type="text" name="owner" placeholder="e.g. Dana R.">
+                <label>{% trans "Owner" %}</label>
+                <input type="text" name="owner" placeholder="{% trans 'e.g. Dana R.' %}">
             </div>
-            <button type="submit" class="btn btn-primary">Create Checklist</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Checklist" %}</button>
         </form>
     </div>
     {% endif %}

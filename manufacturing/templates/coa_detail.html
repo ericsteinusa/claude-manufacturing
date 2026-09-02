@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ coa.coa_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/coa/" class="btn">Certificates of Analysis</a>
-<a href="/qa/coa/{{ coa.id }}/pdf/" class="btn btn-primary">⬇ Download PDF</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/coa/" class="btn">{% trans "Certificates of Analysis" %}</a>
+<a href="/qa/coa/{{ coa.id }}/pdf/" class="btn btn-primary">⬇ {% trans "Download PDF" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -21,38 +22,38 @@
 <div class="coa-wrap">
     <div class="menu-title">{{ coa.coa_number }}
         {% if coa.overall_result == 'pass' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Pass</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Pass" %}</span>
         {% elif coa.overall_result == 'fail' %}
-        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Fail</span>
+        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{% trans "Fail" %}</span>
         {% else %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Pending</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Pending" %}</span>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Certificate Header</h3>
+        <h3>{% trans "Certificate Header" %}</h3>
         <dl class="meta-grid">
-            <dt>Product</dt><dd>{{ coa.product_name }}</dd>
-            <dt>Lot Number</dt><dd>{{ coa.lot_number }}</dd>
-            <dt>Issued Date</dt><dd>{{ coa.issued_date }}</dd>
-            <dt>Issued By</dt><dd>{{ coa.issued_by|default:"—" }}</dd>
-            <dt>Notes</dt><dd>{{ coa.notes|default:"—" }}</dd>
+            <dt>{% trans "Product" %}</dt><dd>{{ coa.product_name }}</dd>
+            <dt>{% trans "Lot Number" %}</dt><dd>{{ coa.lot_number }}</dd>
+            <dt>{% trans "Issued Date" %}</dt><dd>{{ coa.issued_date }}</dd>
+            <dt>{% trans "Issued By" %}</dt><dd>{{ coa.issued_by|default:"—" }}</dd>
+            <dt>{% trans "Notes" %}</dt><dd>{{ coa.notes|default:"—" }}</dd>
         </dl>
     </div>
 
     <div class="card">
-        <h3>Certified Characteristics</h3>
+        <h3>{% trans "Certified Characteristics" %}</h3>
         {% if results %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
                     <tr>
-                        <th>Characteristic</th>
-                        <th class="num">Measured</th>
-                        <th class="num">Target</th>
+                        <th>{% trans "Characteristic" %}</th>
+                        <th class="num">{% trans "Measured" %}</th>
+                        <th class="num">{% trans "Target" %}</th>
                         <th class="num">LCL</th>
                         <th class="num">UCL</th>
-                        <th>Result</th>
+                        <th>{% trans "Result" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,11 +66,11 @@
                         <td class="num">{{ r.ucl|default:"—"|floatformat:3 }}</td>
                         <td>
                             {% if r.result == 'pass' %}
-                            <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Pass</span>
+                            <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Pass" %}</span>
                             {% elif r.result == 'fail' %}
-                            <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Fail</span>
+                            <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{% trans "Fail" %}</span>
                             {% else %}
-                            <span class="pill" style="font-size:11px;padding:2px 8px;">No Spec</span>
+                            <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "No Spec" %}</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -78,7 +79,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No characteristics recorded.</div>
+        <div class="empty-state">{% trans "No characteristics recorded." %}</div>
         {% endif %}
     </div>
 </div>

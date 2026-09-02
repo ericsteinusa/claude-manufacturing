@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Compliance Template{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Compliance Template" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/compliance/templates/" class="btn">Compliance Templates</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/compliance/templates/" class="btn">{% trans "Compliance Templates" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">New Compliance Template</div>
+    <div class="menu-title">{% trans "New Compliance Template" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,18 +26,18 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Name *</label>
-                <input type="text" name="name" required placeholder="e.g. ISO 13485:2016 Internal Audit">
+                <label>{% trans "Name *" %}</label>
+                <input type="text" name="name" required placeholder="{% trans 'e.g. ISO 13485:2016 Internal Audit' %}">
             </div>
             <div class="form-row">
-                <label>Standard</label>
-                <input type="text" name="standard" placeholder="e.g. ISO 13485:2016">
+                <label>{% trans "Standard" %}</label>
+                <input type="text" name="standard" placeholder="{% trans 'e.g. ISO 13485:2016' %}">
             </div>
             <div class="form-row">
-                <label>Description</label>
+                <label>{% trans "Description" %}</label>
                 <textarea name="description" rows="3"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Create Template</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Template" %}</button>
         </form>
     </div>
 </div>
