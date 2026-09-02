@@ -1368,13 +1368,13 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 15 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 16 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
-  `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, and
-  `sales_reports.html`. Pattern to copy for
+  `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, `sales_reports.html`,
+  and `eng_reports.html`. Pattern to copy for
   the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
@@ -1566,6 +1566,23 @@ to two new languages, it didn't mark any new template.
   `add_so_item`, re-fetched the fragment for the current month, and confirmed Total Revenue jumped
   from $0 to the order's exact value — then deleted it and confirmed it reverted to $0; also
   confirmed the fragment renders correctly in Portuguese and Dutch with an active session in each.
+  `eng_reports.html`'s own version (`eng_reports_kpis_fragment` polling
+  `/eng/reports/kpis-fragment/`) is the second one (after Credit) with nothing static to leave
+  behind — the Projects-by-Status/ECRs-by-Status/Open-Tasks-by-Priority breakdowns are plain CSS
+  bar charts (`.bar-inner` width percentages), not Chart.js canvases, so there's no
+  canvas-redraw-avoidance concern at all; the whole page (three status/priority breakdown cards
+  plus the Overdue Projects and Recent ECRs tables) moved into the fragment verbatim. The
+  full-page template also needed its first-ever `extra_scripts` block, just to carry the htmx
+  script tag, matching the Credit dashboard precedent. No core-module refactor was needed:
+  `engineering_core.eng_reports()` (aliased `_eng_reports_data` in `views/__init__.py`) was
+  already the single small, independently-tested function backing this entire page — the seventh
+  dashboard in a row not needing one. Full suite passes (3460, unchanged — no new core logic),
+  `manage.py check` and `ruff check .` both clean. Verified end-to-end via the Django test client:
+  hit `/eng/reports/kpis-fragment/` directly (renders standalone with real data); created a real
+  overdue project (due date in the past, status `in_progress`) via
+  `engineering_core.create_project`, re-fetched the fragment, and confirmed it appeared in the
+  Overdue Projects table — then deleted it and confirmed it was gone; also confirmed the fragment
+  renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

@@ -365,6 +365,7 @@ urlpatterns = [
     path('eng/ecrs/new/', views.eng_ecr_detail, name='eng_ecr_new'),
     path('eng/ecrs/<int:ecr_id>/', views.eng_ecr_detail, name='eng_ecr_detail'),
     path('eng/reports/', views.eng_reports_view, name='eng_reports'),
+    path('eng/reports/kpis-fragment/', views.eng_reports_kpis_fragment, name='eng_reports_kpis_fragment'),
     path('eng/tasks/', views.eng_tasks_list, name='eng_tasks_list'),
     path('eng/tasks/<int:task_id>/', views.eng_task_detail, name='eng_task_detail'),
     path('eng/specs/', views.eng_specs_list, name='eng_specs_list'),
