@@ -1368,14 +1368,14 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 20 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 21 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
   `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, `sales_reports.html`,
-  `eng_reports.html`, `cs_reports.html`, `sales_performance.html`, `marketing_dashboard.html`, and
-  `gl_dashboard.html`. Pattern to copy for
+  `eng_reports.html`, `cs_reports.html`, `sales_performance.html`, `marketing_dashboard.html`,
+  `gl_dashboard.html`, and `ar_list.html`. Pattern to copy for
   the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
@@ -1648,6 +1648,22 @@ to two new languages, it didn't mark any new template.
   GL journal via `accounting_core.create_journal`, re-fetched the fragment, and confirmed it
   appeared in the Recent Journal Entries table — then deleted it and confirmed it was gone; also
   confirmed the fragment renders correctly in Portuguese and Dutch with an active session in each.
+  `ar_list.html`'s own version (`ar_list_kpis_fragment` polling `/ar/kpis-fragment/`) is the first
+  one in this series that isn't a department landing page at all — it's the AR invoice *list*
+  page, whose 5-card KPI row (Open/Overdue/Outstanding/Total Invoiced/Total Invoices) is computed
+  globally by `get_ar_dashboard(conn)` with no arguments, independent of the page's own
+  status/customer/date-range filters below it — a controller watching this page wants the KPI
+  counts to stay current without a manual refresh regardless of which filtered slice of invoices
+  they're currently looking at, so only that KPI row (not the filtered invoice table or the New
+  Invoice form) moved into the fragment, the same "KPI-grid-only, no recent-items table" shape
+  `qa_dashboard_kpis.html` established. No core-module refactor was needed: `get_ar_dashboard()`
+  was already the single small, independently-tested function backing it. Full suite passes
+  (3460, unchanged — no new core logic), `manage.py check` and `ruff check .` both clean. Verified
+  end-to-end via the Django test client: hit `/ar/kpis-fragment/` directly (renders standalone
+  with real data — Total Invoices: 9); created a real AR invoice via
+  `accounting_core.create_ar_invoice`, re-fetched the fragment, and confirmed Total Invoices
+  incremented from 9 to 10 — then deleted it and confirmed it reverted to 9; also confirmed the
+  fragment renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

@@ -331,6 +331,7 @@ urlpatterns = [
     path('ap/<int:inv_id>/', views.ap_invoice_detail, name='ap_invoice_detail'),
     # Accounts Receivable
     path('ar/', views.ar_list, name='ar_list'),
+    path('ar/kpis-fragment/', views.ar_list_kpis_fragment, name='ar_list_kpis_fragment'),
     path('ar/export/', views.ar_export, name='ar_export'),
     path('ar/new/', views.ar_invoice_detail, name='ar_invoice_new'),
     path('ar/<int:inv_id>/', views.ar_invoice_detail, name='ar_invoice_detail'),

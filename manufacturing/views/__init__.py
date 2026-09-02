@@ -5326,6 +5326,15 @@ def ar_list(request):
 
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)
+def ar_list_kpis_fragment(request):
+    """htmx polling target for ar_list's global KPI row (unfiltered, same
+    regardless of the invoice-list filters currently applied below it)."""
+    with get_db_connection() as conn:
+        dashboard = get_ar_dashboard(conn)
+    return render(request, 'ar_list_kpis.html', {'dashboard': dashboard})
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def ar_export(request):
     status = request.GET.get('status', '')
     customer_id = request.GET.get('customer_id', '')
