@@ -372,6 +372,7 @@ urlpatterns = [
     path('sales/', views.sales_dashboard, name='sales_dashboard'),
     path('sales/kpis-fragment/', views.sales_dashboard_kpis_fragment, name='sales_dashboard_kpis_fragment'),
     path('sales/reports/', views.sales_reports_view, name='sales_reports_view'),
+    path('sales/reports/kpis-fragment/', views.sales_reports_kpis_fragment, name='sales_reports_kpis_fragment'),
     path('sales/orders/', views.sales_orders_list, name='sales_orders_list'),
     path('sales/orders/new/', views.sales_order_detail, name='sales_order_new'),
     path('sales/orders/<int:so_id>/', views.sales_order_detail, name='sales_order_detail'),

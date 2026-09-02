@@ -4864,3 +4864,23 @@ six wired languages). See CLAUDE.md's htmx section for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 14 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Sales Reports
+page.** The fifteenth template, up from 14 — and the first period-filtered analytical report
+rather than a fixed-scope department dashboard. `sales_reports.html`'s KPI row (Total Revenue/
+Orders/Avg Order Value) plus its Top Customers and Top Products tables now poll
+`/sales/reports/kpis-fragment/` every 30s, carrying the currently-selected `[start, end]` date
+range (from the Today/This Month/This Quarter/This Year chips or a custom range) through as query
+params, so a sales manager watching "This Month" sees revenue tick up as orders are confirmed
+without the poll silently reverting to a different range. No core-module refactor was needed:
+`sales_core.get_sales_reports(conn, start, end)` was already the single small, independently-
+tested function backing this page. The static Revenue Trend chart is left full-page-reload-only,
+matching every prior pass's canvas-redraw-avoidance precedent. Verified end-to-end (a real
+confirmed sales order with a line item created via the Django test client, confirmed Total Revenue
+updating live for the current month, then removed; confirmed correct rendering in all six wired
+languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 15 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.

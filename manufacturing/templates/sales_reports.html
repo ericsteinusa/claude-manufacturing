@@ -56,19 +56,8 @@
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin:-4px 0 20px;">{{ start }} → {{ end }}</p>
 
-    <div class="kpi-row">
-        <div class="kpi">
-            <div class="num">${{ totals.total_revenue|floatformat:0 }}</div>
-            <div class="lbl">{% trans "Total Revenue" %}</div>
-        </div>
-        <div class="kpi">
-            <div class="num">{{ totals.order_count }}</div>
-            <div class="lbl">{% trans "Orders" %}</div>
-        </div>
-        <div class="kpi">
-            <div class="num">${{ totals.avg_order_value|floatformat:0 }}</div>
-            <div class="lbl">{% trans "Avg. Order Value" %}</div>
-        </div>
+    <div id="sales-reports-kpis" hx-get="/sales/reports/kpis-fragment/?start={{ start }}&amp;end={{ end }}" hx-trigger="every 30s" hx-swap="innerHTML">
+        {% include "sales_reports_kpis.html" %}
     </div>
 
     <div class="card" style="margin-bottom:20px;">
@@ -76,40 +65,12 @@
         <canvas id="chart-revenue-trend" height="90"></canvas>
     </div>
 
-    <div class="two-col">
-        <div class="card">
-            <h3>{% trans "Top Customers" %}</h3>
-            <table class="list-table">
-                <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Revenue" %}</th></tr></thead>
-                <tbody>
-                {% for c in top_customers %}
-                <tr><td>{{ c.customer }}</td><td>${{ c.revenue|floatformat:0 }}</td></tr>
-                {% empty %}
-                <tr><td colspan="2" style="text-align:center;color:var(--text-muted);">{% trans "No orders in this range." %}</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="card">
-            <h3>{% trans "Top Products" %}</h3>
-            <table class="list-table">
-                <thead><tr><th>{% trans "Product" %}</th><th>{% trans "Revenue" %}</th></tr></thead>
-                <tbody>
-                {% for p in top_products %}
-                <tr><td>{{ p.product }}</td><td>${{ p.revenue|floatformat:0 }}</td></tr>
-                {% empty %}
-                <tr><td colspan="2" style="text-align:center;color:var(--text-muted);">{% trans "No orders in this range." %}</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
 </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
