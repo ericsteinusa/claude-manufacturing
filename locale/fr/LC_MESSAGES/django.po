@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 23:00+0000\n"
+"POT-Creation-Date: 2026-09-02 23:47+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -1108,6 +1108,7 @@ msgstr "G/L"
 
 #: manufacturing/templates/ap_invoice_detail.html:54
 #: manufacturing/templates/ar_invoice_detail.html:54
+#: manufacturing/templates/blanket_po_detail.html:54
 #: manufacturing/templates/maint_wo_detail.html:57
 #: manufacturing/templates/payroll_stub_detail.html:36
 #: manufacturing/templates/po_detail.html:90
@@ -1386,7 +1387,7 @@ msgstr "N° de chèque, etc."
 #: manufacturing/templates/ats_candidate_detail.html:69
 #: manufacturing/templates/ats_requisition_detail.html:91
 #: manufacturing/templates/benefit_plan_detail.html:122
-#: manufacturing/templates/blanket_po_detail.html:89
+#: manufacturing/templates/blanket_po_detail.html:100
 #: manufacturing/templates/blanket_po_new.html:50
 #: manufacturing/templates/blanket_po_release_new.html:44
 #: manufacturing/templates/coa_detail.html:40
@@ -1964,7 +1965,9 @@ msgstr "Embaucher ce Candidat"
 msgid ""
 "Creates a real employee record in Personnel and sets their hire date for "
 "Workforce Analytics."
-msgstr "Crée une véritable fiche employé dans Personnel et définit sa date d'embauche pour l'Analyse de la Main-d'Œuvre."
+msgstr ""
+"Crée une véritable fiche employé dans Personnel et définit sa date "
+"d'embauche pour l'Analyse de la Main-d'Œuvre."
 
 #: manufacturing/templates/ats_application_detail.html:96
 msgid "Hire Date *"
@@ -2363,7 +2366,9 @@ msgstr "Candidat *"
 msgid ""
 "Candidate not listed yet? <a href=\"/ats/candidates/new/\">Add a new "
 "candidate</a> first."
-msgstr "Le candidat n'est pas encore répertorié ? <a href=\"/ats/candidates/new/\">Ajoutez d'abord un nouveau candidat</a>."
+msgstr ""
+"Le candidat n'est pas encore répertorié ? <a href=\"/ats/candidates/new/"
+"\">Ajoutez d'abord un nouveau candidat</a>."
 
 #: manufacturing/templates/ats_requisition_list.html:3
 #: manufacturing/templates/ats_requisition_list.html:16
@@ -2770,7 +2775,9 @@ msgstr "Assureur : %(carrier)s"
 msgid ""
 "Employee cost: $%(emp_cost)s / pay period — Employer cost: $%(empr_cost)s / "
 "pay period"
-msgstr "Coût de l'employé : $%(emp_cost)s / période de paie — Coût de l'employeur : $%(empr_cost)s / période de paie"
+msgstr ""
+"Coût de l'employé : $%(emp_cost)s / période de paie — Coût de l'employeur : $"
+"%(empr_cost)s / période de paie"
 
 #: manufacturing/templates/benefit_plan_detail.html:45
 msgid "Deactivate Plan"
@@ -3048,20 +3055,20 @@ msgstr "Aucun régime d'avantages pour l'instant."
 msgid "Back"
 msgstr "Retour"
 
-#: manufacturing/templates/blanket_po_detail.html:51
+#: manufacturing/templates/blanket_po_detail.html:62
 #: manufacturing/templates/po_detail.html:104
 msgid "Supplier:"
 msgstr "Fournisseur :"
 
-#: manufacturing/templates/blanket_po_detail.html:52
+#: manufacturing/templates/blanket_po_detail.html:63
 msgid "Description:"
 msgstr "Description :"
 
-#: manufacturing/templates/blanket_po_detail.html:53
+#: manufacturing/templates/blanket_po_detail.html:64
 msgid "Validity:"
 msgstr "Validité :"
 
-#: manufacturing/templates/blanket_po_detail.html:56
+#: manufacturing/templates/blanket_po_detail.html:67
 #, python-format
 msgid ""
 "<b>Total Value:</b> $%(tot)s\n"
@@ -3070,7 +3077,7 @@ msgstr ""
 "<b>Valeur Totale :</b> $%(tot)s\n"
 "                    (Libéré : $%(rel)s, Restant : $%(rem)s)"
 
-#: manufacturing/templates/blanket_po_detail.html:59
+#: manufacturing/templates/blanket_po_detail.html:70
 #, python-format
 msgid ""
 "<b>Total Qty:</b> %(tot)s\n"
@@ -3079,35 +3086,35 @@ msgstr ""
 "<b>Quantité Totale :</b> %(tot)s\n"
 "                    (Libéré : %(rel)s, Restant : %(rem)s)"
 
-#: manufacturing/templates/blanket_po_detail.html:63
+#: manufacturing/templates/blanket_po_detail.html:74
 #: manufacturing/templates/pers_review_detail.html:112
 #: manufacturing/templates/pers_training_detail.html:109
 #: manufacturing/templates/po_detail.html:113
 msgid "Notes:"
 msgstr "Notes :"
 
-#: manufacturing/templates/blanket_po_detail.html:67
+#: manufacturing/templates/blanket_po_detail.html:78
 msgid "Cancel this blanket PO?"
 msgstr "Annuler cette commande ouverte ?"
 
-#: manufacturing/templates/blanket_po_detail.html:69
+#: manufacturing/templates/blanket_po_detail.html:80
 msgid "Cancel Blanket PO"
 msgstr "Annuler la Commande Ouverte"
 
-#: manufacturing/templates/blanket_po_detail.html:76
+#: manufacturing/templates/blanket_po_detail.html:87
 msgid "Call-offs"
 msgstr "Appels de Livraison"
 
-#: manufacturing/templates/blanket_po_detail.html:78
+#: manufacturing/templates/blanket_po_detail.html:89
 #: manufacturing/templates/blanket_po_release_new.html:48
 msgid "Add Call-off"
 msgstr "Ajouter un Appel"
 
-#: manufacturing/templates/blanket_po_detail.html:85
+#: manufacturing/templates/blanket_po_detail.html:96
 msgid "Release #"
 msgstr "N° de Livraison"
 
-#: manufacturing/templates/blanket_po_detail.html:86
+#: manufacturing/templates/blanket_po_detail.html:97
 #: manufacturing/templates/blanket_po_release_new.html:29
 #: manufacturing/templates/maint_parts_list.html:78
 #: manufacturing/templates/po_detail.html:166
@@ -3125,7 +3132,7 @@ msgstr "N° de Livraison"
 msgid "Qty"
 msgstr "Qté"
 
-#: manufacturing/templates/blanket_po_detail.html:87
+#: manufacturing/templates/blanket_po_detail.html:98
 #: manufacturing/templates/blanket_po_release_new.html:35
 #: manufacturing/templates/legal_contract_detail.html:67
 #: manufacturing/templates/legal_contract_list.html:91
@@ -3139,12 +3146,12 @@ msgstr "Qté"
 msgid "Value"
 msgstr "Valeur"
 
-#: manufacturing/templates/blanket_po_detail.html:88
+#: manufacturing/templates/blanket_po_detail.html:99
 #: manufacturing/templates/blanket_po_release_new.html:40
 msgid "Delivery Date"
 msgstr "Date de Livraison"
 
-#: manufacturing/templates/blanket_po_detail.html:105
+#: manufacturing/templates/blanket_po_detail.html:116
 msgid "No call-offs recorded yet."
 msgstr "Aucun appel enregistré pour l'instant."
 
@@ -3547,7 +3554,11 @@ msgid ""
 "            recorded against the selected lot. A lot with no SPC "
 "measurements has nothing\n"
 "            to certify yet."
-msgstr "Génère un CoA à partir des mesures SPC (Qualité → SPC) actuellement\n            enregistrées pour le lot sélectionné. Un lot sans mesure SPC n'a rien\n            à certifier pour l'instant."
+msgstr ""
+"Génère un CoA à partir des mesures SPC (Qualité → SPC) actuellement\n"
+"            enregistrées pour le lot sélectionné. Un lot sans mesure SPC n'a "
+"rien\n"
+"            à certifier pour l'instant."
 
 #: manufacturing/templates/coa_new.html:34
 msgid "Lot *"
@@ -3601,7 +3612,8 @@ msgstr "Norme : %(standard)s · Propriétaire : %(owner)s"
 #, python-format
 msgid ""
 "Progress: %(percent)s%% (%(complete)s complete, %(na)s N/A of %(total)s)"
-msgstr "Progression : %(percent)s%% (%(complete)s terminé, %(na)s N/A sur %(total)s)"
+msgstr ""
+"Progression : %(percent)s%% (%(complete)s terminé, %(na)s N/A sur %(total)s)"
 
 #: manufacturing/templates/compliance_checklist_detail.html:43
 #: manufacturing/templates/compliance_template_detail.html:31
@@ -3811,7 +3823,14 @@ msgid ""
 "        not the full standard. Consult the actual standard text and a "
 "qualified auditor for real\n"
 "        certification work."
-msgstr "Listes de contrôle des exigences réutilisables pour une réglementation ou une norme donnée. Les modèles ISO/FDA préchargés\n        sont des listes de contrôle de départ illustratives — un petit sous-ensemble représentatif de clauses,\n        pas la norme complète. Consultez le texte réel de la norme et un auditeur qualifié pour le\n        travail de certification réel."
+msgstr ""
+"Listes de contrôle des exigences réutilisables pour une réglementation ou "
+"une norme donnée. Les modèles ISO/FDA préchargés\n"
+"        sont des listes de contrôle de départ illustratives — un petit sous-"
+"ensemble représentatif de clauses,\n"
+"        pas la norme complète. Consultez le texte réel de la norme et un "
+"auditeur qualifié pour le\n"
+"        travail de certification réel."
 
 #: manufacturing/templates/compliance_template_list.html:41
 msgid "No compliance templates yet."
@@ -14450,7 +14469,11 @@ msgid ""
 "track their\n"
 "            <a href=\"/pers/offboarding/\">offboarding checklist</a> from "
 "their respective pages."
-msgstr "Consignez l'<a href=\"/pers/exit-interviews/\">entretien de départ</a> de cet employé ou suivez sa\n            <a href=\"/pers/offboarding/\">liste de contrôle de départ</a> depuis leurs pages respectives."
+msgstr ""
+"Consignez l'<a href=\"/pers/exit-interviews/\">entretien de départ</a> de "
+"cet employé ou suivez sa\n"
+"            <a href=\"/pers/offboarding/\">liste de contrôle de départ</a> "
+"depuis leurs pages respectives."
 
 #: manufacturing/templates/termination_list.html:51
 msgid "Termination Process"
@@ -14473,7 +14496,9 @@ msgstr "Initier la Résiliation"
 msgid ""
 "Setting a termination date also marks the employee as terminated on their "
 "record."
-msgstr "La définition d'une date de résiliation marque également l'employé comme résilié dans son dossier."
+msgstr ""
+"La définition d'une date de résiliation marque également l'employé comme "
+"résilié dans son dossier."
 
 #: manufacturing/templates/time_clock_attendance.html:3
 #: manufacturing/templates/time_clock_attendance.html:54
