@@ -65,6 +65,26 @@ def credit_dashboard(request):
     ))
 
 
+@dept_required(_CREDIT_DEPT_KEYS)
+def credit_dashboard_kpis_fragment(request):
+    """htmx polling target for credit_dashboard's KPI rows + accounts/applications/collections tables."""
+    with get_db_connection() as conn:
+        data = get_credit_dashboard(conn)
+        recent_accounts = list_credit_accounts(conn)[:8]
+        recent_applications = [
+            a for a in list_credit_applications(conn) if a['status'] == 'pending'
+        ][:8]
+        recent_collections = [
+            c for c in list_collection_activities(conn)
+            if c['status'] in ('Open', 'In Progress', 'Escalated')
+        ][:8]
+    return render(request, 'credit_dashboard_kpis.html', {
+        **data, 'recent_accounts': recent_accounts,
+        'recent_applications': recent_applications,
+        'recent_collections': recent_collections,
+    })
+
+
 # ---------------------------------------------------------------------------
 # Accounts
 # ---------------------------------------------------------------------------

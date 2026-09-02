@@ -1,0 +1,99 @@
+{% load i18n %}
+    <div class="section-label">{% trans "Credit Accounts" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Total Accounts" %}</div>
+            <div class="val">{{ accounts.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if accounts.hold or accounts.suspended %} yellow{% endif %}">
+            <div class="lbl">{% trans "Hold / Suspended" %}</div>
+            <div class="val">{{ accounts.hold|add:accounts.suspended|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">{% trans "Total Exposure" %}</div>
+            <div class="val">${{ accounts.total_exposure|floatformat:0|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">{% trans "Applications" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Total Applications" %}</div>
+            <div class="val">{{ applications.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if applications.pending %} yellow{% endif %}">
+            <div class="lbl">{% trans "Pending Review" %}</div>
+            <div class="val">{{ applications.pending|default:0 }}</div>
+        </div>
+        <div class="kpi">&nbsp;</div>
+    </div>
+
+    <div class="section-label">{% trans "Collections" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Total Activities" %}</div>
+            <div class="val">{{ collections.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if collections.open %} red{% endif %}">
+            <div class="lbl">{% trans "Open" %}</div>
+            <div class="val">{{ collections.open|default:0 }}</div>
+        </div>
+        <div class="kpi">&nbsp;</div>
+    </div>
+
+    <div class="card">
+        <h3>{% trans "Credit Accounts" %}</h3>
+        <table class="list-table">
+            <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Limit" %}</th><th>{% trans "Terms" %}</th><th>{% trans "Status" %}</th></tr></thead>
+            <tbody>
+            {% for a in recent_accounts %}
+            <tr>
+                <td><a href="/credit/accounts/{{ a.id }}/">{{ a.company_name|default:a.first_name }} {{ a.last_name }}</a></td>
+                <td>${{ a.credit_limit|floatformat:2 }}</td>
+                <td>{{ a.terms|default:"—" }}</td>
+                <td><span class="badge s-{{ a.status }}">{{ a.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">{% trans "No credit accounts found." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>{% trans "Pending Applications" %}</h3>
+        <table class="list-table">
+            <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Applied" %}</th><th>{% trans "Requested Limit" %}</th><th>{% trans "Status" %}</th></tr></thead>
+            <tbody>
+            {% for a in recent_applications %}
+            <tr>
+                <td><a href="/credit/applications/{{ a.id }}/">{{ a.company_name|default:a.first_name }} {{ a.last_name }}</a></td>
+                <td>{{ a.applied_date }}</td>
+                <td>${{ a.requested_limit|floatformat:2 }}</td>
+                <td><span class="badge s-{{ a.status }}">{{ a.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">{% trans "No pending applications." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>{% trans "Open Collections" %}</h3>
+        <table class="list-table">
+            <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Type" %}</th><th>{% trans "Date" %}</th><th>{% trans "Status" %}</th></tr></thead>
+            <tbody>
+            {% for c in recent_collections %}
+            <tr>
+                <td><a href="/credit/collections/{{ c.id }}/">{{ c.company_name|default:c.first_name }} {{ c.last_name }}</a></td>
+                <td>{{ c.activity_type }}</td>
+                <td>{{ c.activity_date }}</td>
+                <td><span class="badge s-{{ c.status|lower|slugify }}">{{ c.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">{% trans "No open collection activities." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>

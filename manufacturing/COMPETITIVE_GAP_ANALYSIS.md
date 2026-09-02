@@ -4828,3 +4828,21 @@ six wired languages). See CLAUDE.md's htmx section for full detail.
 live queue" candidate has been explicitly scoped yet — the next pass should re-survey the
 remaining ~438 templates for another KPI-heavy dashboard with the same rationale, or pick up
 frontend modernity's broader gap (a full reactive SPA) as a separate, much larger initiative.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Customers/Credit
+dashboard.** The thirteenth template, up from 12. `credit_dashboard.html`'s three KPI-row sections
+(Credit Accounts, Applications, Collections) plus its Credit Accounts/Pending Applications/Open
+Collections tables now poll `/credit/kpis-fragment/` every 30s — the first dashboard in this
+series with no static charts at all, so the entire body past the toolbar/dept-grid moved into the
+fragment. No core-module refactor was needed: `credit_core.get_credit_dashboard()`,
+`list_credit_accounts()`, `list_credit_applications()`, and `list_collection_activities()` were
+already small, independently-tested functions the full-page view already called directly — the
+fifth dashboard in a row (after Sales, IT, Customer Service, Engineering) not needing one. Verified
+end-to-end (a real credit application created via the Django test client, confirmed appearing live
+in the fragment's table, then removed; confirmed correct rendering in all six wired languages). See
+CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 13 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.
