@@ -4884,3 +4884,20 @@ languages). See CLAUDE.md's htmx section for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 15 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Engineering
+Reports page.** The sixteenth template, up from 15. `eng_reports.html`'s three status/priority
+breakdown cards (Projects by Status, ECRs by Status, Open Tasks by Priority — plain CSS bar
+charts, not Chart.js canvases) plus its Overdue Projects and Recent ECRs tables now poll
+`/eng/reports/kpis-fragment/` every 30s — the second page in this series (after Credit) with
+nothing static to leave behind, so the whole page moved into the fragment verbatim. No
+core-module refactor was needed: `engineering_core.eng_reports()` was already the single small,
+independently-tested function backing this entire page — the seventh dashboard in a row not
+needing one. Verified end-to-end (a real overdue project created via the Django test client,
+confirmed appearing live in the fragment's table, then removed; confirmed correct rendering in
+all six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 16 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.

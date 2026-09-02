@@ -1,0 +1,87 @@
+{% load i18n %}
+    <div class="two-col">
+        <div class="card">
+            <h3>{% trans "Projects by Status" %}</h3>
+            {% with total=proj_by_status|length %}
+            {% for r in proj_by_status %}
+            <div class="bar-wrap">
+                <div class="bar-lbl"><span class="badge st-{{ r.status }}">{{ r.status }}</span></div>
+                <div class="bar-outer">
+                    <div class="bar-inner" style="width:{{ r.cnt }}%;"></div>
+                </div>
+                <div class="bar-val">{{ r.cnt }}</div>
+            </div>
+            {% empty %}<p style="color:#888;font-size:13px;">{% trans "No projects." %}</p>
+            {% endfor %}
+            {% endwith %}
+        </div>
+        <div class="card">
+            <h3>{% trans "ECRs by Status" %}</h3>
+            {% for r in ecr_by_status %}
+            <div class="bar-wrap">
+                <div class="bar-lbl"><span class="badge st-{{ r.status }}">{{ r.status }}</span></div>
+                <div class="bar-outer">
+                    <div class="bar-inner" style="width:{{ r.cnt }}%;"></div>
+                </div>
+                <div class="bar-val">{{ r.cnt }}</div>
+            </div>
+            {% empty %}<p style="color:#888;font-size:13px;">{% trans "No ECRs." %}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>{% trans "Open Tasks by Priority" %}</h3>
+            {% for r in open_tasks_by_priority %}
+            <div class="bar-wrap">
+                <div class="bar-lbl"><span class="badge pri-{{ r.priority }}">{{ r.priority }}</span></div>
+                <div class="bar-outer">
+                    <div class="bar-inner" style="width:{{ r.cnt }}%;"></div>
+                </div>
+                <div class="bar-val">{{ r.cnt }}</div>
+            </div>
+            {% empty %}<p style="color:#888;font-size:13px;">{% trans "No open tasks." %}</p>
+            {% endfor %}
+        </div>
+        <div class="card">
+            <h3>{% trans "Overdue Projects" %}</h3>
+            {% if overdue_projects %}
+            <table class="list-table">
+                <thead><tr><th>{% trans "Number" %}</th><th>{% trans "Title" %}</th><th>{% trans "Due" %}</th></tr></thead>
+                <tbody>
+                {% for p in overdue_projects %}
+                <tr class="clickable" onclick="location.href='/eng/projects/{{ p.id }}/'">
+                    <td>{{ p.project_number }}</td>
+                    <td>{{ p.title }}</td>
+                    <td style="color:#c33;font-weight:bold;">{{ p.due_date }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:#888;font-size:13px;">{% trans "No overdue projects." %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="section-hdr">{% trans "Recent ECRs (last 10)" %}</div>
+    <div class="card">
+        <table class="list-table">
+            <thead><tr>
+                <th>{% trans "ECR #" %}</th><th>{% trans "Title" %}</th><th>{% trans "Project" %}</th><th>{% trans "Status" %}</th>
+            </tr></thead>
+            <tbody>
+            {% for e in recent_ecrs %}
+            <tr class="clickable" onclick="location.href='/eng/ecrs/{{ e.id }}/'">
+                <td>{{ e.ecr_number }}</td>
+                <td>{{ e.title }}</td>
+                <td>{{ e.project_number|default:"—" }}</td>
+                <td><span class="badge st-{{ e.status }}">{{ e.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;text-align:center;padding:12px;">{% trans "No ECRs yet." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>

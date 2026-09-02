@@ -5921,6 +5921,15 @@ def eng_reports_view(request):
 
 
 @dept_required(_ENGINEERING_DEPT_KEYS)
+def eng_reports_kpis_fragment(request):
+    """htmx polling target for eng_reports' status/priority breakdowns +
+    Overdue Projects/Recent ECRs tables."""
+    with get_db_connection() as conn:
+        data = _eng_reports_data(conn)
+    return render(request, 'eng_reports_kpis.html', data)
+
+
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_tasks_list(request):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
