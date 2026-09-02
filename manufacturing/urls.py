@@ -368,6 +368,7 @@ urlpatterns = [
     path('eng/specs/', views.eng_specs_list, name='eng_specs_list'),
     path('eng/specs/<int:spec_id>/', views.eng_spec_detail, name='eng_spec_detail'),
     path('sales/', views.sales_dashboard, name='sales_dashboard'),
+    path('sales/kpis-fragment/', views.sales_dashboard_kpis_fragment, name='sales_dashboard_kpis_fragment'),
     path('sales/reports/', views.sales_reports_view, name='sales_reports_view'),
     path('sales/orders/', views.sales_orders_list, name='sales_orders_list'),
     path('sales/orders/new/', views.sales_order_detail, name='sales_order_new'),
