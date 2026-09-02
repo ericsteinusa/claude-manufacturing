@@ -1368,12 +1368,12 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 11 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 12 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
-  `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, and `cs_dashboard.html`.
-  Pattern to copy for the next page:
+  `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`, and
+  `eng_dashboard.html`. Pattern to copy for the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
@@ -1489,6 +1489,22 @@ to two new languages, it didn't mark any new template.
   re-fetched the fragment, and confirmed it appeared in the Recent Tickets table — then deleted it
   and confirmed it was gone; also confirmed the fragment renders correctly in Portuguese and Dutch
   with an active session in each.
+  `eng_dashboard.html`'s own version (`eng_dashboard_kpis_fragment` polling `/eng/kpis-fragment/`)
+  picked the KPI row (Active/Planning/Completed Projects, ECRs Pending, Open/Overdue Tasks) plus
+  the Recent Projects and Recent ECRs tables — an engineering manager watching this page wants to
+  see a new ECR land or a project's status change without a manual refresh, the same
+  "time-sensitive queue" rationale as every prior htmx pass, over the static
+  project/task-status/priority, ECR-status, engineer-workload, and standards-status charts below
+  it. No core-module refactor was needed: `engineering_core.get_eng_dashboard(conn)`,
+  `list_projects(conn)[:8]`, and `list_ecrs(conn)[:8]` were already small, independently-tested
+  functions the full-page view already called directly, the same shape as Sales/IT/CS's
+  no-refactor cases — the fourth dashboard in a row not needing one. Full suite passes (3460,
+  unchanged — no new core logic), `manage.py check` and `ruff check .` both clean. Verified
+  end-to-end via the Django test client: hit `/eng/kpis-fragment/` directly (renders standalone
+  with real data); created a real ECR via `engineering_core.create_ecr`, re-fetched the fragment,
+  and confirmed it appeared in the Recent ECRs table — then deleted it and confirmed it was gone;
+  also confirmed the fragment renders correctly in Portuguese and Dutch with an active session in
+  each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

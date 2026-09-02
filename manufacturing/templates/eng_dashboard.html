@@ -64,13 +64,8 @@
         <a href="/eng/reports/" class="dept-btn">{% trans "Reports" %}</a>
     </div>
 
-    <div class="kpi-row">
-        <div class="kpi"><div class="val">{{ dash.projects.in_progress|default:0 }}</div><div class="lbl">{% trans "Active Projects" %}</div></div>
-        <div class="kpi"><div class="val">{{ dash.projects.planning|default:0 }}</div><div class="lbl">{% trans "Planning" %}</div></div>
-        <div class="kpi"><div class="val">{{ dash.projects.completed|default:0 }}</div><div class="lbl">{% trans "Completed" %}</div></div>
-        <div class="kpi"><div class="val">{{ dash.ecrs.pending|default:0 }}</div><div class="lbl">{% trans "ECRs Pending" %}</div></div>
-        <div class="kpi"><div class="val">{{ dash.tasks.open_tasks|default:0 }}</div><div class="lbl">{% trans "Open Tasks" %}</div></div>
-        <div class="kpi"><div class="val">{{ dash.tasks.overdue_tasks|default:0 }}</div><div class="lbl">{% trans "Overdue Tasks" %}</div></div>
+    <div id="eng-kpis" hx-get="/eng/kpis-fragment/" hx-trigger="every 30s" hx-swap="innerHTML">
+        {% include "eng_dashboard_kpis.html" %}
     </div>
 
     <div class="two-col" style="margin-bottom:16px;">
@@ -106,46 +101,12 @@
         </div>
     </div>
 
-    <div class="two-col">
-        <div>
-            <div class="section-hdr">{% trans "Recent Projects" %}</div>
-            <table class="list-table">
-                <thead><tr><th>{% trans "Number" %}</th><th>{% trans "Title" %}</th><th>{% trans "Status" %}</th><th>{% trans "Due" %}</th></tr></thead>
-                <tbody>
-                {% for p in recent_projects %}
-                <tr onclick="location.href='/eng/projects/{{ p.id }}/'">
-                    <td>{{ p.project_number }}</td>
-                    <td>{{ p.title }}</td>
-                    <td><span class="badge st-{{ p.status }}">{{ p.status }}</span></td>
-                    <td>{{ p.due_date|default:"—" }}</td>
-                </tr>
-                {% empty %}<tr><td colspan="4" style="color:#888;">{% trans "No projects yet." %}</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <div class="section-hdr">{% trans "Recent ECRs" %}</div>
-            <table class="list-table">
-                <thead><tr><th>{% trans "ECR #" %}</th><th>{% trans "Title" %}</th><th>{% trans "Status" %}</th></tr></thead>
-                <tbody>
-                {% for e in recent_ecrs %}
-                <tr onclick="location.href='/eng/ecrs/{{ e.id }}/'">
-                    <td>{{ e.ecr_number }}</td>
-                    <td>{{ e.title }}</td>
-                    <td><span class="badge st-{{ e.status }}">{{ e.status }}</span></td>
-                </tr>
-                {% empty %}<tr><td colspan="3" style="color:#888;">{% trans "No ECRs yet." %}</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
