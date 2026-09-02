@@ -4621,3 +4621,44 @@ out the last of the 17 named departments' core areas, though a substantial long 
 sub-features across many departments remains untranslated, consistent with this series' policy
 of scoping each pass to a department's own directly-owned templates rather than every reachable
 link.
+
+Since this entry, i18n coverage was further extended (not logged in this document's own running
+tally, but tracked in `CLAUDE.md`'s Localization section) to the department-grid button labels
+(`menus.py`'s `DASHBOARD_DEPARTMENTS`, via `gettext_lazy`), Personnel's recruiting/benefits/
+offboarding cluster (16 templates), and Quality's SPC/CoA/Control Plans/Compliance cluster (13
+templates) — closing every long-tail exclusion explicitly named as still-open above and in the
+Quality department pass earlier in this document. Two more htmx live-refresh templates were also
+added (`purchasing_dashboard.html`, `qa_dashboard.html`), bringing §6.1's count from 5 to 7.
+
+---
+
+**2026-09-02: §6.13 CI-gated load testing — closing the "not per-PR" gap, per direct
+instruction.** This document has twice previously argued against a full per-PR load-test gate as
+too slow/costly for this app's traffic profile (Section 8's table above, and the 2026-08-29 entry
+adding pass/fail thresholds while deliberately keeping the job `workflow_dispatch`-only) — this
+pass revisits that tradeoff on explicit direction rather than unilaterally. `.github/workflows/
+loadtest.yml` now also triggers on `pull_request` and `push: branches: [main]`, the exact same
+trigger shape as `build`/`mobile`/`lint`/`pytest` (`docker-build.yml`/`mobile.yml`/`ruff.yml`/
+`tests.yml` all use `on: pull_request: / push: branches: [main]` with no path filtering — matched
+verbatim here for consistency rather than inventing a different convention). `workflow_dispatch`
+is kept alongside it for ad-hoc runs with custom parameters (heavier load, longer soak, tighter/
+looser thresholds) without needing a PR. PR/push runs use the same fixed values as
+`workflow_dispatch`'s own defaults (10 users, 2/s spawn rate, 1-minute duration, 1% max failure
+rate, 3000ms max p95) — `inputs.*` evaluates to empty outside `workflow_dispatch`, so
+`${{ inputs.users || '10' }}`-style fallbacks in the "Run load test"/"Check regression thresholds"
+steps supply the same defaults automatically, with no separate CI-speed-trimmed parameter set;
+kept deliberately not-trimmed since a same-ballpark spawn rate/duration is what actually exercises
+the connection-per-request pattern this job exists to catch (`manufacturing/db_pg.py`'s
+`get_db_connection()`), not a token smoke test. No changes to `scripts/loadtest/locustfile.py`,
+`run.sh`, or `check_thresholds.py` — this pass only changed the trigger, not the test logic or
+thresholds. Verified for real, not just YAML-valid: ran the actual pipeline locally against a
+from-this-worktree dev server (`./scripts/loadtest/run.sh http://localhost:8001 5 2 15s` then
+`python scripts/loadtest/check_thresholds.py` against the real output) — 0 failures across 41
+requests, p95 400ms, well within the default 1%/3000ms thresholds, confirming the underlying
+mechanics this workflow now gates on every PR still work end-to-end. `tests/
+test_loadtest_check_thresholds.py`'s existing 6 tests re-ran clean (untouched, since
+`check_thresholds.py`'s logic wasn't touched); full suite 3438 passed (unchanged — no Python
+logic changed, only a workflow YAML file). §6.13/§9.2's "CI-gated load testing" row moves from
+🟡 Partial ("manual trigger, now actually gates on regression") to ✅ Full — it now runs on every
+PR and push to `main`, not just on-demand, closing the specific "not per-PR" gap both prior
+entries flagged as the reason it wasn't promoted past Partial.

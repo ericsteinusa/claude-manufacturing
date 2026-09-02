@@ -1,13 +1,26 @@
 name: loadtest
 
-# Manually-triggered only — not a gate on every PR (too slow/costly for
-# that per COMPETITIVE_GAP_ANALYSIS.md §6.13's own assessment). This gives
-# a repeatable, one-click way to run scripts/loadtest/locustfile.py against
-# a throwaway Postgres service container without depending on a
-# developer's local machine, checking specifically whether
-# manufacturing/db_pg.py's get_db_connection() (a fresh Postgres connection
-# per call) bottlenecks under real concurrent HTTP traffic.
+# Runs on every PR and on push to main, same as build/mobile/lint/pytest —
+# closing the "manual-only, not a gate on every PR" gap
+# COMPETITIVE_GAP_ANALYSIS.md §6.13 previously scored this as only
+# partially closed for. Also keeps workflow_dispatch for an ad-hoc run
+# with custom parameters
+# (heavier load, a longer soak, tighter/looser thresholds) without needing
+# a PR. Runs scripts/loadtest/locustfile.py against a throwaway Postgres
+# service container without depending on a developer's local machine,
+# checking specifically whether manufacturing/db_pg.py's
+# get_db_connection() (a fresh Postgres connection per call) bottlenecks
+# under real concurrent HTTP traffic. PR/push runs use the same fixed
+# defaults as workflow_dispatch's own defaults below (10 users, 1-minute
+# duration) — deliberately not trimmed down for CI speed, since a
+# same-ballpark spawn rate/duration is what actually exercises the
+# connection-per-request pattern this job exists to catch; `inputs.*` is
+# empty outside workflow_dispatch, so `inputs.x || 'default'` supplies the
+# same values automatically.
 on:
+  pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       users:
@@ -78,12 +91,12 @@ jobs:
       - name: Run load test
         run: |
           ./scripts/loadtest/run.sh http://localhost:8000 \
-            "${{ inputs.users }}" "${{ inputs.spawn_rate }}" "${{ inputs.duration }}"
+            "${{ inputs.users || '10' }}" "${{ inputs.spawn_rate || '2' }}" "${{ inputs.duration || '1m' }}"
       - name: Check regression thresholds
         run: |
           python scripts/loadtest/check_thresholds.py scripts/loadtest/results_stats.csv \
-            --max-failure-rate "${{ inputs.max_failure_rate }}" \
-            --max-p95-ms "${{ inputs.max_p95_ms }}"
+            --max-failure-rate "${{ inputs.max_failure_rate || '1.0' }}" \
+            --max-p95-ms "${{ inputs.max_p95_ms || '3000' }}"
       - name: Stop the dev server
         if: always()
         run: kill "$(cat server.pid)" 2>/dev/null || true
