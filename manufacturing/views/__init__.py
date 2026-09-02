@@ -5430,17 +5430,22 @@ def ar_invoice_detail(request, inv_id=None):
 @dept_required(_ACCOUNTING_DEPT_KEYS)
 def gl_dashboard(request):
     conn = get_db_connection()
-    ap_dash = get_ap_dashboard(conn)
-    ar_dash = get_ar_dashboard(conn)
+    kpis = get_accounting_dashboard_kpis(conn)
     acct_count = len(list_accounts(conn, active_only=True))
-    recent_journals = list_journals(conn)[:8]
     conn.close()
-    ctx = _acct_ctx(request,
-        ap=ap_dash, ar=ar_dash,
-        acct_count=acct_count,
-        recent_journals=recent_journals,
-    )
+    ctx = _acct_ctx(request, **kpis, acct_count=acct_count)
     return render(request, 'gl_dashboard.html', ctx)
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS)
+def gl_dashboard_kpis_fragment(request):
+    """htmx polling target for gl_dashboard's AP/AR cards, accounts count,
+    and Recent Journal Entries table."""
+    conn = get_db_connection()
+    kpis = get_accounting_dashboard_kpis(conn)
+    acct_count = len(list_accounts(conn, active_only=True))
+    conn.close()
+    return render(request, 'gl_dashboard_kpis.html', {**kpis, 'acct_count': acct_count})
 
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)

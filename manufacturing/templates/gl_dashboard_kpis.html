@@ -1,0 +1,67 @@
+{% load i18n %}
+    <div class="two-col" style="margin-bottom:14px;">
+        <div class="card">
+            <h3>{% trans "Accounts Payable" %}</h3>
+            <div style="display:flex;gap:20px;">
+                <div><div style="font-size:11px;color:#555;font-weight:bold;">{% trans "Open" %}</div>
+                    <div style="font-size:20px;font-weight:bold;color:var(--accent);">{{ ap.open_count }}</div></div>
+                <div><div style="font-size:11px;color:#555;font-weight:bold;">{% trans "Overdue" %}</div>
+                    <div style="font-size:20px;font-weight:bold;color:#c33;">{{ ap.overdue_count }}</div></div>
+                <div><div style="font-size:11px;color:#555;font-weight:bold;">{% trans "Outstanding" %}</div>
+                    <div style="font-size:20px;font-weight:bold;color:var(--accent);">${{ ap.total_outstanding|floatformat:0 }}</div></div>
+            </div>
+            <a href="/ap/" style="display:inline-block;margin-top:10px;color:var(--accent);font-size:13px;font-weight:bold;">{% trans "View A/P →" %}</a>
+        </div>
+        <div class="card">
+            <h3>{% trans "Accounts Receivable" %}</h3>
+            <div style="display:flex;gap:20px;">
+                <div><div style="font-size:11px;color:#555;font-weight:bold;">{% trans "Open" %}</div>
+                    <div style="font-size:20px;font-weight:bold;color:var(--accent);">{{ ar.open_count }}</div></div>
+                <div><div style="font-size:11px;color:#555;font-weight:bold;">{% trans "Overdue" %}</div>
+                    <div style="font-size:20px;font-weight:bold;color:#c33;">{{ ar.overdue_count }}</div></div>
+                <div><div style="font-size:11px;color:#555;font-weight:bold;">{% trans "Outstanding" %}</div>
+                    <div style="font-size:20px;font-weight:bold;color:var(--accent);">${{ ar.total_outstanding|floatformat:0 }}</div></div>
+            </div>
+            <a href="/ar/" style="display:inline-block;margin-top:10px;color:var(--accent);font-size:13px;font-weight:bold;">{% trans "View A/R →" %}</a>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+        <h3>{% trans "Navigate" %}</h3>
+        <div class="dept-grid">
+            <a href="/gl/accounts/" class="dept-btn">{% blocktrans with count=acct_count %}Chart of Accounts<br><span style="font-size:12px;font-weight:normal;">({{ count }} accounts)</span>{% endblocktrans %}</a>
+            <a href="/gl/journals/" class="dept-btn">{% trans "Journal Entries" %}</a>
+            <a href="/gl/journals/new/" class="dept-btn">{% trans "New Journal Entry" %}</a>
+            <a href="/gl/trial-balance/" class="dept-btn">{% trans "Trial Balance" %}</a>
+            <a href="/gl/income-statement/" class="dept-btn">{% trans "Income Statement" %}</a>
+            <a href="/gl/balance-sheet/" class="dept-btn">{% trans "Balance Sheet" %}</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>{% trans "Recent Journal Entries" %}</h3>
+        {% if recent_journals %}
+        <table class="list-table">
+            <thead><tr>
+                <th>{% trans "Date" %}</th><th>{% trans "Reference" %}</th><th>{% trans "Description" %}</th>
+                <th>{% trans "Lines" %}</th><th>{% trans "Total Dr" %}</th><th>{% trans "Posted" %}</th><th>{% trans "By" %}</th>
+            </tr></thead>
+            <tbody>
+            {% for j in recent_journals %}
+            <tr onclick="location='/gl/journals/{{ j.id }}/'">
+                <td>{{ j.journal_date }}</td>
+                <td>{{ j.reference|default:"—" }}</td>
+                <td>{{ j.description|default:"—" }}</td>
+                <td>{{ j.line_count }}</td>
+                <td style="text-align:right;font-family:monospace;">${{ j.total_debit|floatformat:2 }}</td>
+                <td><span class="{% if j.posted %}posted-yes{% else %}posted-no{% endif %}">
+                    {% if j.posted %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</span></td>
+                <td>{{ j.created_by|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888;font-size:13px;">{% trans "No journal entries yet." %}</p>
+        {% endif %}
+    </div>

@@ -4952,3 +4952,21 @@ wired languages). See CLAUDE.md's htmx section for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 19 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the General Ledger
+dashboard.** The twentieth template, up from 19. `gl_dashboard.html`'s AP/AR summary cards, the
+accounts-count Chart-of-Accounts nav link, and the Recent Journal Entries table now poll
+`/gl/kpis-fragment/` every 30s — everything on the page past the toolbar, since it has no
+Chart.js canvases at all, the same "nothing static to leave behind" shape as Credit/Engineering
+Reports/Sales Performance. Also simplified existing code in the process: the view previously
+called `get_ap_dashboard()`/`get_ar_dashboard()`/`list_journals()[:8]` separately — the exact
+combination `accounting_core.get_accounting_dashboard_kpis()` already provides (built for the
+Accounting dashboard pass) — so `gl_dashboard` now reuses that shared helper directly instead of
+duplicating the combining logic. Verified end-to-end (a real balanced GL journal created via the
+Django test client, confirmed appearing live in the fragment's table, then removed; confirmed
+correct rendering in all six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 20 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.

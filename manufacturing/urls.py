@@ -336,6 +336,7 @@ urlpatterns = [
     path('ar/<int:inv_id>/', views.ar_invoice_detail, name='ar_invoice_detail'),
     # General Ledger
     path('gl/', views.gl_dashboard, name='gl_dashboard'),
+    path('gl/kpis-fragment/', views.gl_dashboard_kpis_fragment, name='gl_dashboard_kpis_fragment'),
     path('gl/accounts/', views.gl_accounts, name='gl_accounts'),
     path('gl/journals/', views.gl_journals, name='gl_journals'),
     path('gl/journals/new/', views.gl_journal_detail, name='gl_journal_new'),
