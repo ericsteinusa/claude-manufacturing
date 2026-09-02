@@ -247,6 +247,7 @@ urlpatterns = [
          name='cs_ticket_detail'),
     path('cs/escalations/', views.cs_escalations, name='cs_escalations'),
     path('cs/reports/', views.cs_reports, name='cs_reports'),
+    path('cs/reports/kpis-fragment/', views.cs_reports_kpis_fragment, name='cs_reports_kpis_fragment'),
     path('cs/plans/', views.cs_plans, name='cs_plans'),
     path('maint/', views.maint_dashboard, name='maint_dashboard'),
     path('maint/kpis-fragment/', views.maint_dashboard_kpis_fragment, name='maint_dashboard_kpis_fragment'),

@@ -1368,13 +1368,13 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 16 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 17 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
   `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, `sales_reports.html`,
-  and `eng_reports.html`. Pattern to copy for
+  `eng_reports.html`, and `cs_reports.html`. Pattern to copy for
   the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
@@ -1582,6 +1582,24 @@ to two new languages, it didn't mark any new template.
   overdue project (due date in the past, status `in_progress`) via
   `engineering_core.create_project`, re-fetched the fragment, and confirmed it appeared in the
   Overdue Projects table — then deleted it and confirmed it was gone; also confirmed the fragment
+  renders correctly in Portuguese and Dutch with an active session in each.
+  `cs_reports.html`'s own version (`cs_reports_kpis_fragment` polling
+  `/cs/reports/kpis-fragment/?days={{ days }}`) combines both prior patterns at once: like Sales
+  Reports, it's a period-filtered analytical report (90 days/6 months/1 year/2 years chips) whose
+  `hx-get` URL carries the current `days` value through as a query param so the poll doesn't
+  silently revert to a different period; like Engineering Reports, it has nothing static to leave
+  behind (no Chart.js canvas anywhere on the page), so the entire KPI-cards/Monthly-Call-Volume-
+  table/Open-Tickets-Summary content moved into the fragment verbatim, needing its own first-ever
+  `extra_scripts` block just for the htmx tag. No core-module refactor was needed:
+  `cs_calls_core.get_summary_stats(conn, days)`, `get_monthly_volume(conn, days)`, and
+  `list_tickets(conn, status='open')` were already small, independently-tested functions the
+  full-page view already called directly — the eighth dashboard in a row not needing one. Full
+  suite passes (3460, unchanged — no new core logic), `manage.py check` and `ruff check .` both
+  clean. Verified end-to-end via the Django test client: confirmed the `hx-get` URL correctly
+  carries the resolved `days` value (e.g. `?days=180`); hit the fragment URL directly (renders
+  standalone with real data — Total Tickets: 25); created a real ticket via
+  `cs_calls_core.create_ticket`, re-fetched the fragment, and confirmed Total Tickets incremented
+  from 25 to 26 — then deleted it and confirmed it reverted to 25; also confirmed the fragment
   renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a

@@ -4901,3 +4901,21 @@ all six wired languages). See CLAUDE.md's htmx section for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 16 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Customer Service
+Reports page.** The seventeenth template, up from 16 — combining both prior patterns at once:
+like Sales Reports, it's period-filtered (90 days/6 months/1 year/2 years), so
+`/cs/reports/kpis-fragment/?days={{ days }}` carries the current period through as a query param;
+like Engineering Reports, it has nothing static to leave behind (no Chart.js canvas at all), so
+the entire KPI-cards/Monthly-Call-Volume-table/Open-Tickets-Summary content moved into the
+fragment verbatim. No core-module refactor was needed:
+`cs_calls_core.get_summary_stats()`/`get_monthly_volume()`/`list_tickets()` were already small,
+independently-tested functions the full-page view already called directly — the eighth dashboard
+in a row not needing one. Verified end-to-end (a real ticket created via the Django test client,
+confirmed the Total Tickets count updating live for the current period, then removed; confirmed
+correct rendering in all six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 17 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.

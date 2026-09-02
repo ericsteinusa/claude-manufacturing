@@ -1,0 +1,74 @@
+{% load i18n %}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="num">{{ stats.total }}</div>
+            <div class="lbl">{% trans "Total Tickets" %}</div>
+        </div>
+        <div class="stat-card warn">
+            <div class="num">{{ stats.open_count }}</div>
+            <div class="lbl">{% trans "Open" %}</div>
+        </div>
+        <div class="stat-card good">
+            <div class="num">{{ stats.completed_count }}</div>
+            <div class="lbl">{% trans "Completed" %}</div>
+        </div>
+        <div class="stat-card {% if stats.completion_rate >= 80 %}good{% elif stats.completion_rate < 50 %}warn{% endif %}">
+            <div class="num">{{ stats.completion_rate }}%</div>
+            <div class="lbl">{% trans "Completion Rate" %}</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">
+                {% if stats.avg_resolution %}{{ stats.avg_resolution }}d{% else %}—{% endif %}
+            </div>
+            <div class="lbl">{% trans "Avg Resolution (days)" %}</div>
+        </div>
+        <div class="stat-card {% if stats.avg_age_open and stats.avg_age_open >= 7 %}warn{% endif %}">
+            <div class="num">
+                {% if stats.avg_age_open %}{{ stats.avg_age_open }}d{% else %}—{% endif %}
+            </div>
+            <div class="lbl">{% trans "Avg Age (open tickets)" %}</div>
+        </div>
+    </div>
+
+    <!-- Monthly volume -->
+    <div class="card">
+        <h3>{% trans "Monthly Call Volume" %}</h3>
+        {% if monthly %}
+        <table class="vol-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Month" %}</th>
+                    <th>{% trans "Total" %}</th>
+                    <th>{% trans "Open" %}</th>
+                    <th>{% trans "Completed" %}</th>
+                    <th>{% trans "Completion Rate" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in monthly %}
+                <tr {% if m.open_count > m.completed_count %}class="row-warn"{% endif %}>
+                    <td>{{ m.month }}</td>
+                    <td>{{ m.total }}</td>
+                    <td>{{ m.open_count }}</td>
+                    <td>{{ m.completed_count }}</td>
+                    <td>{{ m.completion_rate }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888;font-size:13px;">{% trans "No data for this period." %}</p>
+        {% endif %}
+    </div>
+
+    <!-- Open / Overdue summary -->
+    <div class="card">
+        <h3>{% trans "Open Tickets Summary" %}</h3>
+        <p style="font-size:14px;color:#333;">
+            {% blocktrans count counter=open_count %}<strong>{{ counter }}</strong> open ticket{% plural %}<strong>{{ counter }}</strong> open tickets{% endblocktrans %}
+            &nbsp;—&nbsp;
+            {% blocktrans count counter=overdue_count %}<strong style="color:#c62828;">{{ counter }}</strong> overdue (&ge;7 days).{% plural %}<strong style="color:#c62828;">{{ counter }}</strong> overdue (&ge;7 days).{% endblocktrans %}
+            <a href="/cs/escalations/" style="color:var(--accent);margin-left:8px;">
+                {% trans "View escalations &rarr;" %}</a>
+        </p>
+    </div>
