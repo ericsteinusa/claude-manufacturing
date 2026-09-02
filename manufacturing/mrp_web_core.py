@@ -14,6 +14,7 @@ from datetime import date, timedelta
 
 from .mrp_core import plan_orders, plan_orders_dated
 from .bom_core import explode_quantity
+from .inventory_core import _ensure_product_extra_columns
 from .work_orders_core import ensure_wo_tables, next_wo_number, create_wo
 from .purchase_orders_core import ensure_po_tables, next_po_number, create_po, add_po_item
 from .log_utils import get_logger
@@ -37,6 +38,9 @@ def load_mrp_inputs(conn):
         scheduled_receipts: {pid: float}  open/in-progress WOs
         safety            : {pid: float}  (zeros — extend to reorder_point if needed)
     """
+    _ensure_product_extra_columns(conn)
+    conn.commit()
+
     rows = conn.execute(
         "SELECT p.id, p.name, "
         "COALESCE(p.item_type, 'buy') AS item_type, "
@@ -92,6 +96,9 @@ def get_demand_details(conn) -> list[dict]:
 
     Used to render the demand summary on the MRP home page.
     """
+    _ensure_product_extra_columns(conn)
+    conn.commit()
+
     rows = conn.execute(
         "SELECT p.id, p.name, "
         "COALESCE(p.item_type, 'buy') AS item_type, "

@@ -105,6 +105,15 @@ def ensure_costing_tables(conn):
         "ALTER TABLE workcenter ADD COLUMN IF NOT EXISTS "
         "overhead_rate REAL NOT NULL DEFAULT 0.0"
     )
+    # A genuinely fresh Postgres deployment's `product` table (created via
+    # schema.py's/work_orders_core.py's own CREATE TABLE IF NOT EXISTS) has
+    # no item_type column — it's only added by seed_sample_products.py's own
+    # ALTER TABLE, a dev-only script never run in production. _get_bom_lines
+    # below selects p.item_type, so self-heal it here too.
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS "
+        "item_type TEXT DEFAULT 'buy'"
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -4,6 +4,7 @@ import pytest
 
 from manufacturing.costing_core import (
     GL_CATEGORIES,
+    ensure_costing_tables,
     get_gl_account_map, set_gl_account_map, list_gl_account_map,
     roll_standard_cost, get_standard_cost, list_cost_history,
     compute_wo_actual_cost, save_wo_actual_cost, get_wo_cost,
@@ -79,6 +80,20 @@ def test_gl_categories_includes_all_expected():
     expected = {'raw_material', 'wip', 'finished_goods', 'cogs',
                 'material_variance', 'labor_variance', 'ap_payable'}
     assert set(GL_CATEGORIES) == expected
+
+
+# ── ensure_costing_tables ────────────────────────────────────────────────
+
+def test_ensure_costing_tables_self_heals_item_type_column():
+    # A genuinely fresh product table (no seed_sample_products.py run) has no
+    # item_type column — _get_bom_lines selects p.item_type, so this must
+    # self-heal it the same way it already does for workcenter.overhead_rate.
+    conn = _Conn(rows=[])
+    ensure_costing_tables(conn)
+    assert any(
+        'ALTER TABLE product ADD COLUMN IF NOT EXISTS' in sql and 'item_type' in sql
+        for sql, _ in conn.calls
+    )
 
 
 # ── GL account map ─────────────────────────────────────────────────────────

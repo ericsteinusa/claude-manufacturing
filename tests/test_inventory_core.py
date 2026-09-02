@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 from manufacturing.inventory_core import (
     TRANS_TYPES,
+    _ensure_product_extra_columns,
     list_products,
     get_product,
     get_transactions,
@@ -54,6 +55,76 @@ def test_trans_types_includes_adjust():
 
 def test_trans_types_includes_return():
     assert 'return' in TRANS_TYPES
+
+
+# ---------------------------------------------------------------------------
+# _ensure_product_extra_columns — self-heal for a genuinely fresh DB
+# ---------------------------------------------------------------------------
+
+def test_ensure_product_extra_columns_alters_item_type():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('item_type' in s for s in sqls)
+
+
+def test_ensure_product_extra_columns_alters_uom():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('uom' in s for s in sqls)
+
+
+def test_ensure_product_extra_columns_alters_lead_time_days():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('lead_time_days' in s for s in sqls)
+
+
+def test_ensure_product_extra_columns_alters_created_by():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('created_by' in s for s in sqls)
+
+
+def test_ensure_product_extra_columns_does_not_commit():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    conn.commit.assert_not_called()
+
+
+def test_list_products_self_heals_columns_and_commits():
+    conn = _conn(fetchall=[])
+    list_products(conn)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('item_type' in s for s in sqls)
+    conn.commit.assert_called()
+
+
+def test_get_product_self_heals_columns_and_commits():
+    conn = _conn(fetchone=_product())
+    get_product(conn, 1)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('item_type' in s for s in sqls)
+    conn.commit.assert_called()
+
+
+def test_create_product_self_heals_columns_without_committing():
+    conn = _conn(fetchone={'id': 1})
+    create_product(conn, 'X', None, '', 0, 0, 0, 'buy', 0, 'ea', 'u@e.com')
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('item_type' in s for s in sqls)
+    conn.commit.assert_not_called()
+
+
+def test_update_product_self_heals_columns_without_committing():
+    conn = _conn()
+    update_product(conn, 1, 'X', None, '', 0, 0, 'buy', 0, 'ea')
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('item_type' in s for s in sqls)
+    conn.commit.assert_not_called()
 
 
 # ---------------------------------------------------------------------------

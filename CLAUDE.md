@@ -1451,6 +1451,31 @@ per template, stated plainly rather than implied as complete.
   query), and `reports_core.inventory_alerts` (never selected `id` at all).
   Fixed in PR #94/#95 — when adding or touching a query that joins for a
   `_name`/`_number` display field, check its sibling `_id` is selected too.
+- **`product.item_type`/`uom`/`lead_time_days`/`created_by` don't exist on a
+  genuinely fresh Postgres deployment.** schema.py's and
+  work_orders_core.py's own `CREATE TABLE IF NOT EXISTS product` never
+  include them — they're only added by `seed_sample_products.py`'s own
+  `ALTER TABLE` steps, a dev-only script never run in production. Caught for
+  real by the per-PR-gated load test (`.github/workflows/loadtest.yml`)
+  hitting `/inventory/` against a CI database seeded with only
+  `seed_sample_data.py` (no products): `psycopg2.errors.UndefinedColumn:
+  column p.item_type does not exist`. Fixed with a shared
+  `inventory_core._ensure_product_extra_columns(conn)` self-heal helper,
+  called at the top of every function across 6 modules that references one
+  of these columns: `inventory_core.py` (`list_products`/`get_product`/
+  `create_product`/`update_product`), `bom_web_core.py` (`list_products`/
+  `get_product`/`update_item_master`/`get_bom`, imports the helper directly
+  from `inventory_core`), `mrp_web_core.py` (`load_mrp_inputs`/
+  `get_demand_details`, same import), and — since `carbon_core.py`,
+  `costing_core.py`, and `cycle_count_core.py` already gate their queries
+  behind their own `ensure_*_tables(conn)` function called from every view —
+  the `item_type`/`uom` `ALTER TABLE`s were added directly inside
+  `ensure_carbon_tables`/`ensure_costing_tables`/`ensure_cycle_count_tables`
+  instead of importing the helper. Postgres DDL is transactional, so
+  functions that must not commit their own transaction (`create_product`/
+  `update_product`/`update_item_master`) just run the `ALTER`s without an
+  explicit `conn.commit()` — the caller's own commit persists them alongside
+  the row it's writing.
 
 ## Windows deployment (`scripts/windows/`)
 `manufacture-autopull.ps1` (polls `origin/main` and redeploys) and

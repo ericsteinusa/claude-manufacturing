@@ -33,6 +33,13 @@ def _row(**kw):
     return kw
 
 
+def _heal_calls():
+    """4 filler responses consumed by load_mrp_inputs'/get_demand_details'
+    _ensure_product_extra_columns() self-heal ALTER TABLE calls, so a
+    side_effect-list test's real query responses line up correctly."""
+    return [MagicMock() for _ in range(4)]
+
+
 # ---------------------------------------------------------------------------
 # load_mrp_inputs
 # ---------------------------------------------------------------------------
@@ -43,9 +50,17 @@ def test_load_mrp_inputs_returns_five_tuple():
     assert len(result) == 5
 
 
+def test_load_mrp_inputs_self_heals_extra_columns():
+    conn = _conn(fetchall=[])
+    load_mrp_inputs(conn)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('ALTER TABLE product' in s and 'item_type' in s for s in sqls)
+    conn.commit.assert_called()
+
+
 def test_load_mrp_inputs_product_keyed_by_id():
     conn = MagicMock()
-    responses = [
+    responses = _heal_calls() + [
         MagicMock(fetchall=lambda: [
             {'id': 1, 'name': 'Widget', 'item_type': 'make',
              'lead_time_days': 5, 'amount': 10.0, 'safety_stock': 0.0}
@@ -63,7 +78,7 @@ def test_load_mrp_inputs_product_keyed_by_id():
 
 def test_load_mrp_inputs_bom_lines_grouped_by_parent():
     conn = MagicMock()
-    responses = [
+    responses = _heal_calls() + [
         MagicMock(fetchall=lambda: [
             {'id': 1, 'name': 'A', 'item_type': 'make', 'lead_time_days': 0, 'amount': 0.0, 'safety_stock': 0.0},
             {'id': 2, 'name': 'B', 'item_type': 'buy', 'lead_time_days': 0, 'amount': 0.0, 'safety_stock': 0.0},
@@ -81,7 +96,7 @@ def test_load_mrp_inputs_bom_lines_grouped_by_parent():
 
 def test_load_mrp_inputs_scheduled_receipts_aggregated():
     conn = MagicMock()
-    responses = [
+    responses = _heal_calls() + [
         MagicMock(fetchall=lambda: [
             {'id': 5, 'name': 'X', 'item_type': 'make', 'lead_time_days': 2, 'amount': 0.0, 'safety_stock': 0.0}
         ]),
@@ -98,14 +113,14 @@ def test_load_mrp_inputs_scheduled_receipts_aggregated():
 def test_load_mrp_inputs_selects_preferred_supplier():
     conn = _conn(fetchall=[])
     load_mrp_inputs(conn)
-    sql = conn.execute.call_args_list[0][0][0]
-    assert 'supplier_id' in sql
-    assert 'LEFT JOIN supplier' in sql
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    product_sql = next(s for s in sqls if 'supplier_id' in s)
+    assert 'LEFT JOIN supplier' in product_sql
 
 
 def test_load_mrp_inputs_carries_supplier_fields():
     conn = MagicMock()
-    responses = [
+    responses = _heal_calls() + [
         MagicMock(fetchall=lambda: [
             {'id': 1, 'name': 'Widget', 'item_type': 'buy', 'lead_time_days': 5,
              'amount': 10.0, 'safety_stock': 0.0, 'supplier_id': 7,
@@ -122,7 +137,7 @@ def test_load_mrp_inputs_carries_supplier_fields():
 
 def test_load_mrp_inputs_empty_db():
     conn = MagicMock()
-    responses = [
+    responses = _heal_calls() + [
         MagicMock(fetchall=lambda: []),
         MagicMock(fetchall=lambda: []),
         MagicMock(fetchall=lambda: []),
@@ -184,6 +199,14 @@ def test_get_demand_details_returns_list_of_dicts():
 def test_get_demand_details_empty():
     conn = _conn(fetchall=[])
     assert get_demand_details(conn) == []
+
+
+def test_get_demand_details_self_heals_extra_columns():
+    conn = _conn(fetchall=[])
+    get_demand_details(conn)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('ALTER TABLE product' in s and 'item_type' in s for s in sqls)
+    conn.commit.assert_called()
 
 
 # ---------------------------------------------------------------------------
