@@ -5001,3 +5001,23 @@ for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 22 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the AR invoice detail
+page — the first non-dashboard target.** The twenty-third template, up from 22. `ar_invoice_detail
+.html` is a single-record detail/edit page with two live `<form>`s on it (an inline status-change
+select, and a Record Payment form pre-filled with the current balance) — wrapping either in a
+periodic innerHTML swap would silently discard in-progress form input, a risk no prior
+dashboard/list pass had to consider. Scoped narrowly in response: only the read-only Payment
+History table now polls `/ar/<id>/payments-fragment/` every 30s, matching the established
+"recent-items table" shape exactly; both forms, including the Record Payment form sharing the
+same `.card` as the polled table, stay outside the fragment untouched. No core-module refactor
+was needed: `accounting_core.list_ar_payments()` was already the exact function the full page
+already called. Verified end-to-end (explicitly confirmed both forms' markup is present on the
+full page and absent from the fragment response; a real payment recorded via the Django test
+client appeared live in the fragment's table, then was removed; confirmed correct rendering in
+all six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 23 of ~450 templates now. AP's own invoice detail page
+(`ap_invoice_detail.html`) is a natural next candidate, mirroring this exact pattern.

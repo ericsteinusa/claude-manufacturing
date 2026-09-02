@@ -160,27 +160,9 @@
     {% if invoice %}
     <div class="card">
         <h3>{% trans "Payment History" %}</h3>
-        {% if payments %}
-        <table class="list-table">
-            <thead><tr>
-                <th>{% trans "Date" %}</th><th>{% trans "Method" %}</th><th>{% trans "Reference" %}</th>
-                <th class="num">{% trans "Amount" %}</th><th>{% trans "Notes" %}</th>
-            </tr></thead>
-            <tbody>
-            {% for p in payments %}
-            <tr>
-                <td>{{ p.payment_date|default:"—" }}</td>
-                <td>{{ p.payment_method }}</td>
-                <td>{{ p.reference|default:"—" }}</td>
-                <td class="num">${{ p.amount|floatformat:2 }}</td>
-                <td>{{ p.notes|default:"" }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p style="color:#888;font-size:13px;">{% trans "No payments recorded." %}</p>
-        {% endif %}
+        <div id="ar-inv-payments" hx-get="/ar/{{ invoice.id }}/payments-fragment/" hx-trigger="every 30s" hx-swap="innerHTML">
+            {% include "ar_invoice_payments_kpis.html" %}
+        </div>
 
         {% if can_edit and invoice.balance > 0 %}
         <hr style="margin:14px 0;">
@@ -222,4 +204,8 @@
     {% endif %}
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 {% endblock %}
