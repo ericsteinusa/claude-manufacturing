@@ -34,36 +34,8 @@
         <a href="/fin/tax/" class="dept-btn">{% trans "Tax Filings" %}</a>
     </div>
 
-    <p style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">{% trans "Accounts Payable" %}</p>
-    <div class="kpi-grid" style="max-width:700px;margin-bottom:24px;">
-        <div class="kpi-card">
-            <div class="kpi-label">{% trans "Open Invoices" %}</div>
-            <div class="kpi-value">{{ ap.open_count|default:0 }}</div>
-        </div>
-        <div class="kpi-card{% if ap.overdue_count %}" style="border-left:4px solid var(--danger-fg);{% endif %}">
-            <div class="kpi-label">{% trans "Overdue" %}</div>
-            <div class="kpi-value{% if ap.overdue_count %} warn{% endif %}">{{ ap.overdue_count|default:0 }}</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">{% trans "Total Outstanding" %}</div>
-            <div class="kpi-value">${{ ap.total_outstanding|floatformat:2 }}</div>
-        </div>
-    </div>
-
-    <p style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">{% trans "Accounts Receivable" %}</p>
-    <div class="kpi-grid" style="max-width:700px;margin-bottom:24px;">
-        <div class="kpi-card">
-            <div class="kpi-label">{% trans "Open Invoices" %}</div>
-            <div class="kpi-value">{{ ar.open_count|default:0 }}</div>
-        </div>
-        <div class="kpi-card{% if ar.overdue_count %}" style="border-left:4px solid var(--danger-fg);{% endif %}">
-            <div class="kpi-label">{% trans "Overdue" %}</div>
-            <div class="kpi-value{% if ar.overdue_count %} warn{% endif %}">{{ ar.overdue_count|default:0 }}</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">{% trans "Total Outstanding" %}</div>
-            <div class="kpi-value">${{ ar.total_outstanding|floatformat:2 }}</div>
-        </div>
+    <div id="acct-kpis" hx-get="/acct/kpis-fragment/" hx-trigger="every 30s" hx-swap="innerHTML">
+        {% include "acct_dashboard_kpis.html" %}
     </div>
 
     <div style="max-width:900px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -99,47 +71,11 @@
         </div>
     </div>
 
-    <div class="card" style="max-width:900px;">
-        <div class="card-title">{% trans "Recent Journal Entries" %}</div>
-        <div class="erp-table-wrap" style="margin-top:12px;">
-            <table class="erp-table">
-                <thead>
-                    <tr>
-                        <th>{% trans "Date" %}</th>
-                        <th>{% trans "Reference" %}</th>
-                        <th>{% trans "Description" %}</th>
-                        <th>{% trans "Lines" %}</th>
-                        <th class="num">{% trans "Total Debit" %}</th>
-                        <th>{% trans "Status" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for j in recent_journals %}
-                <tr>
-                    <td><a href="/gl/journals/{{ j.id }}/">{{ j.journal_date }}</a></td>
-                    <td>{{ j.reference|default:"—" }}</td>
-                    <td>{{ j.description|default:"—"|truncatechars:60 }}</td>
-                    <td>{{ j.line_count }}</td>
-                    <td class="num">${{ j.total_debit|floatformat:2 }}</td>
-                    <td>
-                        {% if j.posted %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Posted" %}</span>
-                        {% else %}
-                        <span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{% trans "Draft" %}</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">{% trans "No journal entries yet." %}</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {

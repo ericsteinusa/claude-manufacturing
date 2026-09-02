@@ -3,7 +3,7 @@ Tests for manufacturing/accounting_core.py — pure unit tests, no Qt, no DB.
 """
 
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from manufacturing.accounting_core import (
     INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, DEBIT_NORMAL,
@@ -18,6 +18,7 @@ from manufacturing.accounting_core import (
     list_journals, get_journal, get_journal_lines,
     create_journal, post_journal, void_journal,
     trial_balance, income_statement, balance_sheet,
+    get_accounting_dashboard_kpis,
 )
 
 
@@ -771,3 +772,48 @@ def test_balance_sheet_returns_sections():
     result = balance_sheet(conn)
     assert 'Asset' in result['sections']
     assert 'balanced' in result
+
+
+# ---------------------------------------------------------------------------
+# get_accounting_dashboard_kpis — backs acct_dashboard + its htmx fragment
+# ---------------------------------------------------------------------------
+
+def _journal_row(**kw):
+    base = {'id': 1, 'journal_date': '2026-01-01', 'reference': 'REF-1',
+            'description': 'Test entry', 'posted': 1, 'created_by': 'u@co.com',
+            'created_at': '2026-01-01', 'line_count': 2, 'total_debit': 100.0}
+    base.update(kw)
+    return base
+
+
+def test_get_accounting_dashboard_kpis_combines_ap_ar_journals():
+    with patch('manufacturing.accounting_core.get_ap_dashboard') as m_ap, \
+         patch('manufacturing.accounting_core.get_ar_dashboard') as m_ar, \
+         patch('manufacturing.accounting_core.list_journals') as m_journals:
+        m_ap.return_value = _ap_dash(open_count=3)
+        m_ar.return_value = _ap_dash(open_count=2)
+        m_journals.return_value = [_journal_row(id=n) for n in range(10)]
+
+        result = get_accounting_dashboard_kpis(MagicMock())
+
+        assert result['ap']['open_count'] == 3
+        assert result['ar']['open_count'] == 2
+        assert len(result['recent_journals']) == 8
+        assert result['recent_journals'][0]['id'] == 0
+
+
+def test_get_accounting_dashboard_kpis_journals_are_plain_dicts():
+    with patch('manufacturing.accounting_core.get_ap_dashboard', return_value=_ap_dash()), \
+         patch('manufacturing.accounting_core.get_ar_dashboard', return_value=_ap_dash()), \
+         patch('manufacturing.accounting_core.list_journals',
+               return_value=[_journal_row()]):
+        result = get_accounting_dashboard_kpis(MagicMock())
+        assert isinstance(result['recent_journals'][0], dict)
+
+
+def test_get_accounting_dashboard_kpis_empty_journals():
+    with patch('manufacturing.accounting_core.get_ap_dashboard', return_value=_ap_dash()), \
+         patch('manufacturing.accounting_core.get_ar_dashboard', return_value=_ap_dash()), \
+         patch('manufacturing.accounting_core.list_journals', return_value=[]):
+        result = get_accounting_dashboard_kpis(MagicMock())
+        assert result['recent_journals'] == []

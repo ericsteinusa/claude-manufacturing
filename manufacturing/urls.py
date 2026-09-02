@@ -322,6 +322,7 @@ urlpatterns = [
     path('payroll/ytd/', views.payroll_ytd, name='payroll_ytd'),
     # Accounting dashboard
     path('acct/', views.acct_dashboard, name='acct_dashboard'),
+    path('acct/kpis-fragment/', views.acct_dashboard_kpis_fragment, name='acct_dashboard_kpis_fragment'),
     # Accounts Payable
     path('ap/', views.ap_list, name='ap_list'),
     path('ap/export/', views.ap_export, name='ap_export'),

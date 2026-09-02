@@ -4772,3 +4772,23 @@ candidates for the next pass, picked for the same "manager watches a live queue"
 Accounting (`acct_dashboard.html`, AP/AR outstanding + recent journals), Customer Service
 (`cs_dashboard.html`, open ticket count), and Engineering (`eng_dashboard.html`, pending ECRs +
 overdue tasks) — none have been touched yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Accounting
+dashboard.** The tenth template, up from 9. `acct_dashboard.html`'s AP KPI row, AR KPI row, and
+Recent Journal Entries table now poll `/acct/kpis-fragment/` every 30s — a controller watching
+this page wants to see a new invoice go overdue or a journal get posted without a manual refresh,
+the same "time-sensitive queue" rationale as every prior htmx pass. Unlike IT/Sales/Quality, this
+one needed a small core-module refactor: the view's inline "recent journals" SQL was extracted into
+`accounting_core.get_accounting_dashboard_kpis(conn)` alongside the already-existing
+`get_ap_dashboard()`/`get_ar_dashboard()`, called by both the full page and the new fragment so
+they can't drift apart — the same pattern `purchasing_core.get_purchasing_dashboard_kpis()`
+established. 3 new unit tests. Verified end-to-end (a real balanced GL journal created via the
+Django test client, confirmed appearing live in the fragment's table, then removed; confirmed
+correct rendering in all six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 10 of ~450 templates now. Remaining "manager watches a
+live queue" candidates, picked for the same rationale, none touched yet: Customer Service
+(`cs_dashboard.html`, open ticket count) and Engineering (`eng_dashboard.html`, pending ECRs +
+overdue tasks).

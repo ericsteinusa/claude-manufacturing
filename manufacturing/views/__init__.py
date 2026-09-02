@@ -5083,6 +5083,7 @@ from ..accounting_core import (  # noqa: E402
     list_journals, get_journal, get_journal_lines,
     create_journal, post_journal, void_journal,
     trial_balance, income_statement, balance_sheet, get_ar_aging,
+    get_accounting_dashboard_kpis,
 )
 
 _ACCOUNTING_DEPT_KEYS = {'accounting', 'finance'}
@@ -8348,18 +8349,10 @@ def acct_dashboard(request):
     """Accounting department landing page — AP, AR, and GL summary."""
     conn = get_db_connection()
     try:
-        ap = get_ap_dashboard(conn)
-        ar = get_ar_dashboard(conn)
-        recent_journals = conn.execute(
-            "SELECT j.id, j.journal_date, j.reference, j.description, j.posted, "
-            "COUNT(jl.id) AS line_count, "
-            "COALESCE(SUM(jl.debit), 0) AS total_debit "
-            "FROM gl_journal j "
-            "LEFT JOIN gl_journal_line jl ON jl.journal_id = j.id "
-            "GROUP BY j.id "
-            "ORDER BY j.journal_date DESC, j.id DESC LIMIT 8"
-        ).fetchall()
-        recent_journals = [dict(r) for r in recent_journals]
+        kpis = get_accounting_dashboard_kpis(conn)
+        ap = kpis['ap']
+        ar = kpis['ar']
+        recent_journals = kpis['recent_journals']
 
         ap_status_rows = conn.execute("""
             SELECT status, COUNT(*) AS cnt FROM ap_invoice GROUP BY status ORDER BY cnt DESC
@@ -8417,6 +8410,17 @@ def acct_dashboard(request):
         journal_trend_json=journal_trend_json,
         journal_posted_json=journal_posted_json,
     ))
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS)
+def acct_dashboard_kpis_fragment(request):
+    """htmx polling target for acct_dashboard's AP/AR KPI rows + recent journals table."""
+    conn = get_db_connection()
+    try:
+        kpis = get_accounting_dashboard_kpis(conn)
+    finally:
+        conn.close()
+    return render(request, 'acct_dashboard_kpis.html', kpis)
 
 
 # ---------------------------------------------------------------------------

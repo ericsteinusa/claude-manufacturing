@@ -231,6 +231,20 @@ def get_ar_dashboard(conn):
     }
 
 
+def get_accounting_dashboard_kpis(conn):
+    """AP/AR summary + the 8 most recent GL journal entries.
+
+    Backs both the full acct_dashboard view and its htmx polling fragment
+    so the two can't drift apart — see get_ap_dashboard/get_ar_dashboard/
+    list_journals for the underlying queries.
+    """
+    return {
+        'ap': get_ap_dashboard(conn),
+        'ar': get_ar_dashboard(conn),
+        'recent_journals': [dict(r) for r in list_journals(conn)[:8]],
+    }
+
+
 def list_ar_invoices(conn, status=None, customer_id=None,
                      date_from=None, date_to=None):
     conds = []
