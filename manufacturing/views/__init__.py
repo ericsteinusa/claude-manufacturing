@@ -7898,6 +7898,17 @@ def cs_dashboard_view(request):
     return render(request, 'cs_dashboard.html', ctx)
 
 
+@dept_required(_CS_DEPT_KEYS)
+def cs_dashboard_kpis_fragment(request):
+    """htmx polling target for cs_dashboard's KPI row + Recent Tickets table."""
+    with get_db_connection() as conn:
+        stats = get_summary_stats(conn)
+        recent_tickets = list_tickets(conn)[:8]
+    return render(request, 'cs_dashboard_kpis.html', {
+        'stats': stats, 'recent_tickets': recent_tickets,
+    })
+
+
 # ---------------------------------------------------------------------------
 # Finance dashboard
 # ---------------------------------------------------------------------------

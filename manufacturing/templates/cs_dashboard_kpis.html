@@ -1,0 +1,61 @@
+{% load i18n %}
+    <div class="kpi-row">
+        <div class="kpi{% if stats.open_count > 0 %} red{% endif %}">
+            <div class="lbl">{% trans "Open Tickets" %}</div>
+            <div class="val">{{ stats.open_count }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">{% trans "Completed" %}</div>
+            <div class="val">{{ stats.completed_count }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">{% trans "Total (12 mo)" %}</div>
+            <div class="val">{{ stats.total }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">{% trans "Completion Rate" %}</div>
+            <div class="val">{{ stats.completion_rate }}%</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">{% trans "Avg Resolution" %}</div>
+            <div class="val">{% if stats.avg_resolution is not None %}{% blocktrans with days=stats.avg_resolution %}{{ days }} days{% endblocktrans %}{% else %}—{% endif %}</div>
+        </div>
+        <div class="kpi{% if stats.avg_age_open is not None and stats.avg_age_open > 7 %} yellow{% endif %}">
+            <div class="lbl">{% trans "Avg Age Open" %}</div>
+            <div class="val">{% if stats.avg_age_open is not None %}{% blocktrans with days=stats.avg_age_open %}{{ days }} days{% endblocktrans %}{% else %}—{% endif %}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>{% trans "Recent Tickets" %}</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>{% trans "ID" %}</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Issue" %}</th>
+                    <th>{% trans "Status" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for t in recent_tickets %}
+            <tr>
+                <td><a href="/cs/{{ t.id }}/">{{ t.id }}</a></td>
+                <td>{{ t.customer_name }}</td>
+                <td>{{ t.call_date }}</td>
+                <td>{{ t.call|truncatechars:60 }}</td>
+                <td>
+                    {% if t.completion_box == 0 %}
+                        <span class="badge st-open">{% trans "Open" %}</span>
+                    {% else %}
+                        <span class="badge st-closed">{% trans "Closed" %}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;">{% trans "No tickets found." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>

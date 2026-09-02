@@ -600,6 +600,7 @@ urlpatterns = [
     path('pers/training/', views.pers_training_list, name='pers_training_list'),
     path('pers/training/<int:training_id>/', views.pers_training_detail, name='pers_training_detail'),
     path('cs-dash/', views.cs_dashboard_view, name='cs_dashboard'),
+    path('cs-dash/kpis-fragment/', views.cs_dashboard_kpis_fragment, name='cs_dashboard_kpis_fragment'),
     path('cs/returns/', views.cs_returns_list, name='cs_returns_list'),
     path('cs/returns/<int:return_id>/', views.cs_returns_detail, name='cs_returns_detail'),
     path('cs/kb/', views.cs_kb_list, name='cs_kb_list'),
