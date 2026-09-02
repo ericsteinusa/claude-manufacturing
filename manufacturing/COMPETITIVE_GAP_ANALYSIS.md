@@ -4809,3 +4809,22 @@ correct rendering in all six wired languages). See CLAUDE.md's htmx section for 
 **§6.1/§9.2 status:** still 🟡 Partial — 11 of ~450 templates now. Remaining "manager watches a
 live queue" candidate, picked for the same rationale, not yet touched: Engineering
 (`eng_dashboard.html`, pending ECRs + overdue tasks).
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Engineering
+dashboard.** The twelfth template, up from 11. `eng_dashboard.html`'s KPI row (Active/Planning/
+Completed Projects, ECRs Pending, Open/Overdue Tasks) plus its Recent Projects and Recent ECRs
+tables now poll `/eng/kpis-fragment/` every 30s — an engineering manager watching this page wants
+to see a new ECR land without a manual refresh, the same "time-sensitive queue" rationale as every
+prior htmx pass. No core-module refactor was needed: `engineering_core.get_eng_dashboard()`,
+`list_projects()`, and `list_ecrs()` were already small, independently-tested functions the
+full-page view already called directly — the fourth dashboard in a row (after Sales, IT, Customer
+Service) not needing one. Verified end-to-end (a real ECR created via the Django test client,
+confirmed appearing live in the fragment's table, then removed; confirmed correct rendering in all
+six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 12 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet — the next pass should re-survey the
+remaining ~438 templates for another KPI-heavy dashboard with the same rationale, or pick up
+frontend modernity's broader gap (a full reactive SPA) as a separate, much larger initiative.

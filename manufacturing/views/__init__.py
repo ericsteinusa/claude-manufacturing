@@ -5691,6 +5691,18 @@ def eng_dashboard(request):
 
 
 @dept_required(_ENGINEERING_DEPT_KEYS)
+def eng_dashboard_kpis_fragment(request):
+    """htmx polling target for eng_dashboard's KPI row + Recent Projects/ECRs tables."""
+    with get_db_connection() as conn:
+        dash = get_eng_dashboard(conn)
+        recent_projects = list_projects(conn)[:8]
+        recent_ecrs = list_ecrs(conn)[:8]
+    return render(request, 'eng_dashboard_kpis.html', {
+        'dash': dash, 'recent_projects': recent_projects, 'recent_ecrs': recent_ecrs,
+    })
+
+
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_projects(request):
     status = request.GET.get('status', '')
     engineer = request.GET.get('engineer', '')

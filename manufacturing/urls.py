@@ -357,6 +357,7 @@ urlpatterns = [
          name='consolidated_financials'),
     path('fin/forecast/', views.fin_cash_forecast, name='fin_cash_forecast'),
     path('eng/', views.eng_dashboard, name='eng_dashboard'),
+    path('eng/kpis-fragment/', views.eng_dashboard_kpis_fragment, name='eng_dashboard_kpis_fragment'),
     path('eng/projects/', views.eng_projects, name='eng_projects'),
     path('eng/projects/new/', views.eng_project_detail, name='eng_project_new'),
     path('eng/projects/<int:project_id>/', views.eng_project_detail, name='eng_project_detail'),
