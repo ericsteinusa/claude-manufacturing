@@ -1964,7 +1964,7 @@ msgstr "Embaucher ce Candidat"
 msgid ""
 "Creates a real employee record in Personnel and sets their hire date for "
 "Workforce Analytics."
-msgstr ""
+msgstr "Crée une véritable fiche employé dans Personnel et définit sa date d'embauche pour l'Analyse de la Main-d'Œuvre."
 
 #: manufacturing/templates/ats_application_detail.html:96
 msgid "Hire Date *"
@@ -2363,7 +2363,7 @@ msgstr "Candidat *"
 msgid ""
 "Candidate not listed yet? <a href=\"/ats/candidates/new/\">Add a new "
 "candidate</a> first."
-msgstr ""
+msgstr "Le candidat n'est pas encore répertorié ? <a href=\"/ats/candidates/new/\">Ajoutez d'abord un nouveau candidat</a>."
 
 #: manufacturing/templates/ats_requisition_list.html:3
 #: manufacturing/templates/ats_requisition_list.html:16
@@ -2770,7 +2770,7 @@ msgstr "Assureur : %(carrier)s"
 msgid ""
 "Employee cost: $%(emp_cost)s / pay period — Employer cost: $%(empr_cost)s / "
 "pay period"
-msgstr ""
+msgstr "Coût de l'employé : $%(emp_cost)s / période de paie — Coût de l'employeur : $%(empr_cost)s / période de paie"
 
 #: manufacturing/templates/benefit_plan_detail.html:45
 msgid "Deactivate Plan"
@@ -3547,7 +3547,7 @@ msgid ""
 "            recorded against the selected lot. A lot with no SPC "
 "measurements has nothing\n"
 "            to certify yet."
-msgstr ""
+msgstr "Génère un CoA à partir des mesures SPC (Qualité → SPC) actuellement\n            enregistrées pour le lot sélectionné. Un lot sans mesure SPC n'a rien\n            à certifier pour l'instant."
 
 #: manufacturing/templates/coa_new.html:34
 msgid "Lot *"
@@ -3601,7 +3601,7 @@ msgstr "Norme : %(standard)s · Propriétaire : %(owner)s"
 #, python-format
 msgid ""
 "Progress: %(percent)s%% (%(complete)s complete, %(na)s N/A of %(total)s)"
-msgstr ""
+msgstr "Progression : %(percent)s%% (%(complete)s terminé, %(na)s N/A sur %(total)s)"
 
 #: manufacturing/templates/compliance_checklist_detail.html:43
 #: manufacturing/templates/compliance_template_detail.html:31
@@ -3811,7 +3811,7 @@ msgid ""
 "        not the full standard. Consult the actual standard text and a "
 "qualified auditor for real\n"
 "        certification work."
-msgstr ""
+msgstr "Listes de contrôle des exigences réutilisables pour une réglementation ou une norme donnée. Les modèles ISO/FDA préchargés\n        sont des listes de contrôle de départ illustratives — un petit sous-ensemble représentatif de clauses,\n        pas la norme complète. Consultez le texte réel de la norme et un auditeur qualifié pour le\n        travail de certification réel."
 
 #: manufacturing/templates/compliance_template_list.html:41
 msgid "No compliance templates yet."
@@ -14450,7 +14450,7 @@ msgid ""
 "track their\n"
 "            <a href=\"/pers/offboarding/\">offboarding checklist</a> from "
 "their respective pages."
-msgstr ""
+msgstr "Consignez l'<a href=\"/pers/exit-interviews/\">entretien de départ</a> de cet employé ou suivez sa\n            <a href=\"/pers/offboarding/\">liste de contrôle de départ</a> depuis leurs pages respectives."
 
 #: manufacturing/templates/termination_list.html:51
 msgid "Termination Process"
@@ -14473,7 +14473,7 @@ msgstr "Initier la Résiliation"
 msgid ""
 "Setting a termination date also marks the employee as terminated on their "
 "record."
-msgstr ""
+msgstr "La définition d'une date de résiliation marque également l'employé comme résilié dans son dossier."
 
 #: manufacturing/templates/time_clock_attendance.html:3
 #: manufacturing/templates/time_clock_attendance.html:54
