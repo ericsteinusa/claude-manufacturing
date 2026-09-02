@@ -1368,11 +1368,11 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 8 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 9 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
-  (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`, and
-  `sales_dashboard.html`. Pattern to copy for the next page:
+  (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
+  `sales_dashboard.html`, and `it_dashboard.html`. Pattern to copy for the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
@@ -1433,6 +1433,23 @@ to two new languages, it didn't mark any new template.
   "Confirmed Orders" incremented to 7 with the new order appearing at the top of the Recent
   Orders table — then deleted the test order and confirmed the count reverted to 6; also
   confirmed the fragment renders correctly in French with an active French session.
+  `it_dashboard.html`'s own version (`it_dashboard_kpis_fragment` polling
+  `/it/kpis-fragment/`) picked the Help Desk Tickets KPI row (Open/In Progress/Critical/Total
+  counts) plus the Recent Support Tickets table — an IT manager watching this page wants to see a
+  new critical ticket land without a manual refresh, the same "time-sensitive queue" rationale as
+  Quality's critical-NCR count and Purchasing's PO-approval queue, over the static Asset Inventory
+  KPI row and all six charts below it (ticket/asset status/priority/type/trend breakdowns), which
+  stay static until reload matching every other htmx pass's precedent. No core-module refactor was
+  needed: `it_core.get_it_dashboard(conn)` already returned `tickets` + `recent_tickets` in one
+  small, already-tested call that the full-page view already used directly, so the fragment view
+  just calls the same function rather than needing a new extracted helper. Full suite passes
+  (3457, unchanged — no new core logic), `manage.py check` and `ruff check .` both clean. Verified
+  end-to-end via the Django test client (logged in as the President sample user): hit
+  `/it/kpis-fragment/` directly (renders standalone with real data — Open: 6, Critical: 2); created
+  a real critical ticket via `it_core.create_ticket`, re-fetched the fragment, and confirmed "Open"
+  incremented to 7 and "Critical (Open)" to 3 with the new ticket appearing in the Recent Support
+  Tickets table — then deleted the test ticket and confirmed both counts reverted; also confirmed
+  the fragment renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

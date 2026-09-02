@@ -4751,3 +4751,24 @@ long-tails like Consultants/Supplier Portal/Consignment/Skills-Matrix/ATS, still
 remaining template coverage in the four existing languages, or matching MRPeasy's 13+ language
 count — this pass did neither on its own, it extended the existing four-language template coverage
 sideways to two more languages.
+
+---
+
+**2026-09-02, next gap: §6.1/§9.4 frontend modernity — extending htmx live-refresh to the IT
+dashboard.** The other dimension §9.4 called out by name (alongside localization breadth, closed
+above) as still wide even against SMB-tier peers. This is the ninth template to get htmx
+live-refresh: `it_dashboard.html`'s Help Desk Tickets KPI row (Open/In Progress/Critical/Total)
+plus its Recent Support Tickets table now poll `/it/kpis-fragment/` every 30s, the same
+"time-sensitive queue" rationale as Quality's critical-NCR count and Purchasing's PO-approval
+queue — an IT manager watching this page wants to see a new critical ticket land without a manual
+refresh. No core-module refactor was needed: `it_core.get_it_dashboard()` already returned
+everything the fragment needs in one already-tested call. Verified end-to-end (live data-change
+round-trip via the Django test client, confirmed correct rendering in all six wired languages
+including the two just added). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 9 of ~450 templates now, up from 8. Narrows but doesn't
+close the gap against every enterprise vendor and Epicor/Infor/Plex's reactive SPAs. Good remaining
+candidates for the next pass, picked for the same "manager watches a live queue" rationale:
+Accounting (`acct_dashboard.html`, AP/AR outstanding + recent journals), Customer Service
+(`cs_dashboard.html`, open ticket count), and Engineering (`eng_dashboard.html`, pending ECRs +
+overdue tasks) — none have been touched yet.

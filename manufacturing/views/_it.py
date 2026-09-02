@@ -109,6 +109,14 @@ def it_dashboard(request):
 
 
 @dept_required('information_tech')
+def it_dashboard_kpis_fragment(request):
+    """htmx polling target for it_dashboard's ticket KPI row + recent tickets table."""
+    with get_db_connection() as conn:
+        data = get_it_dashboard(conn)
+    return render(request, 'it_dashboard_kpis.html', data)
+
+
+@dept_required('information_tech')
 def it_ticket_list(request):
     status_f = request.GET.get('status', '').strip()
     priority_f = request.GET.get('priority', '').strip()
