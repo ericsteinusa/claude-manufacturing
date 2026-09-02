@@ -4970,3 +4970,20 @@ correct rendering in all six wired languages). See CLAUDE.md's htmx section for 
 
 **§6.1/§9.2 status:** still 🟡 Partial — 20 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Accounts
+Receivable list page.** The twenty-first template, up from 20 — and the first one in this series
+that isn't a department landing page at all. `ar_list.html`'s 5-card KPI row (Open/Overdue/
+Outstanding/Total Invoiced/Total Invoices) is computed globally with no filter arguments,
+independent of the page's own status/customer/date-range filters below it, so only that KPI row
+(not the filtered invoice table or the New Invoice form) now polls `/ar/kpis-fragment/` every
+30s — the same "KPI-grid-only, no recent-items table" shape `qa_dashboard_kpis.html` established.
+No core-module refactor was needed: `accounting_core.get_ar_dashboard()` was already the single
+small, independently-tested function backing it. Verified end-to-end (a real AR invoice created
+via the Django test client, confirmed Total Invoices incrementing live, then removed; confirmed
+correct rendering in all six wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 21 of ~450 templates now. AP's own list page (`ap_list.html`)
+is a natural next candidate, mirroring this exact pattern.
