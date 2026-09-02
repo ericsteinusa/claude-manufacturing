@@ -4987,3 +4987,17 @@ correct rendering in all six wired languages). See CLAUDE.md's htmx section for 
 
 **§6.1/§9.2 status:** still 🟡 Partial — 21 of ~450 templates now. AP's own list page (`ap_list.html`)
 is a natural next candidate, mirroring this exact pattern.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Accounts Payable
+list page.** The twenty-second template, up from 21 — mirroring AR's exact shape. `ap_list.html`'s
+5-card KPI row, computed globally by `get_ap_dashboard(conn)` with no filter arguments and
+independent of the page's own status/vendor/date-range filters below it, now polls
+`/ap/kpis-fragment/` every 30s. No core-module refactor was needed. Verified end-to-end (a real
+AP invoice created via the Django test client, confirmed Total Invoices incrementing live, then
+removed; confirmed correct rendering in all six wired languages). See CLAUDE.md's htmx section
+for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 22 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.

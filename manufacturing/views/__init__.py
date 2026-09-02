@@ -5174,6 +5174,15 @@ def ap_list(request):
 
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)
+def ap_list_kpis_fragment(request):
+    """htmx polling target for ap_list's global KPI row (unfiltered, same
+    regardless of the invoice-list filters currently applied below it)."""
+    with get_db_connection() as conn:
+        dashboard = get_ap_dashboard(conn)
+    return render(request, 'ap_list_kpis.html', {'dashboard': dashboard})
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def ap_export(request):
     status = request.GET.get('status', '')
     vendor_id = request.GET.get('vendor_id', '')
