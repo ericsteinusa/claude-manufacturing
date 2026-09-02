@@ -1320,12 +1320,51 @@ dashboard, e.g. guessing "Product" → the existing translation of
 by hand. Then `python manage.py compilemessages`
 — the `.mo` binary Django actually loads at runtime isn't regenerated
 automatically, and the dev server's autoreloader doesn't watch `.po`/`.mo`
-files, so a manual restart is also needed after compiling. **The other
-~450 department-specific content templates (forms, tables, detail pages)
-remain untranslated** — extending this pattern to any of them, or adding an
-already-wired language, is mechanical (`{% load i18n %}`, wrap each string,
-add its line to each `.po` file, recompile) but is real, not-yet-done work
-per template, stated plainly rather than implied as complete.
+files, so a manual restart is also needed after compiling.
+
+**Two more languages added: Portuguese and Dutch** (closing the
+localization-breadth gap COMPETITIVE_GAP_ANALYSIS.md §9.4 called out —
+MRPeasy shipping more languages than this app's then-three). `LANGUAGES`
+in `manufacture/settings.py` now has 6 entries (en/es/fr/de/pt/nl).
+Unlike every prior language pass, which paired "mark a new template with
+`{% trans %}`" with "add its translation," this pass added **zero** new
+`{% trans %}`/`{% blocktrans %}` tags — every template already marked for
+es/fr/de (206+ templates, the full 17-department core plus every
+long-tail cluster) was already extraction-ready, so `python manage.py
+makemessages -l pt --ignore=venv --ignore=mobile --ignore=media
+--ignore=backups --ignore=docs` (and `-l nl`) against a completely new,
+previously-nonexistent locale directory just extracted the existing 2,437
+msgids straight from the source templates with empty `msgstr`s — no
+`msgmerge`/fuzzy-matching gotchas at all, since there was no prior
+translation for anything to fuzzy-match against. The entire remaining
+effort was translating those 2,437 entries (2,413 simple + 24 plural
+pairs) into both languages: split into 18 chunks of ~140 entries each and
+translated by 18 parallel subagents (one per chunk, each producing both
+languages together so terminology stays paired), then merged
+programmatically into `locale/pt/LC_MESSAGES/django.po` and
+`locale/nl/LC_MESSAGES/django.po` by matching on msgid/msgid_plural and
+writing correctly-escaped `msgstr`/`msgstr[0]`/`msgstr[1]` lines — no
+manual `msgstr`-editing gotchas from prior passes applied either, since
+every value was written as a single escaped line (backslash, then `"`,
+then real newlines → literal `\n`) rather than hand-typed multi-line
+continuations. Kept the same acronym-preservation convention (NCR, CAPA,
+MRP, BOM, OEE, RMA, FMEA, ISO, SPC, CoA, GL, AP, AR, PO, WO, SO, KPI,
+etc. left untranslated) and each language's native quotation marks for
+strings with embedded quotes (Portuguese `«…»`, Dutch `„…"`). Verified:
+`msgfmt --check` clean on both new `.po` files, zero blank/duplicated
+entries confirmed programmatically (all 2,437 keys present, no gaps),
+full suite 3,457 passed (unchanged — no Python logic touched), `manage.py
+check` and `ruff check .` both clean. Verified end-to-end via the Django
+test client (the background dev server on port 8000 was serving a
+different worktree, same recurring gotcha noted elsewhere in this file)
+logged in as the President sample user, switching to both `pt` and `nl`
+via `/i18n/setlang/` and confirming translated content on the main
+dashboard, Quality, Purchasing, Sales, Legal, and Personnel dashboards,
+plus a live plural ("N overdue" → "N atrasados"/"N te laat") and the
+language switcher itself listing both new languages. **The other ~250
+department-specific content templates never marked for es/fr/de remain
+untranslated in pt/nl too** — this pass only extended existing coverage
+to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
