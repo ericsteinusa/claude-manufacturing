@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Benefit Plan{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Benefit Plan" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/benefits/" class="btn">Benefits</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/benefits/" class="btn">{% trans "Benefits" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">New Benefit Plan</div>
+    <div class="menu-title">{% trans "New Benefit Plan" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,11 +26,11 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Name *</label>
-                <input type="text" name="name" required placeholder="e.g. PPO Gold">
+                <label>{% trans "Name *" %}</label>
+                <input type="text" name="name" required placeholder="{% trans 'e.g. PPO Gold' %}">
             </div>
             <div class="form-row">
-                <label>Plan Type</label>
+                <label>{% trans "Plan Type" %}</label>
                 <select name="plan_type">
                     {% for pt in plan_types %}
                     <option value="{{ pt }}">{{ pt }}</option>
@@ -37,22 +38,22 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Carrier</label>
-                <input type="text" name="carrier" placeholder="e.g. Acme Health">
+                <label>{% trans "Carrier" %}</label>
+                <input type="text" name="carrier" placeholder="{% trans 'e.g. Acme Health' %}">
             </div>
             <div class="form-row">
-                <label>Description</label>
+                <label>{% trans "Description" %}</label>
                 <textarea name="description" rows="2"></textarea>
             </div>
             <div class="form-row">
-                <label>Employee Cost / Pay Period</label>
+                <label>{% trans "Employee Cost / Pay Period" %}</label>
                 <input type="number" name="employee_cost_per_pay" step="0.01" min="0" value="0">
             </div>
             <div class="form-row">
-                <label>Employer Cost / Pay Period</label>
+                <label>{% trans "Employer Cost / Pay Period" %}</label>
                 <input type="number" name="employer_cost_per_pay" step="0.01" min="0" value="0">
             </div>
-            <button type="submit" class="btn btn-primary">Create Plan</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Plan" %}</button>
         </form>
     </div>
 </div>

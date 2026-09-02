@@ -1,29 +1,30 @@
 {% extends "base.html" %}
-{% block page_title %}Candidates{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Candidates" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ats/" class="btn">Recruiting Dashboard</a>
-<a href="/ats/requisitions/" class="btn">Requisitions</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ats/" class="btn">{% trans "Recruiting Dashboard" %}</a>
+<a href="/ats/requisitions/" class="btn">{% trans "Requisitions" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/ats/candidates/new/" class="btn btn-primary">+ New Candidate</a>
+<a href="/ats/candidates/new/" class="btn btn-primary">+ {% trans "New Candidate" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Candidates</div>
+    <div class="menu-title">{% trans "Candidates" %}</div>
 
     <form method="get" style="margin-bottom:14px;">
-        <input type="text" name="q" value="{{ q }}" placeholder="Search name or email..."
+        <input type="text" name="q" value="{{ q }}" placeholder="{% trans 'Search name or email...' %}"
                style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+        <button type="submit" class="btn" style="padding:6px 12px;">{% trans "Search" %}</button>
     </form>
 
     {% if candidates %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Source</th><th></th></tr></thead>
+            <thead><tr><th>{% trans "Name" %}</th><th>{% trans "Email" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Source" %}</th><th></th></tr></thead>
             <tbody>
                 {% for c in candidates %}
                 <tr>
@@ -31,14 +32,14 @@
                     <td>{{ c.email|default:"—" }}</td>
                     <td>{{ c.phone|default:"—" }}</td>
                     <td>{{ c.source|default:"—" }}</td>
-                    <td><a href="/ats/candidates/{{ c.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/ats/candidates/{{ c.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No candidates found.</div>
+    <div class="empty-state">{% trans "No candidates found." %}</div>
     {% endif %}
 </div>
 {% endblock %}

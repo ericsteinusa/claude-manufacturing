@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Offboarding{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Offboarding" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/pers/" class="btn">Personnel</a>
-<a href="/pers/terminations/" class="btn">Terminations</a>
-<a href="/pers/exit-interviews/" class="btn">Exit Interviews</a>
-<a href="/pers/offboarding/" class="btn">Offboarding</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/pers/" class="btn">{% trans "Personnel" %}</a>
+<a href="/pers/terminations/" class="btn">{% trans "Terminations" %}</a>
+<a href="/pers/exit-interviews/" class="btn">{% trans "Exit Interviews" %}</a>
+<a href="/pers/offboarding/" class="btn">{% trans "Offboarding" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,28 +50,28 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Offboarding Checklist</h2>
+    <h2>{% trans "Offboarding Checklist" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search employee / task…">
-        <button type="submit">Filter</button>
-        <a href="/pers/offboarding/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search employee / task…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/pers/offboarding/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Employee</th><th>Task</th><th>Due Date</th>
-                    <th>Assigned To</th><th>Status</th><th>Completed</th><th></th>
+                    <th>{% trans "Employee" %}</th><th>{% trans "Task" %}</th><th>{% trans "Due Date" %}</th>
+                    <th>{% trans "Assigned To" %}</th><th>{% trans "Status" %}</th><th>{% trans "Completed" %}</th><th></th>
                 </tr>
             </thead>
             <tbody>
@@ -89,13 +90,13 @@
                         <input type="hidden" name="action" value="complete">
                         <input type="hidden" name="task_id" value="{{ r.id }}">
                         <input type="hidden" name="completed_date" value="{% now 'Y-m-d' %}">
-                        <button type="submit" class="btn-mini">Mark Complete</button>
+                        <button type="submit" class="btn-mini">{% trans "Mark Complete" %}</button>
                     </form>
                     {% endif %}
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;text-align:center;">No offboarding tasks found.</td></tr>
+            <tr><td colspan="7" style="color:#888;text-align:center;">{% trans "No offboarding tasks found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -103,35 +104,35 @@
 
     {% if user_role != 'Auditor' %}
     <div class="card">
-        <h3>Add Offboarding Task</h3>
-        <p class="hint">Common tasks: {{ default_tasks|join:", " }}</p>
+        <h3>{% trans "Add Offboarding Task" %}</h3>
+        <p class="hint">{% blocktrans with tasks=default_tasks|join:", " %}Common tasks: {{ tasks }}{% endblocktrans %}</p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="create">
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Employee *</label>
+                    <label>{% trans "Employee *" %}</label>
                     <select name="people_id" required>
-                        <option value="">— Select —</option>
+                        <option value="">{% trans "— Select —" %}</option>
                         {% for e in employees %}
                         <option value="{{ e.id }}">{{ e.first_name }} {{ e.last_name }} ({{ e.dept_name|default:"—" }})</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Task *</label>
-                    <input type="text" name="task" required placeholder="e.g. Return company laptop">
+                    <label>{% trans "Task *" %}</label>
+                    <input type="text" name="task" required placeholder="{% trans 'e.g. Return company laptop' %}">
                 </div>
                 <div class="form-group">
-                    <label>Due Date</label>
+                    <label>{% trans "Due Date" %}</label>
                     <input type="date" name="due_date">
                 </div>
                 <div class="form-group">
-                    <label>Assigned To</label>
+                    <label>{% trans "Assigned To" %}</label>
                     <input type="text" name="assigned_to">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in statuses %}
                         <option value="{{ s }}"{% if s == 'Pending' %} selected{% endif %}>{{ s }}</option>
@@ -139,11 +140,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Task</button>
+            <button type="submit" class="btn-submit">{% trans "Add Task" %}</button>
         </form>
     </div>
     {% endif %}
