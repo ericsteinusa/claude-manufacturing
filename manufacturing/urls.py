@@ -582,6 +582,7 @@ urlpatterns = [
     path('credit/collections/', views.credit_collections_list, name='credit_collections_list'),
     path('credit/collections/<int:activity_id>/', views.credit_collections_detail, name='credit_collections_detail'),
     path('mkt/', views.mkt_dashboard, name='mkt_dashboard'),
+    path('mkt/kpis-fragment/', views.mkt_dashboard_kpis_fragment, name='mkt_dashboard_kpis_fragment'),
     path('mkt/campaigns/', views.mkt_campaign_list, name='mkt_campaign_list'),
     path('mkt/campaigns/<int:campaign_id>/', views.mkt_campaign_detail, name='mkt_campaign_detail'),
     path('mkt/leads/', views.mkt_lead_list, name='mkt_lead_list'),

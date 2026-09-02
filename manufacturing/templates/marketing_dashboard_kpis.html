@@ -1,0 +1,80 @@
+{% load i18n %}
+    <div class="section-label">{% trans "Campaigns" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Total" %}</div>
+            <div class="val">{{ campaigns.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if campaigns.active %} green{% endif %}">
+            <div class="lbl">{% trans "Active" %}</div>
+            <div class="val">{{ campaigns.active|default:0 }}</div>
+        </div>
+        <div class="kpi{% if campaigns.planned %} yellow{% endif %}">
+            <div class="lbl">{% trans "Planned" %}</div>
+            <div class="val">{{ campaigns.planned|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">{% trans "Leads" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Total Leads" %}</div>
+            <div class="val">{{ leads.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if leads.new_count %} yellow{% endif %}">
+            <div class="lbl">{% trans "New" %}</div>
+            <div class="val">{{ leads.new_count|default:0 }}</div>
+        </div>
+        <div class="kpi{% if leads.qualified %} green{% endif %}">
+            <div class="lbl">{% trans "Qualified" %}</div>
+            <div class="val">{{ leads.qualified|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">{% trans "Content" %}</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">{% trans "Total Items" %}</div>
+            <div class="val">{{ content.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if content.draft %} yellow{% endif %}">
+            <div class="lbl">{% trans "Draft" %}</div>
+            <div class="val">{{ content.draft|default:0 }}</div>
+        </div>
+        <div class="kpi{% if content.published %} green{% endif %}">
+            <div class="lbl">{% trans "Published" %}</div>
+            <div class="val">{{ content.published|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>{% trans "Recent Campaigns" %}</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Name" %}</th>
+                    <th>{% trans "Channel" %}</th>
+                    <th>{% trans "Objective" %}</th>
+                    <th>{% trans "Budget" %}</th>
+                    <th>{% trans "Start" %}</th>
+                    <th>{% trans "End" %}</th>
+                    <th>{% trans "Status" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in recent_campaigns %}
+            <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.channel|default:"—" }}</td>
+                <td>{{ c.objective|default:"—"|truncatechars:40 }}</td>
+                <td>{% if c.budget %}${{ c.budget|floatformat:0 }}{% else %}—{% endif %}</td>
+                <td>{{ c.start_date|default:"—" }}</td>
+                <td>{{ c.end_date|default:"—" }}</td>
+                <td><span class="badge st-{{ c.status|lower }}">{{ c.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="color:#888;">{% trans "No campaigns found." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>

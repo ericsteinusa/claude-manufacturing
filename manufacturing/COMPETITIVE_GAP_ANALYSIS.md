@@ -4935,3 +4935,20 @@ languages). See CLAUDE.md's htmx section for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 18 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+**2026-09-02, continuing frontend modernity: extending htmx live-refresh to the Marketing
+dashboard.** The nineteenth template, up from 18. `marketing_dashboard.html`'s Campaigns/Leads/
+Content KPI-row trio plus its Recent Campaigns table now poll `/mkt/kpis-fragment/` every 30s —
+a marketing manager watching this page wants to see a new campaign go active or a lead get
+qualified without a manual refresh, the same "time-sensitive queue" rationale as every prior htmx
+pass, over the six static status/channel/source breakdown charts below it. No core-module
+refactor was needed: `marketing_core.get_marketing_dashboard()` was already the single small,
+independently-tested function backing this content — the tenth dashboard in a row not needing
+one. Verified end-to-end (a real active campaign created via the Django test client, confirmed
+appearing live in the fragment's table, then removed; confirmed correct rendering in all six
+wired languages). See CLAUDE.md's htmx section for full detail.
+
+**§6.1/§9.2 status:** still 🟡 Partial — 19 of ~450 templates now. No further "manager watches a
+live queue" candidate has been explicitly scoped yet.
