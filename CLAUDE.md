@@ -1368,11 +1368,12 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 9 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 10 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
-  `sales_dashboard.html`, and `it_dashboard.html`. Pattern to copy for the next page:
+  `sales_dashboard.html`, `it_dashboard.html`, and `acct_dashboard.html`. Pattern to copy for the
+  next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
@@ -1450,6 +1451,29 @@ to two new languages, it didn't mark any new template.
   incremented to 7 and "Critical (Open)" to 3 with the new ticket appearing in the Recent Support
   Tickets table — then deleted the test ticket and confirmed both counts reverted; also confirmed
   the fragment renders correctly in Portuguese and Dutch with an active session in each.
+  `acct_dashboard.html`'s own version (`acct_dashboard_kpis_fragment` polling
+  `/acct/kpis-fragment/`) picked the AP KPI row (Open/Overdue/Total Outstanding), the AR KPI row
+  (same three), and the Recent Journal Entries table — a controller watching this page wants to see
+  a new invoice go overdue or a journal get posted without a manual refresh, the same
+  "time-sensitive queue" rationale as every prior htmx pass, over the static AP/AR-status,
+  top-vendor/customer, and journal-trend charts below it. Unlike IT/Sales/Quality, this one *did*
+  need a small core-module refactor: the view's inline "recent journals" SQL (a `LEFT JOIN`
+  aggregating line count + total debit per journal, `LIMIT 8`) was duplicated logic waiting to
+  happen, so it's now `accounting_core.get_accounting_dashboard_kpis(conn)` — a thin wrapper
+  combining the already-existing `get_ap_dashboard()`/`get_ar_dashboard()` with
+  `list_journals(conn)[:8]` (reusing the *unfiltered* `list_journals()` rather than duplicating its
+  query, since calling it with no filters already returns every journal ordered newest-first) —
+  called by both the full-page view and the new fragment view so they can't drift apart, the same
+  pattern `purchasing_core.get_purchasing_dashboard_kpis()` established. 3 new unit tests
+  (`test_accounting_core.py`), mocking `get_ap_dashboard`/`get_ar_dashboard`/`list_journals`
+  directly rather than `conn.execute`, since the combining function's own logic (slicing to 8,
+  wrapping in dicts) is what needed coverage, not the underlying queries those three functions
+  already test themselves. Full suite passes (3460, +3), `manage.py check` and `ruff check .` both
+  clean. Verified end-to-end via the Django test client: hit `/acct/kpis-fragment/` directly
+  (renders standalone with real data — AP Open Invoices: 7); created a real balanced GL journal via
+  `accounting_core.create_journal`, re-fetched the fragment, and confirmed it appeared at the top of
+  the Recent Journal Entries table — then deleted it and confirmed it was gone; also confirmed the
+  fragment renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
