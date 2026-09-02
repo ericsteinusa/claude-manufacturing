@@ -71,6 +71,17 @@ def qa_dashboard(request):
     ))
 
 
+@dept_required(_QA_DEPT_KEYS)
+def qa_dashboard_kpis_fragment(request):
+    """htmx polling target for qa_dashboard's KPI row."""
+    conn = get_db_connection()
+    try:
+        counts = get_dashboard_counts(conn)
+    finally:
+        conn.close()
+    return render(request, 'qa_dashboard_kpis.html', {'counts': counts})
+
+
 # --- NCR ---
 
 @dept_required(_QA_DEPT_KEYS)
