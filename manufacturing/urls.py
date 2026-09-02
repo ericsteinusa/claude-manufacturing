@@ -510,6 +510,7 @@ urlpatterns = [
     path('fin/tax/', views.fin_tax_list, name='fin_tax_list'),
     path('fin/tax/<int:filing_id>/', views.fin_tax_detail, name='fin_tax_detail'),
     path('it/', views.it_dashboard, name='it_dashboard'),
+    path('it/kpis-fragment/', views.it_dashboard_kpis_fragment, name='it_dashboard_kpis_fragment'),
     path('it/tickets/', views.it_ticket_list, name='it_ticket_list'),
     path('it/tickets/<int:ticket_id>/', views.it_ticket_detail, name='it_ticket_detail'),
     path('it/assets/', views.it_asset_list, name='it_asset_list'),

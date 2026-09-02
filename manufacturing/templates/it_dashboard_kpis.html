@@ -1,0 +1,62 @@
+{% load i18n %}
+    <p style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">{% trans "Help Desk Tickets" %}</p>
+    <div class="kpi-grid" style="max-width:900px;margin-bottom:24px;">
+        <div class="kpi-card{% if tickets.open_count %}" style="border-left:4px solid var(--danger-fg);{% endif %}">
+            <div class="kpi-label">{% trans "Open" %}</div>
+            <div class="kpi-value{% if tickets.open_count %} warn{% endif %}">{{ tickets.open_count|default:0 }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">{% trans "In Progress" %}</div>
+            <div class="kpi-value">{{ tickets.in_progress_count|default:0 }}</div>
+        </div>
+        <div class="kpi-card{% if tickets.critical_count %}" style="border-left:4px solid var(--danger-fg);{% endif %}">
+            <div class="kpi-label">{% trans "Critical (Open)" %}</div>
+            <div class="kpi-value{% if tickets.critical_count %} warn{% endif %}">{{ tickets.critical_count|default:0 }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">{% trans "Total Tickets" %}</div>
+            <div class="kpi-value">{{ tickets.total_count|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:1000px;">
+        <div class="card-title">{% trans "Recent Support Tickets" %}</div>
+        <div class="erp-table-wrap" style="margin-top:12px;">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>{% trans "Ticket #" %}</th>
+                        <th>{% trans "Requester" %}</th>
+                        <th>{% trans "Department" %}</th>
+                        <th>{% trans "Issue Type" %}</th>
+                        <th>{% trans "Priority" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th>{% trans "Date" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for t in recent_tickets %}
+                <tr>
+                    <td>{{ t.ticket_number }}</td>
+                    <td>{{ t.requester|default:"—" }}</td>
+                    <td>{{ t.department|default:"—" }}</td>
+                    <td>{{ t.issue_type|default:"—" }}</td>
+                    <td>
+                        {% if t.priority == 'critical' %}<span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{{ t.priority|title }}</span>
+                        {% elif t.priority == 'high' %}<span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{{ t.priority|title }}</span>
+                        {% else %}<span class="pill" style="font-size:11px;padding:2px 8px;">{{ t.priority|title }}</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if t.status == 'resolved' or t.status == 'closed' %}<span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{{ t.status|title }}</span>
+                        {% elif t.status == 'in_progress' %}<span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{{ t.status|title }}</span>
+                        {% else %}<span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{{ t.status|title }}</span>{% endif %}
+                    </td>
+                    <td>{{ t.submitted_date|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">{% trans "No tickets found." %}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
