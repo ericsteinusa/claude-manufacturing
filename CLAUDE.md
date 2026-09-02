@@ -1156,6 +1156,79 @@ consistent with this series' policy of scoping each pass to a
 department's own directly-owned templates rather than every reachable
 link.
 
+Also translated: Personnel's own **recruiting/benefits/offboarding
+cluster** (`ats_dashboard.html`, `ats_requisition_list.html`,
+`ats_requisition_new.html`, `ats_requisition_detail.html`,
+`ats_candidate_list.html`, `ats_candidate_new.html`,
+`ats_candidate_detail.html`, `ats_application_detail.html`,
+`benefits_dashboard.html`, `benefit_plan_new.html`,
+`benefit_plan_detail.html`, `employee_benefits.html`,
+`termination_list.html`, `termination_detail.html`,
+`exit_interview_list.html`, `offboarding_list.html` — 16 templates, the
+long-tail exception explicitly named as still-open in the Personnel core
+pass above; the biggest deliberately-scoped-out sub-feature in this
+series). 307 `{% trans %}`/`{% blocktrans %}` tags added across the three
+sub-clusters (ATS 136, Benefits 71, Offboarding 100). `makemessages`
+fuzzy-matched 76 of the new strings against unrelated existing
+translations — the largest fuzzy count in this series yet (previous high
+was Sales' 169, but that was against ~10x this batch's own new-string
+count; 76 wrong guesses out of ~180 unique new strings this pass is a
+much higher *rate* than any prior single pass) — all corrected by hand
+with real translations across all three languages using the established
+strip-fuzzy-and-replace technique. Also found — and this is new relative
+to every prior pass — **24 entries `makemessages` left genuinely blank**
+(not fuzzy-guessed at all, just empty `msgstr`), because these were
+short, generic-sounding strings (`"Stage"`, `"Tier"`, `"Enrolled"`,
+`"Candidate"`, `"Waive"`, etc.) with no similar-enough existing
+translation anywhere in the app for `msgmerge` to even attempt a guess;
+translated all 24 by hand. A blank-entry audit script written for this
+pass initially produced a **false-positive list of 36**, not 24 — it
+mis-parsed gettext's standard line-wrapping for long translated values
+(`msgstr ""` followed by unprefixed `"..."` continuation lines) as an
+empty translation, because its regex only captured the first `msgstr`
+line; 12 of the 36 were long-standing, correctly-translated, wrapped
+entries from unrelated departments (Customer Service, Maintenance,
+Quality, Reports, RFQ, Sales, Time Clock) that just happened to sort
+alongside this pass's real gaps. Confirmed via `git show HEAD:...` that
+all 12 already had real multi-line translations before this pass touched
+anything, then rewrote the audit script to properly reassemble wrapped
+`msgstr` values across their continuation lines before flagging — this
+is a new, more subtle variant of the multi-line-value parsing gotcha
+already documented above (previously only the msgid side, and only for
+`{% blocktrans %}`-wrapped source text spanning template lines, was
+known to wrap across multiple `.po` lines; this is the msgstr side
+wrapping purely from *translated* value length, independent of the
+source). Worth a standing note for any future manual blank/duplication
+audit: reconstruct the full `msgstr` (and `msgstr[N]`) value by
+concatenating the `msgstr` line with every immediately-following
+bare-`"..."` line, not just the first line, before deciding an entry is
+blank. Full suite re-ran clean (3431, unchanged — template/locale-file
+work only), `manage.py check` clean, `msgfmt --check` clean on all three
+files, zero fuzzy/blank/duplicated entries confirmed programmatically
+after the fix. This pass's template-marking work (adding the
+`{% trans %}`/`{% blocktrans %}` tags themselves, before any of the
+`makemessages`/fuzzy/blank work above) was done by three parallel
+subagents, one per sub-cluster (ATS, Benefits, Offboarding), each given
+the same established conventions (dotted-lookup `blocktrans` binding
+rule, bare `default:"..."` heading expansion, no raw-enum translation,
+no `|pluralize`) verbatim — a first for this series, previously always
+done by hand in one pass; a follow-up programmatic sweep confirmed no
+file was missing `{% load i18n %}`, no stray `|pluralize` survived, and
+no unbound dotted lookup was left inside any `{% blocktrans %}` block
+across all 16 files before `makemessages` was ever run. Verified
+end-to-end against a dev server instance run from this exact worktree
+(not the stale port-8000 instance from a different worktree that tripped
+up the department-grid-label pass immediately before this one — see
+below): logged in as a full-access user, switched through all three
+languages via `/i18n/setlang/`, and confirmed correct translated text on
+all 10 list/dashboard/new-record pages in the cluster (ATS dashboard,
+requisition list/new, candidate list/new, Benefits dashboard/new-plan,
+Terminations list, Exit Interviews list, Offboarding checklist),
+including several of the specific strings that were fuzzy- or
+blank-fixed by hand (e.g. German "z. B. PPO Gold" and "z. B. Empfehlung,
+Jobbörse" placeholder text on the new-record forms), in Spanish, French,
+and German.
+
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ plan.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/benefits/" class="btn">Benefits</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/benefits/" class="btn">{% trans "Benefits" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -21,9 +22,9 @@
 <div class="cp-wrap">
     <div class="menu-title">{{ plan.name }} ({{ plan.plan_type }})
         {% if plan.is_active %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
         {% else %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Inactive" %}</span>
         {% endif %}
     </div>
 
@@ -31,29 +32,28 @@
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Plan Details</h3>
+        <h3>{% trans "Plan Details" %}</h3>
         <p style="font-size:13px;color:#444;">
-            Carrier: {{ plan.carrier|default:"—" }}<br>
+            {% blocktrans with carrier=plan.carrier|default:"—" %}Carrier: {{ carrier }}{% endblocktrans %}<br>
             {% if plan.description %}{{ plan.description }}<br>{% endif %}
-            Employee cost: ${{ plan.employee_cost_per_pay|floatformat:2 }} / pay period —
-            Employer cost: ${{ plan.employer_cost_per_pay|floatformat:2 }} / pay period
+            {% blocktrans with emp_cost=plan.employee_cost_per_pay|floatformat:2 empr_cost=plan.employer_cost_per_pay|floatformat:2 %}Employee cost: ${{ emp_cost }} / pay period — Employer cost: ${{ empr_cost }} / pay period{% endblocktrans %}
         </p>
         {% if can_edit %}
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="toggle_active">
-            <button type="submit" class="btn">{% if plan.is_active %}Deactivate Plan{% else %}Reactivate Plan{% endif %}</button>
+            <button type="submit" class="btn">{% if plan.is_active %}{% trans "Deactivate Plan" %}{% else %}{% trans "Reactivate Plan" %}{% endif %}</button>
         </form>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Enrollments</h3>
+        <h3>{% trans "Enrollments" %}</h3>
         {% if enrollments %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
-                    <tr><th>Employee</th><th>Tier</th><th class="num">Dependents</th><th>Status</th><th>Enrolled</th>{% if can_edit %}<th></th>{% endif %}</tr>
+                    <tr><th>{% trans "Employee" %}</th><th>{% trans "Tier" %}</th><th class="num">{% trans "Dependents" %}</th><th>{% trans "Status" %}</th><th>{% trans "Enrolled" %}</th>{% if can_edit %}<th></th>{% endif %}</tr>
                 </thead>
                 <tbody>
                     {% for e in enrollments %}
@@ -70,13 +70,13 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="waive">
                                 <input type="hidden" name="enrollment_id" value="{{ e.id }}">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Waive</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Waive" %}</button>
                             </form>
                             <form method="post" style="display:inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="terminate">
                                 <input type="hidden" name="enrollment_id" value="{{ e.id }}">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Terminate</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Terminate" %}</button>
                             </form>
                             {% endif %}
                         </td>
@@ -87,19 +87,19 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No enrollments yet.</div>
+        <div class="empty-state">{% trans "No enrollments yet." %}</div>
         {% endif %}
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Enroll Employee</h3>
+        <h3>{% trans "Enroll Employee" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="enroll">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Employee *</label>
+                    <label>{% trans "Employee *" %}</label>
                     <select name="people_id" required>
                         {% for p in people %}
                         <option value="{{ p.id }}">{{ p.last_name }}, {{ p.first_name }}</option>
@@ -107,7 +107,7 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Tier</label>
+                    <label>{% trans "Tier" %}</label>
                     <select name="tier">
                         {% for t in tiers %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -115,15 +115,15 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Dependents</label>
+                    <label>{% trans "Dependents" %}</label>
                     <input type="number" name="dependents_count" min="0" value="0">
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans 'Optional' %}">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Enroll</button>
+            <button type="submit" class="btn btn-primary">{% trans "Enroll" %}</button>
         </form>
     </div>
     {% endif %}

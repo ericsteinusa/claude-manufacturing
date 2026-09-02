@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ application.first_name }} {{ application.last_name }} — {{ application.requisition_title }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ats/requisitions/{{ application.requisition_id }}/" class="btn">Requisition</a>
-<a href="/ats/candidates/" class="btn">Candidates</a>
-<a href="/ats/" class="btn">Recruiting Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ats/requisitions/{{ application.requisition_id }}/" class="btn">{% trans "Requisition" %}</a>
+<a href="/ats/candidates/" class="btn">{% trans "Candidates" %}</a>
+<a href="/ats/" class="btn">{% trans "Recruiting Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -23,26 +24,26 @@
 <div class="cp-wrap">
     <div class="menu-title">{{ application.first_name }} {{ application.last_name }} — {{ application.requisition_title }}
         {% if application.stage == 'Hired' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Hired</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Hired" %}</span>
         {% elif application.stage == 'Rejected' %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Rejected</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Rejected" %}</span>
         {% else %}
         <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{{ application.stage }}</span>
         {% endif %}
     </div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        {{ application.email|default:"—" }} · {{ application.phone|default:"—" }} · Applied {{ application.applied_date }}
+        {{ application.email|default:"—" }} · {{ application.phone|default:"—" }} · {% blocktrans with d=application.applied_date %}Applied {{ d }}{% endblocktrans %}
     </p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Stage History</h3>
+        <h3>{% trans "Stage History" %}</h3>
         {% if application.history %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Stage</th><th>Date</th><th>Changed By</th><th>Notes</th></tr></thead>
+                <thead><tr><th>{% trans "Stage" %}</th><th>{% trans "Date" %}</th><th>{% trans "Changed By" %}</th><th>{% trans "Notes" %}</th></tr></thead>
                 <tbody>
                     {% for h in application.history %}
                     <tr>
@@ -56,18 +57,18 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No stage history.</div>
+        <div class="empty-state">{% trans "No stage history." %}</div>
         {% endif %}
     </div>
 
     {% if can_edit and application.stage != 'Hired' and application.stage != 'Rejected' %}
     <div class="card">
-        <h3>Advance Stage</h3>
+        <h3>{% trans "Advance Stage" %}</h3>
         <form method="post" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
             {% csrf_token %}
             <input type="hidden" name="action" value="advance">
             <div class="form-row">
-                <label>New Stage</label>
+                <label>{% trans "New Stage" %}</label>
                 <select name="stage">
                     {% for s in stages %}
                     <option value="{{ s }}">{{ s }}</option>
@@ -75,28 +76,28 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Notes</label>
-                <input type="text" name="notes" placeholder="Optional">
+                <label>{% trans "Notes" %}</label>
+                <input type="text" name="notes" placeholder="{% trans 'Optional' %}">
             </div>
-            <button type="submit" class="btn btn-primary">Update Stage</button>
+            <button type="submit" class="btn btn-primary">{% trans "Update Stage" %}</button>
         </form>
     </div>
 
     <div class="card">
-        <h3>Hire This Candidate</h3>
+        <h3>{% trans "Hire This Candidate" %}</h3>
         <p style="font-size:12px;color:var(--text-muted);">
-            Creates a real employee record in Personnel and sets their hire date for Workforce Analytics.
+            {% trans "Creates a real employee record in Personnel and sets their hire date for Workforce Analytics." %}
         </p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="hire">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Hire Date *</label>
+                    <label>{% trans "Hire Date *" %}</label>
                     <input type="date" name="hire_date" required>
                 </div>
                 <div class="form-row">
-                    <label>Department</label>
+                    <label>{% trans "Department" %}</label>
                     <select name="dept_id">
                         <option value="">—</option>
                         {% for d in depts %}
@@ -105,19 +106,19 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Job Title</label>
+                    <label>{% trans "Job Title" %}</label>
                     <input type="text" name="job_title">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Hire &amp; Add to Personnel</button>
+            <button type="submit" class="btn btn-primary">{% trans "Hire &amp; Add to Personnel" %}</button>
         </form>
     </div>
     {% endif %}
 
     {% if application.hired_people_id %}
     <div class="card">
-        <h3>Employee Record</h3>
-        <a href="/people/{{ application.hired_people_id }}/" class="btn">View Employee Profile</a>
+        <h3>{% trans "Employee Record" %}</h3>
+        <a href="/people/{{ application.hired_people_id }}/" class="btn">{% trans "View Employee Profile" %}</a>
     </div>
     {% endif %}
 </div>

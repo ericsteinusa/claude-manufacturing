@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Termination — {{ term.employee_name }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with name=term.employee_name %}Termination — {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/pers/" class="btn">Personnel</a>
-<a href="/pers/terminations/" class="btn">Terminations</a>
-<a href="/pers/exit-interviews/" class="btn">Exit Interviews</a>
-<a href="/pers/offboarding/" class="btn">Offboarding</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/pers/" class="btn">{% trans "Personnel" %}</a>
+<a href="/pers/terminations/" class="btn">{% trans "Terminations" %}</a>
+<a href="/pers/exit-interviews/" class="btn">{% trans "Exit Interviews" %}</a>
+<a href="/pers/offboarding/" class="btn">{% trans "Offboarding" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -36,21 +37,21 @@
 
     <div class="card">
         <div class="detail-grid">
-            <div class="field"><div class="lbl">Department</div><div class="val">{{ term.dept_name|default:"—" }}</div></div>
-            <div class="field"><div class="lbl">Termination Date</div><div class="val">{{ term.termination_date|default:"—" }}</div></div>
-            <div class="field"><div class="lbl">Type</div><div class="val">{{ term.term_type|default:"—" }}</div></div>
-            <div class="field"><div class="lbl">Rehire Eligible</div><div class="val">{{ term.rehire_eligible|default:"—" }}</div></div>
-            <div class="field full-span"><div class="lbl">Reason</div><div class="val">{{ term.reason|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Department" %}</div><div class="val">{{ term.dept_name|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Termination Date" %}</div><div class="val">{{ term.termination_date|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Type" %}</div><div class="val">{{ term.term_type|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Rehire Eligible" %}</div><div class="val">{{ term.rehire_eligible|default:"—" }}</div></div>
+            <div class="field full-span"><div class="lbl">{% trans "Reason" %}</div><div class="val">{{ term.reason|default:"—" }}</div></div>
             {% if term.notes %}
-            <div class="field full-span"><div class="lbl">Notes</div><div class="val">{{ term.notes }}</div></div>
+            <div class="field full-span"><div class="lbl">{% trans "Notes" %}</div><div class="val">{{ term.notes }}</div></div>
             {% endif %}
         </div>
     </div>
 
     <div class="card">
         <p style="font-size:13px;color:var(--text-muted);">
-            Log this employee's <a href="/pers/exit-interviews/">exit interview</a> or track their
-            <a href="/pers/offboarding/">offboarding checklist</a> from their respective pages.
+            {% blocktrans %}Log this employee's <a href="/pers/exit-interviews/">exit interview</a> or track their
+            <a href="/pers/offboarding/">offboarding checklist</a> from their respective pages.{% endblocktrans %}
         </p>
     </div>
 

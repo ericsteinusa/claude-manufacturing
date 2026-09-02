@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Candidate{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Candidate" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ats/candidates/" class="btn">Candidates</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ats/candidates/" class="btn">{% trans "Candidates" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">New Candidate</div>
+    <div class="menu-title">{% trans "New Candidate" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,30 +26,30 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>First Name *</label>
+                <label>{% trans "First Name *" %}</label>
                 <input type="text" name="first_name" required>
             </div>
             <div class="form-row">
-                <label>Last Name *</label>
+                <label>{% trans "Last Name *" %}</label>
                 <input type="text" name="last_name" required>
             </div>
             <div class="form-row">
-                <label>Email</label>
+                <label>{% trans "Email" %}</label>
                 <input type="email" name="email">
             </div>
             <div class="form-row">
-                <label>Phone</label>
+                <label>{% trans "Phone" %}</label>
                 <input type="text" name="phone">
             </div>
             <div class="form-row">
-                <label>Source</label>
-                <input type="text" name="source" placeholder="e.g. Referral, Job Board">
+                <label>{% trans "Source" %}</label>
+                <input type="text" name="source" placeholder="{% trans 'e.g. Referral, Job Board' %}">
             </div>
             <div class="form-row">
-                <label>Resume Notes</label>
-                <textarea name="resume_notes" rows="3" placeholder="Summary of background/experience"></textarea>
+                <label>{% trans "Resume Notes" %}</label>
+                <textarea name="resume_notes" rows="3" placeholder="{% trans 'Summary of background/experience' %}"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Add Candidate</button>
+            <button type="submit" class="btn btn-primary">{% trans "Add Candidate" %}</button>
         </form>
     </div>
 </div>

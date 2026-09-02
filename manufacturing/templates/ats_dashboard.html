@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Recruiting{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Recruiting" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ats/requisitions/new/" class="btn btn-primary">+ New Requisition</a>
-<a href="/ats/requisitions/" class="btn">Requisitions</a>
-<a href="/ats/candidates/" class="btn">Candidates</a>
-<a href="/pers/" class="btn">Personnel Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ats/requisitions/new/" class="btn btn-primary">+ {% trans "New Requisition" %}</a>
+<a href="/ats/requisitions/" class="btn">{% trans "Requisitions" %}</a>
+<a href="/ats/candidates/" class="btn">{% trans "Candidates" %}</a>
+<a href="/pers/" class="btn">{% trans "Personnel Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -25,40 +26,40 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <div class="menu-title">Recruiting Dashboard</div>
+    <div class="menu-title">{% trans "Recruiting Dashboard" %}</div>
 
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Open Requisitions</div>
+            <div class="lbl">{% trans "Open Requisitions" %}</div>
             <div class="val">{{ dashboard.open_requisitions|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Total Candidates</div>
+            <div class="lbl">{% trans "Total Candidates" %}</div>
             <div class="val">{{ dashboard.total_candidates|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">In Pipeline</div>
+            <div class="lbl">{% trans "In Pipeline" %}</div>
             <div class="val">{{ dashboard.by_stage.Applied|add:dashboard.by_stage.Screening|add:dashboard.by_stage.Interview|add:dashboard.by_stage.Offer }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Hired</div>
+            <div class="lbl">{% trans "Hired" %}</div>
             <div class="val">{{ dashboard.by_stage.Hired|default:0 }}</div>
         </div>
     </div>
 
     <div class="two-col">
         <div class="card">
-            <h3>Pipeline Funnel</h3>
+            <h3>{% trans "Pipeline Funnel" %}</h3>
             {% for stage, count in dashboard.by_stage.items %}
             <div class="funnel-row"><span>{{ stage }}</span><span><strong>{{ count }}</strong></span></div>
             {% endfor %}
         </div>
 
         <div class="card">
-            <h3>Recent Hires</h3>
+            <h3>{% trans "Recent Hires" %}</h3>
             {% if dashboard.recent_hires %}
             <table class="erp-table">
-                <thead><tr><th>Candidate</th><th>Requisition</th></tr></thead>
+                <thead><tr><th>{% trans "Candidate" %}</th><th>{% trans "Requisition" %}</th></tr></thead>
                 <tbody>
                 {% for h in dashboard.recent_hires %}
                 <tr><td>{{ h.last_name }}, {{ h.first_name }}</td><td>{{ h.requisition_title }}</td></tr>
@@ -66,31 +67,31 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="empty-state">No hires yet.</div>
+            <div class="empty-state">{% trans "No hires yet." %}</div>
             {% endif %}
         </div>
     </div>
 
     <div class="card">
-        <h3>Open Requisitions</h3>
+        <h3>{% trans "Open Requisitions" %}</h3>
         {% if requisitions %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Title</th><th>Department</th><th>Target Hire Date</th><th></th></tr></thead>
+                <thead><tr><th>{% trans "Title" %}</th><th>{% trans "Department" %}</th><th>{% trans "Target Hire Date" %}</th><th></th></tr></thead>
                 <tbody>
                 {% for r in requisitions %}
                 <tr>
                     <td><a href="/ats/requisitions/{{ r.id }}/">{{ r.title }}</a></td>
                     <td>{{ r.dept_name|default:"—" }}</td>
                     <td>{{ r.target_hire_date|default:"—" }}</td>
-                    <td><a href="/ats/requisitions/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/ats/requisitions/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No open requisitions.</div>
+        <div class="empty-state">{% trans "No open requisitions." %}</div>
         {% endif %}
     </div>
 </div>

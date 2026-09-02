@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Requisition{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Requisition" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ats/requisitions/" class="btn">Requisitions</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ats/requisitions/" class="btn">{% trans "Requisitions" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">New Requisition</div>
+    <div class="menu-title">{% trans "New Requisition" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,11 +26,11 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Title *</label>
-                <input type="text" name="title" required placeholder="e.g. Welder II">
+                <label>{% trans "Title *" %}</label>
+                <input type="text" name="title" required placeholder="{% trans 'e.g. Welder II' %}">
             </div>
             <div class="form-row">
-                <label>Department</label>
+                <label>{% trans "Department" %}</label>
                 <select name="dept_id">
                     <option value="">—</option>
                     {% for d in depts %}
@@ -38,14 +39,14 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Description</label>
+                <label>{% trans "Description" %}</label>
                 <textarea name="description" rows="3"></textarea>
             </div>
             <div class="form-row">
-                <label>Target Hire Date</label>
+                <label>{% trans "Target Hire Date" %}</label>
                 <input type="date" name="target_hire_date">
             </div>
-            <button type="submit" class="btn btn-primary">Create Requisition</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Requisition" %}</button>
         </form>
     </div>
 </div>

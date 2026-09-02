@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Benefits{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Benefits" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/benefits/plans/new/" class="btn btn-primary">+ New Plan</a>
-<a href="/pers/" class="btn">Personnel Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/benefits/plans/new/" class="btn btn-primary">+ {% trans "New Plan" %}</a>
+<a href="/pers/" class="btn">{% trans "Personnel Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -20,33 +21,33 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <div class="menu-title">Benefits Management</div>
+    <div class="menu-title">{% trans "Benefits Management" %}</div>
 
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Active Plans</div>
+            <div class="lbl">{% trans "Active Plans" %}</div>
             <div class="val">{{ dashboard.plans.active|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Active Enrollments</div>
+            <div class="lbl">{% trans "Active Enrollments" %}</div>
             <div class="val">{{ dashboard.enrollments.active_count|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Employee Cost / Pay Period</div>
+            <div class="lbl">{% trans "Employee Cost / Pay Period" %}</div>
             <div class="val">${{ dashboard.enrollments.total_employee_cost|floatformat:2|default:"0.00" }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Employer Cost / Pay Period</div>
+            <div class="lbl">{% trans "Employer Cost / Pay Period" %}</div>
             <div class="val">${{ dashboard.enrollments.total_employer_cost|floatformat:2|default:"0.00" }}</div>
         </div>
     </div>
 
     <div class="card">
-        <h3>Enrollment by Plan Type</h3>
+        <h3>{% trans "Enrollment by Plan Type" %}</h3>
         {% if dashboard.by_plan_type %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Plan Type</th><th class="num">Enrolled</th><th class="num">Employer Cost / Pay</th></tr></thead>
+                <thead><tr><th>{% trans "Plan Type" %}</th><th class="num">{% trans "Enrolled" %}</th><th class="num">{% trans "Employer Cost / Pay" %}</th></tr></thead>
                 <tbody>
                 {% for row in dashboard.by_plan_type %}
                 <tr>
@@ -59,17 +60,17 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No active enrollments yet.</div>
+        <div class="empty-state">{% trans "No active enrollments yet." %}</div>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Plans</h3>
+        <h3>{% trans "Plans" %}</h3>
         {% if plans %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
-                    <tr><th>Name</th><th>Type</th><th>Carrier</th><th class="num">Employee $/Pay</th><th class="num">Employer $/Pay</th><th>Status</th><th></th></tr>
+                    <tr><th>{% trans "Name" %}</th><th>{% trans "Type" %}</th><th>{% trans "Carrier" %}</th><th class="num">{% trans "Employee $/Pay" %}</th><th class="num">{% trans "Employer $/Pay" %}</th><th>{% trans "Status" %}</th><th></th></tr>
                 </thead>
                 <tbody>
                 {% for p in plans %}
@@ -81,19 +82,19 @@
                     <td class="num">${{ p.employer_cost_per_pay|floatformat:2 }}</td>
                     <td>
                         {% if p.is_active %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
                         {% else %}
-                        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Inactive" %}</span>
                         {% endif %}
                     </td>
-                    <td><a href="/benefits/plans/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/benefits/plans/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No benefit plans yet.</div>
+        <div class="empty-state">{% trans "No benefit plans yet." %}</div>
         {% endif %}
     </div>
 </div>

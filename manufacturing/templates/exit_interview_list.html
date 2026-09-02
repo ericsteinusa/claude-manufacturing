@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Exit Interviews{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Exit Interviews" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/pers/" class="btn">Personnel</a>
-<a href="/pers/terminations/" class="btn">Terminations</a>
-<a href="/pers/exit-interviews/" class="btn">Exit Interviews</a>
-<a href="/pers/offboarding/" class="btn">Offboarding</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/pers/" class="btn">{% trans "Personnel" %}</a>
+<a href="/pers/terminations/" class="btn">{% trans "Terminations" %}</a>
+<a href="/pers/exit-interviews/" class="btn">{% trans "Exit Interviews" %}</a>
+<a href="/pers/offboarding/" class="btn">{% trans "Offboarding" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -41,22 +42,22 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Exit Interviews</h2>
+    <h2>{% trans "Exit Interviews" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <input type="text" name="search" value="{{ search }}" placeholder="Search employee / reason…">
-        <button type="submit">Filter</button>
-        <a href="/pers/exit-interviews/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search employee / reason…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/pers/exit-interviews/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Employee</th><th>Interview Date</th><th>Interviewer</th>
-                    <th>Reason for Leaving</th><th>Would Recommend?</th>
+                    <th>{% trans "Employee" %}</th><th>{% trans "Interview Date" %}</th><th>{% trans "Interviewer" %}</th>
+                    <th>{% trans "Reason for Leaving" %}</th><th>{% trans "Would Recommend?" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,7 +70,7 @@
                 <td>{{ r.would_recommend|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No exit interviews recorded.</td></tr>
+            <tr><td colspan="5" style="color:#888;text-align:center;">{% trans "No exit interviews recorded." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -77,50 +78,50 @@
 
     {% if user_role != 'Auditor' %}
     <div class="card">
-        <h3>Log Exit Interview</h3>
+        <h3>{% trans "Log Exit Interview" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Employee *</label>
+                    <label>{% trans "Employee *" %}</label>
                     <select name="people_id" required>
-                        <option value="">— Select —</option>
+                        <option value="">{% trans "— Select —" %}</option>
                         {% for e in employees %}
                         <option value="{{ e.id }}">{{ e.first_name }} {{ e.last_name }} ({{ e.dept_name|default:"—" }})</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Interview Date</label>
+                    <label>{% trans "Interview Date" %}</label>
                     <input type="date" name="interview_date">
                 </div>
                 <div class="form-group">
-                    <label>Interviewer</label>
+                    <label>{% trans "Interviewer" %}</label>
                     <input type="text" name="interviewer">
                 </div>
                 <div class="form-group">
-                    <label>Would Recommend?</label>
+                    <label>{% trans "Would Recommend?" %}</label>
                     <select name="would_recommend">
-                        <option value="">— Select —</option>
+                        <option value="">{% trans "— Select —" %}</option>
                         {% for r in recommend_options %}
                         <option value="{{ r }}">{{ r }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Reason for Leaving</label>
+                    <label>{% trans "Reason for Leaving" %}</label>
                     <input type="text" name="reason_for_leaving">
                 </div>
                 <div class="form-group full-span">
-                    <label>Feedback</label>
+                    <label>{% trans "Feedback" %}</label>
                     <textarea name="feedback"></textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Exit Interview</button>
+            <button type="submit" class="btn-submit">{% trans "Save Exit Interview" %}</button>
         </form>
     </div>
     {% endif %}
