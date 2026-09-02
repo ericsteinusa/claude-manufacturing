@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Log SPC Measurement{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Log SPC Measurement" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/spc/" class="btn">SPC Home</a>
-<a href="/qa/" class="btn">Quality Home</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/spc/" class="btn">{% trans "SPC Home" %}</a>
+<a href="/qa/" class="btn">{% trans "Quality Home" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -32,18 +33,18 @@
 {% block body %}
 <div class="content">
 <div class="spc-wrap">
-    <div class="menu-title">Log SPC Measurement</div>
+    <div class="menu-title">{% trans "Log SPC Measurement" %}</div>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Measurement</h3>
+        <h3>{% trans "New Measurement" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Product</label>
+                    <label>{% trans "Product" %}</label>
                     <select name="product_id" required>
                         {% for p in products %}
                         <option value="{{ p.id }}" {% if product_id == p.id|stringformat:"s" %}selected{% endif %}>{{ p.name }}</option>
@@ -51,62 +52,62 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Characteristic</label>
-                    <input type="text" name="characteristic" value="{{ characteristic }}" placeholder="e.g. Diameter (mm)" required>
+                    <label>{% trans "Characteristic" %}</label>
+                    <input type="text" name="characteristic" value="{{ characteristic }}" placeholder="{% trans 'e.g. Diameter (mm)' %}" required>
                 </div>
                 <div class="form-row">
-                    <label>Measured Value *</label>
+                    <label>{% trans "Measured Value *" %}</label>
                     <input type="number" step="any" name="measured_value" required>
                 </div>
                 <div class="form-row">
-                    <label>Lot (optional — required to later certify via CoA)</label>
+                    <label>{% trans "Lot (optional — required to later certify via CoA)" %}</label>
                     <select name="lot_id">
-                        <option value="">— No lot —</option>
+                        <option value="">{% trans "— No lot —" %}</option>
                         {% for l in lots %}
                         <option value="{{ l.id }}">{{ l.lot_number }} ({{ l.product_name }})</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="2"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn">Log Measurement</button>
+            <button type="submit" class="save-btn">{% trans "Log Measurement" %}</button>
         </form>
     </div>
     {% endif %}
 
     {% if characteristic %}
     <div class="card">
-        <h3>Process Capability (Cpk) — {{ characteristic }}</h3>
+        <h3>{% blocktrans %}Process Capability (Cpk) — {{ characteristic }}{% endblocktrans %}</h3>
         {% if cpk.cpk != None %}
         <div class="cpk-grid">
             <div class="cpk-tile"><div class="num">{{ cpk.cpk }}</div><div class="lbl">Cpk</div></div>
-            <div class="cpk-tile"><div class="num">{{ cpk.mean }}</div><div class="lbl">Mean</div></div>
-            <div class="cpk-tile"><div class="num">{{ cpk.std_dev }}</div><div class="lbl">Std Dev</div></div>
-            <div class="cpk-tile"><div class="num">{{ cpk.n }}</div><div class="lbl">Samples</div></div>
+            <div class="cpk-tile"><div class="num">{{ cpk.mean }}</div><div class="lbl">{% trans "Mean" %}</div></div>
+            <div class="cpk-tile"><div class="num">{{ cpk.std_dev }}</div><div class="lbl">{% trans "Std Dev" %}</div></div>
+            <div class="cpk-tile"><div class="num">{{ cpk.n }}</div><div class="lbl">{% trans "Samples" %}</div></div>
         </div>
         {% else %}
-        <div class="empty-state">{{ cpk.error|default:"Not enough data yet." }}</div>
+        <div class="empty-state">{% if cpk.error %}{{ cpk.error }}{% else %}{% trans "Not enough data yet." %}{% endif %}</div>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Recent Measurements</h3>
+        <h3>{% trans "Recent Measurements" %}</h3>
         {% if measurements %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Value</th><th>Status</th><th>Lot</th><th>Measured</th><th>By</th></tr></thead>
+                <thead><tr><th>{% trans "Value" %}</th><th>{% trans "Status" %}</th><th>{% trans "Lot" %}</th><th>{% trans "Measured" %}</th><th>{% trans "By" %}</th></tr></thead>
                 <tbody>
                     {% for m in measurements %}
                     <tr>
                         <td>{{ m.measured_value }}</td>
                         <td>
                             {% if m.in_control %}
-                            <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">In Control</span>
+                            <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "In Control" %}</span>
                             {% else %}
-                            <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Out of Control</span>
+                            <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{% trans "Out of Control" %}</span>
                             {% endif %}
                         </td>
                         <td>{{ m.lot_id|default:"—" }}</td>
@@ -118,7 +119,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No measurements logged yet for this characteristic.</div>
+        <div class="empty-state">{% trans "No measurements logged yet for this characteristic." %}</div>
         {% endif %}
     </div>
     {% endif %}

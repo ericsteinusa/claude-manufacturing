@@ -1,28 +1,29 @@
 {% extends "base.html" %}
-{% block page_title %}Control Plans{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Control Plans" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/" class="btn">QA Dashboard</a>
-<a href="/qa/fmea/risk-register/" class="btn">Risk Register</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/" class="btn">{% trans "QA Dashboard" %}</a>
+<a href="/qa/fmea/risk-register/" class="btn">{% trans "Risk Register" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/qa/control-plans/new/" class="btn btn-primary">+ New Control Plan</a>
+<a href="/qa/control-plans/new/" class="btn btn-primary">+ {% trans "New Control Plan" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Control Plans</div>
+    <div class="menu-title">{% trans "Control Plans" %}</div>
 
     {% if plans %}
     <div class="erp-table-wrap">
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Product</th>
-                    <th>Revision</th>
-                    <th>Status</th>
+                    <th>{% trans "Name" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Revision" %}</th>
+                    <th>{% trans "Status" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -34,21 +35,21 @@
                     <td>{{ p.revision }}</td>
                     <td>
                         {% if p.status == 'active' %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
                         {% elif p.status == 'superseded' %}
-                        <span class="pill" style="font-size:11px;padding:2px 8px;">Superseded</span>
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Superseded" %}</span>
                         {% else %}
-                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Draft</span>
+                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{% trans "Draft" %}</span>
                         {% endif %}
                     </td>
-                    <td><a href="/qa/control-plans/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/qa/control-plans/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No control plans yet.</div>
+    <div class="empty-state">{% trans "No control plans yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}
