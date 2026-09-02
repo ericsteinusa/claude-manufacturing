@@ -1368,14 +1368,14 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 19 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 20 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
   `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, `sales_reports.html`,
-  `eng_reports.html`, `cs_reports.html`, `sales_performance.html`, and `marketing_dashboard.html`.
-  Pattern to copy for
+  `eng_reports.html`, `cs_reports.html`, `sales_performance.html`, `marketing_dashboard.html`, and
+  `gl_dashboard.html`. Pattern to copy for
   the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
@@ -1632,6 +1632,22 @@ to two new languages, it didn't mark any new template.
   `marketing_core.create_campaign`, re-fetched the fragment, and confirmed it appeared in the
   Recent Campaigns table — then deleted it and confirmed it was gone; also confirmed the fragment
   renders correctly in Portuguese and Dutch with an active session in each.
+  `gl_dashboard.html`'s own version (`gl_dashboard_kpis_fragment` polling `/gl/kpis-fragment/`)
+  picked the AP/AR summary cards, the accounts-count Chart-of-Accounts nav link, and the Recent
+  Journal Entries table — everything on this page past the toolbar, since it has no Chart.js
+  canvases at all, the same "nothing static to leave behind" shape as Credit/Engineering
+  Reports/Sales Performance. Unlike those three, this one *did* simplify existing code: the view
+  previously called `get_ap_dashboard()`/`get_ar_dashboard()`/`list_journals()[:8]` separately —
+  the exact same three calls `accounting_core.get_accounting_dashboard_kpis()` already combines
+  (built for the Accounting dashboard pass) — so `gl_dashboard` now calls that shared helper
+  directly instead of duplicating the combining logic, with `acct_count` (a `list_accounts()`
+  call, outside that helper's scope) fetched alongside it in both the full-page and fragment
+  views. No new core logic, so no new tests were needed. Full suite passes (3460, unchanged),
+  `manage.py check` and `ruff check .` both clean. Verified end-to-end via the Django test client:
+  hit `/gl/kpis-fragment/` directly (renders standalone with real data); created a real balanced
+  GL journal via `accounting_core.create_journal`, re-fetched the fragment, and confirmed it
+  appeared in the Recent Journal Entries table — then deleted it and confirmed it was gone; also
+  confirmed the fragment renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
