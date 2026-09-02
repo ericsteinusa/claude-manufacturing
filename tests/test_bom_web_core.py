@@ -63,6 +63,14 @@ def test_list_products_filters_by_item_type():
     assert 'item_type' in sql
 
 
+def test_list_products_self_heals_extra_columns():
+    conn = _conn(fetchall=[])
+    list_products(conn)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('ALTER TABLE product' in s and 'item_type' in s for s in sqls)
+    conn.commit.assert_called()
+
+
 def test_list_products_has_bom_true_filters_zero_count():
     conn = _conn(fetchall=[
         {'id': 1, 'name': 'A', 'item_type': 'make', 'uom': 'ea',
@@ -105,6 +113,16 @@ def test_get_product_returns_none_when_missing():
     assert get_product(conn, 999) is None
 
 
+def test_get_product_self_heals_extra_columns():
+    conn = _conn(fetchone={'id': 5, 'name': 'Widget', 'item_type': 'make',
+                           'uom': 'ea', 'lead_time_days': 3,
+                           'amount': 0, 'reorder_point': 0})
+    get_product(conn, 5)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('ALTER TABLE product' in s and 'item_type' in s for s in sqls)
+    conn.commit.assert_called()
+
+
 # ---------------------------------------------------------------------------
 # get_bom
 # ---------------------------------------------------------------------------
@@ -123,6 +141,14 @@ def test_get_bom_returns_list():
 def test_get_bom_empty_when_no_components():
     conn = _conn(fetchall=[])
     assert get_bom(conn, 99) == []
+
+
+def test_get_bom_self_heals_extra_columns():
+    conn = _conn(fetchall=[])
+    get_bom(conn, 1)
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('ALTER TABLE product' in s and 'item_type' in s for s in sqls)
+    conn.commit.assert_called()
 
 
 # ---------------------------------------------------------------------------
@@ -246,6 +272,13 @@ def test_update_item_master_invalid_type_defaults_to_buy():
     update_item_master(conn, 1, item_type='invalid', lead_time_days=0, uom='ea')
     _, params = conn.execute.call_args[0]
     assert 'buy' in params
+
+
+def test_update_item_master_self_heals_extra_columns():
+    conn = _conn()
+    update_item_master(conn, 1, item_type='make', lead_time_days=5, uom='kg')
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('ALTER TABLE product' in s and 'item_type' in s for s in sqls)
 
 
 def test_update_item_master_negative_lead_time_clamped():

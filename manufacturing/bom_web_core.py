@@ -8,6 +8,7 @@ is imported here so web tests need not touch the DB.
 """
 
 from .bom_core import would_create_cycle, explode_quantity
+from .inventory_core import _ensure_product_extra_columns
 from .log_utils import get_logger
 
 log = get_logger(__name__)
@@ -27,6 +28,9 @@ def list_products(conn, item_type: str | None = None,
     ``has_bom=True`` limits to products that have at least one BOM line;
     ``has_bom=False`` limits to products with no BOM lines.
     """
+    _ensure_product_extra_columns(conn)
+    conn.commit()
+
     sql = (
         "SELECT p.id, p.name, "
         "COALESCE(p.item_type, 'buy') AS item_type, "
@@ -57,6 +61,8 @@ def list_products(conn, item_type: str | None = None,
 
 
 def get_product(conn, product_id: int) -> dict | None:
+    _ensure_product_extra_columns(conn)
+    conn.commit()
     row = conn.execute(
         "SELECT id, name, "
         "COALESCE(item_type, 'buy') AS item_type, "
@@ -75,6 +81,7 @@ def update_item_master(conn, product_id: int, item_type: str,
     item_type = item_type if item_type in ITEM_TYPES else 'buy'
     uom = (uom or 'ea').strip() or 'ea'
     lead_time_days = max(0, int(lead_time_days or 0))
+    _ensure_product_extra_columns(conn)
     conn.execute(
         "UPDATE product SET item_type = %s, lead_time_days = %s, uom = %s "
         "WHERE id = %s",
@@ -90,6 +97,8 @@ def update_item_master(conn, product_id: int, item_type: str,
 
 def get_bom(conn, product_id: int) -> list[dict]:
     """Direct components of a product (one level), with component details."""
+    _ensure_product_extra_columns(conn)
+    conn.commit()
     rows = conn.execute(
         "SELECT b.id, b.component_id, "
         "COALESCE(b.qty_required, 1.0) AS qty_required, "

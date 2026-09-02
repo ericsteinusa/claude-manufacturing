@@ -42,6 +42,19 @@ def test_ensure_carbon_tables_creates_expected_objects():
     assert any('CREATE TABLE IF NOT EXISTS carbon_scope2_entry (' in c for c in calls)
 
 
+def test_ensure_carbon_tables_self_heals_item_type_column():
+    # A genuinely fresh product table (no seed_sample_products.py run) has no
+    # item_type column — _get_bom_lines selects p.item_type, so this must
+    # self-heal it the same way it already does for kg_co2e_per_unit.
+    conn = MagicMock()
+    ensure_carbon_tables(conn)
+    calls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any(
+        'ALTER TABLE product ADD COLUMN IF NOT EXISTS' in c and 'item_type' in c
+        for c in calls
+    )
+
+
 def test_set_material_factor():
     conn = MagicMock()
     set_material_factor(conn, 5, 2.5)

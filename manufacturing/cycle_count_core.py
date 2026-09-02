@@ -57,6 +57,19 @@ def ensure_cycle_count_tables(conn):
         "CREATE INDEX IF NOT EXISTS cycle_count_line_cc_id "
         "ON cycle_count_line(cycle_count_id)"
     )
+    # A genuinely fresh Postgres deployment's `product` table (created via
+    # schema.py's/work_orders_core.py's own CREATE TABLE IF NOT EXISTS) has
+    # neither of these columns — they're only added by
+    # seed_sample_products.py's own ALTER TABLE, a dev-only script never run
+    # in production. generate_sheet() filters on item_type and
+    # get_cycle_count_lines() selects p.uom, so self-heal both here.
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS "
+        "item_type TEXT DEFAULT 'buy'"
+    )
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS uom TEXT DEFAULT 'ea'"
+    )
 
 
 def _next_count_number(conn):

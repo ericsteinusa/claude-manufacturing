@@ -3,6 +3,7 @@ approval, and auto-post workflow."""
 
 from manufacturing.cycle_count_core import (
     GROUP_BY_OPTIONS, ABC_CLASSES,
+    ensure_cycle_count_tables,
     _next_count_number, compute_abc_classes, list_group_values,
     generate_sheet, enter_counts, decide_cycle_count, post_cycle_count,
 )
@@ -44,6 +45,25 @@ def test_group_by_options():
 
 def test_abc_classes():
     assert set(ABC_CLASSES) == {'A', 'B', 'C'}
+
+
+# ── ensure_cycle_count_tables ────────────────────────────────────────────
+
+def test_ensure_cycle_count_tables_self_heals_item_type_and_uom():
+    # A genuinely fresh product table (no seed_sample_products.py run) has
+    # neither column — generate_sheet() filters on item_type and
+    # get_cycle_count_lines() selects p.uom, so both must self-heal here.
+    conn = _MultiConn([])
+    ensure_cycle_count_tables(conn)
+    sqls = [sql for sql, _ in conn.calls]
+    assert any(
+        'ALTER TABLE product ADD COLUMN IF NOT EXISTS' in s and 'item_type' in s
+        for s in sqls
+    )
+    assert any(
+        'ALTER TABLE product ADD COLUMN IF NOT EXISTS' in s and 'uom' in s
+        for s in sqls
+    )
 
 
 # ── numbering ────────────────────────────────────────────────────────────
