@@ -1418,7 +1418,26 @@ per template, stated plainly rather than implied as complete.
   caller happens to always supply a real date from a form field, so this only
   surfaced when `consignment_core.py` tried passing `None` for an
   auto-generated invoice. **Check `information_schema.columns` before assuming
-  a column's type or nullability.**
+  a column's type or nullability.** A related variant, caught by
+  `.github/workflows/loadtest.yml` once it started running on every PR
+  against a genuinely fresh CI database (see `COMPETITIVE_GAP_ANALYSIS.md`
+  §6.13 for the workflow change itself): `product.item_type`/`uom`/
+  `lead_time_days`/
+  `created_by` are **only ever added via `seeds/seed_sample_products.py`'s own
+  `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`** — `schema.py`'s and
+  `work_orders_core.py`'s `CREATE TABLE IF NOT EXISTS product` (whichever runs
+  first) never include them. A real production deployment (which never runs
+  that dev-only seed script) hitting `/inventory/` before those columns exist
+  500'd with `psycopg2.errors.UndefinedColumn`. Fixed with a shared
+  `inventory_core._ensure_product_extra_columns(conn)` self-heal, called from
+  every function in that module that touches any of the four columns — the
+  same "self-heal in the query path" pattern `get_product()` already used for
+  just `created_by` before this fix generalized it. Five more modules
+  (`bom_web_core.py`, `carbon_core.py`, `mrp_web_core.py`,
+  `cycle_count_core.py`, `costing_core.py`) reference the same columns without
+  any self-heal and share the identical latent bug, flagged separately rather
+  than fixed in the same pass since none of them are on the load test's
+  current page list.
 - **Batch number generation.** The `_next_wo_num()` / `_next_req_num()` helpers
   compute the next `WO-<yr>-NNNN` / `REQ-<yr>-NNNN` via `COUNT(*)` on **their
   own fresh connection**. That collides when creating **several rows in one

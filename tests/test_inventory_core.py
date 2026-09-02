@@ -15,6 +15,7 @@ from manufacturing.inventory_core import (
     record_transaction,
     create_product,
     update_product,
+    _ensure_product_extra_columns,
 )
 
 
@@ -54,6 +55,80 @@ def test_trans_types_includes_adjust():
 
 def test_trans_types_includes_return():
     assert 'return' in TRANS_TYPES
+
+
+# ---------------------------------------------------------------------------
+# _ensure_product_extra_columns — self-heal for item_type/uom/
+# lead_time_days/created_by, columns schema.py's/work_orders_core.py's
+# CREATE TABLE IF NOT EXISTS for `product` never includes (only
+# seed_sample_products.py's own ALTER TABLE steps do, a dev-only script
+# never run in production). Caught for real via a fresh CI database with
+# only seed_sample_data.py run: /inventory/ 500'd with
+# psycopg2.errors.UndefinedColumn: column p.item_type does not exist.
+# ---------------------------------------------------------------------------
+
+def _alter_calls(conn):
+    return [c[0][0] for c in conn.execute.call_args_list if 'ALTER TABLE product' in c[0][0]]
+
+
+def test_ensure_product_extra_columns_adds_item_type():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    assert any('item_type' in sql for sql in _alter_calls(conn))
+
+
+def test_ensure_product_extra_columns_adds_uom():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    assert any('uom' in sql for sql in _alter_calls(conn))
+
+
+def test_ensure_product_extra_columns_adds_lead_time_days():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    assert any('lead_time_days' in sql for sql in _alter_calls(conn))
+
+
+def test_ensure_product_extra_columns_adds_created_by():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    assert any('created_by' in sql for sql in _alter_calls(conn))
+
+
+def test_ensure_product_extra_columns_uses_if_not_exists():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    assert all('IF NOT EXISTS' in sql for sql in _alter_calls(conn))
+
+
+def test_ensure_product_extra_columns_does_not_commit():
+    conn = MagicMock()
+    _ensure_product_extra_columns(conn)
+    conn.commit.assert_not_called()
+
+
+def test_list_products_self_heals_extra_columns():
+    conn = _conn(fetchall=[])
+    list_products(conn)
+    assert len(_alter_calls(conn)) == 4
+
+
+def test_get_product_self_heals_extra_columns():
+    conn = _conn(fetchone=_product())
+    get_product(conn, 1)
+    assert len(_alter_calls(conn)) == 4
+
+
+def test_create_product_self_heals_extra_columns():
+    conn = _conn(fetchone={'id': 1})
+    create_product(conn, 'X', None, '', 0, 0, 0, 'buy', 0, 'ea', 'u@e.com')
+    assert len(_alter_calls(conn)) == 4
+
+
+def test_update_product_self_heals_extra_columns():
+    conn = _conn()
+    update_product(conn, 1, 'X', None, '', 0, 0, 'buy', 0, 'ea')
+    assert len(_alter_calls(conn)) == 4
 
 
 # ---------------------------------------------------------------------------
