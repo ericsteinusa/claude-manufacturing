@@ -4662,3 +4662,32 @@ logic changed, only a workflow YAML file). §6.13/§9.2's "CI-gated load testing
 🟡 Partial ("manual trigger, now actually gates on regression") to ✅ Full — it now runs on every
 PR and push to `main`, not just on-demand, closing the specific "not per-PR" gap both prior
 entries flagged as the reason it wasn't promoted past Partial.
+
+**Immediate payoff, same PR:** the gate caught a real regression on its very first automatic
+run — `GET /inventory/` failed ~90% of requests with `psycopg2.errors.UndefinedColumn: column
+p.item_type does not exist`, a bug that had existed on `main` all along but was never caught
+because the job had only ever been run manually against dev databases that happened to already
+have `seed_sample_products.py`'s columns present. Root cause: `schema.py`'s and
+`work_orders_core.py`'s own `CREATE TABLE IF NOT EXISTS product` (whichever wins the race on a
+fresh deployment) never include `item_type`/`uom`/`lead_time_days`/`created_by` — those four are
+only ever added via `seed_sample_products.py`'s own `ALTER TABLE` steps, a dev-only seed script
+this CI job's own seed step (`seed_sample_data.py`, people only) never runs, exactly matching
+what a real customer's first-ever production deployment would also never run. Fixed in
+`inventory_core.py` with a shared `_ensure_product_extra_columns(conn)` self-heal, called from
+`list_products()`, `get_product()`, `create_product()`, and `update_product()` — the same
+"self-heal in the query path" pattern `get_product()` already used for just `created_by`, now
+generalized to all four columns and to the two write paths that had the identical latent bug
+but hadn't been caught yet since the load test only exercises read paths. Reproduced locally
+against a genuinely fresh Postgres database (`createdb` + `migrate` + `seed_sample_data.py`
+only, no products) before writing the fix, confirmed the exact same traceback, then confirmed
+the fix resolves it end-to-end — list, detail, create, and update all verified via real HTTP
+requests against that fresh database, not just unit tests. 10 new unit tests in `tests/
+test_inventory_core.py` (six for `_ensure_product_extra_columns` itself, four confirming each
+of the four public functions actually calls it). Five more modules
+(`bom_web_core.py`, `carbon_core.py`, `mrp_web_core.py`, `cycle_count_core.py`,
+`costing_core.py`) reference the same three product columns without any self-heal and share the
+identical latent bug — flagged as a separate follow-up task rather than fixed here, since none
+of them are on `locustfile.py`'s current page list and wouldn't have blocked this PR either way.
+This is exactly the kind of regression a per-PR gate is supposed to catch that a manual,
+occasionally-run job doesn't — concrete evidence for the "Full" promotion above, not just a
+process/trigger change.

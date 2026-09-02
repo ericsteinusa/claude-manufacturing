@@ -35,6 +35,31 @@ _TRANS_SIGN = {
 # Queries
 # ---------------------------------------------------------------------------
 
+def _ensure_product_extra_columns(conn) -> None:
+    """Self-heal item_type/uom/lead_time_days/created_by on ``product``.
+
+    schema.py's/work_orders_core.py's own CREATE TABLE IF NOT EXISTS for
+    ``product`` (whichever runs first on a fresh deployment) never
+    includes any of these four — they're only added via
+    seed_sample_products.py's own ALTER TABLE steps, a dev-only seed
+    script never run in production. Any query selecting/inserting/
+    updating them raises psycopg2.errors.UndefinedColumn until this has
+    run once (caught for real via a fresh CI database with only
+    seed_sample_data.py run — /inventory/ 500'd on column p.item_type
+    does not exist). Called from every function in this module that
+    touches any of the four. Does not commit — callers commit right
+    after calling this.
+    """
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS item_type TEXT DEFAULT 'buy'")
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS uom TEXT DEFAULT 'ea'")
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS lead_time_days INTEGER DEFAULT 0")
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
+
+
 def list_products(conn, search=None, filter_status=None,
                   item_type=None) -> list[dict]:
     """Return product rows annotated with a stock-status label.
@@ -42,6 +67,9 @@ def list_products(conn, search=None, filter_status=None,
     filter_status: None | 'low' (at or below reorder_point > 0) | 'zero'
     item_type:     None | 'make' | 'buy'
     """
+    _ensure_product_extra_columns(conn)
+    conn.commit()
+
     where = ['1=1']
     params: list = []
 
@@ -92,11 +120,7 @@ def list_products(conn, search=None, filter_status=None,
 
 def get_product(conn, product_id: int) -> dict | None:
     """Single product with supplier name."""
-    # `product` has no created_by column in the base schema, and no other
-    # module's ensure/ALTER step adds one — self-heal here since this is the
-    # only query in the codebase that selects it.
-    conn.execute(
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
+    _ensure_product_extra_columns(conn)
     conn.commit()
     row = conn.execute(
         "SELECT p.id, p.name, "
@@ -223,6 +247,7 @@ def create_product(conn, name: str, supplier_id, bin_loc: str,
     """Insert a new product and return its id. Does not commit."""
     if not name.strip():
         raise ValueError("Product name is required")
+    _ensure_product_extra_columns(conn)
     row = conn.execute(
         "INSERT INTO product "
         "(name, supplier_id, bin, amount, reorder_point, purchase_price, "
@@ -245,6 +270,7 @@ def update_product(conn, product_id: int, name: str, supplier_id,
     """Update editable product master fields. Does not commit."""
     if not name.strip():
         raise ValueError("Product name is required")
+    _ensure_product_extra_columns(conn)
     conn.execute(
         "UPDATE product SET name=%s, supplier_id=%s, bin=%s, "
         "reorder_point=%s, purchase_price=%s, item_type=%s, "
