@@ -1368,12 +1368,13 @@ to two new languages, it didn't mark any new template.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 14 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 15 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
   `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
   (the main company dashboard), `purchasing_dashboard.html`, `qa_dashboard.html`,
   `sales_dashboard.html`, `it_dashboard.html`, `acct_dashboard.html`, `cs_dashboard.html`,
-  `eng_dashboard.html`, `credit_dashboard.html`, and `finance_dashboard.html`. Pattern to copy for
+  `eng_dashboard.html`, `credit_dashboard.html`, `finance_dashboard.html`, and
+  `sales_reports.html`. Pattern to copy for
   the next page:
   a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
@@ -1542,6 +1543,29 @@ to two new languages, it didn't mark any new template.
   journal via `accounting_core.create_journal`, re-fetched the fragment, and confirmed it appeared
   in the Recent Journal Entries table — then deleted it and confirmed it was gone; also confirmed
   the fragment renders correctly in Portuguese and Dutch with an active session in each.
+  `sales_reports.html`'s own version (`sales_reports_kpis_fragment` polling
+  `/sales/reports/kpis-fragment/`) is the first one that's a period-filtered analytical report
+  rather than a fixed-scope department landing dashboard — the whole page (KPI row, Top Customers,
+  Top Products) is scoped to whatever `[start, end]` date range the Today/This Month/This
+  Quarter/This Year chips or the custom date-range form selected, so the `hx-get` URL carries that
+  through as query params read straight from the already-resolved `start`/`end` context variables
+  (`hx-get="/sales/reports/kpis-fragment/?start={{ start }}&amp;end={{ end }}"`) rather than a
+  fixed path — the fragment view re-runs `sales_core.get_sales_reports(conn, start, end)` for
+  exactly the range currently on screen, so a sales manager who leaves "This Month" open sees
+  revenue tick up as new orders are confirmed, without the poll silently reverting to a different
+  range. Matching the Accounting pass's precedent of grouping all "live" content contiguously, the
+  KPI row and Top Customers/Top Products tables (previously separated by the Revenue Trend chart)
+  moved together into the fragment, with the chart — left static per every prior pass's
+  canvas-redraw-avoidance precedent — now rendered after them instead of between. No core-module
+  refactor was needed: `get_sales_reports()` was already the single small, independently-tested
+  function backing this page. Full suite passes (3460, unchanged — no new core logic), `manage.py
+  check` and `ruff check .` both clean. Verified end-to-end via the Django test client: confirmed
+  the `hx-get` URL correctly carries the resolved date range (e.g. `?start=2026-01-01&end=2026-09-02`
+  for the "This Year" chip); hit the fragment URL directly (renders standalone with real data);
+  created a real confirmed sales order with a line item via `sales_orders_core.create_so`/
+  `add_so_item`, re-fetched the fragment for the current month, and confirmed Total Revenue jumped
+  from $0 to the order's exact value — then deleted it and confirmed it reverted to $0; also
+  confirmed the fragment renders correctly in Portuguese and Dutch with an active session in each.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

@@ -6258,6 +6258,19 @@ def sales_reports_view(request):
 
 
 @dept_required(_SALES_DEPT_KEYS)
+def sales_reports_kpis_fragment(request):
+    """htmx polling target for sales_reports' KPI row + Top Customers/Products
+    tables — re-runs get_sales_reports() for the same [start, end] range the
+    full page is currently showing, passed through as query params."""
+    today = date.today()
+    start = request.GET.get('start') or today.replace(day=1).isoformat()
+    end = request.GET.get('end') or today.isoformat()
+    with get_db_connection() as conn:
+        data = get_sales_reports(conn, start, end)
+    return render(request, 'sales_reports_kpis.html', data)
+
+
+@dept_required(_SALES_DEPT_KEYS)
 def sales_orders_list(request):
     status = request.GET.get('status', '')
     customer_id = request.GET.get('customer_id', '')
