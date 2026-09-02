@@ -62,31 +62,8 @@
         <a href="/dashboard/" class="dept-btn">{% trans "Home" %}</a>
     </div>
 
-    <div class="kpi-row">
-        <div class="kpi">
-            <div class="lbl">{% trans "Open POs" %}</div>
-            <div class="val">{{ pos.open|default:0 }}</div>
-        </div>
-        <div class="kpi{% if pos.pending_approval %} yellow{% endif %}">
-            <div class="lbl">{% trans "Pending Approval" %}</div>
-            <div class="val">{{ pos.pending_approval|default:0 }}</div>
-        </div>
-        <div class="kpi">
-            <div class="lbl">{% trans "Draft" %}</div>
-            <div class="val">{{ pos.draft|default:0 }}</div>
-        </div>
-        <div class="kpi">
-            <div class="lbl">{% trans "Sent" %}</div>
-            <div class="val">{{ pos.sent|default:0 }}</div>
-        </div>
-        <div class="kpi{% if pos.partial %} yellow{% endif %}">
-            <div class="lbl">{% trans "Partial Receipt" %}</div>
-            <div class="val">{{ pos.partial|default:0 }}</div>
-        </div>
-        <div class="kpi">
-            <div class="lbl">{% trans "Total POs" %}</div>
-            <div class="val">{{ pos.total|default:0 }}</div>
-        </div>
+    <div id="purch-kpis" hx-get="/purch/kpis-fragment/" hx-trigger="every 30s" hx-swap="innerHTML">
+        {% include "purchasing_dashboard_kpis.html" %}
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -122,39 +99,12 @@
         </div>
     </div>
 
-    <div class="card">
-        <h3>{% trans "Recent Purchase Orders" %}</h3>
-        <table class="list-table">
-            <thead>
-                <tr>
-                    <th>{% trans "PO #" %}</th>
-                    <th>{% trans "Supplier" %}</th>
-                    <th>{% trans "Order Date" %}</th>
-                    <th>{% trans "Expected Date" %}</th>
-                    <th>{% trans "Status" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for po in recent_pos %}
-            <tr>
-                <td><a href="/po/{{ po.id }}/">{{ po.po_number }}</a></td>
-                <td>{{ po.supplier_name }}</td>
-                <td>{{ po.order_date|default:"—" }}</td>
-                <td>{{ po.expected_date|default:"—" }}</td>
-                <td><span class="badge st-{{ po.status }}">{{ po.status }}</span></td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="5" style="color:#888;">{% trans "No purchase orders yet." %}</td></tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
 </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {

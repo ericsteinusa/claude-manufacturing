@@ -1286,11 +1286,11 @@ per template, stated plainly rather than implied as complete.
 
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
-  partial — a full SPA rewrite isn't proportionate to this codebase's size). 5 of ~450 templates
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 6 of ~450 templates
   poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
-  `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, and `dashboard.html`
-  (the main company dashboard). Pattern to copy for the next page: a `<div id="..."
-  hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
+  `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, `dashboard.html`
+  (the main company dashboard), and `purchasing_dashboard.html`. Pattern to copy for the next page:
+  a `<div id="..." hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
   "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
   (same auth decorator as the parent view) that renders that same partial template standalone, and
   `<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>` in the page's
@@ -1298,6 +1298,27 @@ per template, stated plainly rather than implied as complete.
   pattern. Factor the shared data-fetching logic (SQL/computation) into one helper function called
   by both the full-page view and the fragment view — `dashboard.html`'s `_dashboard_kpis()` in
   `views/__init__.py` is the reference example — so the two can't silently drift out of sync.
+  `purchasing_dashboard.html`'s own version of this (`purch_dashboard_kpis_fragment` polling
+  `/purch/kpis-fragment/`) picked the KPI row (Open/Pending Approval/Draft/Sent/Partial/Total PO
+  counts) plus the Recent Purchase Orders table — a manager watching this page wants to see a PO's
+  status change or a new draft appear without a manual refresh, the same "time-sensitive queue"
+  rationale as Maintenance's and Production's dashboards, picked over the heavier chart-data half of
+  the page (PO status breakdown, spend by month, top suppliers/items, PO trend, requisition status)
+  which stays static until reload, matching every other htmx pass's precedent of not polling slow
+  aggregate chart data. `purchasing_core.py`'s `get_purchasing_dashboard()` was refactored to extract
+  a `get_purchasing_dashboard_kpis(conn)` helper (the first two of its eight queries) that it now
+  calls internally, rather than duplicating those two queries in the fragment view — 7 new unit
+  tests added, including one asserting the full dashboard call and the standalone kpis-only call
+  return byte-identical `pos`/`recent_pos` values, so the two truly can't drift apart. Full suite
+  passes (3438, +7 from the new tests), `manage.py check` clean. Verified end-to-end against a
+  from-this-worktree dev server instance (not the port-8000 instance from a different worktree —
+  see the note further down): hit `/purch/kpis-fragment/` directly and confirmed it renders
+  standalone with real data (Total POs: 13); created a real PO via
+  `purchase_orders_core.create_po` (status `'draft'`), re-fetched the fragment, and confirmed
+  "Total POs" incremented to 14 with the new PO appearing at the top of the Recent Purchase Orders
+  table — genuine live data, not a cached partial — then deleted the test PO and confirmed the
+  count reverted to 13; separately confirmed the fragment renders correctly in French when fetched
+  with an active French session, matching `dashboard.html`'s own i18n/htmx-composition precedent.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

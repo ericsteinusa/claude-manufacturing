@@ -4,7 +4,7 @@ Tests for manufacturing/purchasing_core.py — pure unit tests, no Qt, no DB.
 
 from unittest.mock import MagicMock
 
-from manufacturing.purchasing_core import get_purchasing_dashboard
+from manufacturing.purchasing_core import get_purchasing_dashboard, get_purchasing_dashboard_kpis
 
 
 def _conn(po_row, recent_rows):
@@ -179,3 +179,71 @@ def test_second_sql_uses_limit_8():
     get_purchasing_dashboard(conn)
     second_sql = conn.execute.call_args_list[1][0][0]
     assert 'LIMIT 8' in second_sql
+
+
+# ---------------------------------------------------------------------------
+# get_purchasing_dashboard_kpis — the htmx polling fragment's data source,
+# shared with get_purchasing_dashboard() so the two can't drift apart.
+# ---------------------------------------------------------------------------
+
+def _kpis_conn(po_row, recent_rows):
+    c = MagicMock()
+    mock1 = MagicMock()
+    mock1.fetchone.return_value = po_row
+    mock2 = MagicMock()
+    mock2.fetchall.return_value = recent_rows
+    c.execute.side_effect = [mock1, mock2]
+    return c
+
+
+def test_kpis_returns_dict_with_pos_key():
+    conn = _kpis_conn({'draft': 0, 'pending_approval': 0, 'sent': 0,
+                       'partial': 0, 'received': 0, 'open': 0, 'total': 0}, [])
+    assert 'pos' in get_purchasing_dashboard_kpis(conn)
+
+
+def test_kpis_returns_dict_with_recent_pos_key():
+    conn = _kpis_conn({'draft': 0, 'pending_approval': 0, 'sent': 0,
+                       'partial': 0, 'received': 0, 'open': 0, 'total': 0}, [])
+    assert 'recent_pos' in get_purchasing_dashboard_kpis(conn)
+
+
+def test_kpis_pos_pending_approval_value():
+    conn = _kpis_conn({'draft': 0, 'pending_approval': 4, 'sent': 0,
+                       'partial': 0, 'received': 0, 'open': 4, 'total': 4}, [])
+    assert get_purchasing_dashboard_kpis(conn)['pos']['pending_approval'] == 4
+
+
+def test_kpis_pos_empty_when_fetchone_returns_none():
+    conn = _kpis_conn(None, [])
+    assert get_purchasing_dashboard_kpis(conn)['pos'] == {}
+
+
+def test_kpis_recent_pos_items_have_po_number():
+    row = {'id': 1, 'po_number': 'PO-2026-0001', 'order_date': '2026-01-01',
+           'expected_date': '2026-01-15', 'status': 'sent', 'supplier_name': 'Acme'}
+    conn = _kpis_conn({'draft': 0, 'pending_approval': 0, 'sent': 1,
+                       'partial': 0, 'received': 0, 'open': 1, 'total': 1}, [row])
+    assert get_purchasing_dashboard_kpis(conn)['recent_pos'][0]['po_number'] == 'PO-2026-0001'
+
+
+def test_kpis_execute_called_exactly_twice():
+    conn = _kpis_conn({'draft': 0, 'pending_approval': 0, 'sent': 0,
+                       'partial': 0, 'received': 0, 'open': 0, 'total': 0}, [])
+    get_purchasing_dashboard_kpis(conn)
+    assert conn.execute.call_count == 2
+
+
+def test_dashboard_kpis_match_standalone_kpis_call():
+    """get_purchasing_dashboard()'s pos/recent_pos must be byte-for-byte
+    what get_purchasing_dashboard_kpis() alone would return — they share
+    the same first two queries, so the full dashboard and the htmx
+    polling fragment can never silently drift apart."""
+    row = {'id': 7, 'po_number': 'PO-2026-0007', 'order_date': '2026-02-01',
+           'expected_date': '2026-02-10', 'status': 'draft', 'supplier_name': 'Acme'}
+    po_row = {'draft': 1, 'pending_approval': 0, 'sent': 0,
+              'partial': 0, 'received': 0, 'open': 1, 'total': 1}
+    full = get_purchasing_dashboard(_conn(po_row, [row]))
+    kpis_only = get_purchasing_dashboard_kpis(_kpis_conn(po_row, [row]))
+    assert full['pos'] == kpis_only['pos']
+    assert full['recent_pos'] == kpis_only['recent_pos']

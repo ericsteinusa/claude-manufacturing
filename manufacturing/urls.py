@@ -583,6 +583,7 @@ urlpatterns = [
     path('mkt/analytics/', views.mkt_analytics, name='mkt_analytics'),
     path('mkt/budget/', views.mkt_budget_list, name='mkt_budget_list'),
     path('purch/', views.purch_dashboard, name='purch_dashboard'),
+    path('purch/kpis-fragment/', views.purch_dashboard_kpis_fragment, name='purch_dashboard_kpis_fragment'),
     path('purch/contracts/', views.purch_contracts_list, name='purch_contracts_list'),
     path('purch/contracts/<int:contract_id>/', views.purch_contract_detail, name='purch_contract_detail'),
     path('purch/reports/', views.purch_reports_view, name='purch_reports_view'),

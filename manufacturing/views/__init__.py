@@ -225,6 +225,7 @@ from ..fixed_asset_core import (
 )
 from ..purchasing_core import (
     get_purchasing_dashboard,
+    get_purchasing_dashboard_kpis,
     CONTRACT_STATUSES as PURCH_CONTRACT_STATUSES,
     CONTRACT_CATEGORIES as PURCH_CONTRACT_CATEGORIES,
     list_contracts as list_purch_contracts,
@@ -7258,6 +7259,15 @@ def purch_dashboard(request):
         req_status_json=json.dumps(data.get('req_status', [])),
     )
     return render(request, 'purchasing_dashboard.html', ctx)
+
+
+@dept_required('purchasing')
+def purch_dashboard_kpis_fragment(request):
+    """htmx polling target for purchasing_dashboard's KPI row + Recent
+    Purchase Orders table."""
+    with get_db_connection() as conn:
+        kpis = get_purchasing_dashboard_kpis(conn)
+    return render(request, 'purchasing_dashboard_kpis.html', kpis)
 
 
 @dept_required('purchasing')
