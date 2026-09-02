@@ -5443,6 +5443,17 @@ def ar_invoice_detail(request, inv_id=None):
     return render(request, 'ar_invoice_detail.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
+def ar_invoice_payments_fragment(request, inv_id):
+    """htmx polling target for ar_invoice_detail's Payment History table only
+    -- deliberately excludes the Record Payment form and the status-change
+    form elsewhere on the page, since those hold in-progress user input that
+    a periodic innerHTML swap would silently discard."""
+    with get_db_connection() as conn:
+        payments = list_ar_payments(conn, inv_id)
+    return render(request, 'ar_invoice_payments_kpis.html', {'payments': payments})
+
+
 # ── General Ledger ───────────────────────────────────────────────────────────
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)

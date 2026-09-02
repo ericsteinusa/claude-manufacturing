@@ -336,6 +336,8 @@ urlpatterns = [
     path('ar/export/', views.ar_export, name='ar_export'),
     path('ar/new/', views.ar_invoice_detail, name='ar_invoice_new'),
     path('ar/<int:inv_id>/', views.ar_invoice_detail, name='ar_invoice_detail'),
+    path('ar/<int:inv_id>/payments-fragment/', views.ar_invoice_payments_fragment,
+         name='ar_invoice_payments_fragment'),
     # General Ledger
     path('gl/', views.gl_dashboard, name='gl_dashboard'),
     path('gl/kpis-fragment/', views.gl_dashboard_kpis_fragment, name='gl_dashboard_kpis_fragment'),
