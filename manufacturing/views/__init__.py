@@ -7968,6 +7968,21 @@ def fin_dashboard(request):
     return render(request, 'finance_dashboard.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
+def fin_dashboard_kpis_fragment(request):
+    """htmx polling target for fin_dashboard's AP/AR/Cash-Flow KPI rows + recent journals table."""
+    with get_db_connection() as conn:
+        data = get_finance_dashboard(conn)
+        cash_position = get_cash_position(conn)
+        cash_forecast = get_cash_forecast_13wk(conn, starting_balance=cash_position)
+    return render(request, 'finance_dashboard_kpis.html', {
+        **data,
+        'cash_position': cash_position,
+        'cash_forecast_end': cash_forecast[-1]['projected_balance'],
+        'cash_forecast_net_change': cash_forecast[-1]['projected_balance'] - cash_position,
+    })
+
+
 # ---------------------------------------------------------------------------
 # Finance sub-pages — budgets, audits, bank rec, tax
 # ---------------------------------------------------------------------------

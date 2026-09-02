@@ -503,6 +503,7 @@ urlpatterns = [
     path('wms/rfid/tags/', views.wms_rfid_tag_list, name='wms_rfid_tag_list'),
     path('wms/rfid/tags/<int:tag_id>/', views.wms_rfid_tag_detail, name='wms_rfid_tag_detail'),
     path('fin/', views.fin_dashboard, name='fin_dashboard'),
+    path('fin/kpis-fragment/', views.fin_dashboard_kpis_fragment, name='fin_dashboard_kpis_fragment'),
     path('fin/budgets/', views.fin_budget_list, name='fin_budget_list'),
     path('fin/budgets/<int:budget_id>/', views.fin_budget_detail, name='fin_budget_detail'),
     path('fin/audits/', views.fin_audit_list, name='fin_audit_list'),
