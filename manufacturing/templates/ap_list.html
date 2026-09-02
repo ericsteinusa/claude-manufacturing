@@ -28,27 +28,8 @@
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
-    <div class="kpi-grid" style="max-width:900px;margin-bottom:20px;">
-        <div class="kpi-card">
-            <div class="kpi-label">{% trans "Open Invoices" %}</div>
-            <div class="kpi-value">{{ dashboard.open_count }}</div>
-        </div>
-        <div class="kpi-card" style="border-left:4px solid var(--danger-fg);">
-            <div class="kpi-label">{% trans "Overdue" %}</div>
-            <div class="kpi-value warn">{{ dashboard.overdue_count }}</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">{% trans "Outstanding" %}</div>
-            <div class="kpi-value">${{ dashboard.total_outstanding|floatformat:2 }}</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">{% trans "Total Invoiced" %}</div>
-            <div class="kpi-value">${{ dashboard.total_invoiced|floatformat:2 }}</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">{% trans "Total Invoices" %}</div>
-            <div class="kpi-value">{{ dashboard.total_invoices }}</div>
-        </div>
+    <div id="ap-kpis" hx-get="/ap/kpis-fragment/" hx-trigger="every 30s" hx-swap="innerHTML">
+        {% include "ap_list_kpis.html" %}
     </div>
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;margin-bottom:16px;">
@@ -153,4 +134,8 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 {% endblock %}

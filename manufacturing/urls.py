@@ -326,6 +326,7 @@ urlpatterns = [
     path('acct/kpis-fragment/', views.acct_dashboard_kpis_fragment, name='acct_dashboard_kpis_fragment'),
     # Accounts Payable
     path('ap/', views.ap_list, name='ap_list'),
+    path('ap/kpis-fragment/', views.ap_list_kpis_fragment, name='ap_list_kpis_fragment'),
     path('ap/export/', views.ap_export, name='ap_export'),
     path('ap/new/', views.ap_invoice_detail, name='ap_invoice_new'),
     path('ap/<int:inv_id>/', views.ap_invoice_detail, name='ap_invoice_detail'),
