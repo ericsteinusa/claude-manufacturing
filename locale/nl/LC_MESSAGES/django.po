@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 23:47+0000\n"
+"POT-Creation-Date: 2026-09-03 00:04+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -972,12 +972,12 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/purch_contracts_list.html:86
 #: manufacturing/templates/purch_contracts_list.html:137
 #: manufacturing/templates/purchasing_dashboard_kpis.html:38
-#: manufacturing/templates/qa_audit_detail.html:89
+#: manufacturing/templates/qa_audit_detail.html:100
 #: manufacturing/templates/qa_audit_list.html:70
-#: manufacturing/templates/qa_capa_detail.html:76
+#: manufacturing/templates/qa_capa_detail.html:87
 #: manufacturing/templates/qa_capa_list.html:85
 #: manufacturing/templates/qa_inspection_detail.html:194
-#: manufacturing/templates/qa_ncr_detail.html:77
+#: manufacturing/templates/qa_ncr_detail.html:88
 #: manufacturing/templates/qa_ncr_list.html:87
 #: manufacturing/templates/qa_reports.html:138
 #: manufacturing/templates/qa_supplier_detail.html:107
@@ -1113,7 +1113,10 @@ msgstr "G/L"
 #: manufacturing/templates/payroll_stub_detail.html:36
 #: manufacturing/templates/po_detail.html:90
 #: manufacturing/templates/prod_shipping_detail.html:73
+#: manufacturing/templates/qa_audit_detail.html:54
+#: manufacturing/templates/qa_capa_detail.html:52
 #: manufacturing/templates/qa_inspection_detail.html:77
+#: manufacturing/templates/qa_ncr_detail.html:54
 msgid "Print / Save PDF"
 msgstr "Afdrukken / PDF Opslaan"
 
@@ -1265,9 +1268,9 @@ msgstr "Wisselkoers"
 #: manufacturing/templates/prod_returns_detail.html:135
 #: manufacturing/templates/prod_shipping_detail.html:130
 #: manufacturing/templates/purch_contract_detail.html:106
-#: manufacturing/templates/qa_audit_detail.html:155
-#: manufacturing/templates/qa_capa_detail.html:142
-#: manufacturing/templates/qa_ncr_detail.html:165
+#: manufacturing/templates/qa_audit_detail.html:166
+#: manufacturing/templates/qa_capa_detail.html:153
+#: manufacturing/templates/qa_ncr_detail.html:176
 #: manufacturing/templates/qa_supplier_detail.html:129
 #: manufacturing/templates/sales_contracts_detail.html:123
 #: manufacturing/templates/sales_forecast_detail.html:176
@@ -1333,7 +1336,7 @@ msgstr "Factuurnr."
 #: manufacturing/templates/prod_labor_report.html:94
 #: manufacturing/templates/prod_reports.html:114
 #: manufacturing/templates/prod_schedule.html:70
-#: manufacturing/templates/qa_capa_detail.html:116
+#: manufacturing/templates/qa_capa_detail.html:127
 #: manufacturing/templates/qa_capa_list.html:85
 #: manufacturing/templates/qa_capa_list.html:132
 msgid "Due Date"
@@ -1520,7 +1523,7 @@ msgstr "Chequenr., enz."
 #: manufacturing/templates/purch_contracts_list.html:157
 #: manufacturing/templates/qa_inspection_detail.html:109
 #: manufacturing/templates/qa_inspection_list.html:159
-#: manufacturing/templates/qa_ncr_detail.html:155
+#: manufacturing/templates/qa_ncr_detail.html:166
 #: manufacturing/templates/qa_ncr_list.html:148
 #: manufacturing/templates/qa_supplier_detail.html:119
 #: manufacturing/templates/qa_supplier_list.html:140
@@ -2161,7 +2164,7 @@ msgstr "Telefoon"
 #: manufacturing/templates/mkt_lead_detail.html:107
 #: manufacturing/templates/mkt_lead_list.html:90
 #: manufacturing/templates/mkt_lead_list.html:133
-#: manufacturing/templates/qa_ncr_detail.html:89
+#: manufacturing/templates/qa_ncr_detail.html:100
 #: manufacturing/templates/qa_ncr_list.html:86
 #: manufacturing/templates/qa_ncr_list.html:118
 #: manufacturing/templates/qa_reports.html:108
@@ -2446,11 +2449,11 @@ msgstr "Geen aanvragen gevonden."
 #: manufacturing/templates/maint_wo_list.html:111
 #: manufacturing/templates/purch_contract_detail.html:60
 #: manufacturing/templates/purch_contracts_list.html:115
-#: manufacturing/templates/qa_audit_detail.html:81
+#: manufacturing/templates/qa_audit_detail.html:92
 #: manufacturing/templates/qa_audit_list.html:99
-#: manufacturing/templates/qa_capa_detail.html:68
+#: manufacturing/templates/qa_capa_detail.html:79
 #: manufacturing/templates/qa_capa_list.html:114
-#: manufacturing/templates/qa_ncr_detail.html:69
+#: manufacturing/templates/qa_ncr_detail.html:80
 #: manufacturing/templates/qa_ncr_list.html:114
 msgid "Title *"
 msgstr "Functie *"
@@ -3004,10 +3007,10 @@ msgstr "Plannen"
 #: manufacturing/templates/pers_training_detail.html:102
 #: manufacturing/templates/pers_training_list.html:87
 #: manufacturing/templates/pers_training_list.html:130
-#: manufacturing/templates/qa_audit_detail.html:101
+#: manufacturing/templates/qa_audit_detail.html:112
 #: manufacturing/templates/qa_audit_list.html:69
 #: manufacturing/templates/qa_audit_list.html:103
-#: manufacturing/templates/qa_capa_detail.html:88
+#: manufacturing/templates/qa_capa_detail.html:99
 #: manufacturing/templates/qa_capa_list.html:84
 #: manufacturing/templates/qa_capa_list.html:118
 #: manufacturing/templates/qa_inspection_detail.html:194
@@ -3358,9 +3361,9 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/payroll_pay_rates.html:131
 #: manufacturing/templates/po_form.html:82
 #: manufacturing/templates/po_landed_cost_new.html:76
-#: manufacturing/templates/qa_audit_detail.html:156
-#: manufacturing/templates/qa_capa_detail.html:143
-#: manufacturing/templates/qa_ncr_detail.html:166
+#: manufacturing/templates/qa_audit_detail.html:167
+#: manufacturing/templates/qa_capa_detail.html:154
+#: manufacturing/templates/qa_ncr_detail.html:177
 #: manufacturing/templates/qa_supplier_detail.html:130
 #: manufacturing/templates/sales_commission_plans.html:128
 #: manufacturing/templates/sales_commissions.html:193
@@ -3498,7 +3501,7 @@ msgstr "Doelwaarde"
 #: manufacturing/templates/maint_inspection_detail.html:68
 #: manufacturing/templates/maint_inspection_detail.html:147
 #: manufacturing/templates/maint_inspection_list.html:79
-#: manufacturing/templates/qa_audit_detail.html:137
+#: manufacturing/templates/qa_audit_detail.html:148
 #: manufacturing/templates/qa_inspection_detail.html:104
 #: manufacturing/templates/qa_inspection_list.html:81
 #: manufacturing/templates/qa_reports.html:184
@@ -3714,10 +3717,10 @@ msgstr "Norm"
 #: manufacturing/templates/mkt_research_detail.html:121
 #: manufacturing/templates/mkt_research_list.html:91
 #: manufacturing/templates/mkt_research_list.html:137
-#: manufacturing/templates/qa_capa_detail.html:108
+#: manufacturing/templates/qa_capa_detail.html:119
 #: manufacturing/templates/qa_capa_list.html:85
 #: manufacturing/templates/qa_capa_list.html:128
-#: manufacturing/templates/qa_ncr_detail.html:141
+#: manufacturing/templates/qa_ncr_detail.html:152
 #: manufacturing/templates/qa_ncr_list.html:87
 #: manufacturing/templates/qa_ncr_list.html:144
 #: manufacturing/templates/report_builder_detail.html:33
@@ -6240,7 +6243,7 @@ msgstr "Auditsoort"
 #: manufacturing/templates/finance_audit_detail.html:110
 #: manufacturing/templates/finance_audit_list.html:87
 #: manufacturing/templates/finance_audit_list.html:134
-#: manufacturing/templates/qa_audit_detail.html:113
+#: manufacturing/templates/qa_audit_detail.html:124
 #: manufacturing/templates/qa_audit_list.html:69
 #: manufacturing/templates/qa_audit_list.html:109
 msgid "Auditor"
@@ -6252,7 +6255,7 @@ msgstr "Auditor"
 #: manufacturing/templates/it_task_list.html:139
 #: manufacturing/templates/maint_inspection_detail.html:131
 #: manufacturing/templates/maint_inspection_list.html:123
-#: manufacturing/templates/qa_audit_detail.html:121
+#: manufacturing/templates/qa_audit_detail.html:132
 #: manufacturing/templates/qa_audit_list.html:113
 msgid "Scheduled Date"
 msgstr "Geplande Datum"
@@ -6263,8 +6266,8 @@ msgstr "Geplande Datum"
 #: manufacturing/templates/legal_compliance_detail.html:113
 #: manufacturing/templates/maint_inspection_detail.html:139
 #: manufacturing/templates/maint_wo_detail.html:176
-#: manufacturing/templates/qa_audit_detail.html:129
-#: manufacturing/templates/qa_capa_detail.html:124
+#: manufacturing/templates/qa_audit_detail.html:140
+#: manufacturing/templates/qa_capa_detail.html:135
 msgid "Completed Date"
 msgstr "Voltooiingsdatum"
 
@@ -6295,7 +6298,7 @@ msgstr "Ref."
 #: manufacturing/templates/it_incident_list.html:109
 #: manufacturing/templates/qa_inspection_detail.html:194
 #: manufacturing/templates/qa_inspection_detail.html:233
-#: manufacturing/templates/qa_ncr_detail.html:101
+#: manufacturing/templates/qa_ncr_detail.html:112
 #: manufacturing/templates/qa_ncr_list.html:86
 #: manufacturing/templates/qa_ncr_list.html:124
 #: manufacturing/templates/qa_reports.html:86
@@ -8467,7 +8470,7 @@ msgid "New Matter"
 msgstr "Nieuwe zaak"
 
 #: manufacturing/templates/legal_employment_list.html:130
-#: manufacturing/templates/qa_ncr_detail.html:150
+#: manufacturing/templates/qa_ncr_detail.html:161
 msgid "Closed Date"
 msgstr "Sluitingsdatum"
 
@@ -8894,8 +8897,8 @@ msgstr "Geslaagd / Afgekeurd / Opmerkingen"
 #: manufacturing/templates/maint_inspection_detail.html:73
 #: manufacturing/templates/mkt_research_detail.html:89
 #: manufacturing/templates/mkt_research_detail.html:149
-#: manufacturing/templates/qa_audit_detail.html:62
-#: manufacturing/templates/qa_audit_detail.html:145
+#: manufacturing/templates/qa_audit_detail.html:73
+#: manufacturing/templates/qa_audit_detail.html:156
 msgid "Findings"
 msgstr "Bevindingen"
 
@@ -8903,7 +8906,7 @@ msgstr "Bevindingen"
 #: manufacturing/templates/maint_schedule_detail.html:64
 #: manufacturing/templates/maint_wo_detail.html:80
 #: manufacturing/templates/offboarding_list.html:93
-#: manufacturing/templates/qa_audit_detail.html:68
+#: manufacturing/templates/qa_audit_detail.html:79
 msgid "Mark Complete"
 msgstr "Markeren als voltooid"
 
@@ -11917,32 +11920,32 @@ msgstr "Audit #%(num)s"
 msgid "All Audits"
 msgstr "Alle audits"
 
-#: manufacturing/templates/qa_audit_detail.html:45
+#: manufacturing/templates/qa_audit_detail.html:56
 #, python-format
 msgid "Audit #%(num)s &mdash; %(title)s"
 msgstr "Audit #%(num)s &mdash; %(title)s"
 
-#: manufacturing/templates/qa_audit_detail.html:48
+#: manufacturing/templates/qa_audit_detail.html:59
 msgid "This audit is past its scheduled date."
 msgstr "Deze audit is over de geplande datum heen."
 
-#: manufacturing/templates/qa_audit_detail.html:52
+#: manufacturing/templates/qa_audit_detail.html:63
 msgid "Complete Audit"
 msgstr "Audit voltooien"
 
-#: manufacturing/templates/qa_audit_detail.html:58
+#: manufacturing/templates/qa_audit_detail.html:69
 msgid "Overall Result"
 msgstr "Totaalresultaat"
 
-#: manufacturing/templates/qa_audit_detail.html:59
+#: manufacturing/templates/qa_audit_detail.html:70
 msgid "Pass / Fail / Conditional…"
 msgstr "Geslaagd / Afgekeurd / Voorwaardelijk…"
 
-#: manufacturing/templates/qa_audit_detail.html:64
+#: manufacturing/templates/qa_audit_detail.html:75
 msgid "Key findings from the audit…"
 msgstr "Belangrijkste bevindingen van de audit…"
 
-#: manufacturing/templates/qa_audit_detail.html:75
+#: manufacturing/templates/qa_audit_detail.html:86
 msgid "Audit Details"
 msgstr "Auditdetails"
 
@@ -11984,36 +11987,36 @@ msgstr "CAPA #%(num)s"
 msgid "All CAPAs"
 msgstr "Alle CAPA's"
 
-#: manufacturing/templates/qa_capa_detail.html:43
+#: manufacturing/templates/qa_capa_detail.html:54
 #, python-format
 msgid "CAPA #%(num)s &mdash; %(title)s"
 msgstr "CAPA #%(num)s &mdash; %(title)s"
 
-#: manufacturing/templates/qa_capa_detail.html:46
+#: manufacturing/templates/qa_capa_detail.html:57
 msgid "This CAPA is past its due date."
 msgstr "Deze CAPA is over de vervaldatum heen."
 
-#: manufacturing/templates/qa_capa_detail.html:50
-#: manufacturing/templates/qa_capa_detail.html:56
+#: manufacturing/templates/qa_capa_detail.html:61
+#: manufacturing/templates/qa_capa_detail.html:67
 msgid "Close CAPA"
 msgstr "CAPA sluiten"
 
-#: manufacturing/templates/qa_capa_detail.html:52
+#: manufacturing/templates/qa_capa_detail.html:63
 msgid "Sets status to Closed and stamps today's completed date."
 msgstr ""
 "Zet de status op Gesloten en registreert de datum van vandaag als "
 "voltooiingsdatum."
 
-#: manufacturing/templates/qa_capa_detail.html:62
+#: manufacturing/templates/qa_capa_detail.html:73
 msgid "CAPA Details"
 msgstr "CAPA-details"
 
-#: manufacturing/templates/qa_capa_detail.html:100
+#: manufacturing/templates/qa_capa_detail.html:111
 #: manufacturing/templates/qa_capa_list.html:124
 msgid "NCR Reference"
 msgstr "NCR-referentie"
 
-#: manufacturing/templates/qa_capa_detail.html:132
+#: manufacturing/templates/qa_capa_detail.html:143
 #: manufacturing/templates/qa_capa_list.html:136
 msgid "Action Plan"
 msgstr "Actieplan"
@@ -12274,17 +12277,17 @@ msgstr "NCR #%(num)s"
 msgid "All NCRs"
 msgstr "Alle NCR's"
 
-#: manufacturing/templates/qa_ncr_detail.html:45
+#: manufacturing/templates/qa_ncr_detail.html:56
 #, python-format
 msgid "NCR #%(num)s &mdash; %(title)s"
 msgstr "NCR #%(num)s &mdash; %(title)s"
 
-#: manufacturing/templates/qa_ncr_detail.html:51
-#: manufacturing/templates/qa_ncr_detail.html:57
+#: manufacturing/templates/qa_ncr_detail.html:62
+#: manufacturing/templates/qa_ncr_detail.html:68
 msgid "Close NCR"
 msgstr "NCR sluiten"
 
-#: manufacturing/templates/qa_ncr_detail.html:53
+#: manufacturing/templates/qa_ncr_detail.html:64
 msgid ""
 "Closing marks this NCR resolved. This action cannot be undone from the web "
 "UI."
@@ -12292,21 +12295,21 @@ msgstr ""
 "Sluiten markeert deze NCR als opgelost. Deze actie kan niet ongedaan worden "
 "gemaakt via de webinterface."
 
-#: manufacturing/templates/qa_ncr_detail.html:63
+#: manufacturing/templates/qa_ncr_detail.html:74
 msgid "NCR Details"
 msgstr "NCR-details"
 
-#: manufacturing/templates/qa_ncr_detail.html:113
+#: manufacturing/templates/qa_ncr_detail.html:124
 #: manufacturing/templates/qa_ncr_list.html:130
 msgid "Product / Part"
 msgstr "Product / onderdeel"
 
-#: manufacturing/templates/qa_ncr_detail.html:121
+#: manufacturing/templates/qa_ncr_detail.html:132
 #: manufacturing/templates/qa_ncr_list.html:134
 msgid "Detected Date"
 msgstr "Detectiedatum"
 
-#: manufacturing/templates/qa_ncr_detail.html:129
+#: manufacturing/templates/qa_ncr_detail.html:140
 #: manufacturing/templates/qa_ncr_list.html:138
 msgid "Disposition"
 msgstr "Beschikking"
