@@ -9,6 +9,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .btn-row, .no-print { display: none !important; }
+    body { background: white !important; }
+    .qa-wrap { max-width: none; }
+}
 .qa-wrap { width:100%; max-width:900px; }
 .qa-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:18px; }
@@ -41,6 +51,7 @@
 
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="qa-wrap">
     <h2>{% blocktrans with num=audit.id title=audit.title %}Audit #{{ num }} &mdash; {{ title }}{% endblocktrans %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
@@ -48,7 +59,7 @@
     {% if audit.is_overdue %}<div class="overdue-notice">&#9888; {% trans "This audit is past its scheduled date." %}</div>{% endif %}
 
     {% if audit.status not in 'Complete,Closed' and can_edit %}
-    <div class="card complete-card">
+    <div class="card complete-card no-print">
         <h3>{% trans "Complete Audit" %}</h3>
         <form method="post">
             {% csrf_token %}
