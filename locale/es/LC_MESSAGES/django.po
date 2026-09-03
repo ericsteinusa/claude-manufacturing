@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 23:47+0000\n"
+"POT-Creation-Date: 2026-09-03 00:12+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
@@ -880,8 +880,8 @@ msgstr "Total Débito"
 #: manufacturing/templates/legal_compliance_detail.html:101
 #: manufacturing/templates/legal_compliance_list.html:86
 #: manufacturing/templates/legal_compliance_list.html:125
-#: manufacturing/templates/legal_contract_detail.html:55
-#: manufacturing/templates/legal_contract_detail.html:114
+#: manufacturing/templates/legal_contract_detail.html:66
+#: manufacturing/templates/legal_contract_detail.html:125
 #: manufacturing/templates/legal_contract_list.html:95
 #: manufacturing/templates/legal_contract_list.html:140
 #: manufacturing/templates/legal_dashboard.html:147
@@ -969,8 +969,8 @@ msgstr "Total Débito"
 #: manufacturing/templates/prod_shipping_list.html:83
 #: manufacturing/templates/prod_shipping_list.html:131
 #: manufacturing/templates/prod_tracking_dashboard.html:76
-#: manufacturing/templates/purch_contract_detail.html:82
-#: manufacturing/templates/purch_contract_detail.html:115
+#: manufacturing/templates/purch_contract_detail.html:93
+#: manufacturing/templates/purch_contract_detail.html:126
 #: manufacturing/templates/purch_contracts_list.html:86
 #: manufacturing/templates/purch_contracts_list.html:137
 #: manufacturing/templates/purchasing_dashboard_kpis.html:38
@@ -992,7 +992,7 @@ msgstr "Total Débito"
 #: manufacturing/templates/sales_commissions.html:115
 #: manufacturing/templates/sales_commissions.html:179
 #: manufacturing/templates/sales_commissions.html:229
-#: manufacturing/templates/sales_contracts_detail.html:99
+#: manufacturing/templates/sales_contracts_detail.html:110
 #: manufacturing/templates/sales_contracts_list.html:88
 #: manufacturing/templates/sales_contracts_list.html:133
 #: manufacturing/templates/sales_dashboard_kpis.html:15
@@ -1109,11 +1109,14 @@ msgstr "L/M"
 #: manufacturing/templates/ap_invoice_detail.html:54
 #: manufacturing/templates/ar_invoice_detail.html:54
 #: manufacturing/templates/blanket_po_detail.html:54
+#: manufacturing/templates/legal_contract_detail.html:56
 #: manufacturing/templates/maint_wo_detail.html:57
 #: manufacturing/templates/payroll_stub_detail.html:36
 #: manufacturing/templates/po_detail.html:90
 #: manufacturing/templates/prod_shipping_detail.html:73
+#: manufacturing/templates/purch_contract_detail.html:54
 #: manufacturing/templates/qa_inspection_detail.html:77
+#: manufacturing/templates/sales_contracts_detail.html:62
 msgid "Print / Save PDF"
 msgstr "Imprimir / Guardar PDF"
 
@@ -1246,7 +1249,7 @@ msgstr "Tipo de Cambio"
 #: manufacturing/templates/it_task_detail.html:97
 #: manufacturing/templates/it_ticket_detail.html:185
 #: manufacturing/templates/legal_compliance_detail.html:121
-#: manufacturing/templates/legal_contract_detail.html:142
+#: manufacturing/templates/legal_contract_detail.html:153
 #: manufacturing/templates/legal_litigation_detail.html:134
 #: manufacturing/templates/maint_downtime_detail.html:136
 #: manufacturing/templates/maint_equipment_detail.html:145
@@ -1264,12 +1267,12 @@ msgstr "Tipo de Cambio"
 #: manufacturing/templates/pers_training_detail.html:96
 #: manufacturing/templates/prod_returns_detail.html:135
 #: manufacturing/templates/prod_shipping_detail.html:130
-#: manufacturing/templates/purch_contract_detail.html:106
+#: manufacturing/templates/purch_contract_detail.html:117
 #: manufacturing/templates/qa_audit_detail.html:155
 #: manufacturing/templates/qa_capa_detail.html:142
 #: manufacturing/templates/qa_ncr_detail.html:165
 #: manufacturing/templates/qa_supplier_detail.html:129
-#: manufacturing/templates/sales_contracts_detail.html:123
+#: manufacturing/templates/sales_contracts_detail.html:134
 #: manufacturing/templates/sales_forecast_detail.html:176
 #: manufacturing/templates/sales_leads_detail.html:107
 #: manufacturing/templates/sales_territories.html:140
@@ -1465,8 +1468,8 @@ msgstr "N.° de cheque, etc."
 #: manufacturing/templates/legal_compliance_detail.html:75
 #: manufacturing/templates/legal_compliance_detail.html:117
 #: manufacturing/templates/legal_compliance_list.html:137
-#: manufacturing/templates/legal_contract_detail.html:84
-#: manufacturing/templates/legal_contract_detail.html:138
+#: manufacturing/templates/legal_contract_detail.html:95
+#: manufacturing/templates/legal_contract_detail.html:149
 #: manufacturing/templates/legal_contract_list.html:164
 #: manufacturing/templates/legal_employment_list.html:138
 #: manufacturing/templates/legal_governance_list.html:133
@@ -1515,8 +1518,8 @@ msgstr "N.° de cheque, etc."
 #: manufacturing/templates/prod_shipping_detail.html:126
 #: manufacturing/templates/prod_shipping_detail.html:141
 #: manufacturing/templates/prod_shipping_list.html:139
-#: manufacturing/templates/purch_contract_detail.html:102
-#: manufacturing/templates/purch_contract_detail.html:121
+#: manufacturing/templates/purch_contract_detail.html:113
+#: manufacturing/templates/purch_contract_detail.html:132
 #: manufacturing/templates/purch_contracts_list.html:157
 #: manufacturing/templates/qa_inspection_detail.html:109
 #: manufacturing/templates/qa_inspection_list.html:159
@@ -1531,8 +1534,8 @@ msgstr "N.° de cheque, etc."
 #: manufacturing/templates/sales_commissions.html:116
 #: manufacturing/templates/sales_commissions.html:187
 #: manufacturing/templates/sales_commissions.html:237
-#: manufacturing/templates/sales_contracts_detail.html:119
-#: manufacturing/templates/sales_contracts_detail.html:133
+#: manufacturing/templates/sales_contracts_detail.html:130
+#: manufacturing/templates/sales_contracts_detail.html:144
 #: manufacturing/templates/sales_contracts_list.html:153
 #: manufacturing/templates/sales_forecast_detail.html:172
 #: manufacturing/templates/sales_forecast_detail.html:185
@@ -1818,7 +1821,7 @@ msgstr "Recibido:"
 
 #: manufacturing/templates/ar_invoice_detail.html:93
 #: manufacturing/templates/ar_list.html:101
-#: manufacturing/templates/sales_contracts_detail.html:83
+#: manufacturing/templates/sales_contracts_detail.html:94
 #: manufacturing/templates/sales_contracts_list.html:117
 #: manufacturing/templates/sales_quotes.html:113
 #: manufacturing/templates/sales_quotes.html:138
@@ -2280,7 +2283,7 @@ msgstr "Aún no hay contrataciones."
 #: manufacturing/templates/it_incident_detail.html:89
 #: manufacturing/templates/it_incident_list.html:61
 #: manufacturing/templates/it_incident_list.html:105
-#: manufacturing/templates/legal_contract_detail.html:98
+#: manufacturing/templates/legal_contract_detail.html:109
 #: manufacturing/templates/legal_contract_list.html:88
 #: manufacturing/templates/legal_contract_list.html:124
 #: manufacturing/templates/legal_dashboard.html:142
@@ -2295,13 +2298,13 @@ msgstr "Aún no hay contrataciones."
 #: manufacturing/templates/mkt_research_list.html:89
 #: manufacturing/templates/mkt_research_list.html:124
 #: manufacturing/templates/personnel_dashboard.html:122
-#: manufacturing/templates/purch_contract_detail.html:112
+#: manufacturing/templates/purch_contract_detail.html:123
 #: manufacturing/templates/purch_contracts_list.html:80
 #: manufacturing/templates/purch_reports.html:122
 #: manufacturing/templates/qa_audit_list.html:69
 #: manufacturing/templates/qa_capa_list.html:84
 #: manufacturing/templates/qa_ncr_list.html:86
-#: manufacturing/templates/sales_contracts_detail.html:87
+#: manufacturing/templates/sales_contracts_detail.html:98
 #: manufacturing/templates/sales_contracts_list.html:82
 #: manufacturing/templates/sales_contracts_list.html:121
 msgid "Title"
@@ -2444,7 +2447,7 @@ msgstr "No se encontraron requisiciones."
 #: manufacturing/templates/ats_requisition_new.html:29
 #: manufacturing/templates/maint_wo_detail.html:92
 #: manufacturing/templates/maint_wo_list.html:111
-#: manufacturing/templates/purch_contract_detail.html:60
+#: manufacturing/templates/purch_contract_detail.html:71
 #: manufacturing/templates/purch_contracts_list.html:115
 #: manufacturing/templates/qa_audit_detail.html:81
 #: manufacturing/templates/qa_audit_list.html:99
@@ -2974,8 +2977,8 @@ msgstr "Planes"
 #: manufacturing/templates/it_network_list.html:71
 #: manufacturing/templates/it_task_detail.html:107
 #: manufacturing/templates/it_task_list.html:64
-#: manufacturing/templates/legal_contract_detail.html:59
-#: manufacturing/templates/legal_contract_detail.html:106
+#: manufacturing/templates/legal_contract_detail.html:70
+#: manufacturing/templates/legal_contract_detail.html:117
 #: manufacturing/templates/legal_contract_list.html:90
 #: manufacturing/templates/legal_contract_list.html:132
 #: manufacturing/templates/legal_dashboard.html:144
@@ -3134,10 +3137,10 @@ msgstr "Cant."
 
 #: manufacturing/templates/blanket_po_detail.html:98
 #: manufacturing/templates/blanket_po_release_new.html:35
-#: manufacturing/templates/legal_contract_detail.html:67
+#: manufacturing/templates/legal_contract_detail.html:78
 #: manufacturing/templates/legal_contract_list.html:91
 #: manufacturing/templates/legal_dashboard.html:145
-#: manufacturing/templates/purch_contract_detail.html:118
+#: manufacturing/templates/purch_contract_detail.html:129
 #: manufacturing/templates/purch_contracts_list.html:85
 #: manufacturing/templates/report_builder_form.html:91
 #: manufacturing/templates/sales_contracts_list.html:83
@@ -3202,8 +3205,8 @@ msgstr "N.º Global"
 #: manufacturing/templates/po_approvals.html:36
 #: manufacturing/templates/po_form.html:34
 #: manufacturing/templates/po_list.html:37
-#: manufacturing/templates/purch_contract_detail.html:64
-#: manufacturing/templates/purch_contract_detail.html:113
+#: manufacturing/templates/purch_contract_detail.html:75
+#: manufacturing/templates/purch_contract_detail.html:124
 #: manufacturing/templates/purch_contracts_list.html:81
 #: manufacturing/templates/purch_contracts_list.html:119
 #: manufacturing/templates/purch_reports.html:67
@@ -3275,8 +3278,8 @@ msgstr "Cantidad Total (deje 0 para seguimiento por valor)"
 #: manufacturing/templates/eng_project_detail.html:100
 #: manufacturing/templates/eng_project_detail.html:218
 #: manufacturing/templates/eng_projects.html:122
-#: manufacturing/templates/legal_contract_detail.html:71
-#: manufacturing/templates/legal_contract_detail.html:126
+#: manufacturing/templates/legal_contract_detail.html:82
+#: manufacturing/templates/legal_contract_detail.html:137
 #: manufacturing/templates/legal_contract_list.html:152
 #: manufacturing/templates/mkt_ad_detail.html:86
 #: manufacturing/templates/mkt_ad_detail.html:174
@@ -3292,12 +3295,12 @@ msgstr "Cantidad Total (deje 0 para seguimiento por valor)"
 #: manufacturing/templates/pers_training_detail.html:103
 #: manufacturing/templates/pers_training_list.html:88
 #: manufacturing/templates/pers_training_list.html:138
-#: manufacturing/templates/purch_contract_detail.html:90
-#: manufacturing/templates/purch_contract_detail.html:116
+#: manufacturing/templates/purch_contract_detail.html:101
+#: manufacturing/templates/purch_contract_detail.html:127
 #: manufacturing/templates/purch_contracts_list.html:83
 #: manufacturing/templates/purch_contracts_list.html:145
-#: manufacturing/templates/sales_contracts_detail.html:107
-#: manufacturing/templates/sales_contracts_detail.html:130
+#: manufacturing/templates/sales_contracts_detail.html:118
+#: manufacturing/templates/sales_contracts_detail.html:141
 #: manufacturing/templates/sales_contracts_list.html:141
 msgid "Start Date"
 msgstr "Fecha de inicio"
@@ -3306,8 +3309,8 @@ msgstr "Fecha de inicio"
 #: manufacturing/templates/cs_surveys_detail.html:109
 #: manufacturing/templates/cs_surveys_list.html:84
 #: manufacturing/templates/cs_surveys_list.html:139
-#: manufacturing/templates/legal_contract_detail.html:75
-#: manufacturing/templates/legal_contract_detail.html:130
+#: manufacturing/templates/legal_contract_detail.html:86
+#: manufacturing/templates/legal_contract_detail.html:141
 #: manufacturing/templates/legal_contract_list.html:156
 #: manufacturing/templates/legal_dashboard.html:146
 #: manufacturing/templates/mkt_ad_detail.html:90
@@ -3324,14 +3327,14 @@ msgstr "Fecha de inicio"
 #: manufacturing/templates/pers_training_detail.html:104
 #: manufacturing/templates/pers_training_list.html:89
 #: manufacturing/templates/pers_training_list.html:142
-#: manufacturing/templates/purch_contract_detail.html:94
-#: manufacturing/templates/purch_contract_detail.html:117
+#: manufacturing/templates/purch_contract_detail.html:105
+#: manufacturing/templates/purch_contract_detail.html:128
 #: manufacturing/templates/purch_contracts_list.html:84
 #: manufacturing/templates/purch_contracts_list.html:149
 #: manufacturing/templates/purch_reports.html:124
-#: manufacturing/templates/sales_contracts_detail.html:67
-#: manufacturing/templates/sales_contracts_detail.html:111
-#: manufacturing/templates/sales_contracts_detail.html:131
+#: manufacturing/templates/sales_contracts_detail.html:78
+#: manufacturing/templates/sales_contracts_detail.html:122
+#: manufacturing/templates/sales_contracts_detail.html:142
 #: manufacturing/templates/sales_contracts_list.html:145
 msgid "End Date"
 msgstr "Fecha de finalización"
@@ -3689,8 +3692,8 @@ msgstr "Norma"
 #: manufacturing/templates/legal_compliance_detail.html:97
 #: manufacturing/templates/legal_compliance_list.html:83
 #: manufacturing/templates/legal_compliance_list.html:121
-#: manufacturing/templates/legal_contract_detail.html:79
-#: manufacturing/templates/legal_contract_detail.html:134
+#: manufacturing/templates/legal_contract_detail.html:90
+#: manufacturing/templates/legal_contract_detail.html:145
 #: manufacturing/templates/legal_contract_list.html:94
 #: manufacturing/templates/legal_contract_list.html:160
 #: manufacturing/templates/legal_employment_list.html:74
@@ -3720,7 +3723,7 @@ msgstr "Norma"
 #: manufacturing/templates/qa_ncr_list.html:144
 #: manufacturing/templates/report_builder_detail.html:33
 #: manufacturing/templates/report_builder_list.html:24
-#: manufacturing/templates/sales_contracts_detail.html:129
+#: manufacturing/templates/sales_contracts_detail.html:140
 #: manufacturing/templates/sales_contracts_list.html:87
 #: manufacturing/templates/sales_leads_detail.html:115
 #: manufacturing/templates/sales_leads_list.html:87
@@ -3758,8 +3761,8 @@ msgstr "Aún no hay listas de verificación. Cree una a partir de una plantilla.
 #: manufacturing/templates/mkt_budget_list.html:120
 #: manufacturing/templates/payroll_deductions.html:56
 #: manufacturing/templates/payroll_deductions.html:87
-#: manufacturing/templates/purch_contract_detail.html:73
-#: manufacturing/templates/purch_contract_detail.html:114
+#: manufacturing/templates/purch_contract_detail.html:84
+#: manufacturing/templates/purch_contract_detail.html:125
 #: manufacturing/templates/purch_contracts_list.html:82
 #: manufacturing/templates/purch_contracts_list.html:128
 msgid "Category"
@@ -5216,7 +5219,7 @@ msgstr "Monto de reembolso"
 #: manufacturing/templates/payroll_run_detail.html:45
 #: manufacturing/templates/pers_review_detail.html:109
 #: manufacturing/templates/pers_training_detail.html:106
-#: manufacturing/templates/purch_contract_detail.html:119
+#: manufacturing/templates/purch_contract_detail.html:130
 #: manufacturing/templates/rfq_list.html:34
 #: manufacturing/templates/sales_order_detail.html:68
 msgid "Created By"
@@ -5947,7 +5950,7 @@ msgid "Standard #"
 msgstr "Norma n.º"
 
 #: manufacturing/templates/eng_spec_detail.html:114
-#: manufacturing/templates/purch_contract_detail.html:120
+#: manufacturing/templates/purch_contract_detail.html:131
 msgid "Created Date"
 msgstr "Fecha de creación"
 
@@ -6038,7 +6041,7 @@ msgstr "Describa la tarea"
 #: manufacturing/templates/prod_returns_list.html:117
 #: manufacturing/templates/prod_shipping_detail.html:97
 #: manufacturing/templates/prod_shipping_list.html:112
-#: manufacturing/templates/purch_contract_detail.html:66
+#: manufacturing/templates/purch_contract_detail.html:77
 #: manufacturing/templates/purch_contracts_list.html:121
 #: manufacturing/templates/qa_inspection_list.html:116
 #: manufacturing/templates/qa_inspection_list.html:125
@@ -6123,7 +6126,7 @@ msgstr "Registrar Entrevista de Salida"
 #: manufacturing/templates/mkt_research_detail.html:114
 #: manufacturing/templates/mkt_research_list.html:130
 #: manufacturing/templates/offboarding_list.html:116
-#: manufacturing/templates/purch_contract_detail.html:75
+#: manufacturing/templates/purch_contract_detail.html:86
 #: manufacturing/templates/purch_contracts_list.html:130
 #: manufacturing/templates/termination_list.html:102
 msgid "— Select —"
@@ -8332,25 +8335,25 @@ msgstr "Agregar elemento"
 msgid "Contract — %(title)s"
 msgstr "Contrato — %(title)s"
 
-#: manufacturing/templates/legal_contract_detail.html:63
-#: manufacturing/templates/legal_contract_detail.html:102
+#: manufacturing/templates/legal_contract_detail.html:74
+#: manufacturing/templates/legal_contract_detail.html:113
 #: manufacturing/templates/legal_contract_list.html:89
 #: manufacturing/templates/legal_contract_list.html:128
 #: manufacturing/templates/legal_dashboard.html:143
 msgid "Counterparty"
 msgstr "Contraparte"
 
-#: manufacturing/templates/legal_contract_detail.html:93
-#: manufacturing/templates/purch_contract_detail.html:55
-#: manufacturing/templates/sales_contracts_detail.html:78
+#: manufacturing/templates/legal_contract_detail.html:104
+#: manufacturing/templates/purch_contract_detail.html:66
+#: manufacturing/templates/sales_contracts_detail.html:89
 msgid "Edit Contract"
 msgstr "Editar contrato"
 
-#: manufacturing/templates/legal_contract_detail.html:122
+#: manufacturing/templates/legal_contract_detail.html:133
 #: manufacturing/templates/legal_contract_list.html:148
-#: manufacturing/templates/purch_contract_detail.html:98
+#: manufacturing/templates/purch_contract_detail.html:109
 #: manufacturing/templates/purch_contracts_list.html:153
-#: manufacturing/templates/sales_contracts_detail.html:91
+#: manufacturing/templates/sales_contracts_detail.html:102
 #: manufacturing/templates/sales_contracts_list.html:125
 msgid "Value ($)"
 msgstr "Valor ($)"
@@ -13213,18 +13216,18 @@ msgstr "Cotizaciones"
 msgid "Forecast"
 msgstr "Pronóstico"
 
-#: manufacturing/templates/sales_contracts_detail.html:63
+#: manufacturing/templates/sales_contracts_detail.html:74
 msgid "Contract Value"
 msgstr "Valor del Contrato"
 
-#: manufacturing/templates/sales_contracts_detail.html:71
-#: manufacturing/templates/sales_contracts_detail.html:115
-#: manufacturing/templates/sales_contracts_detail.html:132
+#: manufacturing/templates/sales_contracts_detail.html:82
+#: manufacturing/templates/sales_contracts_detail.html:126
+#: manufacturing/templates/sales_contracts_detail.html:143
 #: manufacturing/templates/sales_contracts_list.html:149
 msgid "Renewal Date"
 msgstr "Fecha de Renovación"
 
-#: manufacturing/templates/sales_contracts_detail.html:95
+#: manufacturing/templates/sales_contracts_detail.html:106
 #: manufacturing/templates/sales_contracts_list.html:129
 #: manufacturing/templates/sales_leads_detail.html:71
 #: manufacturing/templates/sales_leads_list.html:128
