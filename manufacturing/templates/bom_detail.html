@@ -6,6 +6,8 @@
 {% if product.item_type == 'make' and lines %}
 <a href="/bom/{{ product.id }}/explode/" class="btn">Exploded BOM</a>
 {% endif %}
+<a href="?export=1" class="btn">⬇ CSV</a>
+<a href="?export=1&format=xlsx" class="btn">⬇ Excel</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
