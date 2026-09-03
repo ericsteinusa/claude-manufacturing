@@ -12,6 +12,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .btn-submit { display: none !important; }
+    body { background: white !important; }
+    .fn-wrap { max-width: none; }
+}
 .fn-wrap { width:100%; max-width:1100px; }
 .fn-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
@@ -48,6 +58,7 @@
 
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="fn-wrap">
     <h2>{{ filing.tax_type }}{% if filing.jurisdiction %} — {{ filing.jurisdiction }}{% endif %}
         <span class="badge s-{{ filing.status|lower }}" style="font-size:14px;">{{ filing.status }}</span>
