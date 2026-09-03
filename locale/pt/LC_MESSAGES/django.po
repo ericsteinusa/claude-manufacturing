@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-03 03:54+0000\n"
+"POT-Creation-Date: 2026-09-03 04:00+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
@@ -793,7 +793,7 @@ msgstr "Total a Débito"
 #: manufacturing/templates/credit_account_detail.html:172
 #: manufacturing/templates/credit_account_list.html:80
 #: manufacturing/templates/credit_account_list.html:120
-#: manufacturing/templates/credit_application_detail.html:56
+#: manufacturing/templates/credit_application_detail.html:67
 #: manufacturing/templates/credit_application_list.html:80
 #: manufacturing/templates/credit_collections_detail.html:54
 #: manufacturing/templates/credit_collections_detail.html:109
@@ -1109,6 +1109,7 @@ msgstr "G/L"
 #: manufacturing/templates/ap_invoice_detail.html:54
 #: manufacturing/templates/ar_invoice_detail.html:54
 #: manufacturing/templates/blanket_po_detail.html:54
+#: manufacturing/templates/credit_application_detail.html:57
 #: manufacturing/templates/cs_returns_detail.html:56
 #: manufacturing/templates/eng_ecr_detail.html:48
 #: manufacturing/templates/eng_spec_detail.html:56
@@ -1405,8 +1406,8 @@ msgstr "N.º de Cheque, etc."
 #: manufacturing/templates/credit_account_detail.html:87
 #: manufacturing/templates/credit_account_detail.html:121
 #: manufacturing/templates/credit_account_list.html:136
-#: manufacturing/templates/credit_application_detail.html:81
-#: manufacturing/templates/credit_application_detail.html:105
+#: manufacturing/templates/credit_application_detail.html:92
+#: manufacturing/templates/credit_application_detail.html:116
 #: manufacturing/templates/credit_application_list.html:124
 #: manufacturing/templates/credit_collections_detail.html:83
 #: manufacturing/templates/credit_collections_detail.html:129
@@ -4187,26 +4188,26 @@ msgstr "Todos os clientes já possuem uma conta de crédito."
 msgid "Credit Application — %(name)s"
 msgstr "Solicitação de Crédito — %(name)s"
 
-#: manufacturing/templates/credit_application_detail.html:60
+#: manufacturing/templates/credit_application_detail.html:71
 #: manufacturing/templates/credit_application_list.html:116
 msgid "Applied Date"
 msgstr "Data da Solicitação"
 
-#: manufacturing/templates/credit_application_detail.html:64
+#: manufacturing/templates/credit_application_detail.html:75
 #: manufacturing/templates/credit_dashboard_kpis.html:66
 msgid "Requested Limit"
 msgstr "Limite Solicitado"
 
-#: manufacturing/templates/credit_application_detail.html:68
+#: manufacturing/templates/credit_application_detail.html:79
 msgid "Approved Limit"
 msgstr "Limite Aprovado"
 
-#: manufacturing/templates/credit_application_detail.html:72
+#: manufacturing/templates/credit_application_detail.html:83
 #: manufacturing/templates/credit_application_list.html:79
 msgid "Reviewed By"
 msgstr "Analisado Por"
 
-#: manufacturing/templates/credit_application_detail.html:76
+#: manufacturing/templates/credit_application_detail.html:87
 #: manufacturing/templates/eng_ecr_detail.html:76
 #: manufacturing/templates/eng_ecr_detail.html:106
 #: manufacturing/templates/eng_ecr_detail.html:157
@@ -4225,7 +4226,7 @@ msgstr "Analisado Por"
 msgid "Review Date"
 msgstr "Data da Análise"
 
-#: manufacturing/templates/credit_application_detail.html:90
+#: manufacturing/templates/credit_application_detail.html:101
 #, python-format
 msgid ""
 "This customer already has a credit account: <a href=\"/credit/accounts/"
@@ -4234,21 +4235,21 @@ msgstr ""
 "Este cliente já possui uma conta de crédito: <a href=\"/credit/accounts/"
 "%(id)s/\">ver conta</a> (limite atual $%(limit)s, status %(status)s)."
 
-#: manufacturing/templates/credit_application_detail.html:96
+#: manufacturing/templates/credit_application_detail.html:107
 msgid "Review Application"
 msgstr "Analisar Solicitação"
 
-#: manufacturing/templates/credit_application_detail.html:101
+#: manufacturing/templates/credit_application_detail.html:112
 msgid "Approved Limit ($)"
 msgstr "Limite Aprovado ($)"
 
-#: manufacturing/templates/credit_application_detail.html:109
+#: manufacturing/templates/credit_application_detail.html:120
 #: manufacturing/templates/po_approvals.html:58
 #: manufacturing/templates/req_detail.html:157
 msgid "Approve"
 msgstr "Aprovar"
 
-#: manufacturing/templates/credit_application_detail.html:110
+#: manufacturing/templates/credit_application_detail.html:121
 #: manufacturing/templates/req_detail.html:158
 msgid "Deny"
 msgstr "Negar"
