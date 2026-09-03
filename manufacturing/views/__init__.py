@@ -3751,6 +3751,14 @@ def bom_detail(request, product_id):
                 return redirect('bom_detail', product_id=product_id)
 
         lines = get_bom(conn, product_id)
+
+        if 'export' in request.GET:
+            return export_response(request, f'bom_{product_id}', [
+                ('component_name', 'Component'), ('item_type', 'Type'),
+                ('on_hand', 'On Hand'), ('qty_required', 'Qty / Unit'),
+                ('unit', 'Unit'), ('scrap_pct', 'Scrap %'), ('notes', 'Notes'),
+            ], lines)
+
         all_products = list_products(conn)
         used_ids = {line['component_id'] for line in lines} | {product_id}
         available_components = [p for p in all_products if p['id'] not in used_ids]
