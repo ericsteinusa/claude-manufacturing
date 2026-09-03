@@ -10,6 +10,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .btn-act, .no-print { display: none !important; }
+    body { background: white !important; }
+    .m-wrap { max-width: none; }
+}
 .m-wrap { width:100%; max-width:800px; }
 
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
@@ -35,6 +45,7 @@
 
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="m-wrap">
     <h2>{% if ecr %}{% blocktrans with num=ecr.ecr_number title=ecr.title %}ECR: {{ num }} — {{ title }}{% endblocktrans %}{% else %}{% trans "New ECR / Design Review" %}{% endif %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
@@ -47,7 +58,7 @@
             <span><strong>{% trans "Status:" %}</strong></span>
             <span class="badge st-{{ ecr.status }}">{{ ecr.status }}</span>
             {% if can_edit %}
-            <form method="post" style="display:inline;margin-left:12px;">
+            <form method="post" class="no-print" style="display:inline;margin-left:12px;">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="status">
                 <select name="new_status" onchange="this.form.submit()">
