@@ -8,6 +8,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .no-print { display: none !important; }
+    body { background: white !important; }
+    .lg-wrap { max-width: none; }
+}
 .lg-wrap { width:100%; max-width:900px; }
 .lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
@@ -35,6 +45,7 @@
 
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
 <div class="lg-wrap">
     <h2>{{ cinv.invoice_number }}
         <span class="badge s-{{ cinv.status }}">{{ cinv.status }}</span>
@@ -51,14 +62,14 @@
         </div>
 
         {% if cinv.status == 'draft' %}
-        <form method="post" action="/consultants/invoices/{{ cinv.id }}/submit/">
+        <form method="post" action="/consultants/invoices/{{ cinv.id }}/submit/" class="no-print">
             {% csrf_token %}
             <button type="submit" class="btn-submit">Submit for Approval</button>
         </form>
         {% endif %}
 
         {% if pending_step %}
-        <div class="alert alert-warning" style="margin-top:14px;">
+        <div class="alert alert-warning no-print" style="margin-top:14px;">
             Awaiting approval as <strong>{{ pending_step.approver_role }}</strong>.
             <form method="post" action="/consultants/invoices/{{ cinv.id }}/decide/" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
                 {% csrf_token %}
@@ -69,7 +80,7 @@
             </form>
         </div>
         {% elif cinv.status == 'submitted' %}
-        <div class="alert alert-warning" style="margin-top:14px;">
+        <div class="alert alert-warning no-print" style="margin-top:14px;">
             Submitted — no approval rule is configured for consultant invoices yet, so nothing is pending.
             Add an <a href="/approval-rules/new/">approval rule</a> for entity type <code>consultant_invoice</code>.
         </div>
