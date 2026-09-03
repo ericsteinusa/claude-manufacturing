@@ -11,6 +11,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .no-print { display: none !important; }
+    body { background: white !important; }
+    .lg-wrap { max-width: none; }
+}
 .lg-wrap { width:100%; max-width:900px; }
 .lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
@@ -43,6 +53,7 @@
 
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="lg-wrap">
     <h2>{{ contract.title }}</h2>
 
@@ -89,7 +100,7 @@
     </div>
 
     {% if can_edit %}
-    <div class="card">
+    <div class="card no-print">
         <h3>{% trans "Edit Contract" %}</h3>
         <form method="post">
             {% csrf_token %}
