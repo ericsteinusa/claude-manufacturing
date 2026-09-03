@@ -9,6 +9,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .btn-row, .no-print { display: none !important; }
+    body { background: white !important; }
+    .qa-wrap { max-width: none; }
+}
 .qa-wrap { width:100%; max-width:900px; }
 .qa-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:18px; }
@@ -41,13 +51,14 @@
 
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="qa-wrap">
     <h2>{% blocktrans with num=ncr.id title=ncr.title %}NCR #{{ num }} &mdash; {{ title }}{% endblocktrans %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     {% if ncr.status != 'Closed' and can_edit %}
-    <div class="card" style="border-color:#c62828;">
+    <div class="card no-print" style="border-color:#c62828;">
         <h3 style="color:#c62828;">{% trans "Close NCR" %}</h3>
         <p style="font-size:13px;color:#555;margin:0 0 12px;">
             {% trans "Closing marks this NCR resolved. This action cannot be undone from the web UI." %}</p>
