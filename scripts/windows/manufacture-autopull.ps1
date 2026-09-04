@@ -40,7 +40,16 @@ if ($local -eq $remote) {
     # tracked server process has died (crash, manual kill, reboot without
     # a logon-trigger firing yet), bring it back up on the code that's
     # already known-good rather than waiting for the next push to notice.
-    & (Join-Path $PSScriptRoot 'manufacture-run.ps1')
+    #
+    # No -Restart here: when the port is already listening this is a no-op,
+    # so it stays quiet on the common path and only logs when a genuine
+    # revival was attempted and failed.
+    $heartbeatOut = & (Join-Path $PSScriptRoot 'manufacture-run.ps1') 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Server was down and could NOT be restarted (exit $LASTEXITCODE)."
+        foreach ($line in $heartbeatOut) { Write-Log "    run.ps1: $line" }
+        exit 1
+    }
     exit 0
 }
 
@@ -65,7 +74,20 @@ if ($checkOk) {
 
 if ($checkOk -and $testOk) {
     Write-Log "Checks passed, restarting service"
-    & (Join-Path $PSScriptRoot 'manufacture-run.ps1') -Restart
+    # Log the OUTCOME, not just the intent. This message used to be the
+    # only record of a restart, written before the attempt and never
+    # reconciled against its result — so a run script that silently
+    # failed to stop the old process (permission boundary) produced a log
+    # full of apparent successes while the box served stale code for
+    # weeks. Capture the transcript too: the failure detail only exists
+    # in the run script's stdout.
+    $runOut = & (Join-Path $PSScriptRoot 'manufacture-run.ps1') -Restart 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Log "Restart OK -- now serving $remote"
+    } else {
+        Write-Log "Restart FAILED (exit $LASTEXITCODE) -- repo is at $remote but the server may still be serving older code."
+        foreach ($line in $runOut) { Write-Log "    run.ps1: $line" }
+    }
 } else {
     Write-Log "Checks FAILED after pull -- service NOT restarted, still running previous commit"
 }

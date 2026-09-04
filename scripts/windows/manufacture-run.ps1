@@ -39,13 +39,29 @@ function Stop-AllServerProcesses {
     # autoreloader can leave more than one process alive in a watcher/child
     # chain, and a targeted kill of just one of them can leave the rest
     # (and the listening socket) behind.
+    #
+    # Kill failures are reported, not swallowed: a Stop-Process that fails
+    # on a permission boundary (scheduled task running as a different or
+    # non-elevated user than the one that launched the server) used to
+    # vanish under -ErrorAction SilentlyContinue, after which the script
+    # cheerfully started a replacement that could never bind the port.
     Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" |
         Where-Object { $_.CommandLine -match 'manage\.py runserver' } |
         ForEach-Object {
-            Write-Host "Stopping PID $($_.ProcessId)"
-            Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+            # Capture the PID before the try: inside catch, $_ is rebound to
+            # the ErrorRecord, so $_.ProcessId would be null there.
+            $procId = $_.ProcessId
+            Write-Host "Stopping PID $procId"
+            try {
+                Stop-Process -Id $procId -Force -ErrorAction Stop
+            } catch {
+                Write-Host "  FAILED to stop PID ${procId}: $($_.Exception.Message)"
+                $script:stopFailures++
+            }
         }
 }
+
+$stopFailures = 0
 
 $listening = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
 
@@ -57,7 +73,29 @@ if ($listening -and -not $Restart) {
 if ($listening -or $Restart) {
     Write-Host "Stopping existing server..."
     Stop-AllServerProcesses
-    Start-Sleep -Seconds 2
+
+    # Wait for the socket to actually clear rather than assuming a fixed
+    # sleep was long enough. Starting while the old process still holds
+    # the port produces a replacement that dies instantly on a bind
+    # error — invisible unless someone reads manufacture-server.log.err.
+    $freed = $false
+    foreach ($i in 1..10) {
+        Start-Sleep -Milliseconds 500
+        if (-not (Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)) {
+            $freed = $true
+            break
+        }
+    }
+
+    if (-not $freed) {
+        Write-Host "ERROR: port $Port is still held after stopping (kill failures: $stopFailures)."
+        Write-Host "       Refusing to start a second server that cannot bind."
+        if ($stopFailures -gt 0) {
+            Write-Host "       Hint: the owning process belongs to another user — run this elevated,"
+            Write-Host "       or set the scheduled task to run as the same account with highest privileges."
+        }
+        exit 1
+    }
 }
 
 Write-Host "Starting server: $VenvPy manage.py runserver 0.0.0.0:$Port"
@@ -68,4 +106,23 @@ Start-Process -FilePath $VenvPy `
     -RedirectStandardError "$LogFile.err" `
     -WindowStyle Hidden
 
-Write-Host "Started. Logs: $LogFile"
+# Confirm it came up instead of reporting success unconditionally. A
+# runserver that dies on startup (bad .env, DB auth failure, port still
+# held) otherwise leaves this script exiting 0 while nothing is serving.
+$up = $false
+foreach ($i in 1..20) {
+    Start-Sleep -Milliseconds 500
+    if (Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue) {
+        $up = $true
+        break
+    }
+}
+
+if (-not $up) {
+    Write-Host "ERROR: server did not come up on port $Port within 10s."
+    Write-Host "       Last lines of ${LogFile}.err:"
+    if (Test-Path "$LogFile.err") { Get-Content "$LogFile.err" -Tail 15 | ForEach-Object { "         $_" } }
+    exit 1
+}
+
+Write-Host "Started and listening on port $Port. Logs: $LogFile"
