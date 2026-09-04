@@ -53,7 +53,7 @@
                     <td class="num">{{ so.item_count }}</td>
                     <td class="num">${{ so.total|floatformat:2 }}</td>
                     <td>
-                        <span class="pill" style="background:{{ so.status_color }}20;color:{{ so.status_color }};border-color:{{ so.status_color }}40;">
+                        <span class="pill pill-{{ so.status }}">
                             {{ so.status|capfirst }}
                         </span>
                     </td>

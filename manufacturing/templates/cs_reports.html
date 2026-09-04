@@ -43,7 +43,7 @@
 
     <!-- Period picker -->
     <div class="period-row">
-        <span style="color:#aad;font-size:13px;">{% trans "Period:" %}</span>
+        <span style="color:var(--text-muted);font-size:13px;">{% trans "Period:" %}</span>
         <a href="?days=90" {% if days == 90 %}class="active"{% endif %}>{% trans "90 days" %}</a>
         <a href="?days=180" {% if days == 180 %}class="active"{% endif %}>{% trans "6 months" %}</a>
         <a href="?days=365" {% if days == 365 %}class="active"{% endif %}>{% trans "1 year" %}</a>

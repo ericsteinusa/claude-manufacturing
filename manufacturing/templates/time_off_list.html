@@ -47,7 +47,7 @@
                     <td>{{ r.request_type }}</td>
                     <td>{{ r.request_date|default:"" }}</td>
                     <td>
-                        <span class="pill" style="background:{{ r.status_color }}20;color:{{ r.status_color }};border-color:{{ r.status_color }}40;font-size:11px;padding:2px 8px;">
+                        <span class="pill pill-{{ r.status }}" style="font-size:11px;padding:2px 8px;">
                             {{ r.status }}
                         </span>
                     </td>

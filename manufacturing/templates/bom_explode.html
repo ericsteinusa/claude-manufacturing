@@ -12,7 +12,7 @@
 .explode-wrap h2 { color: var(--text); font-size: 20px; margin-bottom: 4px; }
 .explode-wrap p.sub { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
 .qty-form { display: flex; gap: 8px; align-items: center; margin-bottom: 18px; }
-.qty-form label { color: white; font-size: 13px; }
+.qty-form label { color:var(--text); font-size: 13px; }
 .qty-form input { padding: 4px 8px; border: 1.5px solid var(--border); border-radius: 4px;
     font-size: 13px; width: 80px; }
 .explode-table { width: 100%; border-collapse: collapse; background: white;
@@ -37,8 +37,8 @@
 <div class="explode-wrap">
     <h2>Exploded BOM: {{ product.name }}</h2>
     <p class="sub">All components needed at every level to build
-        <strong style="color:white;">{{ qty|floatformat:"g" }} {{ product.uom }}</strong>
-        of <strong style="color:white;">{{ product.name }}</strong>.</p>
+        <strong style="color:var(--text);">{{ qty|floatformat:"g" }} {{ product.uom }}</strong>
+        of <strong style="color:var(--text);">{{ product.name }}</strong>.</p>
 
     <!-- Qty selector -->
     <form method="get" class="qty-form">

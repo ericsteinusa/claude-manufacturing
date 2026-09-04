@@ -46,10 +46,10 @@
 
     <form method="get" class="filter-bar">
         <input type="date" name="date_from" value="{{ date_from }}">
-        <span style="color:white;">{% trans "to" %}</span>
+        <span style="color:var(--text);">{% trans "to" %}</span>
         <input type="date" name="date_to" value="{{ date_to }}">
         <button type="submit">{% trans "Apply" %}</button>
-        <a href="/time-clock/ot/" style="color:white;font-size:13px;margin-left:4px;">{% trans "Reset" %}</a>
+        <a href="/time-clock/ot/" style="color:var(--accent);font-size:13px;margin-left:4px;">{% trans "Reset" %}</a>
     </form>
 
     <div class="tabs">
