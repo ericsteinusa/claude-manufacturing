@@ -15,7 +15,7 @@
 .ess-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
 .tile-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:20px; }
 .tile { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
-.tile label { display:block; font-size:11px; color:#888; font-weight:bold; text-transform:uppercase; margin-bottom:6px; }
+.tile label { display:block; font-size:11px; color:var(--text-muted); font-weight:bold; text-transform:uppercase; margin-bottom:6px; }
 .tile .big { font-size:22px; font-weight:bold; color:#222; }
 .tile a { color:var(--accent); font-size:12px; font-weight:bold; text-decoration:none; }
 .tile a:hover { text-decoration:underline; }
@@ -34,7 +34,7 @@
         <div class="tile">
             <label>Vacation Balance ({{ balance.year }})</label>
             <div class="big">{{ balance.remaining_days|floatformat:1 }} days left</div>
-            <div style="font-size:12px;color:#888;margin-top:2px;">
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
                 {{ balance.used_days|floatformat:1 }} of {{ balance.allotted_days|floatformat:1 }} used
             </div>
             <a href="/ess/time-off/">View / Request Time Off &rarr;</a>
@@ -43,11 +43,11 @@
             <label>Latest Pay Stub</label>
             {% if latest_stub %}
             <div class="big">${{ latest_stub.net_pay|floatformat:2 }}</div>
-            <div style="font-size:12px;color:#888;margin-top:2px;">
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
                 {{ latest_stub.pay_period_start }} to {{ latest_stub.pay_period_end }}
             </div>
             {% else %}
-            <div class="big" style="font-size:14px;color:#888;">No pay stubs yet</div>
+            <div class="big" style="font-size:14px;color:var(--text-muted);">No pay stubs yet</div>
             {% endif %}
             <a href="/ess/pay-stubs/">View Pay Stubs &rarr;</a>
         </div>

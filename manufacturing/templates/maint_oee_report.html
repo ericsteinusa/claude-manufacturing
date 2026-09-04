@@ -20,7 +20,7 @@
     padding:20px; text-align:center; }
 .oee-kpi .num { font-size:36px; font-weight:bold; }
 .oee-kpi .lbl { font-size:12px; color:var(--text-muted); margin-top:6px; }
-.oee-kpi .sub { font-size:11px; color:#888; margin-top:2px; }
+.oee-kpi .sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
 .oee-kpi.green .num { color:#2e7d32; }
 .oee-kpi.amber .num { color:#e65100; }
 .oee-kpi.red .num { color:#c62828; }
@@ -59,7 +59,7 @@
         <form method="get" action="/maint/oee/" class="date-form" style="margin-left:8px;">
             <input type="hidden" name="period" value="custom">
             <input type="date" name="date_from" value="{{ date_from }}" required>
-            <span style="font-size:13px;color:#888;">{% trans "to" %}</span>
+            <span style="font-size:13px;color:var(--text-muted);">{% trans "to" %}</span>
             <input type="date" name="date_to" value="{{ date_to }}" required>
             <button type="submit">{% trans "Go" %}</button>
         </form>
@@ -155,17 +155,17 @@
             <div>
                 <strong style="color:#1d6fe8;">{% trans "Availability" %}</strong><br>
                 {% trans "(Scheduled Hours − Downtime) ÷ Scheduled Hours" %}<br>
-                <span style="color:#888;font-size:12px;">{% trans "Scheduled hours = workcenter capacity × calendar days. Downtime pulled from the downtime log by equipment name match." %}</span>
+                <span style="color:var(--text-muted);font-size:12px;">{% trans "Scheduled hours = workcenter capacity × calendar days. Downtime pulled from the downtime log by equipment name match." %}</span>
             </div>
             <div>
                 <strong style="color:#7c3aed;">{% trans "Performance" %}</strong><br>
                 {% trans "Standard Hours ÷ Actual Hours" %}<br>
-                <span style="color:#888;font-size:12px;">{% trans "From completed work order routing operations at each workcenter. Standard hours are set in the routing; actual hours are recorded at completion." %}</span>
+                <span style="color:var(--text-muted);font-size:12px;">{% trans "From completed work order routing operations at each workcenter. Standard hours are set in the routing; actual hours are recorded at completion." %}</span>
             </div>
             <div>
                 <strong style="color:#059669;">{% trans "Quality" %}</strong><br>
                 {% trans "(Total Qty − Scrap) ÷ Total Qty" %}<br>
-                <span style="color:#888;font-size:12px;">{% trans "Total quantity from work orders routed through this workcenter; scrap quantity recorded per routing step at completion." %}</span>
+                <span style="color:var(--text-muted);font-size:12px;">{% trans "Total quantity from work orders routed through this workcenter; scrap quantity recorded per routing step at completion." %}</span>
             </div>
         </div>
     </div>

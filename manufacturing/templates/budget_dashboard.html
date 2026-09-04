@@ -96,7 +96,7 @@
                 <td>${{ b.total_budgeted|floatformat:0 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;">No budgets found.</td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);">No budgets found.</td></tr>
             {% endfor %}
             </tbody>
         </table>

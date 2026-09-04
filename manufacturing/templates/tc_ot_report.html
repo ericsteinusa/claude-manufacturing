@@ -97,7 +97,7 @@
                 <td>{% if d.ot_hours > 0 %}<span class="ot-flag">{{ d.ot_hours_fmt }}</span>{% else %}—{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No entries for this period." %}</td></tr>
+            <tr><td colspan="3" style="color:var(--text-muted);text-align:center;">{% trans "No entries for this period." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -124,7 +124,7 @@
                 <td>{% if r.ot_hours > 0 %}<span class="ot-flag">{{ r.ot_hours_fmt }}</span>{% else %}—{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;text-align:center;">{% trans "No time entries for this period." %}</td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);text-align:center;">{% trans "No time entries for this period." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

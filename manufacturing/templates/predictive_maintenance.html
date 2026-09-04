@@ -61,7 +61,7 @@
         <tr>
             <td><strong>{{ row.equipment }}</strong></td>
             <td class="num">{{ row.failure_count }}</td>
-            <td class="num">{% if row.mtbf_days %}{{ row.mtbf_days }}{% else %}<span style="color:#999;">insufficient data</span>{% endif %}</td>
+            <td class="num">{% if row.mtbf_days %}{{ row.mtbf_days }}{% else %}<span style="color:var(--text-muted);">insufficient data</span>{% endif %}</td>
             <td>{{ row.last_failure_date|default:"—" }}</td>
             <td class="num">
                 {% if row.days_since_last_failure is not None %}
@@ -75,7 +75,7 @@
             <td>
                 {% for s in row.sensor_statuses %}
                 <span class="pill-sensor {{ s }}">{{ s }}</span>
-                {% empty %}<span style="color:#999;">—</span>{% endfor %}
+                {% empty %}<span style="color:var(--text-muted);">—</span>{% endfor %}
             </td>
         </tr>
         {% empty %}

@@ -27,7 +27,7 @@
 .badge-make { background: #d0e8ff; border-color: #3070c0; color: #1a4080; }
 .badge-buy  { background: #e8e8e8; border-color: #888; color: #444; }
 .depth-indent { display: inline-block; }
-.level-label { font-size: 10px; color: #999; font-weight: normal; margin-left: 4px; }
+.level-label { font-size: 10px; color: var(--text-muted); font-weight: normal; margin-left: 4px; }
 .empty-note { color: var(--text-muted); font-size: 14px; margin-top: 20px; }
 .total-row td { font-weight: bold; background: #eef6ff; border-top: 2px solid #ccc; }
 {% endblock %}
@@ -67,7 +67,7 @@
                     <span class="depth-indent"
                           style="padding-left: {{ row.depth|add:row.depth|add:row.depth|add:row.depth }}px;">
                         {% if row.depth > 0 %}
-                        <span style="color:#aaa;">{% for i in row.depth|rjust:row.depth %}└─{% endfor %}</span>
+                        <span style="color:var(--text-muted);">{% for i in row.depth|rjust:row.depth %}└─{% endfor %}</span>
                         {% endif %}
                         <a href="/bom/{{ row.component_id }}/"
                            style="color:var(--accent);">{{ row.component_name }}</a>

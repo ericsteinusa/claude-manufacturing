@@ -173,7 +173,7 @@
                     <option value="{{ level }}" {% if report.access_level == level or level == 'private' and not report %}selected{% endif %}>{{ level|capfirst }}</option>
                     {% endfor %}
                 </select>
-                {% if not can_share %}<small style="color:#888;">{% trans "Only managers can share reports beyond Private." %}</small>{% endif %}
+                {% if not can_share %}<small style="color:var(--text-muted);">{% trans "Only managers can share reports beyond Private." %}</small>{% endif %}
             </div>
             <button type="submit" name="action" value="save" class="btn-submit">{% trans "Save Report" %}</button>
         </div>

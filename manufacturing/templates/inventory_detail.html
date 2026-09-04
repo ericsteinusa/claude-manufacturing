@@ -59,7 +59,7 @@
     margin-bottom: 10px;
 }
 .inv-barcode img { max-width: 260px; height: auto; }
-.inv-barcode small { font-size: 10px; color: #aaa; letter-spacing: 1px; }
+.inv-barcode small { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
 @media print {
     .save-btn, .txn-btn, .btn { display: none !important; }
     body { background: white !important; }
@@ -128,7 +128,7 @@
                 <input type="text" name="notes" placeholder="Notes">
                 <button type="submit" class="txn-btn">Record</button>
             </div>
-            <p style="color:#888;font-size:11px;margin-top:6px;">
+            <p style="color:var(--text-muted);font-size:11px;margin-top:6px;">
                 Receive / Return: adds to stock &nbsp;|&nbsp;
                 Issue: subtracts from stock &nbsp;|&nbsp;
                 Adjust: enter a positive or negative signed quantity
@@ -245,13 +245,13 @@
                     </td>
                     <td style="color:#555;">{{ t.reference|default:"—" }}</td>
                     <td style="color:#666;font-size:12px;">{{ t.notes|default:"" }}</td>
-                    <td style="color:#888;font-size:11px;">{{ t.created_by|default:"" }}</td>
+                    <td style="color:var(--text-muted);font-size:11px;">{{ t.created_by|default:"" }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <p style="color:#aaa;font-size:13px;">No transactions recorded yet.</p>
+        <p style="color:var(--text-muted);font-size:13px;">No transactions recorded yet.</p>
         {% endif %}
     </div>
 </div>

@@ -124,7 +124,7 @@ a.kpi:hover { border-color:var(--accent); }
                 <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;">{% trans "No work orders yet." %}</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);">{% trans "No work orders yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

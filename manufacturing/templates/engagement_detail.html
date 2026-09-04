@@ -41,7 +41,7 @@
 .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
 .alert-success { background:#d4edda; color:#0a3622; border:1px solid #c3e6cb; }
 .unbilled { color:#856404; }
-.billed { color:#888; }
+.billed { color:var(--text-muted); }
 {% endblock %}
 
 {% block body %}
@@ -94,7 +94,7 @@
                 <td>{% if t.invoice_id %}<span class="billed">Invoiced</span>{% else %}<span class="unbilled">Unbilled</span>{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No time entries yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No time entries yet.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -128,7 +128,7 @@
                 <td>{% if c.invoice_id %}<span class="billed">Invoiced</span>{% else %}<span class="unbilled">Unbilled</span>{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No charges yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No charges yet.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -165,7 +165,7 @@
                 <td><span class="badge s-{{ i.status }}">{{ i.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="3" style="color:#888;text-align:center;">No invoices cut yet.</td></tr>
+            <tr><td colspan="3" style="color:var(--text-muted);text-align:center;">No invoices cut yet.</td></tr>
             {% endfor %}
             </tbody>
         </table>

@@ -17,8 +17,9 @@
     padding: 8px 16px; margin-bottom: 14px; font-size: 13px; color: #856404; }
 .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
 .filter-row a { padding: 4px 14px; border: 1.5px solid var(--border); border-radius: 14px;
-    font-size: 12px; text-decoration: none; color: white; background: rgba(0,0,0,0.25); }
-.filter-row a.active, .filter-row a:hover { background: white; color: var(--accent); }
+    font-size: 12px; text-decoration: none; color: var(--text); background: var(--card-bg); }
+.filter-row a:hover { border-color: var(--accent); color: var(--accent); }
+.filter-row a.active { background: var(--accent); border-color: var(--accent); color: white; }
 .lot-table { width: 100%; border-collapse: collapse; background: white;
     border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
 .lot-table th, .lot-table td { padding: 8px 12px; text-align: left;

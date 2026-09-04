@@ -89,7 +89,7 @@
                     {% elif not c.is_active %}<span class="badge-inactive">Inactive</span>
                     {% endif %}
                 </td>
-                <td style="color:#888;font-size:12px;">{{ c.updated_at|default:"—" }}</td>
+                <td style="color:var(--text-muted);font-size:12px;">{{ c.updated_at|default:"—" }}</td>
                 {% if can_edit %}
                 <td>
                     <form method="post" style="display:inline;">
@@ -108,7 +108,7 @@
                 {% endif %}
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="text-align:center;color:#888;">No currencies configured.</td></tr>
+            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No currencies configured.</td></tr>
             {% endfor %}
             </tbody>
         </table>

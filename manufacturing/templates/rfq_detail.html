@@ -158,7 +158,7 @@
                                 {% else %}
                                 {% if cell and cell.quoted_price is not None %}
                                 <span {% if cell.is_lowest %}class="cell-lowest"{% endif %}>${{ cell.quoted_price|floatformat:2 }}</span>
-                                {% if cell.lead_time_days %}<span style="font-size:11px;color:#888;"> {% blocktrans with d=cell.lead_time_days %}{{ d }}d{% endblocktrans %}</span>{% endif %}
+                                {% if cell.lead_time_days %}<span style="font-size:11px;color:var(--text-muted);"> {% blocktrans with d=cell.lead_time_days %}{{ d }}d{% endblocktrans %}</span>{% endif %}
                                 {% else %}—{% endif %}
                                 {% endif %}
                             </td>

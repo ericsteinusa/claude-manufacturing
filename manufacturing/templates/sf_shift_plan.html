@@ -72,7 +72,7 @@
         {% for wc in plans %}
         <tr>
             <td>{{ wc.workcenter_name }}</td>
-            <td class="num">{% if wc.has_plan %}{{ wc.planned_qty|floatformat:0 }}{% else %}<span style="color:#999;">not set</span>{% endif %}</td>
+            <td class="num">{% if wc.has_plan %}{{ wc.planned_qty|floatformat:0 }}{% else %}<span style="color:var(--text-muted);">not set</span>{% endif %}</td>
             <td class="num">{{ wc.qty_produced|floatformat:0 }}</td>
             <td class="num">{{ wc.performance_pct }}%</td>
         </tr>

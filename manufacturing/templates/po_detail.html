@@ -104,7 +104,7 @@
                 <div><b>{% trans "Supplier:" %}</b> {{ po.company_name|default:"—" }}</div>
                 <div><b>{% trans "Total:" %}</b> {{ po.currency|default:"USD" }} {{ po.total|floatformat:2 }}
                     {% if currencies and po.currency and po.currency != base_currency %}
-                    <span style="font-size:12px;color:#888;">(≈ ${{ po.total_base|floatformat:2 }} {{ base_currency }})</span>
+                    <span style="font-size:12px;color:var(--text-muted);">(≈ ${{ po.total_base|floatformat:2 }} {{ base_currency }})</span>
                     {% endif %}
                 </div>
                 <div><b>{% trans "Order Date:" %}</b> {{ po.order_date|default:"—" }}</div>
@@ -247,7 +247,7 @@
                 </tbody>
             </table>
             {% else %}
-            <p style="color:#888;font-size:13px;">{% trans "No landed costs recorded yet." %}</p>
+            <p style="color:var(--text-muted);font-size:13px;">{% trans "No landed costs recorded yet." %}</p>
             {% endif %}
         </div>
 

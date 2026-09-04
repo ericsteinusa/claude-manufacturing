@@ -54,7 +54,7 @@ details.mech-wos table { margin-top:8px; }
         <form method="get" action="/maint/reports/labor/" class="date-form" style="margin-left:8px;">
             <input type="hidden" name="period" value="custom">
             <input type="date" name="date_from" value="{{ date_from }}" required>
-            <span style="font-size:13px;color:#888;">{% trans "to" %}</span>
+            <span style="font-size:13px;color:var(--text-muted);">{% trans "to" %}</span>
             <input type="date" name="date_to" value="{{ date_to }}" required>
             <select name="status">
                 <option value="">{% trans "All Statuses" %}</option>

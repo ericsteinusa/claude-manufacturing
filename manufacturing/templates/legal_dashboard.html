@@ -158,7 +158,7 @@
                 <td><span class="badge st-{{ c.status|lower }}">{{ c.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;">{% trans "No contracts found." %}</td></tr>
+            <tr><td colspan="6" style="color:var(--text-muted);">{% trans "No contracts found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
