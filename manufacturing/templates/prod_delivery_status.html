@@ -78,7 +78,7 @@
                 <td>{{ s.notes|default:"—"|truncatechars:40 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;text-align:center;">{% trans "No shipments found." %}</td></tr>
+            <tr><td colspan="7" style="color:var(--text-muted);text-align:center;">{% trans "No shipments found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

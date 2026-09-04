@@ -17,7 +17,7 @@
 .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .detail-grid.three { grid-template-columns:1fr 1fr 1fr; }
 .detail-item { display:flex; flex-direction:column; gap:3px; }
-.detail-item .lbl { font-size:11px; font-weight:bold; color:#888; text-transform:uppercase; }
+.detail-item .lbl { font-size:11px; font-weight:bold; color:var(--text-muted); text-transform:uppercase; }
 .detail-item .val { font-size:14px; color:#222; }
 .badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
 .s-Planned      { background:#e2e3e5; color:#383d41; }
@@ -80,19 +80,19 @@
         </div>
         {% if project.description %}
         <div style="margin-bottom:12px;">
-            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Description" %}</span>
+            <span style="font-size:11px;font-weight:bold;color:var(--text-muted);text-transform:uppercase;">{% trans "Description" %}</span>
             <div style="font-size:14px;margin-top:4px;white-space:pre-wrap;">{{ project.description }}</div>
         </div>
         {% endif %}
         {% if project.findings %}
         <div>
-            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Findings" %}</span>
+            <span style="font-size:11px;font-weight:bold;color:var(--text-muted);text-transform:uppercase;">{% trans "Findings" %}</span>
             <div class="findings-box">{{ project.findings }}</div>
         </div>
         {% endif %}
         {% if project.notes %}
         <div style="margin-top:10px;">
-            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Notes" %}</span>
+            <span style="font-size:11px;font-weight:bold;color:var(--text-muted);text-transform:uppercase;">{% trans "Notes" %}</span>
             <div style="font-size:14px;margin-top:4px;">{{ project.notes }}</div>
         </div>
         {% endif %}

@@ -104,7 +104,7 @@
                 <div><b>Customer:</b> {{ so.customer_name }}</div>
                 <div><b>Total:</b> {{ so.currency|default:"USD" }} {{ so.total|floatformat:2 }}
                     {% if currencies and so.currency and so.currency != base_currency %}
-                    <span style="font-size:12px;color:#888;">(≈ ${{ so.total_base|floatformat:2 }} {{ base_currency }})</span>
+                    <span style="font-size:12px;color:var(--text-muted);">(≈ ${{ so.total_base|floatformat:2 }} {{ base_currency }})</span>
                     {% endif %}
                 </div>
                 <div><b>Order Date:</b> {{ so.order_date|default:"—" }}</div>

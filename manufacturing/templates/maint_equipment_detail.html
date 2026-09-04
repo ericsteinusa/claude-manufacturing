@@ -33,7 +33,7 @@
     display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
 }
 .eq-barcode img { max-width:260px; height:auto; }
-.eq-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+.eq-barcode small { font-size:10px; color:var(--text-muted); letter-spacing:1px; }
 @media print {
     .btn, .save-btn, form { display:none !important; }
     body { background:white !important; }
@@ -153,7 +153,7 @@
     <div class="card">
         <h3>{% trans "Sub-Equipment" %}</h3>
         {% for c in children %}
-        <div><a href="/maint/equipment/{{ c.id }}/">{{ c.name }}</a> <span style="color:#777;font-size:12px;">{{ c.status }}</span></div>
+        <div><a href="/maint/equipment/{{ c.id }}/">{{ c.name }}</a> <span style="color:var(--text-muted);font-size:12px;">{{ c.status }}</span></div>
         {% endfor %}
     </div>
     {% endif %}
@@ -162,7 +162,7 @@
     <div class="card">
         <h3>{% trans "Spare Parts On File For This Equipment" %}</h3>
         {% for p in parts %}
-        <div><a href="/maint/parts/{{ p.id }}/">{{ p.name }}</a> <span style="color:#777;font-size:12px;">{% blocktrans with qty=p.quantity %}qty {{ qty }}{% endblocktrans %}</span></div>
+        <div><a href="/maint/parts/{{ p.id }}/">{{ p.name }}</a> <span style="color:var(--text-muted);font-size:12px;">{% blocktrans with qty=p.quantity %}qty {{ qty }}{% endblocktrans %}</span></div>
         {% endfor %}
     </div>
     {% endif %}

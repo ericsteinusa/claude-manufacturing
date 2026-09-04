@@ -43,12 +43,12 @@
 .st-received,.st-complete,.st-closed { background:#e8eaf6; color:#303f9f; }
 .st-rejected,.st-cancelled { background:#fce8e8; color:#c62828; }
 .st-partial { background:#fff3e0; color:#e65100; }
-.empty-note { color:#888; font-size:13px; }
+.empty-note { color:var(--text-muted); font-size:13px; }
 .con-barcode {
     display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
 }
 .con-barcode img { max-width:260px; height:auto; }
-.con-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+.con-barcode small { font-size:10px; color:var(--text-muted); letter-spacing:1px; }
 @media print {
     .btn, .save-btn, form { display:none !important; }
     body { background:white !important; }

@@ -29,7 +29,7 @@
 .cell-ok   { background: #e8f5e9; color: #1a6b1a; }
 .cell-warn { background: #fff3cd; color: #856404; }
 .cell-over { background: #f8d7da; color: #721c24; font-weight: bold; }
-.cell-off  { background: #f5f5f5; color: #aaa; }
+.cell-off  { background: #f5f5f5; color: var(--text-muted); }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
 .badge-over { background: #f8d7da; color: #721c24; }
 .badge-ok   { background: #e8f5e9; color: #1a6b1a; }
@@ -79,7 +79,7 @@
                     <td class="num">{{ b.over_capacity_days }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" style="text-align:center;color:#888;">No active work centers.</td></tr>
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No active work centers.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -111,7 +111,7 @@
                     {% endfor %}
                 </tr>
                 {% empty %}
-                <tr><td style="text-align:center;color:#888;">No active work centers.</td></tr>
+                <tr><td style="text-align:center;color:var(--text-muted);">No active work centers.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -144,7 +144,7 @@
                         {% if s.delay_to_date %}
                         Delay to {{ s.delay_to_date }} ({{ s.delay_days }} day{{ s.delay_days|pluralize }})
                         {% else %}
-                        <span style="color:#888;">no slack found nearby</span>
+                        <span style="color:var(--text-muted);">no slack found nearby</span>
                         {% endif %}
                     </td>
                     <td>

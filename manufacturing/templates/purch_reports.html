@@ -77,7 +77,7 @@
                     <td style="text-align:right;">${{ s.total_value|floatformat:2 }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No data." %}</td></tr>
+                <tr><td colspan="3" style="color:var(--text-muted);text-align:center;">{% trans "No data." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -106,7 +106,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No recent POs." %}</td></tr>
+                <tr><td colspan="3" style="color:var(--text-muted);text-align:center;">{% trans "No recent POs." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -133,7 +133,7 @@
                 <td style="color:#b8860b;font-weight:bold;">{{ c.end_date }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;text-align:center;">{% trans "No contracts expiring within 90 days." %}</td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);text-align:center;">{% trans "No contracts expiring within 90 days." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

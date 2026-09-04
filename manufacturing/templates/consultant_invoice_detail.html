@@ -101,7 +101,7 @@
                 <td class="metric">${{ t.cost|floatformat:2 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No time entries on this invoice.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No time entries on this invoice.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -120,7 +120,7 @@
                 <td class="metric">${{ c.amount|floatformat:2 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;text-align:center;">No charges on this invoice.</td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);text-align:center;">No charges on this invoice.</td></tr>
             {% endfor %}
             </tbody>
             <tfoot>
@@ -144,7 +144,7 @@
                 <td>{{ s.signature_meaning|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">Not yet submitted.</td></tr>
+            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">Not yet submitted.</td></tr>
             {% endfor %}
             </tbody>
         </table>

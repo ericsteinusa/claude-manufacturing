@@ -48,9 +48,9 @@
                     <td>{{ a.product_name }}</td>
                     <td class="num">${{ a.unit_cost|floatformat:2 }}</td>
                     <td class="num">{{ a.on_hand_qty|floatformat:2 }}
-                        <span style="color:#888;">(${{ a.on_hand_value|floatformat:2 }})</span></td>
+                        <span style="color:var(--text-muted);">(${{ a.on_hand_value|floatformat:2 }})</span></td>
                     <td class="num">{{ a.used_qty|floatformat:2 }}
-                        <span style="color:#888;">(${{ a.used_value|floatformat:2 }})</span></td>
+                        <span style="color:var(--text-muted);">(${{ a.used_value|floatformat:2 }})</span></td>
                     <td><span class="pill">{{ a.status|capfirst }}</span></td>
                 </tr>
                 {% endfor %}

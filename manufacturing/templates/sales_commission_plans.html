@@ -84,7 +84,7 @@
                 {% endif %}
             </tr>
             {% empty %}
-            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;">{% trans "No commission plans defined." %}</td></tr>
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:var(--text-muted);text-align:center;">{% trans "No commission plans defined." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

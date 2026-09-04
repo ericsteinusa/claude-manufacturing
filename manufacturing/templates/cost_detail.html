@@ -53,7 +53,7 @@
     {% if current_cost %}
     <div class="card">
         <h3>Current Standard Cost
-            <small style="font-weight:normal;color:#888;font-size:12px;">
+            <small style="font-weight:normal;color:var(--text-muted);font-size:12px;">
                 — rolled {{ current_cost.rolled_at|default:'' }}
             </small>
         </h3>
@@ -78,7 +78,7 @@
     </div>
     {% else %}
     <div class="card">
-        <p style="color:#888;text-align:center;padding:20px;">No standard cost on record yet.</p>
+        <p style="color:var(--text-muted);text-align:center;padding:20px;">No standard cost on record yet.</p>
     </div>
     {% endif %}
 

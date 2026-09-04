@@ -94,7 +94,7 @@
                 <td><span class="badge s-{{ s.status }}">{{ s.status|title }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No shipments found." %}</td></tr>
+            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">{% trans "No shipments found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

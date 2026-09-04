@@ -123,7 +123,7 @@
                 <td>{{ r.owner|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;">No risks recorded yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);">No risks recorded yet.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -145,7 +145,7 @@
                 <td>{{ a.owner|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;">No assessments recorded yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);">No assessments recorded yet.</td></tr>
             {% endfor %}
             </tbody>
         </table>

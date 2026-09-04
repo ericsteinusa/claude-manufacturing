@@ -68,7 +68,7 @@
     {% if current_carbon %}
     <div class="card">
         <h3>Current Carbon Footprint
-            <small style="font-weight:normal;color:#888;font-size:12px;">
+            <small style="font-weight:normal;color:var(--text-muted);font-size:12px;">
                 — rolled {{ current_carbon.effective_date|default:'' }}
             </small>
         </h3>
@@ -89,7 +89,7 @@
     </div>
     {% else %}
     <div class="card">
-        <p style="color:#888;text-align:center;padding:20px;">No carbon footprint on record yet.</p>
+        <p style="color:var(--text-muted);text-align:center;padding:20px;">No carbon footprint on record yet.</p>
     </div>
     {% endif %}
 

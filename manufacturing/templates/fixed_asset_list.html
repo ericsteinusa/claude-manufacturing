@@ -15,7 +15,7 @@
 .kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
 .kpi .lbl { font-size:11px; color:#666; font-weight:bold; text-transform:uppercase; margin-bottom:4px; }
 .kpi .val { font-size:20px; font-weight:bold; color:var(--accent); }
-.kpi .sub { font-size:11px; color:#888; margin-top:2px; }
+.kpi .sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
 .card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
@@ -43,7 +43,7 @@
 .alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
 .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
 .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
-.depn { color:#888; font-size:12px; }
+.depn { color:var(--text-muted); font-size:12px; }
 {% endblock %}
 
 {% block body %}
@@ -95,7 +95,7 @@
                 {% endfor %}
             </select>
             <button type="submit" class="btn-search">Filter</button>
-            <a href="/assets/fixed/" style="font-size:13px;color:#888;">Clear</a>
+            <a href="/assets/fixed/" style="font-size:13px;color:var(--text-muted);">Clear</a>
         </div>
         </form>
         <table class="list-table">
@@ -130,7 +130,7 @@
                 <td style="color:#555;font-size:12px;">{{ a.in_service_date|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="10" style="text-align:center;color:#888;padding:20px;">No fixed assets found.</td></tr>
+            <tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:20px;">No fixed assets found.</td></tr>
             {% endfor %}
             </tbody>
         </table>

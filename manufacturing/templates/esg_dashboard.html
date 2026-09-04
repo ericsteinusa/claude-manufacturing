@@ -22,7 +22,7 @@
 .scope-3 { background: #faf3ea; border: 1px solid #e0c69c; }
 .scope-3 .value { color: #8f6a1a; }
 .scope-total { background: #333; border: 1px solid #333; }
-.scope-total .label { color: #ccc; }
+.scope-total .label { color: #ccc; }  /* light-on-dark — .scope-total is #333 */
 .scope-total .value { color: white; }
 .filter-row { display: flex; gap: 10px; align-items: end; margin-bottom: 14px; }
 .filter-row label { display: block; font-size: 12px; font-weight: bold; color: #555; margin-bottom: 3px; }
@@ -116,7 +116,7 @@
             </tbody>
         </table>
         {% else %}
-        <p style="color:#888;font-size:13px;">No production carbon data yet.</p>
+        <p style="color:var(--text-muted);font-size:13px;">No production carbon data yet.</p>
         {% endif %}
     </div>
 
@@ -160,7 +160,7 @@
             </tbody>
         </table>
         {% else %}
-        <p style="color:#888;font-size:13px;">No Scope 2 entries yet.</p>
+        <p style="color:var(--text-muted);font-size:13px;">No Scope 2 entries yet.</p>
         {% endif %}
     </div>
 
@@ -187,7 +187,7 @@
             </tbody>
         </table>
         {% else %}
-        <p style="color:#888;font-size:13px;">No active workcenters.</p>
+        <p style="color:var(--text-muted);font-size:13px;">No active workcenters.</p>
         {% endif %}
         {% endif %}
     </div>

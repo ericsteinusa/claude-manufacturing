@@ -46,7 +46,7 @@
     display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
 }
 .engp-barcode img { max-width:260px; height:auto; }
-.engp-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+.engp-barcode small { font-size:10px; color:var(--text-muted); letter-spacing:1px; }
 @media print {
     .btn, .btn-act, form { display:none !important; }
     body { background:white !important; }
@@ -143,7 +143,7 @@
                 {% endif %}
             </tr>
             {% empty %}
-            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;padding:12px;">{% trans "No tasks yet." %}</td></tr>
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:var(--text-muted);text-align:center;padding:12px;">{% trans "No tasks yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

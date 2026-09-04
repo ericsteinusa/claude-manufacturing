@@ -1777,10 +1777,35 @@ to two new languages, it didn't mark any new template.
   `getComputedStyle().backgroundColor` reports it as transparent (every
   gradient button looks white-on-white); and a translucent `rgba()`
   background must be alpha-blended over its ancestor before comparing.
-  Current state on `main`: zero elements below 2.0 contrast across 299
-  pages. ~377 muted greys (`#999`/`#aaa`, contrast 2.0–2.9) are
-  deliberate and were left alone — raising those to WCAG AA is a design
-  decision, not a bug fix.
+  *Muted text uses the `--text-muted` token, not ad-hoc hex greys.* Don't
+  write `color:#999` / `#888` / `#aaa` — use `var(--text-muted)`
+  (`#5a6a84`, 5.48:1 on white, WCAG AA). All four base templates define
+  it. 508 hardcoded greys were converted in one pass; note `#888` on white
+  is only 3.54:1, so it looks "fine" while failing AA.
+
+  Related dark-theme leftover, now gone but worth recognising: panels
+  built as `background: rgba(0,0,0,0.25)` with `border:
+  rgba(255,255,255,0.15)` were designed to overlay a *dark* page and
+  render as mid-grey boxes on the light one, dragging their text to ~2:1.
+  Three existed (`mrp_home.html`'s `.info-card`, `mrp_plan.html`'s
+  `.sum-card`, `lot_list.html`'s filter chips); all now use
+  `var(--card-bg)` / `var(--border)`. `base.html`'s `rgba(0,0,0,.45)`
+  mobile-sidebar scrim is *not* one of these — it's a genuine overlay.
+
+  Current state on `main`: zero elements below 2.0 contrast, and zero
+  muted-grey text below WCAG AA, across 299 pages. **~61 sub-AA items
+  remain and are deliberate** — semantic status colours (the amber/orange
+  `In Progress`, `Under Review` pills), `var(--accent)` itself at 4.24:1
+  on white (changing it is a rebrand, not a bug fix), and Swagger UI's own
+  CSS on `/api/docs/`. Measure with a size-aware threshold (AA allows 3:1
+  for text ≥24px, or ≥18.66px bold) — otherwise you over-report large KPI
+  numbers by ~36 items.
+
+  **When converting greys, check the *ancestor's* background, not just the
+  element's own.** A rule like `.scope-total .label { color:#ccc }` is
+  correct light-on-dark because `.scope-total` is `#333`; blindly swapping
+  it to `var(--text-muted)` makes it unreadable. This exact case was
+  caught by the audit in `esg_dashboard.html` and reverted.
 
 - **Print / export buttons on detail and list pages.** Document-type detail
   pages carry a `Print / Save PDF` button; list pages carry `Export CSV` /

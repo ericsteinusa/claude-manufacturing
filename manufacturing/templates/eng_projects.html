@@ -85,7 +85,7 @@
             <td>{{ p.done_count }}/{{ p.task_count }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="6" style="color:#888;text-align:center;padding:16px;">{% trans "No projects found." %}</td></tr>
+        <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">{% trans "No projects found." %}</td></tr>
         {% endfor %}
         </tbody>
     </table>

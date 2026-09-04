@@ -47,7 +47,7 @@
             <tr><th><strong>Net Pay</strong></th><td><strong>${{ ytd.net|floatformat:2 }}</strong></td></tr>
         </table>
         {% else %}
-        <p style="color:#888;">No payroll history for {{ year }}.</p>
+        <p style="color:var(--text-muted);">No payroll history for {{ year }}.</p>
         {% endif %}
     </div>
 </div>

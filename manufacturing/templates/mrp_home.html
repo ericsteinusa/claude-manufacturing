@@ -13,9 +13,9 @@
 .mrp-wrap { width: 100%; max-width: 1040px; }
 .mrp-wrap h2 { color: var(--text); font-size: 20px; margin-bottom: 4px; }
 .mrp-wrap p.sub { color: var(--text-muted); font-size: 13px; margin-bottom: 18px; }
-.info-card { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15);
+.info-card { background: var(--card-bg); border: 1px solid var(--border);
     border-radius: 6px; padding: 12px 18px; margin-bottom: 18px; color: var(--text-muted); font-size: 13px; }
-.info-card strong { color: white; }
+.info-card strong { color: var(--text); }
 .mrp-table { width: 100%; border-collapse: collapse; background: white;
     border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
 .mrp-table th, .mrp-table td { padding: 8px 12px; text-align: left;
@@ -29,7 +29,7 @@
 .badge-make { background: #d0e8ff; border-color: #3070c0; color: #1a4080; }
 .badge-buy  { background: #e8e8e8; border-color: #888; color: #444; }
 .need-high  { color: #c00; font-weight: bold; }
-.need-zero  { color: #aaa; }
+.need-zero  { color: var(--text-muted); }
 .run-btn { display: inline-block; padding: 10px 28px; background: var(--accent);
     color: white; border: none; border-radius: 6px; font-size: 15px;
     font-weight: bold; cursor: pointer; margin-top: 4px; }
@@ -47,7 +47,7 @@
         <strong>Demand source:</strong> Confirmed Sales Orders &nbsp;|&nbsp;
         <strong>Scheduled receipts:</strong> Open / In-Progress Work Orders &nbsp;|&nbsp;
         <strong>Safety stock:</strong> Reorder Point per product
-        <span style="color:rgba(255,255,255,.45);font-size:11px;margin-left:8px;">
+        <span style="color:var(--text-muted);font-size:11px;margin-left:8px;">
             (set on each product's inventory record)
         </span>
     </div>

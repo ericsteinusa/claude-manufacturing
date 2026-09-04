@@ -91,7 +91,7 @@
         <div class="progress-bar-wrap">
             <div class="progress-bar-fill" style="width:{% if attainment > 100 %}100{% else %}{{ attainment }}{% endif %}%;background:{% if attainment >= 100 %}#1a6b1a{% else %}var(--accent){% endif %};"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:4px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:4px;">
             <span>$0</span>
             <span>{% blocktrans with wt=forecast.weighted_value|floatformat:0 %}Weighted: ${{ wt }}{% endblocktrans %}</span>
         </div>
@@ -101,9 +101,9 @@
                 {% if variance >= 0 %}+{% endif %}${{ variance|floatformat:0 }}
             </span>
             {% if variance >= 0 %}
-            <span style="color:#888;font-size:12px;margin-left:8px;">{% trans "Above target" %}</span>
+            <span style="color:var(--text-muted);font-size:12px;margin-left:8px;">{% trans "Above target" %}</span>
             {% else %}
-            <span style="color:#888;font-size:12px;margin-left:8px;">{% trans "Below target" %}</span>
+            <span style="color:var(--text-muted);font-size:12px;margin-left:8px;">{% trans "Below target" %}</span>
             {% endif %}
         </div>
     </div>

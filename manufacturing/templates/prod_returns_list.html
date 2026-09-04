@@ -95,7 +95,7 @@
                 <td>{{ r.created_at|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No returns found." %}</td></tr>
+            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">{% trans "No returns found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

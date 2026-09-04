@@ -16,12 +16,12 @@
 .kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
 .kpi .lbl { font-size:11px; color:#666; font-weight:bold; text-transform:uppercase; margin-bottom:4px; }
 .kpi .val { font-size:20px; font-weight:bold; color:var(--accent); }
-.kpi .sub { font-size:11px; color:#888; margin-top:2px; }
+.kpi .sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
 .card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; border-bottom:1px solid #eee; padding-bottom:8px; }
 .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; }
 .detail-row { display:flex; flex-direction:column; gap:2px; }
-.detail-row label { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:.4px; }
+.detail-row label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; }
 .detail-row .dval { font-size:14px; color:#333; }
 .edit-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
@@ -98,13 +98,13 @@
     {% if asset.purchase_price %}
     <div class="card" style="padding:14px 20px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;">
-            <span style="color:#888;">Depreciation Progress</span>
+            <span style="color:var(--text-muted);">Depreciation Progress</span>
             <span><strong>${{ asset.book_value|floatformat:0 }}</strong> remaining of ${{ asset.purchase_price|floatformat:0 }}</span>
         </div>
         <div class="bar-track">
             <div class="bar-fill" style="width:{{ dep_pct }}%;"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:#aaa;">
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--text-muted);">
             <span>0%</span><span>{{ dep_pct }}% depreciated</span><span>100%</span>
         </div>
     </div>
@@ -177,13 +177,13 @@
                 <td style="color:#555;font-size:12px;">{{ e.changed_at }}</td>
                 <td class="evt-type">{{ e.event_type }}</td>
                 <td>{{ e.description|default:"—" }}</td>
-                <td style="color:#888;font-size:12px;">{{ e.changed_by|default:"—" }}</td>
+                <td style="color:var(--text-muted);font-size:12px;">{{ e.changed_by|default:"—" }}</td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <p style="color:#888;font-size:13px;margin:0;">No events logged.</p>
+        <p style="color:var(--text-muted);font-size:13px;margin:0;">No events logged.</p>
         {% endif %}
 
         <form method="post" action="" style="margin-top:14px;border-top:1px solid #eee;padding-top:14px;">

@@ -44,7 +44,7 @@
     display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
 }
 .cs-barcode img { max-width:260px; height:auto; }
-.cs-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+.cs-barcode small { font-size:10px; color:var(--text-muted); letter-spacing:1px; }
 @media print {
     .btn, .save-btn, .btn-close, form { display:none !important; }
     body { background:white !important; }
@@ -69,7 +69,7 @@
     <div class="status-bar">
         {% if ticket.status == 'completed' %}
         <span class="badge badge-closed">&#10003; {% trans "Closed" %}</span>
-        <span style="color:#aaa;font-size:13px;">
+        <span style="color:var(--text-muted);font-size:13px;">
             {% blocktrans with date=ticket.completion_date time=ticket.completion_time %}Completed {{ date }} {{ time }}{% endblocktrans %}</span>
         {% else %}
         <span class="badge badge-open">{% blocktrans count counter=ticket.days_open %}Open — {{ counter }} day old{% plural %}Open — {{ counter }} days old{% endblocktrans %}</span>

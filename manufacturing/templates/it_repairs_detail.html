@@ -19,7 +19,7 @@
 .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .detail-grid.three { grid-template-columns:1fr 1fr 1fr; }
 .detail-item { display:flex; flex-direction:column; gap:3px; }
-.detail-item .lbl { font-size:11px; font-weight:bold; color:#888; text-transform:uppercase; }
+.detail-item .lbl { font-size:11px; font-weight:bold; color:var(--text-muted); text-transform:uppercase; }
 .detail-item .val { font-size:14px; color:#222; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .form-grid.three { grid-template-columns:1fr 1fr 1fr; }
@@ -90,18 +90,18 @@
             </div>
         </div>
         <div style="margin-bottom:10px;">
-            <span style="font-size:12px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Problem Description" %}</span>
+            <span style="font-size:12px;font-weight:bold;color:var(--text-muted);text-transform:uppercase;">{% trans "Problem Description" %}</span>
             <div style="font-size:14px;color:#222;margin-top:4px;white-space:pre-wrap;">{{ repair.problem_description|default:"—" }}</div>
         </div>
         {% if repair.resolution %}
         <div>
-            <span style="font-size:12px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Resolution" %}</span>
+            <span style="font-size:12px;font-weight:bold;color:var(--text-muted);text-transform:uppercase;">{% trans "Resolution" %}</span>
             <div style="font-size:14px;color:#222;margin-top:4px;white-space:pre-wrap;">{{ repair.resolution }}</div>
         </div>
         {% endif %}
         {% if repair.notes %}
         <div style="margin-top:10px;">
-            <span style="font-size:12px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Notes" %}</span>
+            <span style="font-size:12px;font-weight:bold;color:var(--text-muted);text-transform:uppercase;">{% trans "Notes" %}</span>
             <div style="font-size:14px;color:#222;margin-top:4px;">{{ repair.notes }}</div>
         </div>
         {% endif %}

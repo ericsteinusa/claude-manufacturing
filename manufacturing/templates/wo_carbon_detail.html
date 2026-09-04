@@ -48,13 +48,13 @@
             <span class="info-label">Carbon Intensity</span>
             <span><strong>{{ carbon.carbon_per_unit_kg|floatformat:3 }} kg CO2e / unit</strong></span>
         </div>
-        <div style="margin-top:12px;font-size:12px;color:#888;">
+        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">
             Computed by {{ carbon.created_by|default:'-' }}
         </div>
     </div>
     {% else %}
     <div class="card">
-        <p style="color:#888;text-align:center;padding:20px;">No carbon record computed yet.</p>
+        <p style="color:var(--text-muted);text-align:center;padding:20px;">No carbon record computed yet.</p>
     </div>
     {% endif %}
 

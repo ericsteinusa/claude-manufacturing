@@ -59,7 +59,7 @@
     <div class="card">
         <div id="gantt-container"><svg id="gantt"></svg></div>
         {% if ops_count == 0 %}
-        <p style="color:#888;text-align:center;">{% trans "No scheduled operations in this window." %}</p>
+        <p style="color:var(--text-muted);text-align:center;">{% trans "No scheduled operations in this window." %}</p>
         {% endif %}
     </div>
 
@@ -79,7 +79,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td style="color:#888;">{% trans "No active workcenters." %}</td></tr>
+            <tr><td style="color:var(--text-muted);">{% trans "No active workcenters." %}</td></tr>
             {% endfor %}
         </table>
     </div>
