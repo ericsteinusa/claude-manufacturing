@@ -9,7 +9,7 @@
     scripts to this same folder.
 
 .NOTES
-    Re-running this script is safe — it replaces any existing tasks of
+    Re-running this script is safe - it replaces any existing tasks of
     the same name rather than duplicating them.
 #>
 
@@ -72,8 +72,8 @@ Register-ScheduledTask -TaskName 'ManufactureAutopull' `
 
 Write-Host ""
 Write-Host "Done. Two scheduled tasks registered:"
-Write-Host "  ManufactureServer   — starts the dev server at logon"
-Write-Host "  ManufactureAutopull — polls origin/main every 2 minutes"
+Write-Host "  ManufactureServer   - starts the dev server at logon"
+Write-Host "  ManufactureAutopull - polls origin/main every 2 minutes"
 Write-Host ""
 Write-Host "Check status with:  Get-ScheduledTask ManufactureServer, ManufactureAutopull"
 Write-Host "View logs at:       C:\tester\manufacture\manufacture-*.log"

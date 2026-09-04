@@ -4,7 +4,7 @@
 
     Windows equivalent of manufacture.service on the Linux box. "Already
     running" is determined by whether something is listening on the
-    configured port, not a tracked PID — a PID-file-based check was tried
+    configured port, not a tracked PID - a PID-file-based check was tried
     first and found unreliable in practice: Django's `runserver`
     autoreloader can replace its own process during normal operation
     (confirmed live), so the recorded PID periodically stopped matching
@@ -77,7 +77,15 @@ if ($listening -or $Restart) {
     # Wait for the socket to actually clear rather than assuming a fixed
     # sleep was long enough. Starting while the old process still holds
     # the port produces a replacement that dies instantly on a bind
-    # error — invisible unless someone reads manufacture-server.log.err.
+    # error - invisible unless someone reads manufacture-server.log.err.
+    #
+    # Keep this file ASCII-only. It is UTF-8 without a BOM, and Windows
+    # PowerShell 5.1 decodes such files as ANSI/cp1252 — so a UTF-8 em-dash
+    # (E2 80 94) arrives as three characters ending in 0x94, which cp1252
+    # maps to U+201D RIGHT DOUBLE QUOTATION MARK. PowerShell accepts smart
+    # quotes as string delimiters, so an em-dash inside a double-quoted
+    # string silently terminates it and the rest of the file parses as
+    # garbage. Comments survive it; executable strings do not.
     $freed = $false
     foreach ($i in 1..10) {
         Start-Sleep -Milliseconds 500
@@ -91,7 +99,7 @@ if ($listening -or $Restart) {
         Write-Host "ERROR: port $Port is still held after stopping (kill failures: $stopFailures)."
         Write-Host "       Refusing to start a second server that cannot bind."
         if ($stopFailures -gt 0) {
-            Write-Host "       Hint: the owning process belongs to another user — run this elevated,"
+            Write-Host "       Hint: the owning process belongs to another user - run this elevated,"
             Write-Host "       or set the scheduled task to run as the same account with highest privileges."
         }
         exit 1
