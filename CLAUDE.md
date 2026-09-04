@@ -1713,6 +1713,75 @@ to two new languages, it didn't mark any new template.
   fragment, and confirmed it appeared in the Payment History table — then deleted it and confirmed
   it was gone; also confirmed the fragment renders correctly in Portuguese and Dutch with an
   active session in each.
+- **Button and text colours (the light content area).** The app was
+  originally dark-themed; the content area is now light while the chrome
+  (`.app-header` / `.app-actions`) stayed dark. Colours written for the old
+  theme render white-on-white and are *invisible, not merely ugly* — a
+  button that is present, functional and unreadable reads to a user as
+  "the button isn't there" (PR #103 was reported as "can't find where to
+  assign a WO"). The conventions below are enforced in `base.html`:
+
+  *Buttons.* Bare `class="btn"` **is correct** in the content area — it is
+  the neutral/secondary button. This supersedes the older advice to always
+  reach for `btn-primary`, which was a per-page workaround from PR #103;
+  the root cause was fixed app-wide in PR #217. Use `btn-primary` for a
+  page's main action and `btn-danger` for destructive ones (prior art:
+  `blanket_po_detail.html`'s Cancel Blanket PO, `consignment_detail.html`'s
+  Cancel Agreement, `bom_detail.html`'s Remove). The dark-chrome treatment
+  is scoped with `:where(.app-header, .app-actions) .btn` — **the
+  `:where()` is load-bearing and must not be "simplified" to a plain
+  descendant selector**: `.app-actions .btn` (0,2,0) would out-specify
+  `.btn-primary` (0,1,0) and silently repaint all 44 toolbar `btn-primary`
+  buttons.
+
+  *The one remaining trap:* setting `background` inline on a `.btn`
+  **without also setting `color`**. The old styling supplied
+  `color: white` implicitly, so such buttons depended on it invisibly —
+  see `time_off_detail.html`'s Approve/Deny, which needed an explicit
+  `color:#fff` added when the default changed.
+
+  *Status pills.* Don't hand-roll pill colours. `base.html` defines a
+  `.pill-<status>` set grouped by meaning (info / success / warn / grey);
+  use `<span class="pill pill-{{ x.status }}">` and add a new status to the
+  appropriate existing group. The PO/SO/WO/time-off **list** pages used to
+  render `background:{{ status_color }}20; color:{{ status_color }}` — the
+  same colour as both a 12.5%-alpha background and the text, which reads on
+  a dark theme and is invisible on a light one (`draft` was mapped to
+  `#ffffff`). Fixed in PR #226. The `*_STATUS_COLORS` maps still exist and
+  still back the mobile API — don't delete them, just don't style web pills
+  from them.
+
+  *Table links vs. buttons.* `.erp-table a` / `.po-table a` / `.filter-bar
+  a:hover` set a link colour and are written `a:not(.btn)` on purpose: at
+  (0,1,1) they out-specify `.btn-primary` (0,1,0), so without the
+  `:not(.btn)` an `<a class="btn btn-primary">` inside a table renders
+  accent-on-accent (PR #225). Per-template `.list-table a { color: … }`
+  rules in `extra_styles` carry the same latent hazard.
+
+  *Never* use `color:white` / `#fff` / `#aad` / `#aef` for text in
+  `{% block body %}`, inline or in `extra_styles`. Use `var(--text)`,
+  `var(--text-muted)` or `var(--accent)`. White text is only correct inside
+  a container with its own dark background (e.g. `.chip { background:#334 }`
+  and its `.chip.active` companion — correct as-is, don't "fix" it).
+
+  *Verifying this is not a grep job.* The defect has appeared in five
+  different shapes — inline `color:white`, the same thing spelled `#aad`,
+  CSS rules in `extra_styles`, pale-grey placeholders, and data-driven pill
+  colours where no colour literal exists in the source at all. Measure
+  instead: render the pages via the Django test client, inject a script
+  that computes WCAG contrast for every element rendering its own text and
+  writes the result into `document.title`, then run `google-chrome
+  --headless --dump-dom` over the saved files (parallel with `xargs -P8`)
+  and parse it back. Two gotchas that will otherwise produce false
+  positives: a `linear-gradient` background is a `background-image`, so
+  `getComputedStyle().backgroundColor` reports it as transparent (every
+  gradient button looks white-on-white); and a translucent `rgba()`
+  background must be alpha-blended over its ancestor before comparing.
+  Current state on `main`: zero elements below 2.0 contrast across 299
+  pages. ~377 muted greys (`#999`/`#aaa`, contrast 2.0–2.9) are
+  deliberate and were left alone — raising those to WCAG AA is a design
+  decision, not a bug fix.
+
 - **Print / export buttons on detail and list pages.** Document-type detail
   pages carry a `Print / Save PDF` button; list pages carry `Export CSV` /
   `Export Excel` links. Both follow one established pattern each, and the
