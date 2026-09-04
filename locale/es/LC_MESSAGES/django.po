@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 16:59+0000\n"
+"POT-Creation-Date: 2026-09-04 17:10+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
@@ -669,7 +669,7 @@ msgstr "Asientos Contables Recientes"
 #: manufacturing/templates/maint_downtime_list.html:117
 #: manufacturing/templates/qa_inspection_detail.html:100
 #: manufacturing/templates/qa_inspection_list.html:81
-#: manufacturing/templates/req_detail.html:115
+#: manufacturing/templates/req_detail.html:126
 #: manufacturing/templates/sales_coaching.html:76
 #: manufacturing/templates/sales_commission_history.html:61
 #: manufacturing/templates/sales_quotes.html:67
@@ -747,7 +747,7 @@ msgstr "Referencia"
 #: manufacturing/templates/prod_schedule.html:67
 #: manufacturing/templates/prod_shipping_detail.html:151
 #: manufacturing/templates/qa_inspection_detail.html:194
-#: manufacturing/templates/req_detail.html:72
+#: manufacturing/templates/req_detail.html:83
 #: manufacturing/templates/rfq_detail.html:87
 #: manufacturing/templates/sales_commission_plans.html:62
 #: manufacturing/templates/sales_commission_plans.html:122
@@ -1124,6 +1124,7 @@ msgstr "L/M"
 #: manufacturing/templates/qa_capa_detail.html:52
 #: manufacturing/templates/qa_inspection_detail.html:77
 #: manufacturing/templates/qa_ncr_detail.html:54
+#: manufacturing/templates/req_detail.html:59
 #: manufacturing/templates/sales_contracts_detail.html:62
 msgid "Print / Save PDF"
 msgstr "Imprimir / Guardar PDF"
@@ -1535,7 +1536,7 @@ msgstr "N.° de cheque, etc."
 #: manufacturing/templates/qa_ncr_list.html:148
 #: manufacturing/templates/qa_supplier_detail.html:119
 #: manufacturing/templates/qa_supplier_list.html:140
-#: manufacturing/templates/req_detail.html:63
+#: manufacturing/templates/req_detail.html:74
 #: manufacturing/templates/req_list.html:119
 #: manufacturing/templates/rfq_list.html:33
 #: manufacturing/templates/sales_commission_history.html:62
@@ -1974,7 +1975,7 @@ msgstr "Nueva Etapa"
 #: manufacturing/templates/benefit_plan_detail.html:123
 #: manufacturing/templates/control_plan_detail.html:159
 #: manufacturing/templates/qa_ncr_list.html:131
-#: manufacturing/templates/req_detail.html:155
+#: manufacturing/templates/req_detail.html:166
 msgid "Optional"
 msgstr "Opcional"
 
@@ -2021,7 +2022,7 @@ msgstr "Fecha de Contratación *"
 #: manufacturing/templates/pers_depts.html:54
 #: manufacturing/templates/pers_depts.html:95
 #: manufacturing/templates/personnel_dashboard.html:122
-#: manufacturing/templates/req_detail.html:59
+#: manufacturing/templates/req_detail.html:70
 #: manufacturing/templates/req_list.html:81
 #: manufacturing/templates/tc_ot_report.html:113
 #: manufacturing/templates/termination_detail.html:40
@@ -3148,8 +3149,8 @@ msgstr "N.º de Liberación"
 #: manufacturing/templates/prod_schedule.html:69
 #: manufacturing/templates/prod_shipping_detail.html:153
 #: manufacturing/templates/prod_shipping_detail.html:180
-#: manufacturing/templates/req_detail.html:72
-#: manufacturing/templates/req_detail.html:98
+#: manufacturing/templates/req_detail.html:83
+#: manufacturing/templates/req_detail.html:109
 #: manufacturing/templates/rfq_detail.html:100
 #: manufacturing/templates/rfq_detail.html:123
 #: manufacturing/templates/sales_order_detail.html:122
@@ -4260,12 +4261,12 @@ msgstr "Límite aprobado ($)"
 
 #: manufacturing/templates/credit_application_detail.html:120
 #: manufacturing/templates/po_approvals.html:58
-#: manufacturing/templates/req_detail.html:157
+#: manufacturing/templates/req_detail.html:168
 msgid "Approve"
 msgstr "Aprobar"
 
 #: manufacturing/templates/credit_application_detail.html:121
-#: manufacturing/templates/req_detail.html:158
+#: manufacturing/templates/req_detail.html:169
 msgid "Deny"
 msgstr "Denegar"
 
@@ -6346,7 +6347,7 @@ msgstr "Ref. de Hallazgo"
 #: manufacturing/templates/it_ticket_list.html:141
 #: manufacturing/templates/prod_shipping_detail.html:173
 #: manufacturing/templates/qa_inspection_detail.html:240
-#: manufacturing/templates/req_detail.html:94
+#: manufacturing/templates/req_detail.html:105
 #: manufacturing/templates/sales_order_detail.html:168
 msgid "Description *"
 msgstr "Descripción *"
@@ -6565,7 +6566,7 @@ msgid "Del"
 msgstr "Elim."
 
 #: manufacturing/templates/finance_budget_detail.html:129
-#: manufacturing/templates/req_detail.html:83
+#: manufacturing/templates/req_detail.html:94
 #: manufacturing/templates/sales_order_detail.html:148
 msgid "No line items yet."
 msgstr "Aún no hay líneas."
@@ -7630,7 +7631,7 @@ msgstr "N.° de Ticket"
 #: manufacturing/templates/it_ticket_detail.html:141
 #: manufacturing/templates/it_ticket_list.html:64
 #: manufacturing/templates/it_ticket_list.html:109
-#: manufacturing/templates/req_detail.html:58
+#: manufacturing/templates/req_detail.html:69
 #: manufacturing/templates/req_list.html:81
 msgid "Requester"
 msgstr "Solicitante"
@@ -8346,7 +8347,7 @@ msgstr "p. ej. OSHA 29 CFR 1910"
 
 #: manufacturing/templates/legal_compliance_list.html:141
 #: manufacturing/templates/prod_shipping_detail.html:181
-#: manufacturing/templates/req_detail.html:106
+#: manufacturing/templates/req_detail.html:117
 #: manufacturing/templates/rfq_detail.html:108
 #: manufacturing/templates/sales_order_detail.html:183
 msgid "Add Item"
@@ -10995,7 +10996,7 @@ msgid "Receive"
 msgstr "Recibir"
 
 #: manufacturing/templates/po_detail.html:170
-#: manufacturing/templates/req_detail.html:72
+#: manufacturing/templates/req_detail.html:83
 #: manufacturing/templates/sales_order_detail.html:123
 msgid "Line Total"
 msgstr "Total de Línea"
@@ -12758,65 +12759,65 @@ msgstr[0] "artículo en o por debajo del punto de reorden"
 msgstr[1] "artículos en o por debajo del punto de reorden"
 
 #: manufacturing/templates/req_detail.html:3
-#: manufacturing/templates/req_detail.html:50
+#: manufacturing/templates/req_detail.html:61
 #, python-format
 msgid "Requisition %(num)s"
 msgstr "Requisición %(num)s"
 
-#: manufacturing/templates/req_detail.html:60
+#: manufacturing/templates/req_detail.html:71
 #: manufacturing/templates/req_list.html:115
 msgid "Needed By"
 msgstr "Necesario Antes De"
 
-#: manufacturing/templates/req_detail.html:61
+#: manufacturing/templates/req_detail.html:72
 #: manufacturing/templates/req_list.html:82
 msgid "Justification"
 msgstr "Justificación"
 
-#: manufacturing/templates/req_detail.html:69
+#: manufacturing/templates/req_detail.html:80
 #: manufacturing/templates/sales_order_detail.html:118
 msgid "Line Items"
 msgstr "Líneas"
 
-#: manufacturing/templates/req_detail.html:72
+#: manufacturing/templates/req_detail.html:83
 msgid "Est. Unit Price"
 msgstr "Precio Unit. Est."
 
-#: manufacturing/templates/req_detail.html:102
+#: manufacturing/templates/req_detail.html:113
 msgid "Est. Unit Price ($)"
 msgstr "Precio Unit. Est. ($)"
 
-#: manufacturing/templates/req_detail.html:112
+#: manufacturing/templates/req_detail.html:123
 msgid "Approval History"
 msgstr "Historial de Aprobación"
 
-#: manufacturing/templates/req_detail.html:115
+#: manufacturing/templates/req_detail.html:126
 msgid "Level"
 msgstr "Nivel"
 
-#: manufacturing/templates/req_detail.html:115
+#: manufacturing/templates/req_detail.html:126
 msgid "Approver"
 msgstr "Aprobador"
 
-#: manufacturing/templates/req_detail.html:115
+#: manufacturing/templates/req_detail.html:126
 msgid "Decision"
 msgstr "Decisión"
 
-#: manufacturing/templates/req_detail.html:115
-#: manufacturing/templates/req_detail.html:154
+#: manufacturing/templates/req_detail.html:126
+#: manufacturing/templates/req_detail.html:165
 msgid "Comment"
 msgstr "Comentario"
 
-#: manufacturing/templates/req_detail.html:127
+#: manufacturing/templates/req_detail.html:138
 msgid "No decisions recorded yet."
 msgstr "Aún no hay decisiones registradas."
 
-#: manufacturing/templates/req_detail.html:135
-#: manufacturing/templates/req_detail.html:142
+#: manufacturing/templates/req_detail.html:146
+#: manufacturing/templates/req_detail.html:153
 msgid "Submit for Approval"
 msgstr "Enviar para Aprobación"
 
-#: manufacturing/templates/req_detail.html:137
+#: manufacturing/templates/req_detail.html:148
 msgid ""
 "Once submitted, this requisition can no longer be edited and will be routed "
 "to your department manager for a decision."
@@ -12824,7 +12825,7 @@ msgstr ""
 "Una vez enviada, esta requisición ya no se puede editar y se enrutará a su "
 "gerente de departamento para una decisión."
 
-#: manufacturing/templates/req_detail.html:149
+#: manufacturing/templates/req_detail.html:160
 msgid "Decide"
 msgstr "Decidir"
 
