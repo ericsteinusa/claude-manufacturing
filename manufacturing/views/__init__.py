@@ -5566,6 +5566,14 @@ def gl_journals(request):
         date_to=date_to or None,
     )
     conn.close()
+
+    if 'export' in request.GET:
+        return export_response(request, 'gl_journals', [
+            ('journal_date', 'Date'), ('reference', 'Reference'), ('description', 'Description'),
+            ('line_count', 'Lines'), ('total_debit', 'Total Dr'),
+            ('posted', 'Posted'), ('created_by', 'Created By'),
+        ], journals)
+
     ctx = _acct_ctx(request,
         journals=journals,
         posted_param=posted_param,
@@ -7571,6 +7579,14 @@ def req_list(request):
             requester_id=actor['people_id'], status=status_f or None,
             search=search or None,
         )
+
+        if 'export' in request.GET:
+            return export_response(request, 'requisitions', [
+                ('req_number', 'Req #'), ('requester_name', 'Requester'),
+                ('dept_name', 'Department'), ('justification', 'Justification'),
+                ('needed_date', 'Needed'), ('est_total', 'Est. Total'), ('status', 'Status'),
+            ], rows)
+
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             try:
                 req_id = create_purchase_req(
@@ -8405,6 +8421,14 @@ def fin_tax_list(request):
     try:
         filings = list_tax_filings(conn, status=status_f or None,
                                    tax_type=type_f or None, search=search or None)
+
+        if 'export' in request.GET:
+            return export_response(request, 'tax_filings', [
+                ('tax_type', 'Tax Type'), ('jurisdiction', 'Jurisdiction'), ('period', 'Period'),
+                ('amount_due', 'Amount Due'), ('amount_paid', 'Amount Paid'),
+                ('due_date', 'Due Date'), ('filed_date', 'Filed Date'), ('status', 'Status'),
+            ], filings)
+
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             try:
                 create_tax_filing(

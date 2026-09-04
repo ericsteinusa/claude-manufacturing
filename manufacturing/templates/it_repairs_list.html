@@ -12,6 +12,8 @@
 <a href="/it/network/" class="btn">{% trans "Network" %}</a>
 <a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
 <a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="?export=1&status={{ status_filter|urlencode }}&priority={{ priority_filter|urlencode }}&search={{ search|urlencode }}" class="btn">⬇ {% trans "Export CSV" %}</a>
+<a href="?export=1&format=xlsx&status={{ status_filter|urlencode }}&priority={{ priority_filter|urlencode }}&search={{ search|urlencode }}" class="btn">⬇ {% trans "Export Excel" %}</a>
 <a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 

@@ -6,6 +6,8 @@
 <a href="/gl/" class="btn">{% trans "G/L Dashboard" %}</a>
 <a href="/gl/accounts/" class="btn">{% trans "Chart of Accounts" %}</a>
 {% if can_edit %}<a href="/gl/journals/new/" class="btn">{% trans "New Entry" %}</a>{% endif %}
+<a href="?export=1&posted={{ posted_param|urlencode }}&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">⬇ {% trans "Export CSV" %}</a>
+<a href="?export=1&format=xlsx&posted={{ posted_param|urlencode }}&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">⬇ {% trans "Export Excel" %}</a>
 <a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 

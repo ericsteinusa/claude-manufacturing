@@ -347,6 +347,14 @@ def legal_ip_list(request):
     conn = get_db_connection()
     try:
         rows = list_ip(conn, status=status_f or None, search=search or None)
+
+        if 'export' in request.GET:
+            return export_response(request, 'legal_ip', [
+                ('id', 'ID'), ('title', 'Title'), ('ip_type', 'Type'),
+                ('registration_no', 'Registration #'), ('jurisdiction', 'Jurisdiction'),
+                ('filed_date', 'Filed Date'), ('expiry_date', 'Expiry Date'), ('status', 'Status'),
+            ], rows)
+
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             try:
                 create_ip(
@@ -382,6 +390,14 @@ def legal_employment_list(request):
     conn = get_db_connection()
     try:
         rows = list_employment(conn, status=status_f or None, search=search or None)
+
+        if 'export' in request.GET:
+            return export_response(request, 'legal_employment', [
+                ('id', 'ID'), ('matter', 'Matter'), ('employee', 'Employee'),
+                ('matter_type', 'Type'), ('owner', 'Owner'), ('opened_date', 'Opened Date'),
+                ('closed_date', 'Closed Date'), ('status', 'Status'),
+            ], rows)
+
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             try:
                 create_employment(
@@ -417,6 +433,14 @@ def legal_governance_list(request):
     conn = get_db_connection()
     try:
         rows = list_governance(conn, status=status_f or None, search=search or None)
+
+        if 'export' in request.GET:
+            return export_response(request, 'legal_governance', [
+                ('id', 'ID'), ('item', 'Item'), ('category', 'Category'),
+                ('owner', 'Owner'), ('ref_date', 'Reference Date'),
+                ('reference', 'Reference'), ('status', 'Status'),
+            ], rows)
+
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             try:
                 create_governance(
