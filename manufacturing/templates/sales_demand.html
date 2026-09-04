@@ -44,7 +44,7 @@
     <h2>{% blocktrans with fy=fiscal_year %}Demand Forecast — {{ fy }}{% endblocktrans %}</h2>
 
     <form method="get" class="filter-bar">
-        <label style="color:white;font-size:13px;">{% trans "Fiscal Year:" %}</label>
+        <label style="color:var(--text);font-size:13px;">{% trans "Fiscal Year:" %}</label>
         <select name="fiscal_year">
             {% for y in years %}
             <option value="{{ y }}"{% if y == fiscal_year %} selected{% endif %}>{{ y }}</option>
@@ -160,10 +160,10 @@
             {% for row in product_rows %}
             <tr>
                 <td style="font-weight:bold;">{{ row.product }}</td>
-                <td style="text-align:right;">{% if row.Q1 %}<span style="color:var(--accent);">${{ row.Q1|floatformat:0 }}</span>{% else %}<span style="color:#ddd;">—</span>{% endif %}</td>
-                <td style="text-align:right;">{% if row.Q2 %}<span style="color:var(--accent);">${{ row.Q2|floatformat:0 }}</span>{% else %}<span style="color:#ddd;">—</span>{% endif %}</td>
-                <td style="text-align:right;">{% if row.Q3 %}<span style="color:var(--accent);">${{ row.Q3|floatformat:0 }}</span>{% else %}<span style="color:#ddd;">—</span>{% endif %}</td>
-                <td style="text-align:right;">{% if row.Q4 %}<span style="color:var(--accent);">${{ row.Q4|floatformat:0 }}</span>{% else %}<span style="color:#ddd;">—</span>{% endif %}</td>
+                <td style="text-align:right;">{% if row.Q1 %}<span style="color:var(--accent);">${{ row.Q1|floatformat:0 }}</span>{% else %}<span style="color:var(--text-muted);">—</span>{% endif %}</td>
+                <td style="text-align:right;">{% if row.Q2 %}<span style="color:var(--accent);">${{ row.Q2|floatformat:0 }}</span>{% else %}<span style="color:var(--text-muted);">—</span>{% endif %}</td>
+                <td style="text-align:right;">{% if row.Q3 %}<span style="color:var(--accent);">${{ row.Q3|floatformat:0 }}</span>{% else %}<span style="color:var(--text-muted);">—</span>{% endif %}</td>
+                <td style="text-align:right;">{% if row.Q4 %}<span style="color:var(--accent);">${{ row.Q4|floatformat:0 }}</span>{% else %}<span style="color:var(--text-muted);">—</span>{% endif %}</td>
                 <td style="text-align:right;font-weight:bold;">${{ row.total_revenue|floatformat:0 }}</td>
                 <td style="text-align:right;">{{ row.total_units }}</td>
                 <td>

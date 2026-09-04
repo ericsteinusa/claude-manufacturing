@@ -60,7 +60,7 @@
     {% if invoice %}
     <div class="stat-row">
         <span class="stat-chip stat-{{ invoice.status }}">{{ invoice.status|capfirst }}</span>
-        <span style="color:white;font-size:14px;">
+        <span style="color:var(--text);font-size:14px;">
             {% trans "Amount:" %} <strong>{{ invoice.currency|default:"USD" }} {{ invoice.amount|floatformat:2 }}</strong>
             {% if currencies and invoice.currency and invoice.currency != base_currency %}
                 <span style="font-size:12px;color:rgba(255,255,255,.7);">(≈ ${{ invoice.amount_base|floatformat:2 }} {{ base_currency }})</span>

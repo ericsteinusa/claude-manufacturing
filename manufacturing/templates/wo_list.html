@@ -48,7 +48,7 @@
                     <td class="num">{{ wo.quantity }}</td>
                     <td>{{ wo.due_date|default:"" }}</td>
                     <td>
-                        <span class="pill" style="background:{{ wo.status_color }}20;color:{{ wo.status_color }};border-color:{{ wo.status_color }}40;">
+                        <span class="pill pill-{{ wo.status }}">
                             {{ wo.status_label }}
                         </span>
                     </td>

@@ -55,7 +55,7 @@
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search by name…' %}">
             <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
-            {% if search %}<a href="/payroll/pay-rates/" style="color:#aad;font-size:13px;">{% trans "Clear" %}</a>{% endif %}
+            {% if search %}<a href="/payroll/pay-rates/" style="color:var(--accent);font-size:13px;">{% trans "Clear" %}</a>{% endif %}
         </form>
     </div>
 
@@ -128,7 +128,7 @@
                 <button type="button" class="del-btn" id="del-btn"
                     onclick="confirmDelete()">{% trans "Remove Rate" %}</button>
                 <button type="button" onclick="document.getElementById('edit-card').style.display='none'"
-                    style="background:none;border:none;color:#aad;cursor:pointer;font-size:13px;">{% trans "Cancel" %}</button>
+                    style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;">{% trans "Cancel" %}</button>
             </div>
         </form>
         <form method="post" id="del-form" style="display:none;">

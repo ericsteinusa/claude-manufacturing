@@ -64,7 +64,7 @@
     <h2>{{ contract.customer }}
         <span class="badge s-{{ contract.status|cut:' ' }}" style="font-size:14px;">{{ contract.status }}</span>
     </h2>
-    {% if contract.title %}<p style="color:white;margin:-8px 0 12px;font-size:15px;">{{ contract.title }}</p>{% endif %}
+    {% if contract.title %}<p style="color:var(--text-muted);margin:-8px 0 12px;font-size:15px;">{{ contract.title }}</p>{% endif %}
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}

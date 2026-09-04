@@ -20,7 +20,7 @@
 .filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
     border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
 .filter-bar button:hover { background:var(--accent); color:white; }
-.filter-bar label { color:white; font-size:13px; font-weight:bold; }
+.filter-bar label { color:var(--text); font-size:13px; font-weight:bold; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 #gantt-container { overflow-x:auto; }
 /* frappe-gantt's own stylesheet sets .gantt .bar-wrapper .bar { fill: var(--g-bar-color) }
@@ -53,7 +53,7 @@
             {% endfor %}
         </select>
         <button type="submit">{% trans "Filter" %}</button>
-        <a href="/prod/schedule/gantt/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
+        <a href="/prod/schedule/gantt/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">

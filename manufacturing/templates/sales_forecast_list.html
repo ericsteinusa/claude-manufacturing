@@ -75,7 +75,7 @@
         <input type="number" name="fiscal_year" value="{{ fiscal_year }}" min="2000" max="2099" style="width:90px;" title="{% trans 'Fiscal year for actuals' %}">
         <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search rep / product line…' %}">
         <button type="submit">{% trans "Filter" %}</button>
-        <a href="/sales/forecast/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
+        <a href="/sales/forecast/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
         <a href="/sales/demand/" class="btn" style="margin-left:auto;">📊 {% trans "Demand by Product" %}</a>
     </form>
 
@@ -158,12 +158,12 @@
                 <td style="text-align:right;">${{ f.expected_value|floatformat:0 }}</td>
                 <td style="text-align:right;">{{ f.probability }}%</td>
                 <td style="text-align:right;font-weight:bold;">${{ f.weighted_value|floatformat:0 }}</td>
-                <td style="text-align:right;">{% if act %}<span style="color:#1a6b1a;font-weight:bold;">${{ act|floatformat:0 }}</span>{% else %}<span style="color:#bbb;">—</span>{% endif %}</td>
+                <td style="text-align:right;">{% if act %}<span style="color:#1a6b1a;font-weight:bold;">${{ act|floatformat:0 }}</span>{% else %}<span style="color:var(--text-muted);">—</span>{% endif %}</td>
                 <td style="text-align:right;">
                     {% if act %}
                         {% if act >= wt %}<span class="var-pos">+${{ act|floatformat:0 }}</span>
                         {% else %}<span class="var-neg">-${{ wt|floatformat:0 }}</span>{% endif %}
-                    {% else %}<span style="color:#ccc;">—</span>{% endif %}
+                    {% else %}<span style="color:var(--text-muted);">—</span>{% endif %}
                 </td>
                 <td><span class="badge s-{{ f.status }}">{{ f.status }}</span></td>
             </tr>
