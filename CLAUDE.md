@@ -1768,14 +1768,18 @@ to two new languages, it didn't mark any new template.
   '<base_filename>', [(field, 'Header'), …], rows)` branch in the view,
   placed **after** the rows are fetched but **before** any POST handling or
   extra context queries. `csv_export.export_response` handles the CSV/XLSX
-  split; row dicts may be missing keys without raising. Don't copy
-  `bom_list.html`'s link markup — it has the right URL shape but predates
-  the `|urlencode` convention and interpolates its filter raw, which
-  silently truncates the export's scope on any value containing `&` or a
-  space (the same bug fixed in `ar_list.html`/`ap_list.html` in PRs
-  #201/#202). When the view already scopes rows by permission (e.g.
-  `req_list`'s full-access / manager / own visibility), exporting that same
-  `rows` variable inherits the scoping for free — don't re-query.
+  split; row dicts may be missing keys without raising. The `|urlencode` is
+  not optional even when the current filter values look safe: without it,
+  any value containing `&` or a space silently truncates the export's scope
+  rather than erroring (the bug fixed in `ar_list.html`/`ap_list.html` in
+  PRs #201/#202, where the free-text `search`/date filters made it
+  reachable). Apply it to whitelisted filters too — `bom_list.html`'s
+  `item_type` is validated against `ITEM_TYPES` in the view so it can't
+  currently break, but it carries the filter for the same reason and
+  widening that tuple shouldn't quietly reintroduce the bug. When the view
+  already scopes rows by permission (e.g. `req_list`'s full-access /
+  manager / own visibility), exporting that same `rows` variable inherits
+  the scoping for free — don't re-query.
 
   **i18n caveat for both:** wrap the new button/link text in `{% trans %}`
   *only if the template already has `{% load i18n %}`*. Several of these
