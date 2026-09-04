@@ -6,8 +6,8 @@
 <a href="{{ back_url }}" class="btn">← Back</a>
 <a href="/time-off/new/" class="btn btn-primary">+ New Request</a>
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-<a href="?export=1{% if status %}&status={{ status }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status %}&status={{ status }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="?export=1{% if status %}&status={{ status|urlencode }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if status %}&status={{ status|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block body %}

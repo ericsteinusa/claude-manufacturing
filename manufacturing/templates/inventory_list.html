@@ -4,8 +4,8 @@
 {% block toolbar_left %}
 <a href="/dashboard/" class="btn">Home</a>
 <a href="/inventory/cycle-counts/" class="btn">Cycle Counts</a>
-<a href="/inventory/export/?search={{ search }}&filter={{ filter_status }}&item_type={{ item_type }}" class="btn">⬇ Export CSV</a>
-<a href="/inventory/export/?search={{ search }}&filter={{ filter_status }}&item_type={{ item_type }}&format=xlsx" class="btn">⬇ Export Excel</a>
+<a href="/inventory/export/?search={{ search|urlencode }}&filter={{ filter_status|urlencode }}&item_type={{ item_type|urlencode }}" class="btn">⬇ Export CSV</a>
+<a href="/inventory/export/?search={{ search|urlencode }}&filter={{ filter_status|urlencode }}&item_type={{ item_type|urlencode }}&format=xlsx" class="btn">⬇ Export Excel</a>
 {% if can_edit %}
 <a href="/inventory/new/" class="btn btn-primary">+ New Product</a>
 {% endif %}

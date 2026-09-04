@@ -4,8 +4,8 @@
 {% block toolbar_left %}
 <a href="/dashboard/" class="btn">Home</a>
 <a href="/assets/fixed/" class="btn">Fixed Assets</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&asset_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&asset_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if type_filter %}&asset_type={{ type_filter|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if type_filter %}&asset_type={{ type_filter|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}

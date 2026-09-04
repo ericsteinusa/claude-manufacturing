@@ -3,8 +3,8 @@
 
 {% block toolbar_left %}
 <a href="/consultants/" class="btn">Consultants</a>
-<a href="/consultants/reports/spend/export/?section=consultant&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ Consultant CSV</a>
-<a href="/consultants/reports/spend/export/?section=engagement&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ Engagement CSV</a>
+<a href="/consultants/reports/spend/export/?section=consultant&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">⬇ Consultant CSV</a>
+<a href="/consultants/reports/spend/export/?section=engagement&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">⬇ Engagement CSV</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
