@@ -149,16 +149,28 @@
             transform: translateY(-1px);
         }
 
-        /* ── Global buttons ── */
+        /* ── Global buttons ──
+           Base .btn is the neutral/secondary button for the light content
+           area. The translucent-white treatment below it is scoped to the
+           dark chrome (.app-header / .app-actions) via :where(), which
+           contributes no specificity — so .btn-primary/.btn-danger keep
+           winning inside the toolbar exactly as they did before. */
         .btn {
             display: inline-flex; align-items: center; gap: 5px;
-            background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3);
+            background: var(--card-bg); border: 1px solid var(--border);
             border-radius: 5px; padding: 5px 13px;
             font-size: 12.5px; font-weight: 500; cursor: pointer;
-            text-decoration: none; color: white; white-space: nowrap;
-            transition: background .15s;
+            text-decoration: none; color: var(--text); white-space: nowrap;
+            transition: background .15s, border-color .15s;
         }
-        .btn:hover { background: rgba(255,255,255,.22); }
+        .btn:hover { background: #f0f4fa; border-color: #a0aec0; }
+        :where(.app-header, .app-actions) .btn {
+            background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3);
+            color: white;
+        }
+        :where(.app-header, .app-actions) .btn:hover {
+            background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.3);
+        }
         .btn-primary {
             background: var(--accent); border-color: var(--accent-hover); color: white;
         }
