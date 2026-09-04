@@ -46,8 +46,8 @@
         {{ training.course_name }}
         <span class="badge s-{{ training.status|cut:' ' }}" style="font-size:14px;">{{ training.status }}</span>
     </h2>
-    <p style="color:white;margin-bottom:12px;font-size:13px;">
-        {% trans "Employee:" %} <a href="/people/{{ training.people_id }}/" style="color:#aef;">
+    <p style="color:var(--text-muted);margin-bottom:12px;font-size:13px;">
+        {% trans "Employee:" %} <a href="/people/{{ training.people_id }}/" style="color:var(--accent);">
         {{ training.last_name }}, {{ training.first_name }}</a>
     </p>
 

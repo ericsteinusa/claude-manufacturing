@@ -7,7 +7,7 @@
     max-width: 1000px;
 }
 .audit-wrap h2 { color: var(--text); font-size: 20px; margin-bottom: 6px; }
-.audit-wrap .subtitle { color: #cde; font-size: 13px; margin-bottom: 20px; }
+.audit-wrap .subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
 .history-entry {
     background: white;
     border-radius: 8px;
@@ -93,7 +93,7 @@
         </div>
     </div>
     {% empty %}
-    <p style="color:white">No history found for this record.</p>
+    <p style="color:var(--text-muted)">No history found for this record.</p>
     {% endfor %}
 </div>
 </div>

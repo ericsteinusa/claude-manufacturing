@@ -117,7 +117,7 @@
     {% endif %}
 
     <p style="margin-top:4px;">
-        <a href="/people/{{ review.people_id }}/" style="color:white;font-size:13px;">
+        <a href="/people/{{ review.people_id }}/" style="color:var(--accent);font-size:13px;">
             &larr; {% blocktrans with first=review.first_name last=review.last_name %}View {{ first }} {{ last }}'s profile{% endblocktrans %}
         </a>
     </p>

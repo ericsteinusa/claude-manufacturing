@@ -55,8 +55,8 @@
     </h2>
 
     {% if task.project_title %}
-    <p style="color:white;margin-bottom:12px;">
-        {% blocktrans with pid=task.project_id num=task.project_number title=task.project_title %}Project: <a href="/eng/projects/{{ pid }}/" style="color:#aef;">
+    <p style="color:var(--text-muted);margin-bottom:12px;">
+        {% blocktrans with pid=task.project_id num=task.project_number title=task.project_title %}Project: <a href="/eng/projects/{{ pid }}/" style="color:var(--accent);">
         {{ num }} — {{ title }}</a>{% endblocktrans %}
     </p>
     {% endif %}

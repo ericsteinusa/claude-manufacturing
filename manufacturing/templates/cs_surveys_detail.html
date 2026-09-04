@@ -51,7 +51,7 @@
 <div class="cs-wrap">
     <h2>{{ survey.title }}
         <span class="badge s-{{ survey.status|lower }}" style="font-size:14px;">{{ survey.status }}</span>
-        <span style="font-size:14px;color:white;font-weight:normal;margin-left:8px;">{{ survey.survey_type }}</span>
+        <span style="font-size:14px;color:var(--text-muted);font-weight:normal;margin-left:8px;">{{ survey.survey_type }}</span>
     </h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
