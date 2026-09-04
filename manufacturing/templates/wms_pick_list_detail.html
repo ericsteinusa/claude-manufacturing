@@ -10,8 +10,21 @@
 {% endif %}
 {% endblock %}
 
+{% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .no-print { display: none !important; }
+    body { background: white !important; }
+}
+{% endblock %}
+
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
 <div class="menu-title">{{ pick_list.pick_number }} — SO {{ pick_list.so_number }}</div>
 <p>Status: <span class="pill pill-{{ pick_list.status }}">{{ pick_list.status|title }}</span></p>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
@@ -20,7 +33,7 @@
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Seq</th><th>Product</th><th>Bin</th><th>Ordered</th><th>Picked</th><th>Status</th>{% if can_edit %}<th></th>{% endif %}</tr>
+            <tr><th>Seq</th><th>Product</th><th>Bin</th><th>Ordered</th><th>Picked</th><th>Status</th>{% if can_edit %}<th class="no-print"></th>{% endif %}</tr>
         </thead>
         <tbody>
             {% for l in lines %}
@@ -32,7 +45,7 @@
                 <td>{{ l.qty_picked }}</td>
                 <td><span class="pill pill-{{ l.status }}">{{ l.status|title }}</span></td>
                 {% if can_edit %}
-                <td>
+                <td class="no-print">
                     {% if l.status == 'pending' %}
                     <form method="post" style="display:flex;gap:6px;align-items:center;">
                         {% csrf_token %}
