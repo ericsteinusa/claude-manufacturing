@@ -342,6 +342,15 @@ def it_repairs_list(request):
     try:
         repairs = list_repairs(conn, status=status_f or None,
                                priority=priority_f or None, search=search or None)
+
+        if 'export' in request.GET:
+            return export_response(request, 'it_repairs', [
+                ('id', 'ID'), ('asset_tag', 'Asset Tag'), ('problem_description', 'Problem'),
+                ('reported_by', 'Reported By'), ('reported_date', 'Reported'),
+                ('priority', 'Priority'), ('status', 'Status'),
+                ('assigned_to', 'Assigned To'), ('completed_date', 'Completed'),
+            ], repairs)
+
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             try:
                 create_repair(

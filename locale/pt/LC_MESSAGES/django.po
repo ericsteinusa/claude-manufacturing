@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-03 04:00+0000\n"
+"POT-Creation-Date: 2026-09-04 16:59+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
@@ -346,14 +346,14 @@ msgstr "Folha de Pagamento"
 #: manufacturing/templates/finance_budget_list.html:11
 #: manufacturing/templates/finance_dashboard.html:16
 #: manufacturing/templates/finance_tax_detail.html:11
-#: manufacturing/templates/finance_tax_list.html:11
+#: manufacturing/templates/finance_tax_list.html:13
 #: manufacturing/templates/gl_accounts.html:9
 #: manufacturing/templates/gl_balance_sheet.html:9
 #: manufacturing/templates/gl_cash_flow_statement.html:10
 #: manufacturing/templates/gl_dashboard.html:13
 #: manufacturing/templates/gl_income_statement.html:9
 #: manufacturing/templates/gl_journal_detail.html:9
-#: manufacturing/templates/gl_journals.html:9
+#: manufacturing/templates/gl_journals.html:11
 #: manufacturing/templates/gl_trial_balance.html:9
 #: manufacturing/templates/it_asset_detail.html:15
 #: manufacturing/templates/it_asset_list.html:15
@@ -366,7 +366,7 @@ msgstr "Folha de Pagamento"
 #: manufacturing/templates/it_network_detail.html:11
 #: manufacturing/templates/it_network_list.html:15
 #: manufacturing/templates/it_repairs_detail.html:11
-#: manufacturing/templates/it_repairs_list.html:15
+#: manufacturing/templates/it_repairs_list.html:17
 #: manufacturing/templates/it_software_detail.html:11
 #: manufacturing/templates/it_software_list.html:15
 #: manufacturing/templates/it_task_detail.html:10
@@ -379,9 +379,9 @@ msgstr "Folha de Pagamento"
 #: manufacturing/templates/legal_contract_list.html:13
 #: manufacturing/templates/legal_dashboard.html:7
 #: manufacturing/templates/legal_dashboard.html:53
-#: manufacturing/templates/legal_employment_list.html:13
-#: manufacturing/templates/legal_governance_list.html:13
-#: manufacturing/templates/legal_ip_list.html:13
+#: manufacturing/templates/legal_employment_list.html:15
+#: manufacturing/templates/legal_governance_list.html:15
+#: manufacturing/templates/legal_ip_list.html:15
 #: manufacturing/templates/legal_litigation_detail.html:10
 #: manufacturing/templates/legal_litigation_list.html:13
 #: manufacturing/templates/maint_dashboard.html:17
@@ -470,7 +470,7 @@ msgstr "Folha de Pagamento"
 #: manufacturing/templates/report_builder_list.html:8
 #: manufacturing/templates/reports_dashboard.html:11
 #: manufacturing/templates/req_detail.html:8
-#: manufacturing/templates/req_list.html:12
+#: manufacturing/templates/req_list.html:14
 #: manufacturing/templates/rfq_detail.html:7
 #: manufacturing/templates/rfq_list.html:7
 #: manufacturing/templates/rfq_new.html:7
@@ -521,7 +521,7 @@ msgstr "Plano de Contas"
 #: manufacturing/templates/gl_dashboard.html:7
 #: manufacturing/templates/gl_dashboard_kpis.html:33
 #: manufacturing/templates/gl_journals.html:3
-#: manufacturing/templates/gl_journals.html:35
+#: manufacturing/templates/gl_journals.html:37
 msgid "Journal Entries"
 msgstr "Lançamentos Contabilísticos"
 
@@ -578,7 +578,7 @@ msgstr "Reconciliação Bancária"
 #: manufacturing/templates/finance_tax_detail.html:10
 #: manufacturing/templates/finance_tax_list.html:3
 #: manufacturing/templates/finance_tax_list.html:10
-#: manufacturing/templates/finance_tax_list.html:56
+#: manufacturing/templates/finance_tax_list.html:58
 msgid "Tax Filings"
 msgstr "Declarações Fiscais"
 
@@ -659,7 +659,7 @@ msgstr "Lançamentos Contabilísticos Recentes"
 #: manufacturing/templates/finance_dashboard_kpis.html:55
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:56
-#: manufacturing/templates/gl_journals.html:57
+#: manufacturing/templates/gl_journals.html:59
 #: manufacturing/templates/it_asset_detail.html:253
 #: manufacturing/templates/it_dashboard_kpis.html:34
 #: manufacturing/templates/maint_downtime_detail.html:94
@@ -688,9 +688,9 @@ msgstr "Data"
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:57
 #: manufacturing/templates/gl_journal_detail.html:120
-#: manufacturing/templates/gl_journals.html:57
-#: manufacturing/templates/legal_governance_list.html:73
-#: manufacturing/templates/legal_governance_list.html:121
+#: manufacturing/templates/gl_journals.html:59
+#: manufacturing/templates/legal_governance_list.html:75
+#: manufacturing/templates/legal_governance_list.html:123
 msgid "Reference"
 msgstr "Referência"
 
@@ -720,7 +720,7 @@ msgstr "Referência"
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:58
 #: manufacturing/templates/gl_journal_detail.html:124
-#: manufacturing/templates/gl_journals.html:57
+#: manufacturing/templates/gl_journals.html:59
 #: manufacturing/templates/it_incident_detail.html:72
 #: manufacturing/templates/it_incident_detail.html:95
 #: manufacturing/templates/it_incident_list.html:125
@@ -760,7 +760,7 @@ msgstr "Descrição"
 #: manufacturing/templates/acct_dashboard_kpis.html:43
 #: manufacturing/templates/finance_dashboard_kpis.html:58
 #: manufacturing/templates/gl_dashboard_kpis.html:47
-#: manufacturing/templates/gl_journals.html:58
+#: manufacturing/templates/gl_journals.html:60
 msgid "Lines"
 msgstr "Linhas"
 
@@ -845,8 +845,8 @@ msgstr "Total a Débito"
 #: manufacturing/templates/finance_budget_list.html:117
 #: manufacturing/templates/finance_dashboard_kpis.html:60
 #: manufacturing/templates/finance_tax_detail.html:116
-#: manufacturing/templates/finance_tax_list.html:90
-#: manufacturing/templates/finance_tax_list.html:143
+#: manufacturing/templates/finance_tax_list.html:92
+#: manufacturing/templates/finance_tax_list.html:145
 #: manufacturing/templates/gl_accounts.html:63
 #: manufacturing/templates/gl_journal_detail.html:60
 #: manufacturing/templates/it_asset_detail.html:75
@@ -865,7 +865,7 @@ msgstr "Total a Débito"
 #: manufacturing/templates/it_network_list.html:67
 #: manufacturing/templates/it_network_list.html:142
 #: manufacturing/templates/it_repairs_detail.html:80
-#: manufacturing/templates/it_repairs_list.html:67
+#: manufacturing/templates/it_repairs_list.html:69
 #: manufacturing/templates/it_software_detail.html:76
 #: manufacturing/templates/it_software_detail.html:119
 #: manufacturing/templates/it_software_list.html:63
@@ -883,12 +883,12 @@ msgstr "Total a Débito"
 #: manufacturing/templates/legal_contract_list.html:95
 #: manufacturing/templates/legal_contract_list.html:140
 #: manufacturing/templates/legal_dashboard.html:147
-#: manufacturing/templates/legal_employment_list.html:74
-#: manufacturing/templates/legal_employment_list.html:118
-#: manufacturing/templates/legal_governance_list.html:74
-#: manufacturing/templates/legal_governance_list.html:113
-#: manufacturing/templates/legal_ip_list.html:75
-#: manufacturing/templates/legal_ip_list.html:123
+#: manufacturing/templates/legal_employment_list.html:76
+#: manufacturing/templates/legal_employment_list.html:120
+#: manufacturing/templates/legal_governance_list.html:76
+#: manufacturing/templates/legal_governance_list.html:115
+#: manufacturing/templates/legal_ip_list.html:77
+#: manufacturing/templates/legal_ip_list.html:125
 #: manufacturing/templates/legal_litigation_detail.html:55
 #: manufacturing/templates/legal_litigation_detail.html:118
 #: manufacturing/templates/legal_litigation_list.html:93
@@ -983,7 +983,7 @@ msgstr "Total a Débito"
 #: manufacturing/templates/qa_supplier_detail.html:107
 #: manufacturing/templates/qa_supplier_list.html:85
 #: manufacturing/templates/qa_supplier_list.html:134
-#: manufacturing/templates/req_list.html:81
+#: manufacturing/templates/req_list.html:83
 #: manufacturing/templates/rfq_list.html:32
 #: manufacturing/templates/sales_coaching.html:75
 #: manufacturing/templates/sales_coaching.html:117
@@ -1027,8 +1027,8 @@ msgstr "Estado"
 #: manufacturing/templates/finance_dashboard_kpis.html:73
 #: manufacturing/templates/gl_dashboard_kpis.html:47
 #: manufacturing/templates/gl_journal_detail.html:63
-#: manufacturing/templates/gl_journals.html:59
-#: manufacturing/templates/gl_journals.html:70
+#: manufacturing/templates/gl_journals.html:61
+#: manufacturing/templates/gl_journals.html:72
 msgid "Posted"
 msgstr "Contabilizado"
 
@@ -1318,8 +1318,8 @@ msgstr "N.º da Fatura"
 #: manufacturing/templates/eng_tasks_list.html:143
 #: manufacturing/templates/finance_tax_detail.html:80
 #: manufacturing/templates/finance_tax_detail.html:124
-#: manufacturing/templates/finance_tax_list.html:88
-#: manufacturing/templates/finance_tax_list.html:139
+#: manufacturing/templates/finance_tax_list.html:90
+#: manufacturing/templates/finance_tax_list.html:141
 #: manufacturing/templates/it_task_detail.html:84
 #: manufacturing/templates/it_task_detail.html:112
 #: manufacturing/templates/it_task_list.html:67
@@ -1446,7 +1446,7 @@ msgstr "N.º de Cheque, etc."
 #: manufacturing/templates/finance_budget_list.html:125
 #: manufacturing/templates/finance_tax_detail.html:136
 #: manufacturing/templates/finance_tax_detail.html:149
-#: manufacturing/templates/finance_tax_list.html:155
+#: manufacturing/templates/finance_tax_list.html:157
 #: manufacturing/templates/gl_accounts.html:109
 #: manufacturing/templates/gl_accounts.html:136
 #: manufacturing/templates/it_asset_detail.html:112
@@ -1463,7 +1463,7 @@ msgstr "N.º de Cheque, etc."
 #: manufacturing/templates/it_network_list.html:154
 #: manufacturing/templates/it_repairs_detail.html:104
 #: manufacturing/templates/it_repairs_detail.html:164
-#: manufacturing/templates/it_repairs_list.html:139
+#: manufacturing/templates/it_repairs_list.html:141
 #: manufacturing/templates/it_software_detail.html:85
 #: manufacturing/templates/it_software_detail.html:131
 #: manufacturing/templates/it_software_list.html:129
@@ -1479,9 +1479,9 @@ msgstr "N.º de Cheque, etc."
 #: manufacturing/templates/legal_contract_detail.html:95
 #: manufacturing/templates/legal_contract_detail.html:149
 #: manufacturing/templates/legal_contract_list.html:164
-#: manufacturing/templates/legal_employment_list.html:138
-#: manufacturing/templates/legal_governance_list.html:133
-#: manufacturing/templates/legal_ip_list.html:139
+#: manufacturing/templates/legal_employment_list.html:140
+#: manufacturing/templates/legal_governance_list.html:135
+#: manufacturing/templates/legal_ip_list.html:141
 #: manufacturing/templates/legal_litigation_detail.html:80
 #: manufacturing/templates/legal_litigation_detail.html:130
 #: manufacturing/templates/legal_litigation_list.html:154
@@ -1536,7 +1536,7 @@ msgstr "N.º de Cheque, etc."
 #: manufacturing/templates/qa_supplier_detail.html:119
 #: manufacturing/templates/qa_supplier_list.html:140
 #: manufacturing/templates/req_detail.html:63
-#: manufacturing/templates/req_list.html:117
+#: manufacturing/templates/req_list.html:119
 #: manufacturing/templates/rfq_list.html:33
 #: manufacturing/templates/sales_commission_history.html:62
 #: manufacturing/templates/sales_commissions.html:116
@@ -1575,20 +1575,34 @@ msgstr "Nenhum pagamento registado."
 
 #: manufacturing/templates/ap_list.html:8
 #: manufacturing/templates/ar_list.html:8
+#: manufacturing/templates/finance_tax_list.html:11
+#: manufacturing/templates/gl_journals.html:9
+#: manufacturing/templates/it_repairs_list.html:15
+#: manufacturing/templates/legal_employment_list.html:13
+#: manufacturing/templates/legal_governance_list.html:13
+#: manufacturing/templates/legal_ip_list.html:13
 #: manufacturing/templates/maint_wo_list.html:9
 #: manufacturing/templates/payroll_history.html:12
 #: manufacturing/templates/po_list.html:12
 #: manufacturing/templates/qa_ncr_list.html:10
 #: manufacturing/templates/report_builder_detail.html:8
+#: manufacturing/templates/req_list.html:12
 msgid "Export CSV"
 msgstr "Exportar CSV"
 
 #: manufacturing/templates/ap_list.html:9
 #: manufacturing/templates/ar_list.html:9
+#: manufacturing/templates/finance_tax_list.html:12
+#: manufacturing/templates/gl_journals.html:10
+#: manufacturing/templates/it_repairs_list.html:16
+#: manufacturing/templates/legal_employment_list.html:14
+#: manufacturing/templates/legal_governance_list.html:14
+#: manufacturing/templates/legal_ip_list.html:14
 #: manufacturing/templates/maint_wo_list.html:10
 #: manufacturing/templates/payroll_history.html:13
 #: manufacturing/templates/po_list.html:13
 #: manufacturing/templates/qa_ncr_list.html:11
+#: manufacturing/templates/req_list.html:13
 msgid "Export Excel"
 msgstr "Exportar Excel"
 
@@ -1626,7 +1640,7 @@ msgstr "Vencimento De:"
 #: manufacturing/templates/ar_list.html:52
 #: manufacturing/templates/gl_cash_flow_statement.html:47
 #: manufacturing/templates/gl_income_statement.html:45
-#: manufacturing/templates/gl_journals.html:46
+#: manufacturing/templates/gl_journals.html:48
 #: manufacturing/templates/prod_schedule.html:50
 #: manufacturing/templates/prod_schedule_gantt.html:47
 #: manufacturing/templates/sales_orders.html:66
@@ -1649,21 +1663,21 @@ msgstr "Até:"
 #: manufacturing/templates/finance_audit_list.html:76
 #: manufacturing/templates/finance_bank_rec_list.html:60
 #: manufacturing/templates/finance_budget_list.html:71
-#: manufacturing/templates/finance_tax_list.html:75
-#: manufacturing/templates/gl_journals.html:48
+#: manufacturing/templates/finance_tax_list.html:77
+#: manufacturing/templates/gl_journals.html:50
 #: manufacturing/templates/it_asset_list.html:54
 #: manufacturing/templates/it_incident_list.html:54
 #: manufacturing/templates/it_license_list.html:52
 #: manufacturing/templates/it_network_list.html:59
-#: manufacturing/templates/it_repairs_list.html:53
+#: manufacturing/templates/it_repairs_list.html:55
 #: manufacturing/templates/it_software_list.html:49
 #: manufacturing/templates/it_task_list.html:55
 #: manufacturing/templates/it_ticket_list.html:55
 #: manufacturing/templates/legal_compliance_list.html:73
 #: manufacturing/templates/legal_contract_list.html:80
-#: manufacturing/templates/legal_employment_list.html:65
-#: manufacturing/templates/legal_governance_list.html:65
-#: manufacturing/templates/legal_ip_list.html:66
+#: manufacturing/templates/legal_employment_list.html:67
+#: manufacturing/templates/legal_governance_list.html:67
+#: manufacturing/templates/legal_ip_list.html:68
 #: manufacturing/templates/legal_litigation_list.html:80
 #: manufacturing/templates/mkt_ad_list.html:83
 #: manufacturing/templates/mkt_budget_list.html:74
@@ -1680,7 +1694,7 @@ msgstr "Até:"
 #: manufacturing/templates/prod_schedule_gantt.html:55
 #: manufacturing/templates/prod_shipping_list.html:70
 #: manufacturing/templates/purch_contracts_list.html:71
-#: manufacturing/templates/req_list.html:71
+#: manufacturing/templates/req_list.html:73
 #: manufacturing/templates/sales_coaching.html:64
 #: manufacturing/templates/sales_commission_history.html:48
 #: manufacturing/templates/sales_commissions.html:102
@@ -1713,21 +1727,21 @@ msgstr "Filtrar"
 #: manufacturing/templates/finance_audit_list.html:77
 #: manufacturing/templates/finance_bank_rec_list.html:61
 #: manufacturing/templates/finance_budget_list.html:72
-#: manufacturing/templates/finance_tax_list.html:76
+#: manufacturing/templates/finance_tax_list.html:78
 #: manufacturing/templates/gl_balance_sheet.html:47
-#: manufacturing/templates/gl_journals.html:50
+#: manufacturing/templates/gl_journals.html:52
 #: manufacturing/templates/gl_trial_balance.html:41
 #: manufacturing/templates/it_asset_list.html:55
 #: manufacturing/templates/it_license_list.html:53
 #: manufacturing/templates/it_network_list.html:60
-#: manufacturing/templates/it_repairs_list.html:54
+#: manufacturing/templates/it_repairs_list.html:56
 #: manufacturing/templates/it_software_list.html:50
 #: manufacturing/templates/it_ticket_list.html:56
 #: manufacturing/templates/legal_compliance_list.html:74
 #: manufacturing/templates/legal_contract_list.html:81
-#: manufacturing/templates/legal_employment_list.html:66
-#: manufacturing/templates/legal_governance_list.html:66
-#: manufacturing/templates/legal_ip_list.html:67
+#: manufacturing/templates/legal_employment_list.html:68
+#: manufacturing/templates/legal_governance_list.html:68
+#: manufacturing/templates/legal_ip_list.html:69
 #: manufacturing/templates/legal_litigation_list.html:81
 #: manufacturing/templates/maint_wo_list.html:73
 #: manufacturing/templates/mkt_ad_list.html:84
@@ -1750,7 +1764,7 @@ msgstr "Filtrar"
 #: manufacturing/templates/qa_inspection_list.html:73
 #: manufacturing/templates/qa_ncr_list.html:79
 #: manufacturing/templates/qa_supplier_list.html:77
-#: manufacturing/templates/req_list.html:72
+#: manufacturing/templates/req_list.html:74
 #: manufacturing/templates/sales_coaching.html:65
 #: manufacturing/templates/sales_commission_history.html:49
 #: manufacturing/templates/sales_commissions.html:103
@@ -2008,7 +2022,7 @@ msgstr "Data de Admissão *"
 #: manufacturing/templates/pers_depts.html:95
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/req_detail.html:59
-#: manufacturing/templates/req_list.html:79
+#: manufacturing/templates/req_list.html:81
 #: manufacturing/templates/tc_ot_report.html:113
 #: manufacturing/templates/termination_detail.html:40
 #: manufacturing/templates/termination_list.html:71
@@ -2221,7 +2235,7 @@ msgstr "Recrutamento"
 #: manufacturing/templates/ats_requisition_list.html:10
 #: manufacturing/templates/ats_requisition_new.html:3
 #: manufacturing/templates/ats_requisition_new.html:21
-#: manufacturing/templates/req_list.html:104
+#: manufacturing/templates/req_list.html:106
 msgid "New Requisition"
 msgstr "Nova Requisição"
 
@@ -2295,8 +2309,8 @@ msgstr "Ainda não há contratações."
 #: manufacturing/templates/legal_contract_list.html:88
 #: manufacturing/templates/legal_contract_list.html:124
 #: manufacturing/templates/legal_dashboard.html:142
-#: manufacturing/templates/legal_ip_list.html:74
-#: manufacturing/templates/legal_ip_list.html:103
+#: manufacturing/templates/legal_ip_list.html:76
+#: manufacturing/templates/legal_ip_list.html:105
 #: manufacturing/templates/maint_labor_report.html:94
 #: manufacturing/templates/maint_wo_list.html:80
 #: manufacturing/templates/mkt_content_detail.html:94
@@ -2401,20 +2415,20 @@ msgstr "Pesquisar cargo..."
 #: manufacturing/templates/eng_tasks_list.html:70
 #: manufacturing/templates/finance_audit_list.html:64
 #: manufacturing/templates/finance_budget_list.html:64
-#: manufacturing/templates/finance_tax_list.html:63
+#: manufacturing/templates/finance_tax_list.html:65
 #: manufacturing/templates/it_asset_list.html:41
 #: manufacturing/templates/it_incident_list.html:41
 #: manufacturing/templates/it_license_list.html:45
 #: manufacturing/templates/it_network_list.html:46
-#: manufacturing/templates/it_repairs_list.html:40
+#: manufacturing/templates/it_repairs_list.html:42
 #: manufacturing/templates/it_software_list.html:42
 #: manufacturing/templates/it_task_list.html:42
 #: manufacturing/templates/it_ticket_list.html:42
 #: manufacturing/templates/legal_compliance_list.html:67
 #: manufacturing/templates/legal_contract_list.html:68
-#: manufacturing/templates/legal_employment_list.html:59
-#: manufacturing/templates/legal_governance_list.html:59
-#: manufacturing/templates/legal_ip_list.html:60
+#: manufacturing/templates/legal_employment_list.html:61
+#: manufacturing/templates/legal_governance_list.html:61
+#: manufacturing/templates/legal_ip_list.html:62
 #: manufacturing/templates/legal_litigation_list.html:68
 #: manufacturing/templates/maint_labor_report.html:60
 #: manufacturing/templates/mkt_ad_list.html:71
@@ -2432,7 +2446,7 @@ msgstr "Pesquisar cargo..."
 #: manufacturing/templates/prod_schedule.html:53
 #: manufacturing/templates/prod_shipping_list.html:64
 #: manufacturing/templates/purch_contracts_list.html:65
-#: manufacturing/templates/req_list.html:65
+#: manufacturing/templates/req_list.html:67
 #: manufacturing/templates/sales_coaching.html:59
 #: manufacturing/templates/sales_commissions.html:97
 #: manufacturing/templates/sales_contracts_list.html:67
@@ -2448,7 +2462,7 @@ msgid "Filled"
 msgstr "Preenchida"
 
 #: manufacturing/templates/ats_requisition_list.html:56
-#: manufacturing/templates/req_list.html:96
+#: manufacturing/templates/req_list.html:98
 msgid "No requisitions found."
 msgstr "Nenhuma requisição encontrada."
 
@@ -2471,7 +2485,7 @@ msgid "e.g. Welder II"
 msgstr "ex.: Soldador II"
 
 #: manufacturing/templates/ats_requisition_new.html:49
-#: manufacturing/templates/req_list.html:121
+#: manufacturing/templates/req_list.html:123
 msgid "Create Requisition"
 msgstr "Criar Requisição"
 
@@ -2804,8 +2818,8 @@ msgstr "Inscrições"
 
 #: manufacturing/templates/benefit_plan_detail.html:56
 #: manufacturing/templates/exit_interview_list.html:59
-#: manufacturing/templates/legal_employment_list.html:73
-#: manufacturing/templates/legal_employment_list.html:114
+#: manufacturing/templates/legal_employment_list.html:75
+#: manufacturing/templates/legal_employment_list.html:116
 #: manufacturing/templates/offboarding_list.html:73
 #: manufacturing/templates/payroll_deductions.html:121
 #: manufacturing/templates/payroll_deductions.html:161
@@ -2990,10 +3004,10 @@ msgstr "Planos"
 #: manufacturing/templates/legal_contract_list.html:90
 #: manufacturing/templates/legal_contract_list.html:132
 #: manufacturing/templates/legal_dashboard.html:144
-#: manufacturing/templates/legal_employment_list.html:73
-#: manufacturing/templates/legal_employment_list.html:106
-#: manufacturing/templates/legal_ip_list.html:74
-#: manufacturing/templates/legal_ip_list.html:107
+#: manufacturing/templates/legal_employment_list.html:75
+#: manufacturing/templates/legal_employment_list.html:108
+#: manufacturing/templates/legal_ip_list.html:76
+#: manufacturing/templates/legal_ip_list.html:109
 #: manufacturing/templates/legal_litigation_detail.html:59
 #: manufacturing/templates/legal_litigation_detail.html:106
 #: manufacturing/templates/legal_litigation_list.html:91
@@ -3183,7 +3197,7 @@ msgstr "Nova PO Recorrente"
 #: manufacturing/templates/eng_ecrs.html:49
 #: manufacturing/templates/eng_projects.html:52
 #: manufacturing/templates/eng_projects.html:59
-#: manufacturing/templates/gl_journals.html:40
+#: manufacturing/templates/gl_journals.html:42
 #: manufacturing/templates/maint_downtime_list.html:63
 #: manufacturing/templates/maint_equipment_list.html:63
 #: manufacturing/templates/maint_inspection_list.html:63
@@ -3586,7 +3600,7 @@ msgstr "Inspetor / Signatário da Qualidade"
 #: manufacturing/templates/coa_new.html:48
 #: manufacturing/templates/it_license_list.html:161
 #: manufacturing/templates/it_network_list.html:155
-#: manufacturing/templates/it_repairs_list.html:140
+#: manufacturing/templates/it_repairs_list.html:142
 #: manufacturing/templates/it_software_list.html:130
 #: manufacturing/templates/mkt_ad_list.html:181
 #: manufacturing/templates/mkt_research_list.html:166
@@ -3703,10 +3717,10 @@ msgstr "Norma"
 #: manufacturing/templates/legal_contract_detail.html:145
 #: manufacturing/templates/legal_contract_list.html:94
 #: manufacturing/templates/legal_contract_list.html:160
-#: manufacturing/templates/legal_employment_list.html:74
-#: manufacturing/templates/legal_employment_list.html:134
-#: manufacturing/templates/legal_governance_list.html:74
-#: manufacturing/templates/legal_governance_list.html:129
+#: manufacturing/templates/legal_employment_list.html:76
+#: manufacturing/templates/legal_employment_list.html:136
+#: manufacturing/templates/legal_governance_list.html:76
+#: manufacturing/templates/legal_governance_list.html:131
 #: manufacturing/templates/mkt_ad_detail.html:82
 #: manufacturing/templates/mkt_ad_detail.html:182
 #: manufacturing/templates/mkt_ad_list.html:176
@@ -3756,8 +3770,8 @@ msgstr "Nenhuma lista de verificação ainda. Crie uma a partir de um modelo."
 #: manufacturing/templates/eng_specs_list.html:125
 #: manufacturing/templates/finance_budget_detail.html:104
 #: manufacturing/templates/finance_budget_detail.html:152
-#: manufacturing/templates/legal_governance_list.html:73
-#: manufacturing/templates/legal_governance_list.html:105
+#: manufacturing/templates/legal_governance_list.html:75
+#: manufacturing/templates/legal_governance_list.html:107
 #: manufacturing/templates/maint_downtime_detail.html:70
 #: manufacturing/templates/maint_downtime_list.html:78
 #: manufacturing/templates/maint_downtime_list.html:111
@@ -4051,7 +4065,7 @@ msgstr "Condições"
 #: manufacturing/templates/credit_account_list.html:79
 #: manufacturing/templates/cs_escalations.html:68
 #: manufacturing/templates/cs_list.html:59
-#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/legal_employment_list.html:76
 msgid "Opened"
 msgstr "Aberto em"
 
@@ -4171,7 +4185,7 @@ msgid "e.g. Net 30"
 msgstr "p. ex., Net 30"
 
 #: manufacturing/templates/credit_account_list.html:132
-#: manufacturing/templates/legal_employment_list.html:126
+#: manufacturing/templates/legal_employment_list.html:128
 msgid "Opened Date"
 msgstr "Data de Abertura"
 
@@ -4499,7 +4513,7 @@ msgstr "Chamados Abertos"
 #: manufacturing/templates/eng_dashboard_kpis.html:5
 #: manufacturing/templates/finance_audit_detail.html:112
 #: manufacturing/templates/finance_audit_list.html:89
-#: manufacturing/templates/it_repairs_list.html:69
+#: manufacturing/templates/it_repairs_list.html:71
 #: manufacturing/templates/it_task_list.html:87
 #: manufacturing/templates/legal_compliance_list.html:85
 #: manufacturing/templates/legal_dashboard.html:83
@@ -4553,7 +4567,7 @@ msgstr "Problema"
 #: manufacturing/templates/cs_detail.html:71
 #: manufacturing/templates/cs_list.html:81
 #: manufacturing/templates/legal_dashboard.html:99
-#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/legal_employment_list.html:76
 #: manufacturing/templates/reports_dashboard.html:237
 #: manufacturing/templates/rfq_detail.html:36
 #: manufacturing/templates/rfq_list.html:23
@@ -4699,8 +4713,8 @@ msgstr "Dias em Aberto"
 #: manufacturing/templates/it_dashboard_kpis.html:32
 #: manufacturing/templates/it_repairs_detail.html:76
 #: manufacturing/templates/it_repairs_detail.html:144
-#: manufacturing/templates/it_repairs_list.html:66
-#: manufacturing/templates/it_repairs_list.html:123
+#: manufacturing/templates/it_repairs_list.html:68
+#: manufacturing/templates/it_repairs_list.html:125
 #: manufacturing/templates/it_task_detail.html:64
 #: manufacturing/templates/it_task_detail.html:108
 #: manufacturing/templates/it_task_list.html:66
@@ -5220,7 +5234,7 @@ msgstr "Valor do Reembolso"
 #: manufacturing/templates/finance_budget_detail.html:93
 #: manufacturing/templates/finance_budget_list.html:82
 #: manufacturing/templates/gl_journal_detail.html:59
-#: manufacturing/templates/gl_journals.html:59
+#: manufacturing/templates/gl_journals.html:61
 #: manufacturing/templates/it_ticket_detail.html:103
 #: manufacturing/templates/payroll_history.html:39
 #: manufacturing/templates/payroll_run_detail.html:45
@@ -5275,8 +5289,8 @@ msgstr "Pontuação Média"
 #: manufacturing/templates/cs_surveys_detail.html:70
 #: manufacturing/templates/finance_tax_detail.html:104
 #: manufacturing/templates/finance_tax_detail.html:146
-#: manufacturing/templates/finance_tax_list.html:85
-#: manufacturing/templates/finance_tax_list.html:131
+#: manufacturing/templates/finance_tax_list.html:87
+#: manufacturing/templates/finance_tax_list.html:133
 #: manufacturing/templates/payroll_dashboard.html:87
 #: manufacturing/templates/payroll_history.html:37
 #: manufacturing/templates/sales_commission_history.html:57
@@ -5342,7 +5356,7 @@ msgstr "Pesquisas e Feedback"
 
 #: manufacturing/templates/cs_surveys_list.html:67
 #: manufacturing/templates/finance_audit_list.html:70
-#: manufacturing/templates/finance_tax_list.html:69
+#: manufacturing/templates/finance_tax_list.html:71
 #: manufacturing/templates/it_asset_list.html:47
 #: manufacturing/templates/it_network_list.html:52
 #: manufacturing/templates/legal_contract_list.html:74
@@ -5789,8 +5803,8 @@ msgstr "Tarefa"
 #: manufacturing/templates/it_asset_list.html:137
 #: manufacturing/templates/it_repairs_detail.html:84
 #: manufacturing/templates/it_repairs_detail.html:152
-#: manufacturing/templates/it_repairs_list.html:68
-#: manufacturing/templates/it_repairs_list.html:131
+#: manufacturing/templates/it_repairs_list.html:70
+#: manufacturing/templates/it_repairs_list.html:133
 #: manufacturing/templates/it_task_detail.html:72
 #: manufacturing/templates/it_task_detail.html:109
 #: manufacturing/templates/it_task_list.html:65
@@ -6021,7 +6035,7 @@ msgid "Engineering Tasks"
 msgstr "Tarefas de Engenharia"
 
 #: manufacturing/templates/eng_tasks_list.html:76
-#: manufacturing/templates/it_repairs_list.html:46
+#: manufacturing/templates/it_repairs_list.html:48
 #: manufacturing/templates/it_task_list.html:48
 #: manufacturing/templates/it_ticket_list.html:48
 msgid "All Priorities"
@@ -6672,12 +6686,12 @@ msgid "Tax Filing — %(tax_type)s"
 msgstr "Declaração Fiscal — %(tax_type)s"
 
 #: manufacturing/templates/finance_tax_detail.html:72
-#: manufacturing/templates/finance_tax_list.html:86
+#: manufacturing/templates/finance_tax_list.html:88
 msgid "Amount Due"
 msgstr "Valor Devido"
 
 #: manufacturing/templates/finance_tax_detail.html:76
-#: manufacturing/templates/finance_tax_list.html:87
+#: manufacturing/templates/finance_tax_list.html:89
 msgid "Amount Paid"
 msgstr "Valor Pago"
 
@@ -6686,20 +6700,20 @@ msgid "Edit Filing"
 msgstr "Editar Declaração"
 
 #: manufacturing/templates/finance_tax_detail.html:92
-#: manufacturing/templates/finance_tax_list.html:119
+#: manufacturing/templates/finance_tax_list.html:121
 msgid "Tax Type *"
 msgstr "Tipo de Imposto *"
 
 #: manufacturing/templates/finance_tax_detail.html:100
-#: manufacturing/templates/finance_tax_list.html:84
-#: manufacturing/templates/finance_tax_list.html:127
-#: manufacturing/templates/legal_ip_list.html:74
-#: manufacturing/templates/legal_ip_list.html:119
+#: manufacturing/templates/finance_tax_list.html:86
+#: manufacturing/templates/finance_tax_list.html:129
+#: manufacturing/templates/legal_ip_list.html:76
+#: manufacturing/templates/legal_ip_list.html:121
 msgid "Jurisdiction"
 msgstr "Jurisdição"
 
 #: manufacturing/templates/finance_tax_detail.html:108
-#: manufacturing/templates/finance_tax_list.html:135
+#: manufacturing/templates/finance_tax_list.html:137
 msgid "Amount Due ($)"
 msgstr "Valor Devido ($)"
 
@@ -6709,9 +6723,9 @@ msgstr "Valor Pago ($)"
 
 #: manufacturing/templates/finance_tax_detail.html:128
 #: manufacturing/templates/finance_tax_detail.html:147
-#: manufacturing/templates/finance_tax_list.html:89
-#: manufacturing/templates/legal_ip_list.html:75
-#: manufacturing/templates/legal_ip_list.html:131
+#: manufacturing/templates/finance_tax_list.html:91
+#: manufacturing/templates/legal_ip_list.html:77
+#: manufacturing/templates/legal_ip_list.html:133
 #: manufacturing/templates/legal_litigation_detail.html:71
 #: manufacturing/templates/legal_litigation_detail.html:114
 #: manufacturing/templates/legal_litigation_list.html:142
@@ -6719,35 +6733,35 @@ msgid "Filed Date"
 msgstr "Data de Apresentação"
 
 #: manufacturing/templates/finance_tax_detail.html:132
-#: manufacturing/templates/finance_tax_list.html:151
+#: manufacturing/templates/finance_tax_list.html:153
 msgid "Reference #"
 msgstr "Referência n.º"
 
-#: manufacturing/templates/finance_tax_list.html:74
+#: manufacturing/templates/finance_tax_list.html:76
 msgid "Search type / jurisdiction / period…"
 msgstr "Buscar tipo / jurisdição / período…"
 
-#: manufacturing/templates/finance_tax_list.html:83
+#: manufacturing/templates/finance_tax_list.html:85
 msgid "Tax Type"
 msgstr "Tipo de Imposto"
 
-#: manufacturing/templates/finance_tax_list.html:106
+#: manufacturing/templates/finance_tax_list.html:108
 msgid "No tax filings found."
 msgstr "Nenhuma declaração fiscal encontrada."
 
-#: manufacturing/templates/finance_tax_list.html:114
+#: manufacturing/templates/finance_tax_list.html:116
 msgid "New Tax Filing"
 msgstr "Nova Declaração Fiscal"
 
-#: manufacturing/templates/finance_tax_list.html:128
+#: manufacturing/templates/finance_tax_list.html:130
 msgid "e.g. Federal, California"
 msgstr "ex.: Federal, Califórnia"
 
-#: manufacturing/templates/finance_tax_list.html:132
+#: manufacturing/templates/finance_tax_list.html:134
 msgid "e.g. Q1 2026, FY2025"
 msgstr "ex.: T1 2026, EF2025"
 
-#: manufacturing/templates/finance_tax_list.html:159
+#: manufacturing/templates/finance_tax_list.html:161
 msgid "Create Filing"
 msgstr "Criar Declaração"
 
@@ -6887,7 +6901,7 @@ msgstr "FORA DE EQUILÍBRIO"
 
 #: manufacturing/templates/gl_cash_flow_statement.html:45
 #: manufacturing/templates/gl_income_statement.html:43
-#: manufacturing/templates/gl_journals.html:44
+#: manufacturing/templates/gl_journals.html:46
 #: manufacturing/templates/prod_schedule.html:48
 #: manufacturing/templates/prod_schedule_gantt.html:45
 #: manufacturing/templates/sales_orders.html:64
@@ -7007,7 +7021,7 @@ msgid "New Journal Entry"
 msgstr "Novo Lançamento Contábil"
 
 #: manufacturing/templates/gl_dashboard_kpis.html:47
-#: manufacturing/templates/gl_journals.html:58
+#: manufacturing/templates/gl_journals.html:60
 msgid "Total Dr"
 msgstr "Total Déb."
 
@@ -7069,7 +7083,7 @@ msgid "Journal Entry #%(num)s"
 msgstr "Lançamento Contábil n.º %(num)s"
 
 #: manufacturing/templates/gl_journal_detail.html:63
-#: manufacturing/templates/gl_journals.html:70
+#: manufacturing/templates/gl_journals.html:72
 msgid "Unposted"
 msgstr "Não Lançado"
 
@@ -7154,19 +7168,19 @@ msgstr "Salvar Lançamento Contábil"
 msgid "New Entry"
 msgstr "Novo Lançamento"
 
-#: manufacturing/templates/gl_journals.html:38
+#: manufacturing/templates/gl_journals.html:40
 msgid "Posted:"
 msgstr "Lançado:"
 
-#: manufacturing/templates/gl_journals.html:41
+#: manufacturing/templates/gl_journals.html:43
 msgid "Posted Only"
 msgstr "Somente Lançados"
 
-#: manufacturing/templates/gl_journals.html:42
+#: manufacturing/templates/gl_journals.html:44
 msgid "Unposted Only"
 msgstr "Somente Não Lançados"
 
-#: manufacturing/templates/gl_journals.html:77
+#: manufacturing/templates/gl_journals.html:79
 msgid "No journal entries found."
 msgstr "Nenhum lançamento contábil encontrado."
 
@@ -7513,8 +7527,8 @@ msgstr "Buscar etiqueta / marca / modelo…"
 #: manufacturing/templates/it_asset_list.html:62
 #: manufacturing/templates/it_repairs_detail.html:64
 #: manufacturing/templates/it_repairs_detail.html:132
-#: manufacturing/templates/it_repairs_list.html:62
-#: manufacturing/templates/it_repairs_list.html:115
+#: manufacturing/templates/it_repairs_list.html:64
+#: manufacturing/templates/it_repairs_list.html:117
 #: manufacturing/templates/it_software_detail.html:68
 #: manufacturing/templates/it_software_detail.html:111
 #: manufacturing/templates/it_software_list.html:61
@@ -7616,7 +7630,7 @@ msgstr "N.º do Chamado"
 #: manufacturing/templates/it_ticket_list.html:64
 #: manufacturing/templates/it_ticket_list.html:109
 #: manufacturing/templates/req_detail.html:58
-#: manufacturing/templates/req_list.html:79
+#: manufacturing/templates/req_list.html:81
 msgid "Requester"
 msgstr "Solicitante"
 
@@ -7637,7 +7651,7 @@ msgstr "Incidente: %(title)s"
 #: manufacturing/templates/it_incident_list.html:117
 #: manufacturing/templates/it_repairs_detail.html:72
 #: manufacturing/templates/it_repairs_detail.html:140
-#: manufacturing/templates/it_repairs_list.html:135
+#: manufacturing/templates/it_repairs_list.html:137
 msgid "Reported Date"
 msgstr "Data do Relato"
 
@@ -7650,7 +7664,7 @@ msgstr "Sistemas Afetados"
 
 #: manufacturing/templates/it_incident_detail.html:93
 #: manufacturing/templates/it_incident_list.html:64
-#: manufacturing/templates/it_repairs_list.html:65
+#: manufacturing/templates/it_repairs_list.html:67
 msgid "Reported"
 msgstr "Relatado"
 
@@ -7765,8 +7779,8 @@ msgstr "Custo"
 #: manufacturing/templates/it_license_detail.html:155
 #: manufacturing/templates/it_license_list.html:66
 #: manufacturing/templates/it_license_list.html:144
-#: manufacturing/templates/legal_ip_list.html:75
-#: manufacturing/templates/legal_ip_list.html:135
+#: manufacturing/templates/legal_ip_list.html:77
+#: manufacturing/templates/legal_ip_list.html:137
 msgid "Expiry Date"
 msgstr "Data de Expiração"
 
@@ -7969,8 +7983,8 @@ msgstr "Solicitação de Reparo n.º %(num)s"
 
 #: manufacturing/templates/it_repairs_detail.html:68
 #: manufacturing/templates/it_repairs_detail.html:136
-#: manufacturing/templates/it_repairs_list.html:64
-#: manufacturing/templates/it_repairs_list.html:119
+#: manufacturing/templates/it_repairs_list.html:66
+#: manufacturing/templates/it_repairs_list.html:121
 msgid "Reported By"
 msgstr "Relatado Por"
 
@@ -7991,44 +8005,44 @@ msgid "Edit Repair"
 msgstr "Editar Reparo"
 
 #: manufacturing/templates/it_repairs_list.html:3
-#: manufacturing/templates/it_repairs_list.html:33
+#: manufacturing/templates/it_repairs_list.html:35
 msgid "Hardware Repairs"
 msgstr "Reparos de Hardware"
 
-#: manufacturing/templates/it_repairs_list.html:51
+#: manufacturing/templates/it_repairs_list.html:53
 msgid "Search asset / reporter…"
 msgstr "Buscar ativo / relator…"
 
-#: manufacturing/templates/it_repairs_list.html:63
+#: manufacturing/templates/it_repairs_list.html:65
 msgid "Problem"
 msgstr "Problema"
 
-#: manufacturing/templates/it_repairs_list.html:102
+#: manufacturing/templates/it_repairs_list.html:104
 msgid "No repairs found."
 msgstr "Nenhum reparo encontrado."
 
-#: manufacturing/templates/it_repairs_list.html:110
+#: manufacturing/templates/it_repairs_list.html:112
 msgid "New Repair Request"
 msgstr "Nova Solicitação de Reparo"
 
-#: manufacturing/templates/it_repairs_list.html:120
+#: manufacturing/templates/it_repairs_list.html:122
 msgid "Name of reporter"
 msgstr "Nome do relator"
 
-#: manufacturing/templates/it_repairs_list.html:132
+#: manufacturing/templates/it_repairs_list.html:134
 #: manufacturing/templates/it_ticket_list.html:134
 msgid "Technician"
 msgstr "Técnico"
 
-#: manufacturing/templates/it_repairs_list.html:143
+#: manufacturing/templates/it_repairs_list.html:145
 msgid "Problem Description *"
 msgstr "Descrição do Problema *"
 
-#: manufacturing/templates/it_repairs_list.html:144
+#: manufacturing/templates/it_repairs_list.html:146
 msgid "Describe the hardware issue"
 msgstr "Descreva o problema de hardware"
 
-#: manufacturing/templates/it_repairs_list.html:148
+#: manufacturing/templates/it_repairs_list.html:150
 msgid "Submit Repair Request"
 msgstr "Enviar Solicitação de Reparo"
 
@@ -8398,19 +8412,19 @@ msgstr "Criar Contrato"
 
 #: manufacturing/templates/legal_dashboard.html:49
 #: manufacturing/templates/legal_ip_list.html:3
-#: manufacturing/templates/legal_ip_list.html:54
+#: manufacturing/templates/legal_ip_list.html:56
 msgid "Intellectual Property"
 msgstr "Propriedade Intelectual"
 
 #: manufacturing/templates/legal_dashboard.html:50
 #: manufacturing/templates/legal_employment_list.html:3
-#: manufacturing/templates/legal_employment_list.html:53
+#: manufacturing/templates/legal_employment_list.html:55
 msgid "Employment Law"
 msgstr "Direito Trabalhista"
 
 #: manufacturing/templates/legal_dashboard.html:51
 #: manufacturing/templates/legal_governance_list.html:3
-#: manufacturing/templates/legal_governance_list.html:53
+#: manufacturing/templates/legal_governance_list.html:55
 msgid "Corporate Governance"
 msgstr "Governança Corporativa"
 
@@ -8455,79 +8469,79 @@ msgstr "Litígios por Tipo de Caso"
 msgid "Recent Contracts"
 msgstr "Contratos Recentes"
 
-#: manufacturing/templates/legal_employment_list.html:64
+#: manufacturing/templates/legal_employment_list.html:66
 msgid "Search matter / employee / owner…"
 msgstr "Pesquisar processo / funcionário / responsável…"
 
-#: manufacturing/templates/legal_employment_list.html:73
-#: manufacturing/templates/legal_employment_list.html:102
+#: manufacturing/templates/legal_employment_list.html:75
+#: manufacturing/templates/legal_employment_list.html:104
 msgid "Matter"
 msgstr "Processo"
 
-#: manufacturing/templates/legal_employment_list.html:89
+#: manufacturing/templates/legal_employment_list.html:91
 msgid "No matters found."
 msgstr "Nenhum processo encontrado."
 
-#: manufacturing/templates/legal_employment_list.html:97
+#: manufacturing/templates/legal_employment_list.html:99
 msgid "New Matter"
 msgstr "Novo Processo"
 
-#: manufacturing/templates/legal_employment_list.html:130
+#: manufacturing/templates/legal_employment_list.html:132
 #: manufacturing/templates/qa_ncr_detail.html:161
 msgid "Closed Date"
 msgstr "Data de Encerramento"
 
-#: manufacturing/templates/legal_employment_list.html:142
+#: manufacturing/templates/legal_employment_list.html:144
 msgid "Create Matter"
 msgstr "Criar Processo"
 
-#: manufacturing/templates/legal_governance_list.html:64
+#: manufacturing/templates/legal_governance_list.html:66
 msgid "Search item / reference / owner…"
 msgstr "Pesquisar item / referência / responsável…"
 
-#: manufacturing/templates/legal_governance_list.html:73
-#: manufacturing/templates/legal_governance_list.html:101
+#: manufacturing/templates/legal_governance_list.html:75
+#: manufacturing/templates/legal_governance_list.html:103
 #: manufacturing/templates/mkt_budget_list.html:82
 #: manufacturing/templates/mkt_budget_list.html:112
 #: manufacturing/templates/rfq_detail.html:122
 msgid "Item"
 msgstr "Item"
 
-#: manufacturing/templates/legal_governance_list.html:74
-#: manufacturing/templates/legal_governance_list.html:125
+#: manufacturing/templates/legal_governance_list.html:76
+#: manufacturing/templates/legal_governance_list.html:127
 msgid "Ref. Date"
 msgstr "Data de Ref."
 
-#: manufacturing/templates/legal_governance_list.html:88
+#: manufacturing/templates/legal_governance_list.html:90
 msgid "No governance items found."
 msgstr "Nenhum item de governança encontrado."
 
-#: manufacturing/templates/legal_governance_list.html:96
+#: manufacturing/templates/legal_governance_list.html:98
 msgid "New Governance Item"
 msgstr "Novo Item de Governança"
 
-#: manufacturing/templates/legal_governance_list.html:137
+#: manufacturing/templates/legal_governance_list.html:139
 msgid "Create Item"
 msgstr "Criar Item"
 
-#: manufacturing/templates/legal_ip_list.html:65
+#: manufacturing/templates/legal_ip_list.html:67
 msgid "Search title / registration # / jurisdiction…"
 msgstr "Pesquisar título / n.º de registro / jurisdição…"
 
-#: manufacturing/templates/legal_ip_list.html:74
-#: manufacturing/templates/legal_ip_list.html:115
+#: manufacturing/templates/legal_ip_list.html:76
+#: manufacturing/templates/legal_ip_list.html:117
 msgid "Registration #"
 msgstr "N.º de Registro"
 
-#: manufacturing/templates/legal_ip_list.html:90
+#: manufacturing/templates/legal_ip_list.html:92
 msgid "No IP records found."
 msgstr "Nenhum registro de PI encontrado."
 
-#: manufacturing/templates/legal_ip_list.html:98
+#: manufacturing/templates/legal_ip_list.html:100
 msgid "New IP Record"
 msgstr "Novo Registro de PI"
 
-#: manufacturing/templates/legal_ip_list.html:143
+#: manufacturing/templates/legal_ip_list.html:145
 msgid "Create IP Record"
 msgstr "Criar Registro de PI"
 
@@ -12749,12 +12763,12 @@ msgid "Requisition %(num)s"
 msgstr "Requisição %(num)s"
 
 #: manufacturing/templates/req_detail.html:60
-#: manufacturing/templates/req_list.html:113
+#: manufacturing/templates/req_list.html:115
 msgid "Needed By"
 msgstr "Necessário Até"
 
 #: manufacturing/templates/req_detail.html:61
-#: manufacturing/templates/req_list.html:80
+#: manufacturing/templates/req_list.html:82
 msgid "Justification"
 msgstr "Justificativa"
 
@@ -12814,35 +12828,35 @@ msgid "Decide"
 msgstr "Decidir"
 
 #: manufacturing/templates/req_list.html:3
-#: manufacturing/templates/req_list.html:59
+#: manufacturing/templates/req_list.html:61
 msgid "Purchase Requisitions"
 msgstr "Requisições de Compra"
 
-#: manufacturing/templates/req_list.html:70
+#: manufacturing/templates/req_list.html:72
 msgid "Search req # / justification…"
 msgstr "Buscar nº da requisição / justificativa…"
 
-#: manufacturing/templates/req_list.html:79
+#: manufacturing/templates/req_list.html:81
 msgid "Req #"
 msgstr "Nº Requisição"
 
-#: manufacturing/templates/req_list.html:80
+#: manufacturing/templates/req_list.html:82
 msgid "Needed"
 msgstr "Necessário"
 
-#: manufacturing/templates/req_list.html:81
+#: manufacturing/templates/req_list.html:83
 msgid "Est. Total"
 msgstr "Total Estimado"
 
-#: manufacturing/templates/req_list.html:109
+#: manufacturing/templates/req_list.html:111
 msgid "Justification *"
 msgstr "Justificativa *"
 
-#: manufacturing/templates/req_list.html:110
+#: manufacturing/templates/req_list.html:112
 msgid "Why is this needed?"
 msgstr "Por que isso é necessário?"
 
-#: manufacturing/templates/req_list.html:124
+#: manufacturing/templates/req_list.html:126
 msgid ""
 "You'll add line items and submit for approval from the requisition's detail "
 "page."
