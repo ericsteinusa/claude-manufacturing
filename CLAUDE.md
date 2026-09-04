@@ -1995,6 +1995,38 @@ failing check/test leaves whatever was already running in place and just
 logs to `manufacture-autopull.log`, so a broken push to `main` never takes
 down what's live on the Windows box.
 
+**"Pulled" is not "deployed" — check the log line, not just that one
+exists.** The box once served weeks-old code while `git log -1` on that
+machine showed it fully current, behind a log containing 30 consecutive
+`Checks passed, restarting service` entries. Every commit had been pulled
+correctly; none had ever been *served*. Three silent failures stacked:
+`manufacture-run.ps1` swallowed `Stop-Process` errors under
+`-ErrorAction SilentlyContinue`, then slept a fixed 2s and started a
+replacement **without re-checking the port had freed** — so the new
+`runserver` died instantly on a bind error into `manufacture-server.log
+.err` while the *original* process kept serving; and autopull wrote its
+`restarting service` line **before** the attempt and never inspected the
+exit code, so total failure and total success were textually identical.
+Nothing on screen changes without a real restart, because `DEBUG=False`
+makes Django cache templates for the life of the process — a pull alone
+is invisible. All three are fixed (the run script now reports kill
+failures with the offending PID, polls until the port genuinely frees,
+refuses to start a server that cannot bind, and confirms the new one is
+listening; autopull logs the outcome plus the run script's transcript).
+**The diagnostic that matters now: a healthy deploy logs
+`Restart OK -- now serving <sha>`.** A bare `Checks passed, restarting
+service` with nothing after it means the restart did not complete.
+Failures log `Restart FAILED (exit N)` followed by indented `run.ps1:`
+lines naming the PID and reason — `Access is denied` there points at the
+scheduled task lacking privilege to kill a server owned by another user,
+fixed by setting the task to run as that account **with highest
+privileges** (a Task Scheduler setting, not a repo change). Worth noting
+the original trigger was never definitively isolated: both the swallowed
+kill error and the fixed-2s race were live, either could have caused it,
+and the manual elevated restart used to recover changed process ownership
+before the fix landed — so treat the above as two real defects closed,
+not one confirmed root cause.
+
 **A DHCP IP change on the Windows box breaks three unrelated things at
 once**, seen in practice when its address moved from `192.168.4.46` to
 `192.168.0.188`: (1) Windows Firewall silently drops inbound connections
