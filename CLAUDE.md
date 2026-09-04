@@ -1792,13 +1792,23 @@ to two new languages, it didn't mark any new template.
   `var(--card-bg)` / `var(--border)`. `base.html`'s `rgba(0,0,0,.45)`
   mobile-sidebar scrim is *not* one of these — it's a genuine overlay.
 
-  Current state on `main`: zero elements below 2.0 contrast, and zero
-  muted-grey text below WCAG AA, across 299 pages. **~61 sub-AA items
-  remain and are deliberate** — semantic status colours (the amber/orange
-  `In Progress`, `Under Review` pills), `var(--accent)` itself at 4.24:1
-  on white (changing it is a rebrand, not a bug fix), and Swagger UI's own
-  CSS on `/api/docs/`. Measure with a size-aware threshold (AA allows 3:1
-  for text ≥24px, or ≥18.66px bold) — otherwise you over-report large KPI
+  *The brand accents are AA-compliant — keep them that way.* `--accent` is
+  `#1a66d9` (was `#1d6fe8`) and the supplier portal's is `#2b8038` (was
+  `#2f8f3e`); both old values failed AA as link text. **Check any change
+  against `--content-bg` (`#f0f4fa`), not white** — that's the binding
+  surface and it's ~0.4 stricter, which is exactly how the old blue passed
+  a white-background spot-check (4.68) while failing in situ (4.24).
+  `--accent-hover` must stay darker than `--accent`. The Chart.js palettes
+  that hardcode `#1d6fe8` were deliberately left — chart fills aren't text,
+  so AA doesn't apply and restyling every chart buys nothing.
+
+  Current state on `main`: across 299 pages — zero elements below 2.0
+  contrast, zero muted-grey text below AA, and zero sub-AA brand-colour
+  text. **~53 sub-AA items remain and are deliberate**: semantic status
+  colours (the amber/orange `In Progress`, `Under Review` pills — muting
+  them to hit a ratio would lose the signal) and Swagger UI's own CSS on
+  `/api/docs/`. Measure with a size-aware threshold (AA allows 3:1 for
+  text ≥24px, or ≥18.66px bold) — otherwise you over-report large KPI
   numbers by ~36 items.
 
   **When converting greys, check the *ancestor's* background, not just the
