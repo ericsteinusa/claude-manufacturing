@@ -27,6 +27,22 @@ $AutopullLauncher   = Join-Path $ScriptDir 'autopull-hidden.vbs'
 # it's not needed (and it's the kind of flag worth not reaching for out of
 # habit).
 
+# Both tasks need an explicit -Principal. Without one, Register-ScheduledTask
+# defaults to RunLevel 'Limited' (non-elevated), and the autopull task then
+# cannot terminate a server process running at a higher integrity level — for
+# instance one started from an elevated shell. Worse, a Limited process can't
+# even read CommandLine from another user's process via Win32_Process, so
+# manufacture-run.ps1's `Where-Object { $_.CommandLine -match 'runserver' }`
+# filter silently matches nothing and no kill is even attempted. That is how
+# the box came to serve weeks-old code behind a log full of apparent
+# successes; see the "pulled is not deployed" note in CLAUDE.md.
+#
+# LogonType Interactive preserves the previous behaviour (tasks run in the
+# registering user's interactive session, which the WScript.Shell launcher
+# relies on for a hidden window); only the elevation changes.
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" `
+    -LogonType Interactive -RunLevel Highest
+
 # --- Task 1: start the server at logon (systemd's WantedBy=multi-user.target) ---
 $startAction  = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$RunLauncher`""
 $startTrigger = New-ScheduledTaskTrigger -AtLogOn
@@ -34,6 +50,7 @@ $startSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStop
 
 Register-ScheduledTask -TaskName 'ManufactureServer' `
     -Action $startAction -Trigger $startTrigger -Settings $startSettings `
+    -Principal $principal `
     -Description 'Start the Manufacturing ERP dev server on logon (Windows equivalent of manufacture.service).' `
     -Force
 
@@ -46,6 +63,7 @@ $pullSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopI
 
 Register-ScheduledTask -TaskName 'ManufactureAutopull' `
     -Action $pullAction -Trigger $pullTrigger -Settings $pullSettings `
+    -Principal $principal `
     -Description 'Poll origin/main every 2 minutes; pull + test-gate + restart on green (Windows equivalent of manufacture-autopull.timer).' `
     -Force
 
