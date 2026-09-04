@@ -11,6 +11,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn { display: none !important; }
+    body { background: white !important; }
+    .ssc-wrap { max-width: none; }
+}
 .ssc-wrap { width:100%; max-width:900px; }
 .ssc-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
@@ -24,6 +34,7 @@
 
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
 <div class="ssc-wrap">
     {% if not scorecard %}
     <h2>Supplier Scorecard</h2>
