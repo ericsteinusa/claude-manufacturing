@@ -1,0 +1,19 @@
+name: powershell-encoding
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  encoding:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # No dependencies: the check is stdlib-only so it stays runnable
+      # locally with `python scripts/check_powershell_encoding.py`.
+      - name: Check Windows PowerShell scripts are ASCII in executable code
+        run: python scripts/check_powershell_encoding.py
