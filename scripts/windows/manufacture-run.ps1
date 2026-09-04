@@ -34,34 +34,73 @@ $Port    = 8000
 
 $LogFile = Join-Path $RepoDir 'manufacture-server.log'
 
-function Stop-AllServerProcesses {
-    # Broad match rather than a single tracked PID — manage.py runserver's
-    # autoreloader can leave more than one process alive in a watcher/child
-    # chain, and a targeted kill of just one of them can leave the rest
-    # (and the listening socket) behind.
+function Get-ServerProcessIds {
+    # Find the server by the socket it holds, NOT by matching CommandLine.
     #
+    # Win32_Process.CommandLine reads back EMPTY for a process owned by a
+    # different user unless the caller is elevated. A CommandLine-only
+    # match therefore finds nothing in exactly the case that matters -- a
+    # server left behind by some earlier session -- so no kill is ever
+    # attempted, $stopFailures stays 0, and the caller reports
+    # "still held (kill failures: 0)" with the run-elevated hint
+    # suppressed. That reads as "the process vanished" when the truth is
+    # "I was not allowed to see it". Observed live on the deployment box:
+    # a stale server served fb8f2df for hours after the repo had pulled
+    # 6d7e61b, and taskkill by PID was the only thing that could see it.
+    #
+    # OwningProcess from Get-NetTCPConnection carries no such restriction.
+    $found = New-Object 'System.Collections.Generic.HashSet[int]'
+
+    foreach ($conn in @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)) {
+        if ($conn.OwningProcess) { [void]$found.Add([int]$conn.OwningProcess) }
+    }
+
+    # runserver's autoreloader is a parent/child pair and only the child
+    # binds the port. Killing just the child lets the parent respawn it,
+    # so walk up one level and take a python.exe parent too. ParentProcessId
+    # is readable cross-user even when CommandLine is not.
+    foreach ($procId in @($found)) {
+        $proc = Get-CimInstance Win32_Process -Filter "ProcessId = $procId" -ErrorAction SilentlyContinue
+        if (-not $proc -or -not $proc.ParentProcessId) { continue }
+        $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($proc.ParentProcessId)" -ErrorAction SilentlyContinue
+        if ($parent -and $parent.Name -eq 'python.exe') { [void]$found.Add([int]$parent.ProcessId) }
+    }
+
+    # Keep the CommandLine match as a supplement, not the primary. When it
+    # IS readable it catches a reloader parent that holds no socket of its
+    # own, and it still finds a runserver that died mid-bind.
+    Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -match 'manage\.py runserver' } |
+        ForEach-Object { [void]$found.Add([int]$_.ProcessId) }
+
+    return $found
+}
+
+function Stop-AllServerProcesses {
     # Kill failures are reported, not swallowed: a Stop-Process that fails
     # on a permission boundary (scheduled task running as a different or
     # non-elevated user than the one that launched the server) used to
     # vanish under -ErrorAction SilentlyContinue, after which the script
     # cheerfully started a replacement that could never bind the port.
-    Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" |
-        Where-Object { $_.CommandLine -match 'manage\.py runserver' } |
-        ForEach-Object {
-            # Capture the PID before the try: inside catch, $_ is rebound to
-            # the ErrorRecord, so $_.ProcessId would be null there.
-            $procId = $_.ProcessId
-            Write-Host "Stopping PID $procId"
-            try {
-                Stop-Process -Id $procId -Force -ErrorAction Stop
-            } catch {
-                Write-Host "  FAILED to stop PID ${procId}: $($_.Exception.Message)"
-                $script:stopFailures++
-            }
+    $targets = Get-ServerProcessIds
+    $script:stopAttempts = $targets.Count
+    if ($targets.Count -eq 0) {
+        Write-Host "No server process found holding port $Port."
+        return
+    }
+    foreach ($procId in $targets) {
+        Write-Host "Stopping PID $procId"
+        try {
+            Stop-Process -Id $procId -Force -ErrorAction Stop
+        } catch {
+            Write-Host "  FAILED to stop PID ${procId}: $($_.Exception.Message)"
+            $script:stopFailures++
         }
+    }
 }
 
 $stopFailures = 0
+$stopAttempts = 0
 
 $listening = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
 
@@ -96,11 +135,17 @@ if ($listening -or $Restart) {
     }
 
     if (-not $freed) {
-        Write-Host "ERROR: port $Port is still held after stopping (kill failures: $stopFailures)."
+        Write-Host "ERROR: port $Port is still held after stopping (found: $stopAttempts, kill failures: $stopFailures)."
         Write-Host "       Refusing to start a second server that cannot bind."
+        # Report BOTH shapes of permission failure. Previously the hint was
+        # gated on $stopFailures alone, so the "could not even see it" case
+        # printed nothing actionable.
         if ($stopFailures -gt 0) {
             Write-Host "       Hint: the owning process belongs to another user - run this elevated,"
             Write-Host "       or set the scheduled task to run as the same account with highest privileges."
+        } elseif ($stopAttempts -eq 0) {
+            Write-Host "       Hint: something holds the port but no owning process could be identified."
+            Write-Host "       Run elevated and check: Get-NetTCPConnection -LocalPort $Port -State Listen"
         }
         exit 1
     }
