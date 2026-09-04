@@ -1713,6 +1713,79 @@ to two new languages, it didn't mark any new template.
   fragment, and confirmed it appeared in the Payment History table — then deleted it and confirmed
   it was gone; also confirmed the fragment renders correctly in Portuguese and Dutch with an
   active session in each.
+- **Print / export buttons on detail and list pages.** Document-type detail
+  pages carry a `Print / Save PDF` button; list pages carry `Export CSV` /
+  `Export Excel` links. Both follow one established pattern each, and the
+  print one has a non-obvious scoping rule that is easy to get wrong.
+
+  *Print* — copy `po_detail.html`: a `.print-btn` style block plus an
+  `@media print { ... display: none !important; }` rule in `extra_styles`,
+  and `<button class="print-btn" onclick="window.print()">` as the first
+  element inside `{% block body %}`'s `.content` div. **The rule that
+  matters: hide only the workflow-action controls, never the record's own
+  data.** Several of these pages render the record *inside form fields*
+  (`<input readonly>` / `<textarea readonly>` when the viewer lacks edit
+  rights, editable otherwise), so a naive `form { display: none }` blanks
+  the document it was supposed to print. Work control-by-control instead:
+  every state-mutating control needs *some* selector in the rule, and the
+  record's own fields need to survive. Which selectors you need depends on
+  how the page is built, and pages often need more than one:
+  - **Action lives in its own card/form, separate from the data** — give it
+    a `no-print` class and add `.no-print` to the rule. `legal_contract
+    _detail.html` (Edit Contract card), `credit_application_detail.html`
+    (Review Application), `req_detail.html` (Add Item + Submit + Decide,
+    3 elements), `consultant_invoice_detail.html` (Submit + the
+    approval-decision alert), `eng_ecr_detail.html` (inline status-change
+    dropdown).
+  - **The data itself is inside the edit form** — hide only that form's
+    submit button, not the form. `.btn-submit` in `purch_contract_detail
+    .html`, `sales_contracts_detail.html`, `eng_spec_detail.html`,
+    `finance_tax_detail.html`, `cs_returns_detail.html`; `.btn-row` in the
+    QA trio; `.btn-act` in `eng_ecr_detail.html`. Hiding the whole form
+    here is the failure mode described above.
+  - **Both at once** is common, not exceptional. `qa_ncr_detail.html` /
+    `qa_capa_detail.html` / `qa_audit_detail.html` hide `.btn-row` (their
+    details card *is* a form) *and* `.no-print` (the separate Close NCR /
+    Close CAPA / Complete Audit card). `eng_ecr_detail.html` likewise
+    pairs `.btn-act` with `.no-print`.
+  - **Nothing extra needed** — when the only controls are toolbar links or
+    buttons already carrying `.btn`, the generic `.btn` entry covers them.
+    `supplier_scorecard_detail.html` (genuinely form-free) and
+    `blanket_po_detail.html` (its Cancel Blanket PO button is a `.btn`).
+
+  Portal templates (`base_portal.html` / `base_supplier_portal.html`) also
+  need `.portal-header` in the rule, since their nav bar isn't a `.btn` —
+  see `portal_rma_detail.html` and `supplier_portal_po_detail.html`.
+
+  Verify by loading a real record in each permission/status state the page
+  branches on, not just one — the action controls are usually behind
+  `{% if can_edit %}` / status checks, so a single spot-check silently
+  misses whichever branch you didn't hit.
+
+  *Export* — copy `it_repairs_list.html`: an `?export=1[&format=xlsx]` link
+  pair in `toolbar_left` with **`|urlencode` on every filter value**, and an
+  `if 'export' in request.GET: return export_response(request,
+  '<base_filename>', [(field, 'Header'), …], rows)` branch in the view,
+  placed **after** the rows are fetched but **before** any POST handling or
+  extra context queries. `csv_export.export_response` handles the CSV/XLSX
+  split; row dicts may be missing keys without raising. Don't copy
+  `bom_list.html`'s link markup — it has the right URL shape but predates
+  the `|urlencode` convention and interpolates its filter raw, which
+  silently truncates the export's scope on any value containing `&` or a
+  space (the same bug fixed in `ar_list.html`/`ap_list.html` in PRs
+  #201/#202). When the view already scopes rows by permission (e.g.
+  `req_list`'s full-access / manager / own visibility), exporting that same
+  `rows` variable inherits the scoping for free — don't re-query.
+
+  **i18n caveat for both:** wrap the new button/link text in `{% trans %}`
+  *only if the template already has `{% load i18n %}`*. Several of these
+  areas are untranslated by design (the whole Consultants feature, the
+  customer/supplier portals, `bom_detail.html`, `supplier_scorecard_detail
+  .html`) — adding a lone translated string to an otherwise-English page
+  creates a half-translated surface for no benefit. Where the tag does
+  apply, `makemessages` merges into the existing `"Print / Save PDF"` /
+  `"Export CSV"` / `"Export Excel"` msgids, which are already translated in
+  all five languages, so no new translation work is needed.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
