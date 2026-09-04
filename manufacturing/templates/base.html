@@ -240,8 +240,12 @@
         .erp-table tbody td.num { text-align: right; }
         .erp-table tbody tr:last-child td { border-bottom: none; }
         .erp-table tbody tr:hover td { background: #f5f8ff; }
-        .erp-table a { color: var(--accent); font-weight: 600; text-decoration: none; }
-        .erp-table a:hover { text-decoration: underline; }
+        /* :not(.btn) — a plain `.erp-table a` (0,1,1) out-specifies
+           `.btn-primary` (0,1,0) and would repaint a button's text with the
+           table's link colour, e.g. accent-on-accent. Buttons keep their own
+           colour; only real table links are restyled. */
+        .erp-table a:not(.btn) { color: var(--accent); font-weight: 600; text-decoration: none; }
+        .erp-table a:not(.btn):hover { text-decoration: underline; }
 
         /* ── Status pills ── */
         .pill {
@@ -271,7 +275,7 @@
             font-size: 12px; text-decoration: none; color: var(--text);
             transition: border-color .12s;
         }
-        .filter-bar a:hover { border-color: var(--accent); color: var(--accent); }
+        .filter-bar a:not(.btn):hover { border-color: var(--accent); color: var(--accent); }
         .filter-bar a.active {
             background: var(--accent); border-color: var(--accent); color: white;
         }
@@ -355,7 +359,7 @@
         .po-table th { background: #e8edf7; color: var(--text); font-size: 11.5px; font-weight: 700; padding: 9px 12px; text-align: left; border-bottom: 2px solid var(--border); }
         .po-table td { padding: 9px 12px; border-bottom: 1px solid #edf0f7; font-size: 13px; }
         .po-table tr:hover td { background: #f5f8ff; }
-        .po-table a { color: var(--accent); font-weight: 600; text-decoration: none; }
+        .po-table a:not(.btn) { color: var(--accent); font-weight: 600; text-decoration: none; }
         .po-table th.num, .po-table td.num { text-align: right; }
 
         /* ── Hamburger toggle (mobile only) ── */
