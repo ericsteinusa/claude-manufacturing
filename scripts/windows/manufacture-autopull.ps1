@@ -7,7 +7,7 @@
     safety gate as the Linux version: only restarts the running server
     if `manage.py check` and the full pytest suite both pass on the new
     commit. A failing gate leaves whatever was already running in place
-    and just logs the failure — a broken push to main never takes down
+    and just logs the failure - a broken push to main never takes down
     what's live.
 #>
 
@@ -28,7 +28,7 @@ Set-Location $RepoDir
 
 git fetch origin main --quiet
 if ($LASTEXITCODE -ne 0) {
-    Write-Log "git fetch failed (exit $LASTEXITCODE) — leaving current deployment as-is."
+    Write-Log "git fetch failed (exit $LASTEXITCODE) - leaving current deployment as-is."
     exit 1
 }
 
@@ -57,7 +57,7 @@ Write-Log "New commits detected (was $local, now $remote), pulling"
 
 git pull origin main --ff-only
 if ($LASTEXITCODE -ne 0) {
-    Write-Log "git pull --ff-only FAILED (local history has diverged?) — service NOT restarted, still running previous commit."
+    Write-Log "git pull --ff-only FAILED (local history has diverged?) - service NOT restarted, still running previous commit."
     exit 1
 }
 
