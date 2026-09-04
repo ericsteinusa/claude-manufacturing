@@ -7,8 +7,8 @@
 <a href="/qa/ncr/" class="btn">{% trans "NCRs" %}</a>
 <a href="/qa/capa/" class="btn">{% trans "CAPAs" %}</a>
 <a href="/dashboard/" class="btn">{% trans "Home" %}</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}

@@ -6,8 +6,8 @@
 {% if can_edit %}
 <a href="/lots/new/" class="btn">+ New Lot</a>
 {% endif %}
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if product_id %}&product_id={{ product_id }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if product_id %}&product_id={{ product_id }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if product_id %}&product_id={{ product_id|urlencode }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if product_id %}&product_id={{ product_id|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}

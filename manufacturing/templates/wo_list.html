@@ -5,8 +5,8 @@
 {% block toolbar_left %}
 <a href="{{ back_url }}" class="btn">← Back</a>
 {% if can_edit %}<a href="/wo/new/" class="btn btn-primary">+ New WO</a>{% endif %}
-<a href="/wo/export/?status={{ status }}" class="btn">⬇ Export CSV</a>
-<a href="/wo/export/?status={{ status }}&format=xlsx" class="btn">⬇ Export Excel</a>
+<a href="/wo/export/?status={{ status|urlencode }}" class="btn">⬇ Export CSV</a>
+<a href="/wo/export/?status={{ status|urlencode }}&format=xlsx" class="btn">⬇ Export Excel</a>
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
 {% endblock %}
 

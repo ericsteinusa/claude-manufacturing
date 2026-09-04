@@ -1773,10 +1773,24 @@ to two new languages, it didn't mark any new template.
   any value containing `&` or a space silently truncates the export's scope
   rather than erroring (the bug fixed in `ar_list.html`/`ap_list.html` in
   PRs #201/#202, where the free-text `search`/date filters made it
-  reachable). Apply it to whitelisted filters too — `bom_list.html`'s
-  `item_type` is validated against `ITEM_TYPES` in the view so it can't
-  currently break, but it carries the filter for the same reason and
-  widening that tuple shouldn't quietly reintroduce the bug. When the view
+  reachable). The mechanism is worth knowing, since nothing errors: Django
+  auto-escapes the `&` to `&amp;`, the browser entity-decodes it back to a
+  real separator, and the link splits into a truncated `search=` plus a
+  junk param — so the user sees N filtered rows, clicks Export, and gets a
+  *larger* set for the truncated term. Apply it to whitelisted filters too
+  — `bom_list.html`'s `item_type` is validated against `ITEM_TYPES` in the
+  view so it can't currently break, but it carries the filter for the same
+  reason and widening that tuple shouldn't quietly reintroduce the bug.
+
+  **The app is now uniformly compliant** — a sweep of the remaining 51
+  templates (PRs #201/#202/#222 had each fixed one page in isolation)
+  means any export link you copy from is a safe reference, not just
+  `it_repairs_list.html`. It covered both link shapes: `?export=1` on the
+  same path, and a separate export URL like `/qa/ncr/export/?…`. Catch a
+  regression from `manufacturing/templates/` with
+  `grep -l 'href="[^"]*export[^"]*{{' *.html | while read f; do grep -H
+  'href="[^"]*export[^"]*{{' "$f" | grep -v urlencode; done` — any output
+  is an unencoded filter. When the view
   already scopes rows by permission (e.g. `req_list`'s full-access /
   manager / own visibility), exporting that same `rows` variable inherits
   the scoping for free — don't re-query.

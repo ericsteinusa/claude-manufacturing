@@ -10,8 +10,8 @@
 <a href="/eng/specs/" class="btn">{% trans "Standards" %}</a>
 <a href="/eng/reports/" class="btn">{% trans "Reports" %}</a>
 <a href="/dashboard/" class="btn">{% trans "Home" %}</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if category_filter %}&category={{ category_filter|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if category_filter %}&category={{ category_filter|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}

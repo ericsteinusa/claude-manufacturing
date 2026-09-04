@@ -4,8 +4,8 @@
 
 {% block toolbar_left %}
 <a href="/maint/" class="btn">{% trans "Dashboard" %}</a>
-<a href="/maint/reports/labor/export/?section=wo&period={{ period }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}" class="btn">⬇ {% trans "WO CSV" %}</a>
-<a href="/maint/reports/labor/export/?section=mechanic&period={{ period }}&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ {% trans "Mechanic CSV" %}</a>
+<a href="/maint/reports/labor/export/?section=wo&period={{ period|urlencode }}&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}&status={{ status_filter|urlencode }}" class="btn">⬇ {% trans "WO CSV" %}</a>
+<a href="/maint/reports/labor/export/?section=mechanic&period={{ period|urlencode }}&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">⬇ {% trans "Mechanic CSV" %}</a>
 <a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
