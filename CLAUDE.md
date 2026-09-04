@@ -2051,6 +2051,27 @@ listening; autopull logs the outcome plus the run script's transcript).
 **The diagnostic that matters now: a healthy deploy logs
 `Restart OK -- now serving <sha>`.** A bare `Checks passed, restarting
 service` with nothing after it means the restart did not complete.
+**`Win32_Process.CommandLine` reads back empty for a process owned by
+another user unless the caller is elevated** — so `manufacture-run.ps1`
+finds the server by the socket it holds (`Get-NetTCPConnection ...
+OwningProcess`, which carries no such restriction), not by matching
+`manage.py runserver` against `CommandLine`. It used to do the latter,
+which failed silently and precisely in the case that matters: a stale
+server left by an earlier session was invisible, so no kill was ever
+*attempted*, `kill failures` stayed `0`, and the "run this elevated"
+hint — gated on that counter — never printed. The log read
+`still held (kill failures: 0)`, which looks like the process vanished
+rather than like a permissions wall. Seen live 2026-09-04: the box
+served `fb8f2df` for hours after pulling `6d7e61b`, `Get-CimInstance ...
+CommandLine` returned nothing from a normal shell, and `netstat -ano |
+findstr :8000` plus `taskkill /F /PID` was the only thing that could see
+it (in the end a reboot was what cleared it — `taskkill` also reported
+`could not be terminated`). The message now prints `found: N, kill
+failures: M` so "could not see it" and "could not kill it" are
+distinguishable, and both get a hint. Because runserver's autoreloader is
+a parent/child pair where only the child binds the port, the lookup also
+walks up one level and takes a `python.exe` parent — killing only the
+child lets the parent respawn it.
 Failures log `Restart FAILED (exit N)` followed by indented `run.ps1:`
 lines naming the PID and reason — `Access is denied` there points at the
 scheduled task lacking privilege to kill a server owned by another user,
