@@ -44,7 +44,9 @@ if ($local -eq $remote) {
     # No -Restart here: when the port is already listening this is a no-op,
     # so it stays quiet on the common path and only logs when a genuine
     # revival was attempted and failed.
-    $heartbeatOut = & (Join-Path $PSScriptRoot 'manufacture-run.ps1') 2>&1
+    # *>&1 for the same reason as the restart path below: Write-Host goes
+    # to the Information stream, so 2>&1 would capture nothing.
+    $heartbeatOut = & (Join-Path $PSScriptRoot 'manufacture-run.ps1') *>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Log "Server was down and could NOT be restarted (exit $LASTEXITCODE)."
         foreach ($line in $heartbeatOut) { Write-Log "    run.ps1: $line" }
@@ -80,8 +82,15 @@ if ($checkOk -and $testOk) {
     # failed to stop the old process (permission boundary) produced a log
     # full of apparent successes while the box served stale code for
     # weeks. Capture the transcript too: the failure detail only exists
-    # in the run script's stdout.
-    $runOut = & (Join-Path $PSScriptRoot 'manufacture-run.ps1') -Restart 2>&1
+    # in the run script's output.
+    #
+    # Must be *>&1, not 2>&1. manufacture-run.ps1 reports exclusively via
+    # Write-Host, which since PowerShell 5.0 writes to the Information
+    # stream (6) rather than stdout or stderr -- so 2>&1 captures nothing
+    # and the transcript below logs zero lines. Observed live: a genuine
+    # "Restart FAILED (exit 1)" was recorded with no explanation beneath
+    # it, which defeats the point of capturing it at all.
+    $runOut = & (Join-Path $PSScriptRoot 'manufacture-run.ps1') -Restart *>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Log "Restart OK -- now serving $remote"
     } else {
