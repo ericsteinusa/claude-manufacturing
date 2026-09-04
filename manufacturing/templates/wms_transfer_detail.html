@@ -5,8 +5,21 @@
 <a href="/wms/transfers/" class="btn">Back to Transfers</a>
 {% endblock %}
 
+{% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .no-print { display: none !important; }
+    body { background: white !important; }
+}
+{% endblock %}
+
 {% block body %}
 <div class="content">
+<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
 <div class="menu-title">{{ transfer.transfer_number }}</div>
 <p>
     {{ transfer.from_warehouse_code }} &rarr; {{ transfer.to_warehouse_code }}
@@ -19,7 +32,7 @@
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Product</th><th>From Bin</th><th>To Bin</th><th>Qty</th><th>Status</th>{% if can_edit %}<th></th>{% endif %}</tr>
+            <tr><th>Product</th><th>From Bin</th><th>To Bin</th><th>Qty</th><th>Status</th>{% if can_edit %}<th class="no-print"></th>{% endif %}</tr>
         </thead>
         <tbody>
             {% for l in lines %}
@@ -30,7 +43,7 @@
                 <td>{{ l.qty }}</td>
                 <td><span class="pill pill-{{ l.status }}">{{ l.status|title }}</span></td>
                 {% if can_edit %}
-                <td>
+                <td class="no-print">
                     {% if l.status == 'pending' and transfer.status == 'draft' %}
                     <form method="post" style="display:inline;">
                         {% csrf_token %}
@@ -63,6 +76,7 @@
 </div>
 
 {% if can_edit and transfer.status == 'draft' %}
+<div class="no-print">
 <h3 style="margin-top:24px;">Add Line</h3>
 {% if available_stock %}
 <form method="post" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
@@ -94,6 +108,7 @@
         <input type="hidden" name="action" value="cancel">
         <button type="submit" class="btn">Cancel Transfer</button>
     </form>
+</div>
 </div>
 {% endif %}
 </div>
