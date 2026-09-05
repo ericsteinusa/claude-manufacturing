@@ -2060,6 +2060,32 @@ form when `main` is checked out, so one cannot serve both. The script also
 declines to restart the service when the tree is not on `main`, rather
 than deploying whatever branch happens to be there.
 
+**`systemctl restart` returning 0 does not mean the server is up.** For
+`Type=simple` it returns as soon as the process is *spawned*, so a
+`runserver` that dies immediately — port already held, bad `.env`, DB auth
+— still exits zero, after which `Restart=on-failure` cycles it forever.
+The script logs the *outcome*: a healthy deploy writes
+`Restart OK -- now serving <sha>` (the same diagnostic as the Windows
+side), a failure writes `Restart FAILED` plus indented `svc:` lines from
+`systemctl status`. **A single `is-active` sample cannot tell a healthy
+server from a crash loop** — during auto-restart the unit reads `active`
+for the moment between spawn and the child's bind failure — so it waits
+for `active`, then re-checks a few seconds later *and* confirms
+`NRestarts` has not climbed.
+
+**The quiet path is health-checked too.** `Restart=on-failure` recovers a
+one-off crash but cannot fix a server that fails every start for the same
+reason, and that state used to be invisible: the unit sat in `activating`
+forever while autopull exited 0 every two minutes with nothing to say.
+Seen live 2026-09-04 — `manufacture.service` crash-looped **4,000+ times
+over eight hours** because a leftover `.claude/launch.json` preview dev
+server (`../manage.py runserver 0.0.0.0:8000`, started by an editor
+session, not by a unit) held the port. The app still answered, because
+*that* process was serving, so nothing looked wrong from outside. A
+non-`active` service is now logged even when there is nothing to pull.
+`fuser -k -9 8000/tcp` clears such a squatter; a plain reboot fixes it
+permanently, since it is not a service and does not come back.
+
 ## Windows deployment (`scripts/windows/`)
 `manufacture-autopull.ps1` (polls `origin/main` and redeploys) and
 `manufacture-run.ps1` (start/restart the dev server, tracked by port
