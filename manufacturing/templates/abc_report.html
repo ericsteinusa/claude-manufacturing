@@ -1,18 +1,19 @@
 {% extends "base.html" %}
-{% block page_title %}ABC vs. Traditional Overhead{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "ABC vs. Traditional Overhead" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/gl/abc-costing/activities/" class="btn">Activities</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/gl/abc-costing/activities/" class="btn">{% trans "Activities" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Activity-Based vs. Traditional Overhead</div>
+    <div class="menu-title">{% trans "Activity-Based vs. Traditional Overhead" %}</div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Products where the flat overhead rate and actual activity-driver consumption
-        disagree by {{ variance_threshold_pct|floatformat:"g" }}% or more are flagged —
-        worth investigating whether the traditional rate is over- or under-costing them.
+        {% blocktrans with pct=variance_threshold_pct|floatformat:"g" %}Products where the flat overhead rate and actual activity-driver consumption
+        disagree by {{ pct }}% or more are flagged —
+        worth investigating whether the traditional rate is over- or under-costing them.{% endblocktrans %}
     </p>
 
     {% if summary %}
@@ -20,11 +21,11 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th class="num">Traditional OH/Unit</th>
-                    <th class="num">ABC OH/Unit</th>
-                    <th class="num">Variance</th>
-                    <th class="num">Variance %</th>
+                    <th>{% trans "Product" %}</th>
+                    <th class="num">{% trans "Traditional OH/Unit" %}</th>
+                    <th class="num">{% trans "ABC OH/Unit" %}</th>
+                    <th class="num">{% trans "Variance" %}</th>
+                    <th class="num">{% trans "Variance %" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -50,9 +51,9 @@
                     </td>
                     <td>
                         {% if row.flagged %}
-                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Investigate</span>
+                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{% trans "Investigate" %}</span>
                         {% endif %}
-                        <a href="/gl/abc-costing/products/{{ row.product_id }}/output/" class="btn" style="padding:3px 10px;font-size:12px;">Set Output</a>
+                        <a href="/gl/abc-costing/products/{{ row.product_id }}/output/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Set Output" %}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -60,7 +61,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No products have recorded activity-driver consumption yet — add usage under an Activity.</div>
+    <div class="empty-state">{% trans "No products have recorded activity-driver consumption yet — add usage under an Activity." %}</div>
     {% endif %}
 </div>
 {% endblock %}
