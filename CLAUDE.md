@@ -2032,6 +2032,37 @@ to two new languages, it didn't mark any new template.
   Fixed in PR #94/#95 — when adding or touching a query that joins for a
   `_name`/`_number` display field, check its sibling `_id` is selected too.
 
+## Checking what a box is actually serving (`/healthz/`)
+Unauthenticated, no session needed, works on both deployments:
+
+    curl -s http://<box>:8000/healthz/
+
+`status` is a pure **liveness** signal (is the DB reachable) — `ok`, or
+`error` with 503. Don't widen it: load balancers assert on it, and a stale
+deploy is still a serving one. Deploy identity lives under `version`:
+
+  * `sha` / `short_sha` — the commit **this process booted with**, read once
+    at import. What the box is *actually serving*.
+  * `disk_sha` — what the working tree holds *now*, read per request.
+  * `code_stale` — true when those differ: the pulled-but-not-restarted
+    window, which is otherwise invisible from outside the machine. A commit
+    that cannot be read reports `None` and `code_stale: false` — "I could
+    not look" must not masquerade as "the deploy is broken".
+
+This exists because on 2026-09-04 the Linux box served an eight-hour-old
+process while its repo sat fully current: `git log` on the box looked
+right, HTTP looked right, and only the *restart* had failed. It is also
+the only way to confirm a deploy of a commit that changes no rendered
+output (docs, `scripts/`) — HTTP alone cannot distinguish those.
+
+`version_core.py` reads `.git` directly rather than shelling out to `git`:
+no subprocess per request, no dependency on git being installed or on the
+deploy user's `PATH`, and it cannot hang. It follows the worktree `.git`-as-
+a-file indirection and `commondir`, and falls back to `packed-refs` when a
+loose ref is absent. **Strip the `refs/heads/` prefix, don't `rsplit('/')`**
+— branch names here are nearly all `feat/x` or `docs/y`, and the naive
+split silently reports `x`.
+
 ## Linux deployment (`scripts/linux/`)
 `manufacture-autopull.sh` (polls `origin/main`, gates on `manage.py check`
 plus the full pytest suite, restarts `manufacture.service`) plus the three
