@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 15:28+0000\n"
+"POT-Creation-Date: 2026-09-05 15:57+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
@@ -352,6 +352,16 @@ msgstr "Folha de Pagamento"
 #: manufacturing/templates/eng_specs_list.html:12
 #: manufacturing/templates/eng_task_detail.html:12
 #: manufacturing/templates/eng_tasks_list.html:12
+#: manufacturing/templates/ess_home.html:11
+#: manufacturing/templates/ess_pay_stub_detail.html:8
+#: manufacturing/templates/ess_pay_stubs.html:8
+#: manufacturing/templates/ess_profile.html:7
+#: manufacturing/templates/ess_review_detail.html:8
+#: manufacturing/templates/ess_reviews.html:7
+#: manufacturing/templates/ess_time_off.html:8
+#: manufacturing/templates/ess_training_detail.html:8
+#: manufacturing/templates/ess_trainings.html:7
+#: manufacturing/templates/ess_ytd.html:8
 #: manufacturing/templates/exit_interview_list.html:10
 #: manufacturing/templates/fin_cash_forecast.html:8
 #: manufacturing/templates/finance_audit_detail.html:11
@@ -678,6 +688,7 @@ msgstr "Lançamentos Contabilísticos Recentes"
 #: manufacturing/templates/credit_dashboard_kpis.html:85
 #: manufacturing/templates/cs_dashboard_kpis.html:36
 #: manufacturing/templates/cs_surveys_detail.html:127
+#: manufacturing/templates/ess_reviews.html:34
 #: manufacturing/templates/finance_dashboard_kpis.html:55
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:56
@@ -859,6 +870,12 @@ msgstr "Total a Débito"
 #: manufacturing/templates/eng_task_detail.html:99
 #: manufacturing/templates/eng_task_detail.html:120
 #: manufacturing/templates/eng_tasks_list.html:94
+#: manufacturing/templates/ess_pay_stubs.html:37
+#: manufacturing/templates/ess_review_detail.html:38
+#: manufacturing/templates/ess_reviews.html:34
+#: manufacturing/templates/ess_time_off.html:54
+#: manufacturing/templates/ess_training_detail.html:38
+#: manufacturing/templates/ess_trainings.html:33
 #: manufacturing/templates/finance_audit_detail.html:90
 #: manufacturing/templates/finance_audit_detail.html:128
 #: manufacturing/templates/finance_audit_list.html:90
@@ -1146,6 +1163,7 @@ msgstr "G/L"
 #: manufacturing/templates/cs_returns_detail.html:56
 #: manufacturing/templates/eng_ecr_detail.html:48
 #: manufacturing/templates/eng_spec_detail.html:56
+#: manufacturing/templates/ess_pay_stub_detail.html:36
 #: manufacturing/templates/finance_tax_detail.html:61
 #: manufacturing/templates/legal_contract_detail.html:56
 #: manufacturing/templates/maint_wo_detail.html:57
@@ -1283,6 +1301,7 @@ msgstr "Taxa de Câmbio"
 #: manufacturing/templates/eng_project_detail.html:112
 #: manufacturing/templates/eng_spec_detail.html:113
 #: manufacturing/templates/eng_task_detail.html:111
+#: manufacturing/templates/ess_profile.html:78
 #: manufacturing/templates/finance_audit_detail.html:102
 #: manufacturing/templates/finance_bank_rec_detail.html:85
 #: manufacturing/templates/finance_budget_detail.html:85
@@ -2136,6 +2155,7 @@ msgstr "Candidatura"
 #: manufacturing/templates/compliance_checklist_list.html:42
 #: manufacturing/templates/compliance_template_list.html:34
 #: manufacturing/templates/control_plan_list.html:45
+#: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/rfq_list.html:55
 msgid "Detail"
 msgstr "Detalhe"
@@ -2193,6 +2213,7 @@ msgstr "Pesquisar"
 #: manufacturing/templates/compliance_checklist_list.html:27
 #: manufacturing/templates/compliance_template_list.html:27
 #: manufacturing/templates/control_plan_list.html:23
+#: manufacturing/templates/ess_profile.html:66
 #: manufacturing/templates/it_task_detail.html:106
 #: manufacturing/templates/maint_equipment_list.html:78
 #: manufacturing/templates/maint_mechanics_list.html:75
@@ -2227,6 +2248,8 @@ msgstr "E-mail"
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/ats_candidate_new.html:41
 #: manufacturing/templates/credit_account_detail.html:82
+#: manufacturing/templates/ess_profile.html:60
+#: manufacturing/templates/ess_profile.html:70
 #: manufacturing/templates/maint_mechanic_detail.html:91
 #: manufacturing/templates/maint_mechanics_list.html:75
 #: manufacturing/templates/maint_mechanics_list.html:116
@@ -2728,6 +2751,7 @@ msgid "Time Clock"
 msgstr "Ponto Eletrônico"
 
 #: manufacturing/templates/base.html:563
+#: manufacturing/templates/ess_home.html:7
 #: manufacturing/templates/pers_depts.html:10
 #: manufacturing/templates/pers_reviews_list.html:11
 #: manufacturing/templates/pers_training_list.html:11
@@ -2737,6 +2761,16 @@ msgid "Time Off"
 msgstr "Ausências"
 
 #: manufacturing/templates/base.html:566
+#: manufacturing/templates/ess_home.html:3
+#: manufacturing/templates/ess_pay_stub_detail.html:7
+#: manufacturing/templates/ess_pay_stubs.html:7
+#: manufacturing/templates/ess_profile.html:6
+#: manufacturing/templates/ess_review_detail.html:7
+#: manufacturing/templates/ess_reviews.html:6
+#: manufacturing/templates/ess_time_off.html:7
+#: manufacturing/templates/ess_training_detail.html:7
+#: manufacturing/templates/ess_trainings.html:6
+#: manufacturing/templates/ess_ytd.html:7
 msgid "My Info"
 msgstr "Minhas Informações"
 
@@ -3044,6 +3078,10 @@ msgstr "Planos"
 #: manufacturing/templates/cs_surveys_list.html:82
 #: manufacturing/templates/cs_surveys_list.html:119
 #: manufacturing/templates/employee_benefits.html:27
+#: manufacturing/templates/ess_reviews.html:34
+#: manufacturing/templates/ess_time_off.html:54
+#: manufacturing/templates/ess_training_detail.html:35
+#: manufacturing/templates/ess_trainings.html:33
 #: manufacturing/templates/finance_audit_detail.html:108
 #: manufacturing/templates/finance_audit_list.html:85
 #: manufacturing/templates/gl_accounts.html:62
@@ -3178,6 +3216,8 @@ msgstr ""
 "                    (Liberado: %(rel)s, Restante: %(rem)s)"
 
 #: manufacturing/templates/blanket_po_detail.html:74
+#: manufacturing/templates/ess_review_detail.html:41
+#: manufacturing/templates/ess_training_detail.html:41
 #: manufacturing/templates/pers_review_detail.html:112
 #: manufacturing/templates/pers_training_detail.html:109
 #: manufacturing/templates/po_detail.html:113
@@ -3341,6 +3381,7 @@ msgid "Released"
 msgstr "Liberado"
 
 #: manufacturing/templates/blanket_po_list.html:35
+#: manufacturing/templates/ess_time_off.html:46
 msgid "Remaining"
 msgstr "Restante"
 
@@ -3375,6 +3416,7 @@ msgstr "Quantidade Total (deixe 0 para controlar por valor)"
 #: manufacturing/templates/eng_project_detail.html:100
 #: manufacturing/templates/eng_project_detail.html:218
 #: manufacturing/templates/eng_projects.html:122
+#: manufacturing/templates/ess_training_detail.html:36
 #: manufacturing/templates/legal_contract_detail.html:82
 #: manufacturing/templates/legal_contract_detail.html:137
 #: manufacturing/templates/legal_contract_list.html:152
@@ -3407,6 +3449,7 @@ msgstr "Data de Início"
 #: manufacturing/templates/cs_surveys_detail.html:109
 #: manufacturing/templates/cs_surveys_list.html:84
 #: manufacturing/templates/cs_surveys_list.html:139
+#: manufacturing/templates/ess_training_detail.html:37
 #: manufacturing/templates/legal_contract_detail.html:86
 #: manufacturing/templates/legal_contract_detail.html:141
 #: manufacturing/templates/legal_contract_list.html:156
@@ -4316,6 +4359,7 @@ msgstr "Analisado Por"
 #: manufacturing/templates/eng_spec_detail.html:122
 #: manufacturing/templates/eng_specs_list.html:89
 #: manufacturing/templates/eng_specs_list.html:145
+#: manufacturing/templates/ess_review_detail.html:35
 #: manufacturing/templates/pers_review_detail.html:69
 #: manufacturing/templates/pers_review_detail.html:105
 #: manufacturing/templates/pers_reviews_list.html:82
@@ -4627,6 +4671,9 @@ msgstr "Resolução Média"
 
 #: manufacturing/templates/cs_dashboard_kpis.html:21
 #: manufacturing/templates/cs_dashboard_kpis.html:25
+#: manufacturing/templates/ess_time_off.html:39
+#: manufacturing/templates/ess_time_off.html:43
+#: manufacturing/templates/ess_time_off.html:47
 #, python-format
 msgid "%(days)s days"
 msgstr "%(days)s dias"
@@ -5654,6 +5701,7 @@ msgid "Standards &amp; Compliance"
 msgstr "Normas &amp; Conformidade"
 
 #: manufacturing/templates/eng_dashboard.html:59
+#: manufacturing/templates/ess_home.html:56
 msgid "Pending Reviews"
 msgstr "Revisões Pendentes"
 
@@ -5860,6 +5908,8 @@ msgid "Engineer"
 msgstr "Engenheiro"
 
 #: manufacturing/templates/eng_project_detail.html:118
+#: manufacturing/templates/ess_time_off.html:54
+#: manufacturing/templates/ess_trainings.html:33
 #: manufacturing/templates/legal_contract_list.html:92
 #: manufacturing/templates/marketing_dashboard_kpis.html:59
 #: manufacturing/templates/mkt_ad_list.html:101
@@ -6165,6 +6215,491 @@ msgstr "— Nenhum —"
 #: manufacturing/templates/eng_tasks_list.html:159
 msgid "Create Task"
 msgstr "Criar Tarefa"
+
+#: manufacturing/templates/ess_home.html:6
+msgid "Pay Stubs"
+msgstr "Holerites"
+
+#: manufacturing/templates/ess_home.html:8
+#: manufacturing/templates/pers_depts.html:8
+#: manufacturing/templates/pers_review_detail.html:8
+#: manufacturing/templates/pers_reviews_list.html:9
+#: manufacturing/templates/pers_training_detail.html:8
+#: manufacturing/templates/pers_training_list.html:9
+#: manufacturing/templates/personnel_dashboard.html:9
+#: manufacturing/templates/sales_coaching.html:8
+#: manufacturing/templates/sales_performance.html:8
+#: manufacturing/templates/sales_performance_reviews.html:8
+msgid "Reviews"
+msgstr "Avaliações"
+
+#: manufacturing/templates/ess_home.html:9
+#: manufacturing/templates/pers_depts.html:9
+#: manufacturing/templates/pers_review_detail.html:9
+#: manufacturing/templates/pers_reviews_list.html:10
+#: manufacturing/templates/pers_training_detail.html:9
+#: manufacturing/templates/pers_training_list.html:10
+#: manufacturing/templates/personnel_dashboard.html:10
+msgid "Training"
+msgstr "Treinamento"
+
+#: manufacturing/templates/ess_home.html:10
+#: manufacturing/templates/ess_profile.html:3
+#: manufacturing/templates/ess_profile.html:29
+msgid "My Profile"
+msgstr "Meu Perfil"
+
+#: manufacturing/templates/ess_home.html:32
+#, python-format
+msgid "Welcome, %(first)s %(last)s"
+msgstr "Bem-vindo, %(first)s %(last)s"
+
+#: manufacturing/templates/ess_home.html:36
+#, python-format
+msgid "Vacation Balance (%(year)s)"
+msgstr "Saldo de Férias (%(year)s)"
+
+#: manufacturing/templates/ess_home.html:37
+#, python-format
+msgid "%(remaining)s days left"
+msgstr "%(remaining)s dias restantes"
+
+#: manufacturing/templates/ess_home.html:39
+#, python-format
+msgid "%(used)s of %(allotted)s used"
+msgstr "%(used)s de %(allotted)s usados"
+
+#: manufacturing/templates/ess_home.html:41
+msgid "View / Request Time Off →"
+msgstr "Ver / Solicitar Ausência →"
+
+#: manufacturing/templates/ess_home.html:44
+msgid "Latest Pay Stub"
+msgstr "Último Holerite"
+
+#: manufacturing/templates/ess_home.html:48
+#: manufacturing/templates/ess_pay_stub_detail.html:47
+#: manufacturing/templates/ess_pay_stubs.html:44
+#, python-format
+msgid "%(start)s to %(end)s"
+msgstr "%(start)s a %(end)s"
+
+#: manufacturing/templates/ess_home.html:51
+msgid "No pay stubs yet"
+msgstr "Ainda não há holerites"
+
+#: manufacturing/templates/ess_home.html:53
+msgid "View Pay Stubs →"
+msgstr "Ver Holerites →"
+
+#: manufacturing/templates/ess_home.html:58
+msgid "View Reviews →"
+msgstr "Ver Avaliações →"
+
+#: manufacturing/templates/ess_home.html:61
+msgid "Upcoming Training"
+msgstr "Próximos Treinamentos"
+
+#: manufacturing/templates/ess_home.html:63
+msgid "View Training →"
+msgstr "Ver Treinamento →"
+
+#: manufacturing/templates/ess_home.html:68
+msgid "Quick Links"
+msgstr "Links Rápidos"
+
+#: manufacturing/templates/ess_home.html:70
+msgid "Clock In / Out"
+msgstr "Bater Ponto"
+
+#: manufacturing/templates/ess_home.html:71
+#: manufacturing/templates/tc_ot_report.html:8
+#: manufacturing/templates/time_clock_hours.html:3
+#: manufacturing/templates/time_clock_hours.html:39
+#: manufacturing/templates/time_clock_status.html:7
+msgid "My Hours"
+msgstr "Minhas Horas"
+
+#: manufacturing/templates/ess_home.html:72
+#: manufacturing/templates/ess_time_off.html:6
+msgid "Request Time Off"
+msgstr "Solicitar Ausência"
+
+#: manufacturing/templates/ess_home.html:73
+msgid "Update My Contact Info"
+msgstr "Atualizar Minhas Informações de Contato"
+
+#: manufacturing/templates/ess_home.html:79
+msgid "Pending Time-Off Requests"
+msgstr "Solicitações de Ausência Pendentes"
+
+#: manufacturing/templates/ess_home.html:82
+#, python-format
+msgid "%(type)s: %(start)s to %(end)s"
+msgstr "%(type)s: %(start)s a %(end)s"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:3
+#: manufacturing/templates/payroll_stub_detail.html:3
+#: manufacturing/templates/payroll_stub_detail.html:35
+msgid "Pay Stub"
+msgstr "Holerite"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:6
+#: manufacturing/templates/ess_pay_stubs.html:3
+#: manufacturing/templates/ess_pay_stubs.html:28
+#: manufacturing/templates/ess_ytd.html:6
+msgid "My Pay Stubs"
+msgstr "Meus Holerites"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:35
+msgid "My Pay Stub"
+msgstr "Meu Holerite"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:39
+#: manufacturing/templates/payroll_stub_detail.html:39
+msgid "PAY STUB"
+msgstr "HOLERITE"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:42
+#: manufacturing/templates/payroll_stub_detail.html:42
+#: manufacturing/templates/payroll_ytd.html:40
+#: manufacturing/templates/pers_training_detail.html:50
+msgid "Employee:"
+msgstr "Funcionário:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:44
+#: manufacturing/templates/payroll_stub_detail.html:44
+msgid "Employee ID:"
+msgstr "ID do Funcionário:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:46
+#: manufacturing/templates/payroll_stub_detail.html:46
+msgid "Pay Period:"
+msgstr "Período de Pagamento:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:48
+#: manufacturing/templates/payroll_stub_detail.html:48
+msgid "Payment Date:"
+msgstr "Data de Pagamento:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:50
+#: manufacturing/templates/payroll_stub_detail.html:50
+msgid "Pay Type:"
+msgstr "Tipo de Pagamento:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:53
+#: manufacturing/templates/payroll_stub_detail.html:53
+msgid "Pay Rate:"
+msgstr "Taxa de Remuneração:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:56
+#: manufacturing/templates/payroll_stub_detail.html:56
+msgid "Annual Salary:"
+msgstr "Salário Anual:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:62
+#: manufacturing/templates/payroll_stub_detail.html:62
+msgid "Earnings"
+msgstr "Proventos"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:63
+#: manufacturing/templates/payroll_stub_detail.html:63
+msgid "Regular Hours:"
+msgstr "Horas Normais:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:65
+#: manufacturing/templates/payroll_stub_detail.html:65
+msgid "Overtime Hours:"
+msgstr "Horas Extras:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:68
+#: manufacturing/templates/payroll_stub_detail.html:68
+msgid "Gross Pay:"
+msgstr "Salário Bruto:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:74
+#: manufacturing/templates/ess_ytd.html:43
+#: manufacturing/templates/payroll_stub_detail.html:74
+msgid "Pre-Tax Deductions"
+msgstr "Deduções Pré-Impostos"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:80
+#: manufacturing/templates/payroll_stub_detail.html:80
+msgid "Total Pre-Tax Deductions:"
+msgstr "Total de Deduções Pré-Impostos:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:86
+#: manufacturing/templates/payroll_stub_detail.html:86
+msgid "Taxes"
+msgstr "Impostos"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:87
+#: manufacturing/templates/payroll_stub_detail.html:87
+msgid "Federal Income Tax:"
+msgstr "Imposto de Renda Federal:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:89
+#: manufacturing/templates/payroll_stub_detail.html:89
+msgid "State Income Tax:"
+msgstr "Imposto de Renda Estadual:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:92
+#: manufacturing/templates/payroll_stub_detail.html:92
+#, python-format
+msgid "Social Security (%(rate)s%%):"
+msgstr "Previdência Social (%(rate)s%%):"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:95
+#: manufacturing/templates/payroll_stub_detail.html:95
+#, python-format
+msgid "Medicare (%(rate)s%%):"
+msgstr "Medicare (%(rate)s%%):"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:98
+#: manufacturing/templates/payroll_stub_detail.html:98
+msgid "Total Taxes:"
+msgstr "Total de Impostos:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:104
+#: manufacturing/templates/payroll_stub_detail.html:104
+msgid "Post-Tax Deductions"
+msgstr "Deduções Pós-Impostos"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:110
+#: manufacturing/templates/payroll_stub_detail.html:110
+msgid "Total Post-Tax Deductions:"
+msgstr "Total de Deduções Pós-Impostos:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:116
+#: manufacturing/templates/payroll_stub_detail.html:116
+msgid "NET PAY:"
+msgstr "SALÁRIO LÍQUIDO:"
+
+#: manufacturing/templates/ess_pay_stubs.html:6
+msgid "YTD Summary"
+msgstr "Resumo Anual"
+
+#: manufacturing/templates/ess_pay_stubs.html:33
+msgid "Pay Period"
+msgstr "Período de Pagamento"
+
+#: manufacturing/templates/ess_pay_stubs.html:34
+msgid "Payment Date"
+msgstr "Data de Pagamento"
+
+#: manufacturing/templates/ess_pay_stubs.html:35
+msgid "Gross"
+msgstr "Bruto"
+
+#: manufacturing/templates/ess_pay_stubs.html:36
+msgid "Net"
+msgstr "Líquido"
+
+#: manufacturing/templates/ess_pay_stubs.html:49
+msgid "View Stub"
+msgstr "Ver Holerite"
+
+#: manufacturing/templates/ess_pay_stubs.html:52
+msgid "No pay stubs yet."
+msgstr "Ainda não há holerites."
+
+#: manufacturing/templates/ess_profile.html:36
+msgid "— name/email/department are managed by HR, not editable here."
+msgstr "— nome, e-mail e departamento são gerenciados pelo RH e não podem ser editados aqui."
+
+#: manufacturing/templates/ess_profile.html:42
+msgid "Address"
+msgstr "Endereço"
+
+#: manufacturing/templates/ess_profile.html:44
+msgid "Street Address"
+msgstr "Endereço"
+
+#: manufacturing/templates/ess_profile.html:48
+msgid "City"
+msgstr "Cidade"
+
+#: manufacturing/templates/ess_profile.html:52
+msgid "State"
+msgstr "Estado"
+
+#: manufacturing/templates/ess_profile.html:56
+msgid "Zip Code"
+msgstr "CEP"
+
+#: manufacturing/templates/ess_profile.html:64
+msgid "Emergency Contact"
+msgstr "Contato de Emergência"
+
+#: manufacturing/templates/ess_profile.html:74
+msgid "Relationship"
+msgstr "Parentesco"
+
+#: manufacturing/templates/ess_review_detail.html:3
+msgid "Review Detail"
+msgstr "Detalhe da Avaliação"
+
+#: manufacturing/templates/ess_review_detail.html:6
+#: manufacturing/templates/ess_reviews.html:3
+msgid "My Reviews"
+msgstr "Minhas Avaliações"
+
+#: manufacturing/templates/ess_review_detail.html:29
+#, python-format
+msgid "%(type)s Review"
+msgstr "Avaliação de %(type)s"
+
+#: manufacturing/templates/ess_review_detail.html:34
+#: manufacturing/templates/pers_review_detail.html:61
+#: manufacturing/templates/pers_review_detail.html:104
+#: manufacturing/templates/pers_reviews_list.html:120
+msgid "Review Type"
+msgstr "Tipo de Avaliação"
+
+#: manufacturing/templates/ess_review_detail.html:36
+#: manufacturing/templates/ess_reviews.html:34
+#: manufacturing/templates/pers_review_detail.html:73
+#: manufacturing/templates/pers_review_detail.html:106
+#: manufacturing/templates/pers_reviews_list.html:81
+#: manufacturing/templates/pers_reviews_list.html:132
+#: manufacturing/templates/sales_performance_reviews.html:76
+#: manufacturing/templates/sales_performance_reviews.html:120
+msgid "Reviewer"
+msgstr "Avaliador"
+
+#: manufacturing/templates/ess_review_detail.html:37
+#: manufacturing/templates/ess_reviews.html:34
+#: manufacturing/templates/pers_review_detail.html:77
+#: manufacturing/templates/pers_review_detail.html:107
+#: manufacturing/templates/pers_reviews_list.html:83
+#: manufacturing/templates/pers_reviews_list.html:136
+#: manufacturing/templates/qa_reports.html:244
+#: manufacturing/templates/qa_supplier_detail.html:78
+#: manufacturing/templates/qa_supplier_list.html:84
+#: manufacturing/templates/qa_supplier_list.html:119
+#: manufacturing/templates/sales_performance_reviews.html:75
+#: manufacturing/templates/sales_performance_reviews.html:116
+msgid "Rating"
+msgstr "Classificação"
+
+#: manufacturing/templates/ess_reviews.html:30
+msgid "My Performance Reviews"
+msgstr "Minhas Avaliações de Desempenho"
+
+#: manufacturing/templates/ess_reviews.html:46
+msgid "No reviews yet."
+msgstr "Ainda não há avaliações."
+
+#: manufacturing/templates/ess_time_off.html:3
+#: manufacturing/templates/ess_time_off.html:34
+msgid "My Time Off"
+msgstr "Minhas Ausências"
+
+#: manufacturing/templates/ess_time_off.html:38
+#, python-format
+msgid "Allotted (%(year)s)"
+msgstr "Concedido (%(year)s)"
+
+#: manufacturing/templates/ess_time_off.html:42
+msgid "Used"
+msgstr "Usado"
+
+#: manufacturing/templates/ess_time_off.html:54
+#: manufacturing/templates/ess_trainings.html:33
+#: manufacturing/templates/legal_contract_list.html:93
+#: manufacturing/templates/marketing_dashboard_kpis.html:60
+#: manufacturing/templates/mkt_ad_list.html:102
+#: manufacturing/templates/mkt_campaign_list.html:91
+#: manufacturing/templates/sales_contracts_list.html:85
+msgid "End"
+msgstr "Fim"
+
+#: manufacturing/templates/ess_time_off.html:66
+msgid "No time-off requests yet."
+msgstr "Ainda não há solicitações de ausência."
+
+#: manufacturing/templates/ess_training_detail.html:3
+msgid "Training Detail"
+msgstr "Detalhe do Treinamento"
+
+#: manufacturing/templates/ess_training_detail.html:6
+#: manufacturing/templates/ess_trainings.html:3
+msgid "My Training"
+msgstr "Meu Treinamento"
+
+#: manufacturing/templates/ess_training_detail.html:34
+#: manufacturing/templates/ess_trainings.html:33
+#: manufacturing/templates/pers_training_list.html:86
+msgid "Course"
+msgstr "Curso"
+
+#: manufacturing/templates/ess_trainings.html:29
+msgid "My Training Records"
+msgstr "Meus Registros de Treinamento"
+
+#: manufacturing/templates/ess_trainings.html:45
+msgid "No training records yet."
+msgstr "Ainda não há registros de treinamento."
+
+#: manufacturing/templates/ess_ytd.html:3
+msgid "My YTD Summary"
+msgstr "Meu Resumo Anual"
+
+#: manufacturing/templates/ess_ytd.html:26
+#, python-format
+msgid "My %(year)s Year-to-Date Summary"
+msgstr "Meu Acumulado Anual de %(year)s"
+
+#: manufacturing/templates/ess_ytd.html:39
+#: manufacturing/templates/payroll_dashboard.html:44
+msgid "Payroll Runs"
+msgstr "Execuções de Folha de Pagamento"
+
+#: manufacturing/templates/ess_ytd.html:40
+msgid "Regular Hours"
+msgstr "Horas Normais"
+
+#: manufacturing/templates/ess_ytd.html:41
+msgid "Overtime Hours"
+msgstr "Horas Extras"
+
+#: manufacturing/templates/ess_ytd.html:42
+#: manufacturing/templates/payroll_run_detail.html:67
+#: manufacturing/templates/payroll_ytd.html:57
+msgid "Gross Pay"
+msgstr "Salário Bruto"
+
+#: manufacturing/templates/ess_ytd.html:44
+msgid "Federal Tax"
+msgstr "Imposto Federal"
+
+#: manufacturing/templates/ess_ytd.html:45
+#: manufacturing/templates/payroll_run_detail.html:68
+#: manufacturing/templates/payroll_ytd.html:58
+msgid "State Tax"
+msgstr "Imposto Estadual"
+
+#: manufacturing/templates/ess_ytd.html:46
+msgid "Social Security"
+msgstr "Previdência Social"
+
+#: manufacturing/templates/ess_ytd.html:47
+#: manufacturing/templates/payroll_run_detail.html:69
+#: manufacturing/templates/payroll_ytd.html:59
+msgid "Medicare"
+msgstr "Medicare"
+
+#: manufacturing/templates/ess_ytd.html:48
+#: manufacturing/templates/payroll_dashboard.html:88
+#: manufacturing/templates/payroll_run_detail.html:70
+#: manufacturing/templates/payroll_ytd.html:59
+msgid "Net Pay"
+msgstr "Salário Líquido"
+
+#: manufacturing/templates/ess_ytd.html:51
+#, python-format
+msgid "No payroll history for %(year)s."
+msgstr "Nenhum histórico de folha de pagamento para %(year)s."
 
 #: manufacturing/templates/exit_interview_list.html:3
 #: manufacturing/templates/exit_interview_list.html:8
@@ -8480,14 +9015,6 @@ msgstr "Valor ($)"
 msgid "Search title / party / owner…"
 msgstr "Pesquisar título / parte / responsável…"
 
-#: manufacturing/templates/legal_contract_list.html:93
-#: manufacturing/templates/marketing_dashboard_kpis.html:60
-#: manufacturing/templates/mkt_ad_list.html:102
-#: manufacturing/templates/mkt_campaign_list.html:91
-#: manufacturing/templates/sales_contracts_list.html:85
-msgid "End"
-msgstr "Fim"
-
 #: manufacturing/templates/legal_contract_list.html:111
 #: manufacturing/templates/legal_dashboard.html:161
 #: manufacturing/templates/purch_contracts_list.html:102
@@ -10238,10 +10765,6 @@ msgstr "Relatório YTD"
 msgid "Payroll Department"
 msgstr "Departamento de Folha de Pagamento"
 
-#: manufacturing/templates/payroll_dashboard.html:44
-msgid "Payroll Runs"
-msgstr "Execuções de Folha de Pagamento"
-
 #: manufacturing/templates/payroll_dashboard.html:48
 msgid "Employees with Pay Rates"
 msgstr "Funcionários com Taxas de Pagamento"
@@ -10307,12 +10830,6 @@ msgstr "Funcionários"
 #: manufacturing/templates/payroll_run_detail.html:53
 msgid "Total Gross"
 msgstr "Total Bruto"
-
-#: manufacturing/templates/payroll_dashboard.html:88
-#: manufacturing/templates/payroll_run_detail.html:70
-#: manufacturing/templates/payroll_ytd.html:59
-msgid "Net Pay"
-msgstr "Salário Líquido"
 
 #: manufacturing/templates/payroll_dashboard.html:104
 msgid "View all runs →"
@@ -10503,11 +11020,6 @@ msgstr "Horas Extras"
 
 #: manufacturing/templates/payroll_run_detail.html:67
 #: manufacturing/templates/payroll_ytd.html:57
-msgid "Gross Pay"
-msgstr "Salário Bruto"
-
-#: manufacturing/templates/payroll_run_detail.html:67
-#: manufacturing/templates/payroll_ytd.html:57
 msgid "Pre-Tax Deds"
 msgstr "Deduções Pré-Impostos"
 
@@ -10516,20 +11028,10 @@ msgstr "Deduções Pré-Impostos"
 msgid "Fed Tax"
 msgstr "Imposto Federal"
 
-#: manufacturing/templates/payroll_run_detail.html:68
-#: manufacturing/templates/payroll_ytd.html:58
-msgid "State Tax"
-msgstr "Imposto Estadual"
-
 #: manufacturing/templates/payroll_run_detail.html:69
 #: manufacturing/templates/payroll_ytd.html:59
 msgid "SS"
 msgstr "SS"
-
-#: manufacturing/templates/payroll_run_detail.html:69
-#: manufacturing/templates/payroll_ytd.html:59
-msgid "Medicare"
-msgstr "Medicare"
 
 #: manufacturing/templates/payroll_run_detail.html:70
 msgid "Post-Tax Deds"
@@ -10588,110 +11090,9 @@ msgstr "Alíquota de Imposto Estadual (%%)"
 msgid "Process Payroll"
 msgstr "Processar Folha de Pagamento"
 
-#: manufacturing/templates/payroll_stub_detail.html:3
-#: manufacturing/templates/payroll_stub_detail.html:35
-msgid "Pay Stub"
-msgstr "Holerite"
-
 #: manufacturing/templates/payroll_stub_detail.html:6
 msgid "Back to Run"
 msgstr "Voltar para a Execução"
-
-#: manufacturing/templates/payroll_stub_detail.html:39
-msgid "PAY STUB"
-msgstr "HOLERITE"
-
-#: manufacturing/templates/payroll_stub_detail.html:42
-#: manufacturing/templates/payroll_ytd.html:40
-#: manufacturing/templates/pers_training_detail.html:50
-msgid "Employee:"
-msgstr "Funcionário:"
-
-#: manufacturing/templates/payroll_stub_detail.html:44
-msgid "Employee ID:"
-msgstr "ID do Funcionário:"
-
-#: manufacturing/templates/payroll_stub_detail.html:46
-msgid "Pay Period:"
-msgstr "Período de Pagamento:"
-
-#: manufacturing/templates/payroll_stub_detail.html:48
-msgid "Payment Date:"
-msgstr "Data de Pagamento:"
-
-#: manufacturing/templates/payroll_stub_detail.html:50
-msgid "Pay Type:"
-msgstr "Tipo de Pagamento:"
-
-#: manufacturing/templates/payroll_stub_detail.html:53
-msgid "Pay Rate:"
-msgstr "Taxa de Remuneração:"
-
-#: manufacturing/templates/payroll_stub_detail.html:56
-msgid "Annual Salary:"
-msgstr "Salário Anual:"
-
-#: manufacturing/templates/payroll_stub_detail.html:62
-msgid "Earnings"
-msgstr "Proventos"
-
-#: manufacturing/templates/payroll_stub_detail.html:63
-msgid "Regular Hours:"
-msgstr "Horas Normais:"
-
-#: manufacturing/templates/payroll_stub_detail.html:65
-msgid "Overtime Hours:"
-msgstr "Horas Extras:"
-
-#: manufacturing/templates/payroll_stub_detail.html:68
-msgid "Gross Pay:"
-msgstr "Salário Bruto:"
-
-#: manufacturing/templates/payroll_stub_detail.html:74
-msgid "Pre-Tax Deductions"
-msgstr "Deduções Pré-Impostos"
-
-#: manufacturing/templates/payroll_stub_detail.html:80
-msgid "Total Pre-Tax Deductions:"
-msgstr "Total de Deduções Pré-Impostos:"
-
-#: manufacturing/templates/payroll_stub_detail.html:86
-msgid "Taxes"
-msgstr "Impostos"
-
-#: manufacturing/templates/payroll_stub_detail.html:87
-msgid "Federal Income Tax:"
-msgstr "Imposto de Renda Federal:"
-
-#: manufacturing/templates/payroll_stub_detail.html:89
-msgid "State Income Tax:"
-msgstr "Imposto de Renda Estadual:"
-
-#: manufacturing/templates/payroll_stub_detail.html:92
-#, python-format
-msgid "Social Security (%(rate)s%%):"
-msgstr "Previdência Social (%(rate)s%%):"
-
-#: manufacturing/templates/payroll_stub_detail.html:95
-#, python-format
-msgid "Medicare (%(rate)s%%):"
-msgstr "Medicare (%(rate)s%%):"
-
-#: manufacturing/templates/payroll_stub_detail.html:98
-msgid "Total Taxes:"
-msgstr "Total de Impostos:"
-
-#: manufacturing/templates/payroll_stub_detail.html:104
-msgid "Post-Tax Deductions"
-msgstr "Deduções Pós-Impostos"
-
-#: manufacturing/templates/payroll_stub_detail.html:110
-msgid "Total Post-Tax Deductions:"
-msgstr "Total de Deduções Pós-Impostos:"
-
-#: manufacturing/templates/payroll_stub_detail.html:116
-msgid "NET PAY:"
-msgstr "SALÁRIO LÍQUIDO:"
 
 #: manufacturing/templates/payroll_ytd.html:3
 msgid "YTD Payroll Report"
@@ -10732,27 +11133,6 @@ msgstr "Total Líquido:"
 #, python-format
 msgid "No payroll data found for %(year)s."
 msgstr "Nenhum dado de folha de pagamento encontrado para %(year)s."
-
-#: manufacturing/templates/pers_depts.html:8
-#: manufacturing/templates/pers_review_detail.html:8
-#: manufacturing/templates/pers_reviews_list.html:9
-#: manufacturing/templates/pers_training_detail.html:8
-#: manufacturing/templates/pers_training_list.html:9
-#: manufacturing/templates/personnel_dashboard.html:9
-#: manufacturing/templates/sales_coaching.html:8
-#: manufacturing/templates/sales_performance.html:8
-#: manufacturing/templates/sales_performance_reviews.html:8
-msgid "Reviews"
-msgstr "Avaliações"
-
-#: manufacturing/templates/pers_depts.html:9
-#: manufacturing/templates/pers_review_detail.html:9
-#: manufacturing/templates/pers_reviews_list.html:10
-#: manufacturing/templates/pers_training_detail.html:9
-#: manufacturing/templates/pers_training_list.html:10
-#: manufacturing/templates/personnel_dashboard.html:10
-msgid "Training"
-msgstr "Treinamento"
 
 #: manufacturing/templates/pers_depts.html:43
 msgid "Departments &amp; Sub-Departments"
@@ -10802,34 +11182,6 @@ msgstr "Avaliação — %(last)s, %(first)s"
 #: manufacturing/templates/pers_review_detail.html:56
 msgid "Edit Review"
 msgstr "Editar Avaliação"
-
-#: manufacturing/templates/pers_review_detail.html:61
-#: manufacturing/templates/pers_review_detail.html:104
-#: manufacturing/templates/pers_reviews_list.html:120
-msgid "Review Type"
-msgstr "Tipo de Avaliação"
-
-#: manufacturing/templates/pers_review_detail.html:73
-#: manufacturing/templates/pers_review_detail.html:106
-#: manufacturing/templates/pers_reviews_list.html:81
-#: manufacturing/templates/pers_reviews_list.html:132
-#: manufacturing/templates/sales_performance_reviews.html:76
-#: manufacturing/templates/sales_performance_reviews.html:120
-msgid "Reviewer"
-msgstr "Avaliador"
-
-#: manufacturing/templates/pers_review_detail.html:77
-#: manufacturing/templates/pers_review_detail.html:107
-#: manufacturing/templates/pers_reviews_list.html:83
-#: manufacturing/templates/pers_reviews_list.html:136
-#: manufacturing/templates/qa_reports.html:244
-#: manufacturing/templates/qa_supplier_detail.html:78
-#: manufacturing/templates/qa_supplier_list.html:84
-#: manufacturing/templates/qa_supplier_list.html:119
-#: manufacturing/templates/sales_performance_reviews.html:75
-#: manufacturing/templates/sales_performance_reviews.html:116
-msgid "Rating"
-msgstr "Classificação"
 
 #: manufacturing/templates/pers_review_detail.html:79
 #: manufacturing/templates/pers_reviews_list.html:138
@@ -10896,10 +11248,6 @@ msgstr "Treinamento &amp; Desenvolvimento"
 #: manufacturing/templates/pers_training_list.html:76
 msgid "Search course / employee…"
 msgstr "Pesquisar curso / funcionário…"
-
-#: manufacturing/templates/pers_training_list.html:86
-msgid "Course"
-msgstr "Curso"
 
 #: manufacturing/templates/pers_training_list.html:104
 msgid "No training records found."
@@ -14115,8 +14463,8 @@ msgstr ""
 "atingimento detalhado por representante e território,\n"
 "        atribua representantes em <a href=\"/sales/territories/\" "
 "style=\"color:var(--accent);\">Gestão de Territórios</a>\n"
-"        e defina metas em <a href=\"/sales/targets/\" style=\"color:var(--accent);"
-"\">Metas de Vendas</a>."
+"        e defina metas em <a href=\"/sales/targets/\" style=\"color:var(--"
+"accent);\">Metas de Vendas</a>."
 
 #: manufacturing/templates/sf_tv.html:5 manufacturing/templates/sf_tv.html:38
 #, python-format
@@ -14163,19 +14511,25 @@ msgstr "Estoque insuficiente para confirmar este pedido:"
 msgid ""
 "%(name)s: need %(need)s, ATP %(atp)s (short %(short)s), earliest available "
 "%(date)s"
-msgstr "%(name)s: necessário %(need)s, ATP %(atp)s (faltam %(short)s), disponível a partir de %(date)s"
+msgstr ""
+"%(name)s: necessário %(need)s, ATP %(atp)s (faltam %(short)s), disponível a "
+"partir de %(date)s"
 
 #: manufacturing/templates/so_detail.html:159
 #, python-format
 msgid ""
 "%(name)s: need %(need)s, ATP %(atp)s (short %(short)s) — not available "
 "within 90 days"
-msgstr "%(name)s: necessário %(need)s, ATP %(atp)s (faltam %(short)s) — não disponível em 90 dias"
+msgstr ""
+"%(name)s: necessário %(need)s, ATP %(atp)s (faltam %(short)s) — não "
+"disponível em 90 dias"
 
 #: manufacturing/templates/so_detail.html:166
 msgid ""
 "Insufficient workcenter capacity to confirm this order by the ship date:"
-msgstr "Capacidade insuficiente do centro de trabalho para confirmar este pedido até a data de envio:"
+msgstr ""
+"Capacidade insuficiente do centro de trabalho para confirmar este pedido até "
+"a data de envio:"
 
 #: manufacturing/templates/so_detail.html:170
 #, python-format
@@ -14597,13 +14951,6 @@ msgstr "Adicione um."
 msgid "Overtime Report"
 msgstr "Relatório de Horas Extras"
 
-#: manufacturing/templates/tc_ot_report.html:8
-#: manufacturing/templates/time_clock_hours.html:3
-#: manufacturing/templates/time_clock_hours.html:39
-#: manufacturing/templates/time_clock_status.html:7
-msgid "My Hours"
-msgstr "Minhas Horas"
-
 #: manufacturing/templates/tc_ot_report.html:45
 msgid "Overtime Reports"
 msgstr "Relatórios de Horas Extras"
@@ -14869,7 +15216,12 @@ msgid ""
 "            work order's actual quantity produced. Roll the product's carbon "
 "footprint\n"
 "            first if it hasn't been rolled yet."
-msgstr "Multiplica a última pegada de carbono consolidada deste produto (por unidade) pela\n            quantidade real produzida nesta ordem de serviço. Consolide primeiro a pegada de carbono\n            do produto, caso ainda não tenha sido feito."
+msgstr ""
+"Multiplica a última pegada de carbono consolidada deste produto (por "
+"unidade) pela\n"
+"            quantidade real produzida nesta ordem de serviço. Consolide "
+"primeiro a pegada de carbono\n"
+"            do produto, caso ainda não tenha sido feito."
 
 #: manufacturing/templates/wo_carbon_detail.html:73
 msgid "Compute Carbon"
@@ -14939,7 +15291,10 @@ msgid ""
 "Sums WO material issues and labor from completed operations, then compares "
 "to\n"
 "            the product's standard cost to compute variances."
-msgstr "Soma as saídas de material e a mão de obra da OS a partir das operações concluídas e depois\n            compara com o custo padrão do produto para calcular as variações."
+msgstr ""
+"Soma as saídas de material e a mão de obra da OS a partir das operações "
+"concluídas e depois\n"
+"            compara com o custo padrão do produto para calcular as variações."
 
 #: manufacturing/templates/wo_cost_detail.html:101
 msgid "Compute Cost"
@@ -15044,7 +15399,12 @@ msgid ""
 "                available hours per day. Backward: packs from the due date "
 "above, in reverse\n"
 "                sequence, and flags whether the due date is at risk."
-msgstr "Para frente: encaixa as operações a partir de hoje, em sequência, nas horas\n                disponíveis por dia de cada centro de trabalho. Para trás: encaixa a partir da data de\n                vencimento acima, em sequência inversa, e sinaliza se essa data está em risco."
+msgstr ""
+"Para frente: encaixa as operações a partir de hoje, em sequência, nas horas\n"
+"                disponíveis por dia de cada centro de trabalho. Para trás: "
+"encaixa a partir da data de\n"
+"                vencimento acima, em sequência inversa, e sinaliza se essa "
+"data está em risco."
 
 #: manufacturing/templates/wo_detail.html:291
 msgid "View WO Cost Detail"

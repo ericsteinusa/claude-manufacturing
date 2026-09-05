@@ -1423,6 +1423,44 @@ Cost and WO Carbon detail pages (confirmed both remaining multi-line
 paragraphs), and the SO/WO "New" forms, in Spanish, French, German,
 Portuguese, and Dutch with real sample data, no console or server errors.
 
+Also translated: the **Employee Self-Service (ESS) pages**
+(`ess_home.html`, `ess_profile.html`, `ess_pay_stubs.html`,
+`ess_pay_stub_detail.html`, `ess_time_off.html`, `ess_reviews.html`,
+`ess_review_detail.html`, `ess_trainings.html`,
+`ess_training_detail.html`, `ess_ytd.html` — 10 templates, routed at
+`/ess/`). The employee-facing counterpart to the manager-facing Personnel
+core/cluster passes — every hourly or salaried employee hits these
+pages directly, not just HR staff, making this one of the higher-value
+remaining gaps despite its small size. 94 unique strings across 5
+languages, 57 genuinely new (the other 37 auto-merged via exact-text
+match) — reuse was unusually high because `ess_pay_stub_detail.html` is
+structurally identical to the already-translated `payroll_stub_detail
+.html` (same `Employee:`/`Pay Period:`/`Social Security ({{ rate }}%):`
+labels, copied verbatim from that pass), and several list-page column
+headers (`Type`, `Status`, `Reviewer`, `Course`) were already established
+by the Personnel and Time Clock passes. Used the same non-pluralized
+`{% blocktrans %}{{ days }} days{% endblocktrans %}` pattern
+`cs_dashboard_kpis.html` established for a `floatformat`-rendered value
+(vacation-balance days) rather than `{% blocktrans count %}`, since a
+decimal count (e.g. "3.5 days") has no clean singular/plural split.
+**Caught and fixed a live bug via cross-reference, not by re-deriving
+convention from scratch**: `ess_home.html`'s tile above the
+Quick-Links card had `{{ balance.used_days|floatformat:1 }} of
+{{ balance.allotted_days|floatformat:1 }} used` sitting right next to
+`ess_time_off.html`'s near-identical "Allotted/Used/Remaining" tiles —
+both wrapped with the same technique, confirming the two pages'
+otherwise-independent English copy was already meant to read as one
+family of phrasing. Full suite 3475 passed (unchanged), `manage.py
+check` and `ruff check .` clean, `msgfmt --check` clean on all 5 files,
+zero fuzzy/blank entries. Verified end-to-end against the real dev
+server: the ESS home tile grid (confirmed the vacation-balance and
+latest-pay-stub tiles with real data), My Profile, My Pay Stubs list +
+a real pay stub's detail page (confirmed it reuses the entire Payroll
+pass's vocabulary — Employee:/Pay Period:/Social Security (%)/PAGO
+NETO: — byte-for-byte), My Time Off, My Reviews, My Training, and My
+YTD Summary, in Spanish, French, German, Portuguese, and Dutch with
+real sample data, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

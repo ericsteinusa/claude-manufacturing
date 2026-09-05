@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 15:28+0000\n"
+"POT-Creation-Date: 2026-09-05 15:57+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -352,6 +352,16 @@ msgstr "Loonadministratie"
 #: manufacturing/templates/eng_specs_list.html:12
 #: manufacturing/templates/eng_task_detail.html:12
 #: manufacturing/templates/eng_tasks_list.html:12
+#: manufacturing/templates/ess_home.html:11
+#: manufacturing/templates/ess_pay_stub_detail.html:8
+#: manufacturing/templates/ess_pay_stubs.html:8
+#: manufacturing/templates/ess_profile.html:7
+#: manufacturing/templates/ess_review_detail.html:8
+#: manufacturing/templates/ess_reviews.html:7
+#: manufacturing/templates/ess_time_off.html:8
+#: manufacturing/templates/ess_training_detail.html:8
+#: manufacturing/templates/ess_trainings.html:7
+#: manufacturing/templates/ess_ytd.html:8
 #: manufacturing/templates/exit_interview_list.html:10
 #: manufacturing/templates/fin_cash_forecast.html:8
 #: manufacturing/templates/finance_audit_detail.html:11
@@ -678,6 +688,7 @@ msgstr "Recente Journaalposten"
 #: manufacturing/templates/credit_dashboard_kpis.html:85
 #: manufacturing/templates/cs_dashboard_kpis.html:36
 #: manufacturing/templates/cs_surveys_detail.html:127
+#: manufacturing/templates/ess_reviews.html:34
 #: manufacturing/templates/finance_dashboard_kpis.html:55
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:56
@@ -859,6 +870,12 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/eng_task_detail.html:99
 #: manufacturing/templates/eng_task_detail.html:120
 #: manufacturing/templates/eng_tasks_list.html:94
+#: manufacturing/templates/ess_pay_stubs.html:37
+#: manufacturing/templates/ess_review_detail.html:38
+#: manufacturing/templates/ess_reviews.html:34
+#: manufacturing/templates/ess_time_off.html:54
+#: manufacturing/templates/ess_training_detail.html:38
+#: manufacturing/templates/ess_trainings.html:33
 #: manufacturing/templates/finance_audit_detail.html:90
 #: manufacturing/templates/finance_audit_detail.html:128
 #: manufacturing/templates/finance_audit_list.html:90
@@ -1146,6 +1163,7 @@ msgstr "G/L"
 #: manufacturing/templates/cs_returns_detail.html:56
 #: manufacturing/templates/eng_ecr_detail.html:48
 #: manufacturing/templates/eng_spec_detail.html:56
+#: manufacturing/templates/ess_pay_stub_detail.html:36
 #: manufacturing/templates/finance_tax_detail.html:61
 #: manufacturing/templates/legal_contract_detail.html:56
 #: manufacturing/templates/maint_wo_detail.html:57
@@ -1283,6 +1301,7 @@ msgstr "Wisselkoers"
 #: manufacturing/templates/eng_project_detail.html:112
 #: manufacturing/templates/eng_spec_detail.html:113
 #: manufacturing/templates/eng_task_detail.html:111
+#: manufacturing/templates/ess_profile.html:78
 #: manufacturing/templates/finance_audit_detail.html:102
 #: manufacturing/templates/finance_bank_rec_detail.html:85
 #: manufacturing/templates/finance_budget_detail.html:85
@@ -2136,6 +2155,7 @@ msgstr "Gesolliciteerd"
 #: manufacturing/templates/compliance_checklist_list.html:42
 #: manufacturing/templates/compliance_template_list.html:34
 #: manufacturing/templates/control_plan_list.html:45
+#: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/rfq_list.html:55
 msgid "Detail"
 msgstr "Detail"
@@ -2193,6 +2213,7 @@ msgstr "Zoeken"
 #: manufacturing/templates/compliance_checklist_list.html:27
 #: manufacturing/templates/compliance_template_list.html:27
 #: manufacturing/templates/control_plan_list.html:23
+#: manufacturing/templates/ess_profile.html:66
 #: manufacturing/templates/it_task_detail.html:106
 #: manufacturing/templates/maint_equipment_list.html:78
 #: manufacturing/templates/maint_mechanics_list.html:75
@@ -2227,6 +2248,8 @@ msgstr "E-mail"
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/ats_candidate_new.html:41
 #: manufacturing/templates/credit_account_detail.html:82
+#: manufacturing/templates/ess_profile.html:60
+#: manufacturing/templates/ess_profile.html:70
 #: manufacturing/templates/maint_mechanic_detail.html:91
 #: manufacturing/templates/maint_mechanics_list.html:75
 #: manufacturing/templates/maint_mechanics_list.html:116
@@ -2728,6 +2751,7 @@ msgid "Time Clock"
 msgstr "Prikklok"
 
 #: manufacturing/templates/base.html:563
+#: manufacturing/templates/ess_home.html:7
 #: manufacturing/templates/pers_depts.html:10
 #: manufacturing/templates/pers_reviews_list.html:11
 #: manufacturing/templates/pers_training_list.html:11
@@ -2737,6 +2761,16 @@ msgid "Time Off"
 msgstr "Verlof"
 
 #: manufacturing/templates/base.html:566
+#: manufacturing/templates/ess_home.html:3
+#: manufacturing/templates/ess_pay_stub_detail.html:7
+#: manufacturing/templates/ess_pay_stubs.html:7
+#: manufacturing/templates/ess_profile.html:6
+#: manufacturing/templates/ess_review_detail.html:7
+#: manufacturing/templates/ess_reviews.html:6
+#: manufacturing/templates/ess_time_off.html:7
+#: manufacturing/templates/ess_training_detail.html:7
+#: manufacturing/templates/ess_trainings.html:6
+#: manufacturing/templates/ess_ytd.html:7
 msgid "My Info"
 msgstr "Mijn gegevens"
 
@@ -3044,6 +3078,10 @@ msgstr "Plannen"
 #: manufacturing/templates/cs_surveys_list.html:82
 #: manufacturing/templates/cs_surveys_list.html:119
 #: manufacturing/templates/employee_benefits.html:27
+#: manufacturing/templates/ess_reviews.html:34
+#: manufacturing/templates/ess_time_off.html:54
+#: manufacturing/templates/ess_training_detail.html:35
+#: manufacturing/templates/ess_trainings.html:33
 #: manufacturing/templates/finance_audit_detail.html:108
 #: manufacturing/templates/finance_audit_list.html:85
 #: manufacturing/templates/gl_accounts.html:62
@@ -3178,6 +3216,8 @@ msgstr ""
 "                    (Vrijgegeven: %(rel)s, Resterend: %(rem)s)"
 
 #: manufacturing/templates/blanket_po_detail.html:74
+#: manufacturing/templates/ess_review_detail.html:41
+#: manufacturing/templates/ess_training_detail.html:41
 #: manufacturing/templates/pers_review_detail.html:112
 #: manufacturing/templates/pers_training_detail.html:109
 #: manufacturing/templates/po_detail.html:113
@@ -3341,6 +3381,7 @@ msgid "Released"
 msgstr "Vrijgegeven"
 
 #: manufacturing/templates/blanket_po_list.html:35
+#: manufacturing/templates/ess_time_off.html:46
 msgid "Remaining"
 msgstr "Resterend"
 
@@ -3377,6 +3418,7 @@ msgstr ""
 #: manufacturing/templates/eng_project_detail.html:100
 #: manufacturing/templates/eng_project_detail.html:218
 #: manufacturing/templates/eng_projects.html:122
+#: manufacturing/templates/ess_training_detail.html:36
 #: manufacturing/templates/legal_contract_detail.html:82
 #: manufacturing/templates/legal_contract_detail.html:137
 #: manufacturing/templates/legal_contract_list.html:152
@@ -3409,6 +3451,7 @@ msgstr "Startdatum"
 #: manufacturing/templates/cs_surveys_detail.html:109
 #: manufacturing/templates/cs_surveys_list.html:84
 #: manufacturing/templates/cs_surveys_list.html:139
+#: manufacturing/templates/ess_training_detail.html:37
 #: manufacturing/templates/legal_contract_detail.html:86
 #: manufacturing/templates/legal_contract_detail.html:141
 #: manufacturing/templates/legal_contract_list.html:156
@@ -4319,6 +4362,7 @@ msgstr "Beoordeeld door"
 #: manufacturing/templates/eng_spec_detail.html:122
 #: manufacturing/templates/eng_specs_list.html:89
 #: manufacturing/templates/eng_specs_list.html:145
+#: manufacturing/templates/ess_review_detail.html:35
 #: manufacturing/templates/pers_review_detail.html:69
 #: manufacturing/templates/pers_review_detail.html:105
 #: manufacturing/templates/pers_reviews_list.html:82
@@ -4630,6 +4674,9 @@ msgstr "Gem. oplostijd"
 
 #: manufacturing/templates/cs_dashboard_kpis.html:21
 #: manufacturing/templates/cs_dashboard_kpis.html:25
+#: manufacturing/templates/ess_time_off.html:39
+#: manufacturing/templates/ess_time_off.html:43
+#: manufacturing/templates/ess_time_off.html:47
 #, python-format
 msgid "%(days)s days"
 msgstr "%(days)s dagen"
@@ -5659,6 +5706,7 @@ msgid "Standards &amp; Compliance"
 msgstr "Normen &amp; naleving"
 
 #: manufacturing/templates/eng_dashboard.html:59
+#: manufacturing/templates/ess_home.html:56
 msgid "Pending Reviews"
 msgstr "Openstaande beoordelingen"
 
@@ -5865,6 +5913,8 @@ msgid "Engineer"
 msgstr "Ingenieur"
 
 #: manufacturing/templates/eng_project_detail.html:118
+#: manufacturing/templates/ess_time_off.html:54
+#: manufacturing/templates/ess_trainings.html:33
 #: manufacturing/templates/legal_contract_list.html:92
 #: manufacturing/templates/marketing_dashboard_kpis.html:59
 #: manufacturing/templates/mkt_ad_list.html:101
@@ -6170,6 +6220,491 @@ msgstr "— Geen —"
 #: manufacturing/templates/eng_tasks_list.html:159
 msgid "Create Task"
 msgstr "Taak Aanmaken"
+
+#: manufacturing/templates/ess_home.html:6
+msgid "Pay Stubs"
+msgstr "Loonstroken"
+
+#: manufacturing/templates/ess_home.html:8
+#: manufacturing/templates/pers_depts.html:8
+#: manufacturing/templates/pers_review_detail.html:8
+#: manufacturing/templates/pers_reviews_list.html:9
+#: manufacturing/templates/pers_training_detail.html:8
+#: manufacturing/templates/pers_training_list.html:9
+#: manufacturing/templates/personnel_dashboard.html:9
+#: manufacturing/templates/sales_coaching.html:8
+#: manufacturing/templates/sales_performance.html:8
+#: manufacturing/templates/sales_performance_reviews.html:8
+msgid "Reviews"
+msgstr "Beoordelingen"
+
+#: manufacturing/templates/ess_home.html:9
+#: manufacturing/templates/pers_depts.html:9
+#: manufacturing/templates/pers_review_detail.html:9
+#: manufacturing/templates/pers_reviews_list.html:10
+#: manufacturing/templates/pers_training_detail.html:9
+#: manufacturing/templates/pers_training_list.html:10
+#: manufacturing/templates/personnel_dashboard.html:10
+msgid "Training"
+msgstr "Training"
+
+#: manufacturing/templates/ess_home.html:10
+#: manufacturing/templates/ess_profile.html:3
+#: manufacturing/templates/ess_profile.html:29
+msgid "My Profile"
+msgstr "Mijn Profiel"
+
+#: manufacturing/templates/ess_home.html:32
+#, python-format
+msgid "Welcome, %(first)s %(last)s"
+msgstr "Welkom, %(first)s %(last)s"
+
+#: manufacturing/templates/ess_home.html:36
+#, python-format
+msgid "Vacation Balance (%(year)s)"
+msgstr "Vakantiesaldo (%(year)s)"
+
+#: manufacturing/templates/ess_home.html:37
+#, python-format
+msgid "%(remaining)s days left"
+msgstr "%(remaining)s dagen resterend"
+
+#: manufacturing/templates/ess_home.html:39
+#, python-format
+msgid "%(used)s of %(allotted)s used"
+msgstr "%(used)s van %(allotted)s gebruikt"
+
+#: manufacturing/templates/ess_home.html:41
+msgid "View / Request Time Off →"
+msgstr "Verlof Bekijken / Aanvragen →"
+
+#: manufacturing/templates/ess_home.html:44
+msgid "Latest Pay Stub"
+msgstr "Laatste Loonstrook"
+
+#: manufacturing/templates/ess_home.html:48
+#: manufacturing/templates/ess_pay_stub_detail.html:47
+#: manufacturing/templates/ess_pay_stubs.html:44
+#, python-format
+msgid "%(start)s to %(end)s"
+msgstr "%(start)s tot %(end)s"
+
+#: manufacturing/templates/ess_home.html:51
+msgid "No pay stubs yet"
+msgstr "Nog geen loonstroken"
+
+#: manufacturing/templates/ess_home.html:53
+msgid "View Pay Stubs →"
+msgstr "Loonstroken Bekijken →"
+
+#: manufacturing/templates/ess_home.html:58
+msgid "View Reviews →"
+msgstr "Beoordelingen Bekijken →"
+
+#: manufacturing/templates/ess_home.html:61
+msgid "Upcoming Training"
+msgstr "Aankomende Trainingen"
+
+#: manufacturing/templates/ess_home.html:63
+msgid "View Training →"
+msgstr "Training Bekijken →"
+
+#: manufacturing/templates/ess_home.html:68
+msgid "Quick Links"
+msgstr "Snelle Links"
+
+#: manufacturing/templates/ess_home.html:70
+msgid "Clock In / Out"
+msgstr "In- / Uitklokken"
+
+#: manufacturing/templates/ess_home.html:71
+#: manufacturing/templates/tc_ot_report.html:8
+#: manufacturing/templates/time_clock_hours.html:3
+#: manufacturing/templates/time_clock_hours.html:39
+#: manufacturing/templates/time_clock_status.html:7
+msgid "My Hours"
+msgstr "Mijn Uren"
+
+#: manufacturing/templates/ess_home.html:72
+#: manufacturing/templates/ess_time_off.html:6
+msgid "Request Time Off"
+msgstr "Verlof Aanvragen"
+
+#: manufacturing/templates/ess_home.html:73
+msgid "Update My Contact Info"
+msgstr "Mijn Contactgegevens Bijwerken"
+
+#: manufacturing/templates/ess_home.html:79
+msgid "Pending Time-Off Requests"
+msgstr "Openstaande Verlofaanvragen"
+
+#: manufacturing/templates/ess_home.html:82
+#, python-format
+msgid "%(type)s: %(start)s to %(end)s"
+msgstr "%(type)s: %(start)s tot %(end)s"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:3
+#: manufacturing/templates/payroll_stub_detail.html:3
+#: manufacturing/templates/payroll_stub_detail.html:35
+msgid "Pay Stub"
+msgstr "Loonstrook"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:6
+#: manufacturing/templates/ess_pay_stubs.html:3
+#: manufacturing/templates/ess_pay_stubs.html:28
+#: manufacturing/templates/ess_ytd.html:6
+msgid "My Pay Stubs"
+msgstr "Mijn Loonstroken"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:35
+msgid "My Pay Stub"
+msgstr "Mijn Loonstrook"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:39
+#: manufacturing/templates/payroll_stub_detail.html:39
+msgid "PAY STUB"
+msgstr "LOONSTROOK"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:42
+#: manufacturing/templates/payroll_stub_detail.html:42
+#: manufacturing/templates/payroll_ytd.html:40
+#: manufacturing/templates/pers_training_detail.html:50
+msgid "Employee:"
+msgstr "Medewerker:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:44
+#: manufacturing/templates/payroll_stub_detail.html:44
+msgid "Employee ID:"
+msgstr "Medewerker-ID:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:46
+#: manufacturing/templates/payroll_stub_detail.html:46
+msgid "Pay Period:"
+msgstr "Loonperiode:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:48
+#: manufacturing/templates/payroll_stub_detail.html:48
+msgid "Payment Date:"
+msgstr "Betaaldatum:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:50
+#: manufacturing/templates/payroll_stub_detail.html:50
+msgid "Pay Type:"
+msgstr "Loonsoort:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:53
+#: manufacturing/templates/payroll_stub_detail.html:53
+msgid "Pay Rate:"
+msgstr "Salaristarief:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:56
+#: manufacturing/templates/payroll_stub_detail.html:56
+msgid "Annual Salary:"
+msgstr "Jaarsalaris:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:62
+#: manufacturing/templates/payroll_stub_detail.html:62
+msgid "Earnings"
+msgstr "Inkomsten"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:63
+#: manufacturing/templates/payroll_stub_detail.html:63
+msgid "Regular Hours:"
+msgstr "Reguliere uren:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:65
+#: manufacturing/templates/payroll_stub_detail.html:65
+msgid "Overtime Hours:"
+msgstr "Overuren:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:68
+#: manufacturing/templates/payroll_stub_detail.html:68
+msgid "Gross Pay:"
+msgstr "Brutoloon:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:74
+#: manufacturing/templates/ess_ytd.html:43
+#: manufacturing/templates/payroll_stub_detail.html:74
+msgid "Pre-Tax Deductions"
+msgstr "Aftrek vóór belasting"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:80
+#: manufacturing/templates/payroll_stub_detail.html:80
+msgid "Total Pre-Tax Deductions:"
+msgstr "Totaal aftrek vóór belasting:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:86
+#: manufacturing/templates/payroll_stub_detail.html:86
+msgid "Taxes"
+msgstr "Belastingen"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:87
+#: manufacturing/templates/payroll_stub_detail.html:87
+msgid "Federal Income Tax:"
+msgstr "Federale inkomstenbelasting:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:89
+#: manufacturing/templates/payroll_stub_detail.html:89
+msgid "State Income Tax:"
+msgstr "Staatsinkomstenbelasting:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:92
+#: manufacturing/templates/payroll_stub_detail.html:92
+#, python-format
+msgid "Social Security (%(rate)s%%):"
+msgstr "Sociale zekerheid (%(rate)s%%):"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:95
+#: manufacturing/templates/payroll_stub_detail.html:95
+#, python-format
+msgid "Medicare (%(rate)s%%):"
+msgstr "Medicare (%(rate)s%%):"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:98
+#: manufacturing/templates/payroll_stub_detail.html:98
+msgid "Total Taxes:"
+msgstr "Totaal belastingen:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:104
+#: manufacturing/templates/payroll_stub_detail.html:104
+msgid "Post-Tax Deductions"
+msgstr "Aftrek na belasting"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:110
+#: manufacturing/templates/payroll_stub_detail.html:110
+msgid "Total Post-Tax Deductions:"
+msgstr "Totaal aftrek na belasting:"
+
+#: manufacturing/templates/ess_pay_stub_detail.html:116
+#: manufacturing/templates/payroll_stub_detail.html:116
+msgid "NET PAY:"
+msgstr "NETTOLOON:"
+
+#: manufacturing/templates/ess_pay_stubs.html:6
+msgid "YTD Summary"
+msgstr "Jaaroverzicht"
+
+#: manufacturing/templates/ess_pay_stubs.html:33
+msgid "Pay Period"
+msgstr "Loonperiode"
+
+#: manufacturing/templates/ess_pay_stubs.html:34
+msgid "Payment Date"
+msgstr "Betaaldatum"
+
+#: manufacturing/templates/ess_pay_stubs.html:35
+msgid "Gross"
+msgstr "Bruto"
+
+#: manufacturing/templates/ess_pay_stubs.html:36
+msgid "Net"
+msgstr "Netto"
+
+#: manufacturing/templates/ess_pay_stubs.html:49
+msgid "View Stub"
+msgstr "Loonstrook Bekijken"
+
+#: manufacturing/templates/ess_pay_stubs.html:52
+msgid "No pay stubs yet."
+msgstr "Nog geen loonstroken."
+
+#: manufacturing/templates/ess_profile.html:36
+msgid "— name/email/department are managed by HR, not editable here."
+msgstr "— naam, e-mail en afdeling worden beheerd door HR en zijn hier niet bewerkbaar."
+
+#: manufacturing/templates/ess_profile.html:42
+msgid "Address"
+msgstr "Adres"
+
+#: manufacturing/templates/ess_profile.html:44
+msgid "Street Address"
+msgstr "Straatnaam en Huisnummer"
+
+#: manufacturing/templates/ess_profile.html:48
+msgid "City"
+msgstr "Plaats"
+
+#: manufacturing/templates/ess_profile.html:52
+msgid "State"
+msgstr "Provincie"
+
+#: manufacturing/templates/ess_profile.html:56
+msgid "Zip Code"
+msgstr "Postcode"
+
+#: manufacturing/templates/ess_profile.html:64
+msgid "Emergency Contact"
+msgstr "Noodcontact"
+
+#: manufacturing/templates/ess_profile.html:74
+msgid "Relationship"
+msgstr "Relatie"
+
+#: manufacturing/templates/ess_review_detail.html:3
+msgid "Review Detail"
+msgstr "Beoordelingsdetail"
+
+#: manufacturing/templates/ess_review_detail.html:6
+#: manufacturing/templates/ess_reviews.html:3
+msgid "My Reviews"
+msgstr "Mijn Beoordelingen"
+
+#: manufacturing/templates/ess_review_detail.html:29
+#, python-format
+msgid "%(type)s Review"
+msgstr "%(type)s-Beoordeling"
+
+#: manufacturing/templates/ess_review_detail.html:34
+#: manufacturing/templates/pers_review_detail.html:61
+#: manufacturing/templates/pers_review_detail.html:104
+#: manufacturing/templates/pers_reviews_list.html:120
+msgid "Review Type"
+msgstr "Beoordelingstype"
+
+#: manufacturing/templates/ess_review_detail.html:36
+#: manufacturing/templates/ess_reviews.html:34
+#: manufacturing/templates/pers_review_detail.html:73
+#: manufacturing/templates/pers_review_detail.html:106
+#: manufacturing/templates/pers_reviews_list.html:81
+#: manufacturing/templates/pers_reviews_list.html:132
+#: manufacturing/templates/sales_performance_reviews.html:76
+#: manufacturing/templates/sales_performance_reviews.html:120
+msgid "Reviewer"
+msgstr "Beoordelaar"
+
+#: manufacturing/templates/ess_review_detail.html:37
+#: manufacturing/templates/ess_reviews.html:34
+#: manufacturing/templates/pers_review_detail.html:77
+#: manufacturing/templates/pers_review_detail.html:107
+#: manufacturing/templates/pers_reviews_list.html:83
+#: manufacturing/templates/pers_reviews_list.html:136
+#: manufacturing/templates/qa_reports.html:244
+#: manufacturing/templates/qa_supplier_detail.html:78
+#: manufacturing/templates/qa_supplier_list.html:84
+#: manufacturing/templates/qa_supplier_list.html:119
+#: manufacturing/templates/sales_performance_reviews.html:75
+#: manufacturing/templates/sales_performance_reviews.html:116
+msgid "Rating"
+msgstr "Score"
+
+#: manufacturing/templates/ess_reviews.html:30
+msgid "My Performance Reviews"
+msgstr "Mijn Prestatiebeoordelingen"
+
+#: manufacturing/templates/ess_reviews.html:46
+msgid "No reviews yet."
+msgstr "Nog geen beoordelingen."
+
+#: manufacturing/templates/ess_time_off.html:3
+#: manufacturing/templates/ess_time_off.html:34
+msgid "My Time Off"
+msgstr "Mijn Verlof"
+
+#: manufacturing/templates/ess_time_off.html:38
+#, python-format
+msgid "Allotted (%(year)s)"
+msgstr "Toegekend (%(year)s)"
+
+#: manufacturing/templates/ess_time_off.html:42
+msgid "Used"
+msgstr "Gebruikt"
+
+#: manufacturing/templates/ess_time_off.html:54
+#: manufacturing/templates/ess_trainings.html:33
+#: manufacturing/templates/legal_contract_list.html:93
+#: manufacturing/templates/marketing_dashboard_kpis.html:60
+#: manufacturing/templates/mkt_ad_list.html:102
+#: manufacturing/templates/mkt_campaign_list.html:91
+#: manufacturing/templates/sales_contracts_list.html:85
+msgid "End"
+msgstr "Einde"
+
+#: manufacturing/templates/ess_time_off.html:66
+msgid "No time-off requests yet."
+msgstr "Nog geen verlofaanvragen."
+
+#: manufacturing/templates/ess_training_detail.html:3
+msgid "Training Detail"
+msgstr "Trainingsdetail"
+
+#: manufacturing/templates/ess_training_detail.html:6
+#: manufacturing/templates/ess_trainings.html:3
+msgid "My Training"
+msgstr "Mijn Training"
+
+#: manufacturing/templates/ess_training_detail.html:34
+#: manufacturing/templates/ess_trainings.html:33
+#: manufacturing/templates/pers_training_list.html:86
+msgid "Course"
+msgstr "Cursus"
+
+#: manufacturing/templates/ess_trainings.html:29
+msgid "My Training Records"
+msgstr "Mijn Trainingsgegevens"
+
+#: manufacturing/templates/ess_trainings.html:45
+msgid "No training records yet."
+msgstr "Nog geen trainingsgegevens."
+
+#: manufacturing/templates/ess_ytd.html:3
+msgid "My YTD Summary"
+msgstr "Mijn Jaaroverzicht"
+
+#: manufacturing/templates/ess_ytd.html:26
+#, python-format
+msgid "My %(year)s Year-to-Date Summary"
+msgstr "Mijn Jaaroverzicht %(year)s"
+
+#: manufacturing/templates/ess_ytd.html:39
+#: manufacturing/templates/payroll_dashboard.html:44
+msgid "Payroll Runs"
+msgstr "Loonruns"
+
+#: manufacturing/templates/ess_ytd.html:40
+msgid "Regular Hours"
+msgstr "Reguliere Uren"
+
+#: manufacturing/templates/ess_ytd.html:41
+msgid "Overtime Hours"
+msgstr "Overuren"
+
+#: manufacturing/templates/ess_ytd.html:42
+#: manufacturing/templates/payroll_run_detail.html:67
+#: manufacturing/templates/payroll_ytd.html:57
+msgid "Gross Pay"
+msgstr "Brutoloon"
+
+#: manufacturing/templates/ess_ytd.html:44
+msgid "Federal Tax"
+msgstr "Federale Belasting"
+
+#: manufacturing/templates/ess_ytd.html:45
+#: manufacturing/templates/payroll_run_detail.html:68
+#: manufacturing/templates/payroll_ytd.html:58
+msgid "State Tax"
+msgstr "Staatsbelasting"
+
+#: manufacturing/templates/ess_ytd.html:46
+msgid "Social Security"
+msgstr "Sociale Zekerheid"
+
+#: manufacturing/templates/ess_ytd.html:47
+#: manufacturing/templates/payroll_run_detail.html:69
+#: manufacturing/templates/payroll_ytd.html:59
+msgid "Medicare"
+msgstr "Medicare"
+
+#: manufacturing/templates/ess_ytd.html:48
+#: manufacturing/templates/payroll_dashboard.html:88
+#: manufacturing/templates/payroll_run_detail.html:70
+#: manufacturing/templates/payroll_ytd.html:59
+msgid "Net Pay"
+msgstr "Netto loon"
+
+#: manufacturing/templates/ess_ytd.html:51
+#, python-format
+msgid "No payroll history for %(year)s."
+msgstr "Geen loonhistorie voor %(year)s."
 
 #: manufacturing/templates/exit_interview_list.html:3
 #: manufacturing/templates/exit_interview_list.html:8
@@ -8485,14 +9020,6 @@ msgstr "Waarde ($)"
 msgid "Search title / party / owner…"
 msgstr "Zoek titel / partij / eigenaar…"
 
-#: manufacturing/templates/legal_contract_list.html:93
-#: manufacturing/templates/marketing_dashboard_kpis.html:60
-#: manufacturing/templates/mkt_ad_list.html:102
-#: manufacturing/templates/mkt_campaign_list.html:91
-#: manufacturing/templates/sales_contracts_list.html:85
-msgid "End"
-msgstr "Einde"
-
 #: manufacturing/templates/legal_contract_list.html:111
 #: manufacturing/templates/legal_dashboard.html:161
 #: manufacturing/templates/purch_contracts_list.html:102
@@ -10245,10 +10772,6 @@ msgstr "YTD-rapport"
 msgid "Payroll Department"
 msgstr "Afdeling salarisadministratie"
 
-#: manufacturing/templates/payroll_dashboard.html:44
-msgid "Payroll Runs"
-msgstr "Loonruns"
-
 #: manufacturing/templates/payroll_dashboard.html:48
 msgid "Employees with Pay Rates"
 msgstr "Medewerkers met loontarieven"
@@ -10314,12 +10837,6 @@ msgstr "Medewerkers"
 #: manufacturing/templates/payroll_run_detail.html:53
 msgid "Total Gross"
 msgstr "Totaal bruto"
-
-#: manufacturing/templates/payroll_dashboard.html:88
-#: manufacturing/templates/payroll_run_detail.html:70
-#: manufacturing/templates/payroll_ytd.html:59
-msgid "Net Pay"
-msgstr "Netto loon"
 
 #: manufacturing/templates/payroll_dashboard.html:104
 msgid "View all runs →"
@@ -10508,11 +11025,6 @@ msgstr "Overuren"
 
 #: manufacturing/templates/payroll_run_detail.html:67
 #: manufacturing/templates/payroll_ytd.html:57
-msgid "Gross Pay"
-msgstr "Brutoloon"
-
-#: manufacturing/templates/payroll_run_detail.html:67
-#: manufacturing/templates/payroll_ytd.html:57
 msgid "Pre-Tax Deds"
 msgstr "Aftrek vóór belasting"
 
@@ -10521,20 +11033,10 @@ msgstr "Aftrek vóór belasting"
 msgid "Fed Tax"
 msgstr "Federale belasting"
 
-#: manufacturing/templates/payroll_run_detail.html:68
-#: manufacturing/templates/payroll_ytd.html:58
-msgid "State Tax"
-msgstr "Staatsbelasting"
-
 #: manufacturing/templates/payroll_run_detail.html:69
 #: manufacturing/templates/payroll_ytd.html:59
 msgid "SS"
 msgstr "SS"
-
-#: manufacturing/templates/payroll_run_detail.html:69
-#: manufacturing/templates/payroll_ytd.html:59
-msgid "Medicare"
-msgstr "Medicare"
 
 #: manufacturing/templates/payroll_run_detail.html:70
 msgid "Post-Tax Deds"
@@ -10593,110 +11095,9 @@ msgstr "Staatsbelastingtarief (%%)"
 msgid "Process Payroll"
 msgstr "Loon verwerken"
 
-#: manufacturing/templates/payroll_stub_detail.html:3
-#: manufacturing/templates/payroll_stub_detail.html:35
-msgid "Pay Stub"
-msgstr "Loonstrook"
-
 #: manufacturing/templates/payroll_stub_detail.html:6
 msgid "Back to Run"
 msgstr "Terug naar run"
-
-#: manufacturing/templates/payroll_stub_detail.html:39
-msgid "PAY STUB"
-msgstr "LOONSTROOK"
-
-#: manufacturing/templates/payroll_stub_detail.html:42
-#: manufacturing/templates/payroll_ytd.html:40
-#: manufacturing/templates/pers_training_detail.html:50
-msgid "Employee:"
-msgstr "Medewerker:"
-
-#: manufacturing/templates/payroll_stub_detail.html:44
-msgid "Employee ID:"
-msgstr "Medewerker-ID:"
-
-#: manufacturing/templates/payroll_stub_detail.html:46
-msgid "Pay Period:"
-msgstr "Loonperiode:"
-
-#: manufacturing/templates/payroll_stub_detail.html:48
-msgid "Payment Date:"
-msgstr "Betaaldatum:"
-
-#: manufacturing/templates/payroll_stub_detail.html:50
-msgid "Pay Type:"
-msgstr "Loonsoort:"
-
-#: manufacturing/templates/payroll_stub_detail.html:53
-msgid "Pay Rate:"
-msgstr "Salaristarief:"
-
-#: manufacturing/templates/payroll_stub_detail.html:56
-msgid "Annual Salary:"
-msgstr "Jaarsalaris:"
-
-#: manufacturing/templates/payroll_stub_detail.html:62
-msgid "Earnings"
-msgstr "Inkomsten"
-
-#: manufacturing/templates/payroll_stub_detail.html:63
-msgid "Regular Hours:"
-msgstr "Reguliere uren:"
-
-#: manufacturing/templates/payroll_stub_detail.html:65
-msgid "Overtime Hours:"
-msgstr "Overuren:"
-
-#: manufacturing/templates/payroll_stub_detail.html:68
-msgid "Gross Pay:"
-msgstr "Brutoloon:"
-
-#: manufacturing/templates/payroll_stub_detail.html:74
-msgid "Pre-Tax Deductions"
-msgstr "Aftrek vóór belasting"
-
-#: manufacturing/templates/payroll_stub_detail.html:80
-msgid "Total Pre-Tax Deductions:"
-msgstr "Totaal aftrek vóór belasting:"
-
-#: manufacturing/templates/payroll_stub_detail.html:86
-msgid "Taxes"
-msgstr "Belastingen"
-
-#: manufacturing/templates/payroll_stub_detail.html:87
-msgid "Federal Income Tax:"
-msgstr "Federale inkomstenbelasting:"
-
-#: manufacturing/templates/payroll_stub_detail.html:89
-msgid "State Income Tax:"
-msgstr "Staatsinkomstenbelasting:"
-
-#: manufacturing/templates/payroll_stub_detail.html:92
-#, python-format
-msgid "Social Security (%(rate)s%%):"
-msgstr "Sociale zekerheid (%(rate)s%%):"
-
-#: manufacturing/templates/payroll_stub_detail.html:95
-#, python-format
-msgid "Medicare (%(rate)s%%):"
-msgstr "Medicare (%(rate)s%%):"
-
-#: manufacturing/templates/payroll_stub_detail.html:98
-msgid "Total Taxes:"
-msgstr "Totaal belastingen:"
-
-#: manufacturing/templates/payroll_stub_detail.html:104
-msgid "Post-Tax Deductions"
-msgstr "Aftrek na belasting"
-
-#: manufacturing/templates/payroll_stub_detail.html:110
-msgid "Total Post-Tax Deductions:"
-msgstr "Totaal aftrek na belasting:"
-
-#: manufacturing/templates/payroll_stub_detail.html:116
-msgid "NET PAY:"
-msgstr "NETTOLOON:"
 
 #: manufacturing/templates/payroll_ytd.html:3
 msgid "YTD Payroll Report"
@@ -10737,27 +11138,6 @@ msgstr "Totaal netto:"
 #, python-format
 msgid "No payroll data found for %(year)s."
 msgstr "Geen loongegevens gevonden voor %(year)s."
-
-#: manufacturing/templates/pers_depts.html:8
-#: manufacturing/templates/pers_review_detail.html:8
-#: manufacturing/templates/pers_reviews_list.html:9
-#: manufacturing/templates/pers_training_detail.html:8
-#: manufacturing/templates/pers_training_list.html:9
-#: manufacturing/templates/personnel_dashboard.html:9
-#: manufacturing/templates/sales_coaching.html:8
-#: manufacturing/templates/sales_performance.html:8
-#: manufacturing/templates/sales_performance_reviews.html:8
-msgid "Reviews"
-msgstr "Beoordelingen"
-
-#: manufacturing/templates/pers_depts.html:9
-#: manufacturing/templates/pers_review_detail.html:9
-#: manufacturing/templates/pers_reviews_list.html:10
-#: manufacturing/templates/pers_training_detail.html:9
-#: manufacturing/templates/pers_training_list.html:10
-#: manufacturing/templates/personnel_dashboard.html:10
-msgid "Training"
-msgstr "Training"
 
 #: manufacturing/templates/pers_depts.html:43
 msgid "Departments &amp; Sub-Departments"
@@ -10807,34 +11187,6 @@ msgstr "Beoordeling — %(last)s, %(first)s"
 #: manufacturing/templates/pers_review_detail.html:56
 msgid "Edit Review"
 msgstr "Beoordeling bewerken"
-
-#: manufacturing/templates/pers_review_detail.html:61
-#: manufacturing/templates/pers_review_detail.html:104
-#: manufacturing/templates/pers_reviews_list.html:120
-msgid "Review Type"
-msgstr "Beoordelingstype"
-
-#: manufacturing/templates/pers_review_detail.html:73
-#: manufacturing/templates/pers_review_detail.html:106
-#: manufacturing/templates/pers_reviews_list.html:81
-#: manufacturing/templates/pers_reviews_list.html:132
-#: manufacturing/templates/sales_performance_reviews.html:76
-#: manufacturing/templates/sales_performance_reviews.html:120
-msgid "Reviewer"
-msgstr "Beoordelaar"
-
-#: manufacturing/templates/pers_review_detail.html:77
-#: manufacturing/templates/pers_review_detail.html:107
-#: manufacturing/templates/pers_reviews_list.html:83
-#: manufacturing/templates/pers_reviews_list.html:136
-#: manufacturing/templates/qa_reports.html:244
-#: manufacturing/templates/qa_supplier_detail.html:78
-#: manufacturing/templates/qa_supplier_list.html:84
-#: manufacturing/templates/qa_supplier_list.html:119
-#: manufacturing/templates/sales_performance_reviews.html:75
-#: manufacturing/templates/sales_performance_reviews.html:116
-msgid "Rating"
-msgstr "Score"
 
 #: manufacturing/templates/pers_review_detail.html:79
 #: manufacturing/templates/pers_reviews_list.html:138
@@ -10901,10 +11253,6 @@ msgstr "Training &amp; Ontwikkeling"
 #: manufacturing/templates/pers_training_list.html:76
 msgid "Search course / employee…"
 msgstr "Zoek cursus / medewerker…"
-
-#: manufacturing/templates/pers_training_list.html:86
-msgid "Course"
-msgstr "Cursus"
 
 #: manufacturing/templates/pers_training_list.html:104
 msgid "No training records found."
@@ -14170,19 +14518,25 @@ msgstr "Onvoldoende voorraad om deze bestelling te bevestigen:"
 msgid ""
 "%(name)s: need %(need)s, ATP %(atp)s (short %(short)s), earliest available "
 "%(date)s"
-msgstr "%(name)s: nodig %(need)s, ATP %(atp)s (tekort %(short)s), eerst beschikbaar op %(date)s"
+msgstr ""
+"%(name)s: nodig %(need)s, ATP %(atp)s (tekort %(short)s), eerst beschikbaar "
+"op %(date)s"
 
 #: manufacturing/templates/so_detail.html:159
 #, python-format
 msgid ""
 "%(name)s: need %(need)s, ATP %(atp)s (short %(short)s) — not available "
 "within 90 days"
-msgstr "%(name)s: nodig %(need)s, ATP %(atp)s (tekort %(short)s) — niet beschikbaar binnen 90 dagen"
+msgstr ""
+"%(name)s: nodig %(need)s, ATP %(atp)s (tekort %(short)s) — niet beschikbaar "
+"binnen 90 dagen"
 
 #: manufacturing/templates/so_detail.html:166
 msgid ""
 "Insufficient workcenter capacity to confirm this order by the ship date:"
-msgstr "Onvoldoende werkplekcapaciteit om deze bestelling vóór de verzenddatum te bevestigen:"
+msgstr ""
+"Onvoldoende werkplekcapaciteit om deze bestelling vóór de verzenddatum te "
+"bevestigen:"
 
 #: manufacturing/templates/so_detail.html:170
 #, python-format
@@ -14601,13 +14955,6 @@ msgstr "Voeg er een toe."
 msgid "Overtime Report"
 msgstr "Overwerkrapport"
 
-#: manufacturing/templates/tc_ot_report.html:8
-#: manufacturing/templates/time_clock_hours.html:3
-#: manufacturing/templates/time_clock_hours.html:39
-#: manufacturing/templates/time_clock_status.html:7
-msgid "My Hours"
-msgstr "Mijn Uren"
-
 #: manufacturing/templates/tc_ot_report.html:45
 msgid "Overtime Reports"
 msgstr "Overwerkrapporten"
@@ -14873,7 +15220,12 @@ msgid ""
 "            work order's actual quantity produced. Roll the product's carbon "
 "footprint\n"
 "            first if it hasn't been rolled yet."
-msgstr "Vermenigvuldigt de laatst berekende CO2-voetafdruk van dit product (per eenheid) met de\n            werkelijk geproduceerde hoeveelheid van deze werkorder. Bereken eerst de CO2-voetafdruk\n            van het product als dat nog niet is gebeurd."
+msgstr ""
+"Vermenigvuldigt de laatst berekende CO2-voetafdruk van dit product (per "
+"eenheid) met de\n"
+"            werkelijk geproduceerde hoeveelheid van deze werkorder. Bereken "
+"eerst de CO2-voetafdruk\n"
+"            van het product als dat nog niet is gebeurd."
 
 #: manufacturing/templates/wo_carbon_detail.html:73
 msgid "Compute Carbon"
@@ -14943,7 +15295,11 @@ msgid ""
 "Sums WO material issues and labor from completed operations, then compares "
 "to\n"
 "            the product's standard cost to compute variances."
-msgstr "Telt de materiaalafschrijvingen en arbeid van de WO uit voltooide bewerkingen op en vergelijkt dit\n            vervolgens met de standaardkostprijs van het product om afwijkingen te berekenen."
+msgstr ""
+"Telt de materiaalafschrijvingen en arbeid van de WO uit voltooide "
+"bewerkingen op en vergelijkt dit\n"
+"            vervolgens met de standaardkostprijs van het product om "
+"afwijkingen te berekenen."
 
 #: manufacturing/templates/wo_cost_detail.html:101
 msgid "Compute Cost"
@@ -15048,7 +15404,12 @@ msgid ""
 "                available hours per day. Backward: packs from the due date "
 "above, in reverse\n"
 "                sequence, and flags whether the due date is at risk."
-msgstr "Vooruit: plant de bewerkingen vanaf vandaag, op volgorde, in binnen de\n                beschikbare uren per dag van elke werkplek. Achteruit: plant vanaf de bovenstaande\n                vervaldatum, in omgekeerde volgorde, en geeft aan of die datum risico loopt."
+msgstr ""
+"Vooruit: plant de bewerkingen vanaf vandaag, op volgorde, in binnen de\n"
+"                beschikbare uren per dag van elke werkplek. Achteruit: plant "
+"vanaf de bovenstaande\n"
+"                vervaldatum, in omgekeerde volgorde, en geeft aan of die "
+"datum risico loopt."
 
 #: manufacturing/templates/wo_detail.html:291
 msgid "View WO Cost Detail"
