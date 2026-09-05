@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 16:56+0000\n"
+"POT-Creation-Date: 2026-09-05 17:38+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -227,113 +227,22 @@ msgstr "Marquer comme Facturé"
 msgid "Cancel Order"
 msgstr "Annuler la Commande"
 
-#: manufacturing/templates/acct_dashboard.html:3
-#: manufacturing/templates/acct_dashboard.html:20
-msgid "Accounting Dashboard"
-msgstr "Tableau de Bord Comptabilité"
+#: manufacturing/templates/abc_activity_detail.html:6
+#: manufacturing/templates/abc_activity_new.html:6
+#: manufacturing/templates/abc_report.html:6
+msgid "Activities"
+msgstr "Activités"
 
-#: manufacturing/templates/acct_dashboard.html:7
-#: manufacturing/templates/acct_dashboard.html:23
-#: manufacturing/templates/acct_dashboard_kpis.html:2
-#: manufacturing/templates/ap_list.html:3
-#: manufacturing/templates/ap_list.html:26
-#: manufacturing/templates/ar_list.html:6 manufacturing/templates/base.html:543
-#: manufacturing/templates/finance_dashboard.html:7
-#: manufacturing/templates/finance_dashboard.html:59
-#: manufacturing/templates/finance_dashboard_kpis.html:2
-#: manufacturing/templates/gl_dashboard_kpis.html:4
-msgid "Accounts Payable"
-msgstr "Comptes fournisseurs"
+#: manufacturing/templates/abc_activity_detail.html:7
+#: manufacturing/templates/abc_activity_list.html:6
+msgid "ABC vs. Traditional Report"
+msgstr "Rapport ABC vs. Traditionnel"
 
-#: manufacturing/templates/acct_dashboard.html:8
-#: manufacturing/templates/acct_dashboard.html:24
-#: manufacturing/templates/acct_dashboard_kpis.html:18
-#: manufacturing/templates/ap_list.html:6
-#: manufacturing/templates/ar_list.html:3
-#: manufacturing/templates/ar_list.html:26
-#: manufacturing/templates/base.html:546
-#: manufacturing/templates/finance_dashboard.html:8
-#: manufacturing/templates/finance_dashboard.html:60
-#: manufacturing/templates/finance_dashboard_kpis.html:18
-#: manufacturing/templates/gl_dashboard_kpis.html:16
-#: manufacturing/templates/sales_dashboard.html:68
-msgid "Accounts Receivable"
-msgstr "Comptes clients"
-
-#: manufacturing/templates/acct_dashboard.html:9
-#: manufacturing/templates/acct_dashboard.html:25
-#: manufacturing/templates/ap_list.html:7
-#: manufacturing/templates/ar_list.html:7 manufacturing/templates/base.html:549
-#: manufacturing/templates/finance_dashboard.html:6
-#: manufacturing/templates/gl_dashboard.html:3
-#: manufacturing/templates/gl_dashboard.html:44
-msgid "General Ledger"
-msgstr "Grand livre"
-
-#: manufacturing/templates/acct_dashboard.html:10
-#: manufacturing/templates/acct_dashboard.html:31
-#: manufacturing/templates/finance_audit_detail.html:7
-#: manufacturing/templates/finance_audit_list.html:7
-#: manufacturing/templates/finance_bank_rec_detail.html:7
-#: manufacturing/templates/finance_bank_rec_list.html:7
-#: manufacturing/templates/finance_budget_detail.html:7
-#: manufacturing/templates/finance_budget_list.html:3
-#: manufacturing/templates/finance_budget_list.html:7
-#: manufacturing/templates/finance_budget_list.html:57
-#: manufacturing/templates/finance_dashboard.html:9
-#: manufacturing/templates/finance_dashboard.html:61
-#: manufacturing/templates/finance_tax_detail.html:7
-#: manufacturing/templates/finance_tax_list.html:7
-msgid "Budgets"
-msgstr "Budgets"
-
-#: manufacturing/templates/acct_dashboard.html:11
-#: manufacturing/templates/acct_dashboard.html:32
-#: manufacturing/templates/finance_audit_detail.html:8
-#: manufacturing/templates/finance_audit_list.html:3
-#: manufacturing/templates/finance_audit_list.html:8
-#: manufacturing/templates/finance_audit_list.html:57
-#: manufacturing/templates/finance_bank_rec_detail.html:8
-#: manufacturing/templates/finance_bank_rec_list.html:8
-#: manufacturing/templates/finance_budget_detail.html:8
-#: manufacturing/templates/finance_budget_list.html:8
-#: manufacturing/templates/finance_dashboard.html:10
-#: manufacturing/templates/finance_dashboard.html:62
-#: manufacturing/templates/finance_tax_detail.html:8
-#: manufacturing/templates/finance_tax_list.html:8
-#: manufacturing/templates/qa_capa_list.html:8
-#: manufacturing/templates/qa_dashboard.html:8
-#: manufacturing/templates/qa_dashboard.html:81
-#: manufacturing/templates/qa_ncr_list.html:8
-#: manufacturing/templates/qa_reports.html:10
-#: manufacturing/templates/qa_supplier_list.html:7
-msgid "Audits"
-msgstr "Audits"
-
-#: manufacturing/templates/acct_dashboard.html:12
-#: manufacturing/templates/finance_audit_detail.html:9
-#: manufacturing/templates/finance_audit_list.html:9
-#: manufacturing/templates/finance_bank_rec_detail.html:9
-#: manufacturing/templates/finance_bank_rec_list.html:9
-#: manufacturing/templates/finance_budget_detail.html:9
-#: manufacturing/templates/finance_budget_list.html:9
-#: manufacturing/templates/finance_dashboard.html:11
-#: manufacturing/templates/finance_tax_detail.html:9
-#: manufacturing/templates/finance_tax_list.html:9
-msgid "Bank Rec"
-msgstr "Rappr. Bancaire"
-
-#: manufacturing/templates/acct_dashboard.html:13
-msgid "Tax"
-msgstr "Taxes"
-
-#: manufacturing/templates/acct_dashboard.html:14
-#: manufacturing/templates/base.html:552
-#: manufacturing/templates/payroll_dashboard.html:3
-#: manufacturing/templates/personnel_dashboard.html:63
-msgid "Payroll"
-msgstr "Paie"
-
+#: manufacturing/templates/abc_activity_detail.html:8
+#: manufacturing/templates/abc_activity_list.html:7
+#: manufacturing/templates/abc_activity_new.html:7
+#: manufacturing/templates/abc_product_output.html:7
+#: manufacturing/templates/abc_report.html:7
 #: manufacturing/templates/acct_dashboard.html:15
 #: manufacturing/templates/ai_insights_dashboard.html:7
 #: manufacturing/templates/ap_invoice_detail.html:9
@@ -583,6 +492,610 @@ msgstr "Paie"
 #: manufacturing/templates/wo_list.html:11
 msgid "Home"
 msgstr "Accueil"
+
+#: manufacturing/templates/abc_activity_detail.html:27
+#, python-format
+msgid "Cost Pool: $%(amt)s (%(uom)s)"
+msgstr "Pool de Coûts : %(amt)s $ (%(uom)s)"
+
+#: manufacturing/templates/abc_activity_detail.html:29
+#, python-format
+msgid "Cost Pool: $%(amt)s (no driver UOM set)"
+msgstr "Pool de Coûts : %(amt)s $ (aucune unité d'inducteur définie)"
+
+#: manufacturing/templates/abc_activity_detail.html:37
+msgid "Product Driver Consumption"
+msgstr "Consommation d'Inducteur par Produit"
+
+#: manufacturing/templates/abc_activity_detail.html:42
+#: manufacturing/templates/abc_activity_detail.html:74
+#: manufacturing/templates/abc_report.html:24
+#: manufacturing/templates/coa_detail.html:36
+#: manufacturing/templates/coa_list.html:29
+#: manufacturing/templates/control_plan_list.html:24
+#: manufacturing/templates/po_detail.html:165
+#: manufacturing/templates/prod_daily_report.html:83
+#: manufacturing/templates/prod_dashboard.html:112
+#: manufacturing/templates/prod_labor_report.html:94
+#: manufacturing/templates/prod_performance_report.html:107
+#: manufacturing/templates/prod_reports.html:86
+#: manufacturing/templates/prod_reports.html:113
+#: manufacturing/templates/prod_schedule.html:68
+#: manufacturing/templates/prod_shipping_detail.html:152
+#: manufacturing/templates/qa_inspection_detail.html:92
+#: manufacturing/templates/qa_inspection_list.html:80
+#: manufacturing/templates/qa_inspection_list.html:114
+#: manufacturing/templates/qa_ncr_list.html:87
+#: manufacturing/templates/reports_dashboard.html:199
+#: manufacturing/templates/sales_demand.html:149
+#: manufacturing/templates/sales_order_detail.html:121
+#: manufacturing/templates/sales_order_detail.html:170
+#: manufacturing/templates/sales_reports_kpis.html:34
+#: manufacturing/templates/so_detail.html:196
+#: manufacturing/templates/spc_list.html:41
+#: manufacturing/templates/spc_list.html:88
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:47
+#: manufacturing/templates/wms_bin_detail.html:26
+#: manufacturing/templates/wms_pack_station.html:22
+#: manufacturing/templates/wms_pack_station.html:54
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+#: manufacturing/templates/wms_ship_confirm.html:17
+#: manufacturing/templates/wms_transfer_detail.html:36
+#: manufacturing/templates/wms_wave_detail.html:26
+#: manufacturing/templates/wo_detail.html:156
+#: manufacturing/templates/wo_detail.html:184
+#: manufacturing/templates/wo_list.html:33
+msgid "Product"
+msgstr "Produit"
+
+#: manufacturing/templates/abc_activity_detail.html:42
+#: manufacturing/templates/abc_product_output.html:34
+msgid "Driver Qty"
+msgstr "Qté d'Inducteur"
+
+#: manufacturing/templates/abc_activity_detail.html:55
+#: manufacturing/templates/control_plan_detail.html:108
+#: manufacturing/templates/payroll_deductions.html:141
+#: manufacturing/templates/po_detail.html:202
+#: manufacturing/templates/rfq_detail.html:57
+#: manufacturing/templates/so_detail.html:220
+#: manufacturing/templates/wms_transfer_detail.html:53
+msgid "Remove"
+msgstr "Supprimer"
+
+#: manufacturing/templates/abc_activity_detail.html:65
+msgid "No driver consumption recorded yet."
+msgstr "Aucune consommation d'inducteur enregistrée pour l'instant."
+
+#: manufacturing/templates/abc_activity_detail.html:82
+msgid "Driver Qty Consumed"
+msgstr "Qté d'Inducteur Consommée"
+
+#: manufacturing/templates/abc_activity_detail.html:86
+msgid "Record Usage"
+msgstr "Enregistrer l'Utilisation"
+
+#: manufacturing/templates/abc_activity_list.html:3
+msgid "ABC Activities"
+msgstr "Activités ABC"
+
+#: manufacturing/templates/abc_activity_list.html:9
+#: manufacturing/templates/abc_activity_new.html:3
+msgid "New Activity"
+msgstr "Nouvelle Activité"
+
+#: manufacturing/templates/abc_activity_list.html:15
+msgid "Activity Cost Pools"
+msgstr "Pools de Coûts par Activité"
+
+#: manufacturing/templates/abc_activity_list.html:18
+msgid "Search by name..."
+msgstr "Rechercher par nom..."
+
+#: manufacturing/templates/abc_activity_list.html:20
+#: manufacturing/templates/ats_candidate_list.html:21
+#: manufacturing/templates/ats_requisition_list.html:27
+#: manufacturing/templates/coa_list.html:20
+#: manufacturing/templates/cs_list.html:44
+msgid "Search"
+msgstr "Rechercher"
+
+#: manufacturing/templates/abc_activity_list.html:28
+#: manufacturing/templates/abc_product_output.html:34
+msgid "Activity"
+msgstr "Activité"
+
+#: manufacturing/templates/abc_activity_list.html:29
+msgid "Driver UOM"
+msgstr "UM d'Inducteur"
+
+#: manufacturing/templates/abc_activity_list.html:30
+msgid "Cost Pool"
+msgstr "Pool de Coûts"
+
+#: manufacturing/templates/abc_activity_list.html:40
+#: manufacturing/templates/ats_candidate_detail.html:44
+#: manufacturing/templates/ats_candidate_list.html:35
+#: manufacturing/templates/ats_dashboard.html:87
+#: manufacturing/templates/ats_requisition_detail.html:64
+#: manufacturing/templates/ats_requisition_list.html:49
+#: manufacturing/templates/benefits_dashboard.html:90
+#: manufacturing/templates/coa_list.html:54
+#: manufacturing/templates/compliance_checklist_list.html:42
+#: manufacturing/templates/compliance_template_list.html:34
+#: manufacturing/templates/control_plan_list.html:45
+#: manufacturing/templates/ess_time_off.html:63
+#: manufacturing/templates/rfq_list.html:55
+#: manufacturing/templates/wms_bin_list.html:60
+#: manufacturing/templates/wms_pick_list_list.html:71
+#: manufacturing/templates/wms_rfid_tag_list.html:68
+#: manufacturing/templates/wms_transfer_list.html:43
+#: manufacturing/templates/wms_wave_detail.html:66
+#: manufacturing/templates/wms_wave_list.html:73
+msgid "Detail"
+msgstr "Détail"
+
+#: manufacturing/templates/abc_activity_list.html:47
+msgid "No activity cost pools yet."
+msgstr "Aucun pool de coûts par activité pour l'instant."
+
+#: manufacturing/templates/abc_activity_new.html:21
+msgid "New Activity Cost Pool"
+msgstr "Nouveau Pool de Coûts par Activité"
+
+#: manufacturing/templates/abc_activity_new.html:29
+#: manufacturing/templates/benefit_plan_new.html:29
+#: manufacturing/templates/compliance_template_new.html:29
+#: manufacturing/templates/control_plan_new.html:37
+#: manufacturing/templates/maint_equipment_detail.html:62
+#: manufacturing/templates/maint_equipment_list.html:105
+#: manufacturing/templates/maint_mechanic_detail.html:47
+#: manufacturing/templates/maint_mechanics_list.html:100
+#: manufacturing/templates/maint_part_detail.html:47
+#: manufacturing/templates/maint_parts_list.html:106
+msgid "Name *"
+msgstr "Nom *"
+
+#: manufacturing/templates/abc_activity_new.html:30
+msgid "e.g. Machine Setups"
+msgstr "par ex. Réglages de Machine"
+
+#: manufacturing/templates/abc_activity_new.html:33
+msgid "Cost Pool Amount ($) *"
+msgstr "Montant du Pool de Coûts ($) *"
+
+#: manufacturing/templates/abc_activity_new.html:37
+msgid "Driver Unit of Measure"
+msgstr "Unité de Mesure de l'Inducteur"
+
+#: manufacturing/templates/abc_activity_new.html:38
+msgid "e.g. per setup, per machine hour"
+msgstr "par ex. par réglage, par heure machine"
+
+#: manufacturing/templates/abc_activity_new.html:41
+#: manufacturing/templates/abc_product_output.html:67
+#: manufacturing/templates/ap_invoice_detail.html:196
+#: manufacturing/templates/ap_invoice_payments_kpis.html:6
+#: manufacturing/templates/ar_invoice_detail.html:196
+#: manufacturing/templates/ar_invoice_payments_kpis.html:6
+#: manufacturing/templates/ats_application_detail.html:46
+#: manufacturing/templates/ats_application_detail.html:79
+#: manufacturing/templates/ats_candidate_detail.html:69
+#: manufacturing/templates/ats_requisition_detail.html:91
+#: manufacturing/templates/benefit_plan_detail.html:122
+#: manufacturing/templates/blanket_po_detail.html:100
+#: manufacturing/templates/blanket_po_new.html:50
+#: manufacturing/templates/blanket_po_release_new.html:44
+#: manufacturing/templates/coa_detail.html:40
+#: manufacturing/templates/coa_new.html:47
+#: manufacturing/templates/credit_account_detail.html:87
+#: manufacturing/templates/credit_account_detail.html:121
+#: manufacturing/templates/credit_account_list.html:136
+#: manufacturing/templates/credit_application_detail.html:92
+#: manufacturing/templates/credit_application_detail.html:116
+#: manufacturing/templates/credit_application_list.html:124
+#: manufacturing/templates/credit_collections_detail.html:83
+#: manufacturing/templates/credit_collections_detail.html:129
+#: manufacturing/templates/credit_collections_list.html:155
+#: manufacturing/templates/cs_returns_detail.html:109
+#: manufacturing/templates/cs_returns_detail.html:124
+#: manufacturing/templates/cs_returns_list.html:137
+#: manufacturing/templates/eng_ecr_detail.html:116
+#: manufacturing/templates/eng_ecr_detail.html:124
+#: manufacturing/templates/eng_ecr_detail.html:160
+#: manufacturing/templates/eng_project_detail.html:109
+#: manufacturing/templates/eng_project_detail.html:120
+#: manufacturing/templates/eng_project_detail.html:173
+#: manufacturing/templates/eng_project_detail.html:221
+#: manufacturing/templates/eng_spec_detail.html:109
+#: manufacturing/templates/eng_spec_detail.html:136
+#: manufacturing/templates/eng_specs_list.html:153
+#: manufacturing/templates/eng_task_detail.html:107
+#: manufacturing/templates/eng_task_detail.html:122
+#: manufacturing/templates/eng_tasks_list.html:155
+#: manufacturing/templates/exit_interview_list.html:120
+#: manufacturing/templates/finance_audit_detail.html:98
+#: manufacturing/templates/finance_audit_detail.html:113
+#: manufacturing/templates/finance_audit_detail.html:179
+#: manufacturing/templates/finance_audit_list.html:150
+#: manufacturing/templates/finance_bank_rec_detail.html:81
+#: manufacturing/templates/finance_bank_rec_detail.html:95
+#: manufacturing/templates/finance_bank_rec_detail.html:155
+#: manufacturing/templates/finance_bank_rec_list.html:72
+#: manufacturing/templates/finance_bank_rec_list.html:120
+#: manufacturing/templates/finance_budget_detail.html:81
+#: manufacturing/templates/finance_budget_detail.html:94
+#: manufacturing/templates/finance_budget_detail.html:107
+#: manufacturing/templates/finance_budget_detail.html:164
+#: manufacturing/templates/finance_budget_list.html:83
+#: manufacturing/templates/finance_budget_list.html:125
+#: manufacturing/templates/finance_tax_detail.html:136
+#: manufacturing/templates/finance_tax_detail.html:149
+#: manufacturing/templates/finance_tax_list.html:157
+#: manufacturing/templates/gl_accounts.html:109
+#: manufacturing/templates/gl_accounts.html:136
+#: manufacturing/templates/it_asset_detail.html:112
+#: manufacturing/templates/it_asset_detail.html:174
+#: manufacturing/templates/it_asset_list.html:153
+#: manufacturing/templates/it_incident_detail.html:76
+#: manufacturing/templates/it_incident_detail.html:96
+#: manufacturing/templates/it_incident_list.html:129
+#: manufacturing/templates/it_license_detail.html:109
+#: manufacturing/templates/it_license_detail.html:171
+#: manufacturing/templates/it_license_list.html:160
+#: manufacturing/templates/it_network_detail.html:102
+#: manufacturing/templates/it_network_detail.html:161
+#: manufacturing/templates/it_network_list.html:154
+#: manufacturing/templates/it_repairs_detail.html:104
+#: manufacturing/templates/it_repairs_detail.html:164
+#: manufacturing/templates/it_repairs_list.html:141
+#: manufacturing/templates/it_software_detail.html:85
+#: manufacturing/templates/it_software_detail.html:131
+#: manufacturing/templates/it_software_list.html:129
+#: manufacturing/templates/it_task_detail.html:92
+#: manufacturing/templates/it_task_detail.html:115
+#: manufacturing/templates/it_task_list.html:151
+#: manufacturing/templates/it_ticket_detail.html:112
+#: manufacturing/templates/it_ticket_detail.html:181
+#: manufacturing/templates/it_ticket_list.html:145
+#: manufacturing/templates/legal_compliance_detail.html:75
+#: manufacturing/templates/legal_compliance_detail.html:117
+#: manufacturing/templates/legal_compliance_list.html:137
+#: manufacturing/templates/legal_contract_detail.html:95
+#: manufacturing/templates/legal_contract_detail.html:149
+#: manufacturing/templates/legal_contract_list.html:164
+#: manufacturing/templates/legal_employment_list.html:140
+#: manufacturing/templates/legal_governance_list.html:135
+#: manufacturing/templates/legal_ip_list.html:141
+#: manufacturing/templates/legal_litigation_detail.html:80
+#: manufacturing/templates/legal_litigation_detail.html:130
+#: manufacturing/templates/legal_litigation_list.html:154
+#: manufacturing/templates/maint_downtime_detail.html:126
+#: manufacturing/templates/maint_downtime_list.html:133
+#: manufacturing/templates/maint_equipment_detail.html:135
+#: manufacturing/templates/maint_equipment_list.html:135
+#: manufacturing/templates/maint_inspection_detail.html:155
+#: manufacturing/templates/maint_inspection_list.html:127
+#: manufacturing/templates/maint_mechanic_detail.html:111
+#: manufacturing/templates/maint_mechanics_list.html:132
+#: manufacturing/templates/maint_part_detail.html:133
+#: manufacturing/templates/maint_parts_list.html:142
+#: manufacturing/templates/maint_schedule_detail.html:150
+#: manufacturing/templates/maint_schedule_list.html:133
+#: manufacturing/templates/maint_wo_detail.html:196
+#: manufacturing/templates/maint_wo_list.html:150
+#: manufacturing/templates/mkt_ad_detail.html:116
+#: manufacturing/templates/mkt_ad_detail.html:186
+#: manufacturing/templates/mkt_ad_list.html:180
+#: manufacturing/templates/mkt_budget_list.html:149
+#: manufacturing/templates/mkt_campaign_detail.html:84
+#: manufacturing/templates/mkt_campaign_detail.html:142
+#: manufacturing/templates/mkt_campaign_list.html:166
+#: manufacturing/templates/mkt_content_detail.html:80
+#: manufacturing/templates/mkt_content_detail.html:134
+#: manufacturing/templates/mkt_content_list.html:158
+#: manufacturing/templates/mkt_lead_detail.html:81
+#: manufacturing/templates/mkt_lead_detail.html:131
+#: manufacturing/templates/mkt_lead_list.html:157
+#: manufacturing/templates/mkt_research_detail.html:95
+#: manufacturing/templates/mkt_research_detail.html:153
+#: manufacturing/templates/mkt_research_list.html:165
+#: manufacturing/templates/offboarding_list.html:143
+#: manufacturing/templates/payroll_deductions.html:192
+#: manufacturing/templates/pers_review_detail.html:94
+#: manufacturing/templates/pers_reviews_list.html:153
+#: manufacturing/templates/pers_training_detail.html:92
+#: manufacturing/templates/pers_training_list.html:154
+#: manufacturing/templates/po_form.html:74
+#: manufacturing/templates/prod_delivery_status.html:66
+#: manufacturing/templates/prod_shipping_detail.html:126
+#: manufacturing/templates/prod_shipping_detail.html:141
+#: manufacturing/templates/prod_shipping_list.html:139
+#: manufacturing/templates/purch_contract_detail.html:113
+#: manufacturing/templates/purch_contract_detail.html:132
+#: manufacturing/templates/purch_contracts_list.html:157
+#: manufacturing/templates/qa_inspection_detail.html:109
+#: manufacturing/templates/qa_inspection_list.html:159
+#: manufacturing/templates/qa_ncr_detail.html:166
+#: manufacturing/templates/qa_ncr_list.html:148
+#: manufacturing/templates/qa_supplier_detail.html:119
+#: manufacturing/templates/qa_supplier_list.html:140
+#: manufacturing/templates/req_detail.html:74
+#: manufacturing/templates/req_list.html:119
+#: manufacturing/templates/rfq_list.html:33
+#: manufacturing/templates/sales_commission_history.html:62
+#: manufacturing/templates/sales_commissions.html:116
+#: manufacturing/templates/sales_commissions.html:187
+#: manufacturing/templates/sales_commissions.html:237
+#: manufacturing/templates/sales_contracts_detail.html:130
+#: manufacturing/templates/sales_contracts_detail.html:144
+#: manufacturing/templates/sales_contracts_list.html:153
+#: manufacturing/templates/sales_forecast_detail.html:172
+#: manufacturing/templates/sales_forecast_detail.html:185
+#: manufacturing/templates/sales_forecast_list.html:236
+#: manufacturing/templates/sales_leads_detail.html:103
+#: manufacturing/templates/sales_leads_detail.html:119
+#: manufacturing/templates/sales_leads_list.html:160
+#: manufacturing/templates/sales_order_detail.html:109
+#: manufacturing/templates/sales_orders.html:112
+#: manufacturing/templates/sales_quotes.html:125
+#: manufacturing/templates/sales_territories.html:80
+#: manufacturing/templates/sales_territories.html:136
+#: manufacturing/templates/sales_territories.html:173
+#: manufacturing/templates/so_form.html:74
+#: manufacturing/templates/spc_log.html:72
+#: manufacturing/templates/supplier_portal_rfqs.html:11
+#: manufacturing/templates/termination_detail.html:46
+#: manufacturing/templates/termination_list.html:141
+#: manufacturing/templates/wms_transfer_new.html:30
+#: manufacturing/templates/wo_detail.html:159
+#: manufacturing/templates/wo_form.html:84
+msgid "Notes"
+msgstr "Notes"
+
+#: manufacturing/templates/abc_activity_new.html:42
+#: manufacturing/templates/ats_application_detail.html:80
+#: manufacturing/templates/ats_candidate_detail.html:70
+#: manufacturing/templates/ats_requisition_detail.html:92
+#: manufacturing/templates/benefit_plan_detail.html:123
+#: manufacturing/templates/control_plan_detail.html:159
+#: manufacturing/templates/qa_ncr_list.html:131
+#: manufacturing/templates/req_detail.html:166
+msgid "Optional"
+msgstr "Facultatif"
+
+#: manufacturing/templates/abc_activity_new.html:44
+msgid "Create Activity"
+msgstr "Créer une Activité"
+
+#: manufacturing/templates/abc_product_output.html:3
+msgid "ABC Detail"
+msgstr "Détail ABC"
+
+#: manufacturing/templates/abc_product_output.html:6
+msgid "ABC Report"
+msgstr "Rapport ABC"
+
+#: manufacturing/templates/abc_product_output.html:29
+msgid "Activity Breakdown"
+msgstr "Répartition par Activité"
+
+#: manufacturing/templates/abc_product_output.html:34
+#: manufacturing/templates/po_detail.html:129
+#: manufacturing/templates/so_detail.html:130
+msgid "Rate"
+msgstr "Taux"
+
+#: manufacturing/templates/abc_product_output.html:34
+msgid "Allocated"
+msgstr "Alloué"
+
+#: manufacturing/templates/abc_product_output.html:49
+msgid "No driver consumption recorded for this product yet."
+msgstr "Aucune consommation d'inducteur enregistrée pour ce produit pour l'instant."
+
+#: manufacturing/templates/abc_product_output.html:51
+msgid "Total Allocated"
+msgstr "Total Alloué"
+
+#: manufacturing/templates/abc_product_output.html:52
+msgid "ABC Overhead / Unit"
+msgstr "Frais Généraux ABC / Unité"
+
+#: manufacturing/templates/abc_product_output.html:52
+msgid "(set output qty below)"
+msgstr "(définissez la qté produite ci-dessous)"
+
+#: manufacturing/templates/abc_product_output.html:53
+msgid "Traditional Overhead / Unit"
+msgstr "Frais Généraux Traditionnels / Unité"
+
+#: manufacturing/templates/abc_product_output.html:58
+msgid "Output Quantity (for period)"
+msgstr "Quantité Produite (pour la période)"
+
+#: manufacturing/templates/abc_product_output.html:62
+msgid "Units Produced"
+msgstr "Unités Produites"
+
+#: manufacturing/templates/abc_product_output.html:68
+msgid "Optional — e.g. period covered"
+msgstr "Facultatif — par ex. période couverte"
+
+#: manufacturing/templates/abc_product_output.html:70
+msgid "Save Output Qty"
+msgstr "Enregistrer la Qté Produite"
+
+#: manufacturing/templates/abc_report.html:3
+msgid "ABC vs. Traditional Overhead"
+msgstr "Frais Généraux ABC vs. Traditionnels"
+
+#: manufacturing/templates/abc_report.html:12
+msgid "Activity-Based vs. Traditional Overhead"
+msgstr "Frais Généraux à Base d'Activités vs. Traditionnels"
+
+#: manufacturing/templates/abc_report.html:14
+#, python-format
+msgid ""
+"Products where the flat overhead rate and actual activity-driver "
+"consumption\n"
+"        disagree by %(pct)s%% or more are flagged —\n"
+"        worth investigating whether the traditional rate is over- or under-"
+"costing them."
+msgstr "Les produits pour lesquels le taux de frais généraux fixe et la consommation réelle d'inducteur d'activité\n        diffèrent de %(pct)s%% ou plus sont signalés —\n        il vaut la peine de vérifier si le taux traditionnel les surévalue ou les sous-évalue."
+
+#: manufacturing/templates/abc_report.html:25
+msgid "Traditional OH/Unit"
+msgstr "FG Traditionnels/Unité"
+
+#: manufacturing/templates/abc_report.html:26
+msgid "ABC OH/Unit"
+msgstr "FG ABC/Unité"
+
+#: manufacturing/templates/abc_report.html:27
+#: manufacturing/templates/maint_labor_report.html:96
+#: manufacturing/templates/maint_labor_report.html:128
+#: manufacturing/templates/prod_labor_report.html:96
+#: manufacturing/templates/prod_labor_report.html:127
+#: manufacturing/templates/sales_demand.html:94
+#: manufacturing/templates/sales_forecast_list.html:146
+#: manufacturing/templates/sales_performance_kpis.html:11
+#: manufacturing/templates/sales_targets.html:77
+msgid "Variance"
+msgstr "Écart"
+
+#: manufacturing/templates/abc_report.html:28
+#: manufacturing/templates/maint_labor_report.html:96
+#: manufacturing/templates/maint_labor_report.html:128
+#: manufacturing/templates/prod_labor_report.html:96
+#: manufacturing/templates/prod_labor_report.html:127
+#, python-format
+msgid "Variance %%"
+msgstr "Écart %%"
+
+#: manufacturing/templates/abc_report.html:54
+msgid "Investigate"
+msgstr "Investiguer"
+
+#: manufacturing/templates/abc_report.html:56
+msgid "Set Output"
+msgstr "Définir la Production"
+
+#: manufacturing/templates/abc_report.html:64
+msgid ""
+"No products have recorded activity-driver consumption yet — add usage under "
+"an Activity."
+msgstr "Aucun produit n'a encore de consommation d'inducteur d'activité enregistrée — ajoutez une utilisation sous une Activité."
+
+#: manufacturing/templates/acct_dashboard.html:3
+#: manufacturing/templates/acct_dashboard.html:20
+msgid "Accounting Dashboard"
+msgstr "Tableau de Bord Comptabilité"
+
+#: manufacturing/templates/acct_dashboard.html:7
+#: manufacturing/templates/acct_dashboard.html:23
+#: manufacturing/templates/acct_dashboard_kpis.html:2
+#: manufacturing/templates/ap_list.html:3
+#: manufacturing/templates/ap_list.html:26
+#: manufacturing/templates/ar_list.html:6 manufacturing/templates/base.html:543
+#: manufacturing/templates/finance_dashboard.html:7
+#: manufacturing/templates/finance_dashboard.html:59
+#: manufacturing/templates/finance_dashboard_kpis.html:2
+#: manufacturing/templates/gl_dashboard_kpis.html:4
+msgid "Accounts Payable"
+msgstr "Comptes fournisseurs"
+
+#: manufacturing/templates/acct_dashboard.html:8
+#: manufacturing/templates/acct_dashboard.html:24
+#: manufacturing/templates/acct_dashboard_kpis.html:18
+#: manufacturing/templates/ap_list.html:6
+#: manufacturing/templates/ar_list.html:3
+#: manufacturing/templates/ar_list.html:26
+#: manufacturing/templates/base.html:546
+#: manufacturing/templates/finance_dashboard.html:8
+#: manufacturing/templates/finance_dashboard.html:60
+#: manufacturing/templates/finance_dashboard_kpis.html:18
+#: manufacturing/templates/gl_dashboard_kpis.html:16
+#: manufacturing/templates/sales_dashboard.html:68
+msgid "Accounts Receivable"
+msgstr "Comptes clients"
+
+#: manufacturing/templates/acct_dashboard.html:9
+#: manufacturing/templates/acct_dashboard.html:25
+#: manufacturing/templates/ap_list.html:7
+#: manufacturing/templates/ar_list.html:7 manufacturing/templates/base.html:549
+#: manufacturing/templates/finance_dashboard.html:6
+#: manufacturing/templates/gl_dashboard.html:3
+#: manufacturing/templates/gl_dashboard.html:44
+msgid "General Ledger"
+msgstr "Grand livre"
+
+#: manufacturing/templates/acct_dashboard.html:10
+#: manufacturing/templates/acct_dashboard.html:31
+#: manufacturing/templates/finance_audit_detail.html:7
+#: manufacturing/templates/finance_audit_list.html:7
+#: manufacturing/templates/finance_bank_rec_detail.html:7
+#: manufacturing/templates/finance_bank_rec_list.html:7
+#: manufacturing/templates/finance_budget_detail.html:7
+#: manufacturing/templates/finance_budget_list.html:3
+#: manufacturing/templates/finance_budget_list.html:7
+#: manufacturing/templates/finance_budget_list.html:57
+#: manufacturing/templates/finance_dashboard.html:9
+#: manufacturing/templates/finance_dashboard.html:61
+#: manufacturing/templates/finance_tax_detail.html:7
+#: manufacturing/templates/finance_tax_list.html:7
+msgid "Budgets"
+msgstr "Budgets"
+
+#: manufacturing/templates/acct_dashboard.html:11
+#: manufacturing/templates/acct_dashboard.html:32
+#: manufacturing/templates/finance_audit_detail.html:8
+#: manufacturing/templates/finance_audit_list.html:3
+#: manufacturing/templates/finance_audit_list.html:8
+#: manufacturing/templates/finance_audit_list.html:57
+#: manufacturing/templates/finance_bank_rec_detail.html:8
+#: manufacturing/templates/finance_bank_rec_list.html:8
+#: manufacturing/templates/finance_budget_detail.html:8
+#: manufacturing/templates/finance_budget_list.html:8
+#: manufacturing/templates/finance_dashboard.html:10
+#: manufacturing/templates/finance_dashboard.html:62
+#: manufacturing/templates/finance_tax_detail.html:8
+#: manufacturing/templates/finance_tax_list.html:8
+#: manufacturing/templates/qa_capa_list.html:8
+#: manufacturing/templates/qa_dashboard.html:8
+#: manufacturing/templates/qa_dashboard.html:81
+#: manufacturing/templates/qa_ncr_list.html:8
+#: manufacturing/templates/qa_reports.html:10
+#: manufacturing/templates/qa_supplier_list.html:7
+msgid "Audits"
+msgstr "Audits"
+
+#: manufacturing/templates/acct_dashboard.html:12
+#: manufacturing/templates/finance_audit_detail.html:9
+#: manufacturing/templates/finance_audit_list.html:9
+#: manufacturing/templates/finance_bank_rec_detail.html:9
+#: manufacturing/templates/finance_bank_rec_list.html:9
+#: manufacturing/templates/finance_budget_detail.html:9
+#: manufacturing/templates/finance_budget_list.html:9
+#: manufacturing/templates/finance_dashboard.html:11
+#: manufacturing/templates/finance_tax_detail.html:9
+#: manufacturing/templates/finance_tax_list.html:9
+msgid "Bank Rec"
+msgstr "Rappr. Bancaire"
+
+#: manufacturing/templates/acct_dashboard.html:13
+msgid "Tax"
+msgstr "Taxes"
+
+#: manufacturing/templates/acct_dashboard.html:14
+#: manufacturing/templates/base.html:552
+#: manufacturing/templates/payroll_dashboard.html:3
+#: manufacturing/templates/personnel_dashboard.html:63
+msgid "Payroll"
+msgstr "Paie"
 
 #: manufacturing/templates/acct_dashboard.html:26
 #: manufacturing/templates/finance_dashboard.html:54
@@ -1548,185 +2061,6 @@ msgstr "Méthode"
 msgid "Check #, etc."
 msgstr "N° de chèque, etc."
 
-#: manufacturing/templates/ap_invoice_detail.html:196
-#: manufacturing/templates/ap_invoice_payments_kpis.html:6
-#: manufacturing/templates/ar_invoice_detail.html:196
-#: manufacturing/templates/ar_invoice_payments_kpis.html:6
-#: manufacturing/templates/ats_application_detail.html:46
-#: manufacturing/templates/ats_application_detail.html:79
-#: manufacturing/templates/ats_candidate_detail.html:69
-#: manufacturing/templates/ats_requisition_detail.html:91
-#: manufacturing/templates/benefit_plan_detail.html:122
-#: manufacturing/templates/blanket_po_detail.html:100
-#: manufacturing/templates/blanket_po_new.html:50
-#: manufacturing/templates/blanket_po_release_new.html:44
-#: manufacturing/templates/coa_detail.html:40
-#: manufacturing/templates/coa_new.html:47
-#: manufacturing/templates/credit_account_detail.html:87
-#: manufacturing/templates/credit_account_detail.html:121
-#: manufacturing/templates/credit_account_list.html:136
-#: manufacturing/templates/credit_application_detail.html:92
-#: manufacturing/templates/credit_application_detail.html:116
-#: manufacturing/templates/credit_application_list.html:124
-#: manufacturing/templates/credit_collections_detail.html:83
-#: manufacturing/templates/credit_collections_detail.html:129
-#: manufacturing/templates/credit_collections_list.html:155
-#: manufacturing/templates/cs_returns_detail.html:109
-#: manufacturing/templates/cs_returns_detail.html:124
-#: manufacturing/templates/cs_returns_list.html:137
-#: manufacturing/templates/eng_ecr_detail.html:116
-#: manufacturing/templates/eng_ecr_detail.html:124
-#: manufacturing/templates/eng_ecr_detail.html:160
-#: manufacturing/templates/eng_project_detail.html:109
-#: manufacturing/templates/eng_project_detail.html:120
-#: manufacturing/templates/eng_project_detail.html:173
-#: manufacturing/templates/eng_project_detail.html:221
-#: manufacturing/templates/eng_spec_detail.html:109
-#: manufacturing/templates/eng_spec_detail.html:136
-#: manufacturing/templates/eng_specs_list.html:153
-#: manufacturing/templates/eng_task_detail.html:107
-#: manufacturing/templates/eng_task_detail.html:122
-#: manufacturing/templates/eng_tasks_list.html:155
-#: manufacturing/templates/exit_interview_list.html:120
-#: manufacturing/templates/finance_audit_detail.html:98
-#: manufacturing/templates/finance_audit_detail.html:113
-#: manufacturing/templates/finance_audit_detail.html:179
-#: manufacturing/templates/finance_audit_list.html:150
-#: manufacturing/templates/finance_bank_rec_detail.html:81
-#: manufacturing/templates/finance_bank_rec_detail.html:95
-#: manufacturing/templates/finance_bank_rec_detail.html:155
-#: manufacturing/templates/finance_bank_rec_list.html:72
-#: manufacturing/templates/finance_bank_rec_list.html:120
-#: manufacturing/templates/finance_budget_detail.html:81
-#: manufacturing/templates/finance_budget_detail.html:94
-#: manufacturing/templates/finance_budget_detail.html:107
-#: manufacturing/templates/finance_budget_detail.html:164
-#: manufacturing/templates/finance_budget_list.html:83
-#: manufacturing/templates/finance_budget_list.html:125
-#: manufacturing/templates/finance_tax_detail.html:136
-#: manufacturing/templates/finance_tax_detail.html:149
-#: manufacturing/templates/finance_tax_list.html:157
-#: manufacturing/templates/gl_accounts.html:109
-#: manufacturing/templates/gl_accounts.html:136
-#: manufacturing/templates/it_asset_detail.html:112
-#: manufacturing/templates/it_asset_detail.html:174
-#: manufacturing/templates/it_asset_list.html:153
-#: manufacturing/templates/it_incident_detail.html:76
-#: manufacturing/templates/it_incident_detail.html:96
-#: manufacturing/templates/it_incident_list.html:129
-#: manufacturing/templates/it_license_detail.html:109
-#: manufacturing/templates/it_license_detail.html:171
-#: manufacturing/templates/it_license_list.html:160
-#: manufacturing/templates/it_network_detail.html:102
-#: manufacturing/templates/it_network_detail.html:161
-#: manufacturing/templates/it_network_list.html:154
-#: manufacturing/templates/it_repairs_detail.html:104
-#: manufacturing/templates/it_repairs_detail.html:164
-#: manufacturing/templates/it_repairs_list.html:141
-#: manufacturing/templates/it_software_detail.html:85
-#: manufacturing/templates/it_software_detail.html:131
-#: manufacturing/templates/it_software_list.html:129
-#: manufacturing/templates/it_task_detail.html:92
-#: manufacturing/templates/it_task_detail.html:115
-#: manufacturing/templates/it_task_list.html:151
-#: manufacturing/templates/it_ticket_detail.html:112
-#: manufacturing/templates/it_ticket_detail.html:181
-#: manufacturing/templates/it_ticket_list.html:145
-#: manufacturing/templates/legal_compliance_detail.html:75
-#: manufacturing/templates/legal_compliance_detail.html:117
-#: manufacturing/templates/legal_compliance_list.html:137
-#: manufacturing/templates/legal_contract_detail.html:95
-#: manufacturing/templates/legal_contract_detail.html:149
-#: manufacturing/templates/legal_contract_list.html:164
-#: manufacturing/templates/legal_employment_list.html:140
-#: manufacturing/templates/legal_governance_list.html:135
-#: manufacturing/templates/legal_ip_list.html:141
-#: manufacturing/templates/legal_litigation_detail.html:80
-#: manufacturing/templates/legal_litigation_detail.html:130
-#: manufacturing/templates/legal_litigation_list.html:154
-#: manufacturing/templates/maint_downtime_detail.html:126
-#: manufacturing/templates/maint_downtime_list.html:133
-#: manufacturing/templates/maint_equipment_detail.html:135
-#: manufacturing/templates/maint_equipment_list.html:135
-#: manufacturing/templates/maint_inspection_detail.html:155
-#: manufacturing/templates/maint_inspection_list.html:127
-#: manufacturing/templates/maint_mechanic_detail.html:111
-#: manufacturing/templates/maint_mechanics_list.html:132
-#: manufacturing/templates/maint_part_detail.html:133
-#: manufacturing/templates/maint_parts_list.html:142
-#: manufacturing/templates/maint_schedule_detail.html:150
-#: manufacturing/templates/maint_schedule_list.html:133
-#: manufacturing/templates/maint_wo_detail.html:196
-#: manufacturing/templates/maint_wo_list.html:150
-#: manufacturing/templates/mkt_ad_detail.html:116
-#: manufacturing/templates/mkt_ad_detail.html:186
-#: manufacturing/templates/mkt_ad_list.html:180
-#: manufacturing/templates/mkt_budget_list.html:149
-#: manufacturing/templates/mkt_campaign_detail.html:84
-#: manufacturing/templates/mkt_campaign_detail.html:142
-#: manufacturing/templates/mkt_campaign_list.html:166
-#: manufacturing/templates/mkt_content_detail.html:80
-#: manufacturing/templates/mkt_content_detail.html:134
-#: manufacturing/templates/mkt_content_list.html:158
-#: manufacturing/templates/mkt_lead_detail.html:81
-#: manufacturing/templates/mkt_lead_detail.html:131
-#: manufacturing/templates/mkt_lead_list.html:157
-#: manufacturing/templates/mkt_research_detail.html:95
-#: manufacturing/templates/mkt_research_detail.html:153
-#: manufacturing/templates/mkt_research_list.html:165
-#: manufacturing/templates/offboarding_list.html:143
-#: manufacturing/templates/payroll_deductions.html:192
-#: manufacturing/templates/pers_review_detail.html:94
-#: manufacturing/templates/pers_reviews_list.html:153
-#: manufacturing/templates/pers_training_detail.html:92
-#: manufacturing/templates/pers_training_list.html:154
-#: manufacturing/templates/po_form.html:74
-#: manufacturing/templates/prod_delivery_status.html:66
-#: manufacturing/templates/prod_shipping_detail.html:126
-#: manufacturing/templates/prod_shipping_detail.html:141
-#: manufacturing/templates/prod_shipping_list.html:139
-#: manufacturing/templates/purch_contract_detail.html:113
-#: manufacturing/templates/purch_contract_detail.html:132
-#: manufacturing/templates/purch_contracts_list.html:157
-#: manufacturing/templates/qa_inspection_detail.html:109
-#: manufacturing/templates/qa_inspection_list.html:159
-#: manufacturing/templates/qa_ncr_detail.html:166
-#: manufacturing/templates/qa_ncr_list.html:148
-#: manufacturing/templates/qa_supplier_detail.html:119
-#: manufacturing/templates/qa_supplier_list.html:140
-#: manufacturing/templates/req_detail.html:74
-#: manufacturing/templates/req_list.html:119
-#: manufacturing/templates/rfq_list.html:33
-#: manufacturing/templates/sales_commission_history.html:62
-#: manufacturing/templates/sales_commissions.html:116
-#: manufacturing/templates/sales_commissions.html:187
-#: manufacturing/templates/sales_commissions.html:237
-#: manufacturing/templates/sales_contracts_detail.html:130
-#: manufacturing/templates/sales_contracts_detail.html:144
-#: manufacturing/templates/sales_contracts_list.html:153
-#: manufacturing/templates/sales_forecast_detail.html:172
-#: manufacturing/templates/sales_forecast_detail.html:185
-#: manufacturing/templates/sales_forecast_list.html:236
-#: manufacturing/templates/sales_leads_detail.html:103
-#: manufacturing/templates/sales_leads_detail.html:119
-#: manufacturing/templates/sales_leads_list.html:160
-#: manufacturing/templates/sales_order_detail.html:109
-#: manufacturing/templates/sales_orders.html:112
-#: manufacturing/templates/sales_quotes.html:125
-#: manufacturing/templates/sales_territories.html:80
-#: manufacturing/templates/sales_territories.html:136
-#: manufacturing/templates/sales_territories.html:173
-#: manufacturing/templates/so_form.html:74
-#: manufacturing/templates/spc_log.html:72
-#: manufacturing/templates/supplier_portal_rfqs.html:11
-#: manufacturing/templates/termination_detail.html:46
-#: manufacturing/templates/termination_list.html:141
-#: manufacturing/templates/wms_transfer_new.html:30
-#: manufacturing/templates/wo_detail.html:159
-#: manufacturing/templates/wo_form.html:84
-msgid "Notes"
-msgstr "Notes"
-
 #: manufacturing/templates/ap_invoice_detail.html:199
 #: manufacturing/templates/ar_invoice_detail.html:199
 msgid "Record Payment"
@@ -2157,16 +2491,6 @@ msgstr "Faire Avancer l'Étape"
 msgid "New Stage"
 msgstr "Nouvelle Étape"
 
-#: manufacturing/templates/ats_application_detail.html:80
-#: manufacturing/templates/ats_candidate_detail.html:70
-#: manufacturing/templates/ats_requisition_detail.html:92
-#: manufacturing/templates/benefit_plan_detail.html:123
-#: manufacturing/templates/control_plan_detail.html:159
-#: manufacturing/templates/qa_ncr_list.html:131
-#: manufacturing/templates/req_detail.html:166
-msgid "Optional"
-msgstr "Facultatif"
-
 #: manufacturing/templates/ats_application_detail.html:82
 msgid "Update Stage"
 msgstr "Mettre à Jour l'Étape"
@@ -2262,27 +2586,6 @@ msgstr "Demandes"
 msgid "Applied"
 msgstr "Demandé"
 
-#: manufacturing/templates/ats_candidate_detail.html:44
-#: manufacturing/templates/ats_candidate_list.html:35
-#: manufacturing/templates/ats_dashboard.html:87
-#: manufacturing/templates/ats_requisition_detail.html:64
-#: manufacturing/templates/ats_requisition_list.html:49
-#: manufacturing/templates/benefits_dashboard.html:90
-#: manufacturing/templates/coa_list.html:54
-#: manufacturing/templates/compliance_checklist_list.html:42
-#: manufacturing/templates/compliance_template_list.html:34
-#: manufacturing/templates/control_plan_list.html:45
-#: manufacturing/templates/ess_time_off.html:63
-#: manufacturing/templates/rfq_list.html:55
-#: manufacturing/templates/wms_bin_list.html:60
-#: manufacturing/templates/wms_pick_list_list.html:71
-#: manufacturing/templates/wms_rfid_tag_list.html:68
-#: manufacturing/templates/wms_transfer_list.html:43
-#: manufacturing/templates/wms_wave_detail.html:66
-#: manufacturing/templates/wms_wave_list.html:73
-msgid "Detail"
-msgstr "Détail"
-
 #: manufacturing/templates/ats_candidate_detail.html:51
 #: manufacturing/templates/ats_requisition_detail.html:71
 msgid "No applications yet."
@@ -2323,13 +2626,6 @@ msgstr "Nouveau Candidat"
 #: manufacturing/templates/ats_candidate_list.html:19
 msgid "Search name or email..."
 msgstr "Rechercher nom ou e-mail..."
-
-#: manufacturing/templates/ats_candidate_list.html:21
-#: manufacturing/templates/ats_requisition_list.html:27
-#: manufacturing/templates/coa_list.html:20
-#: manufacturing/templates/cs_list.html:44
-msgid "Search"
-msgstr "Rechercher"
 
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/benefits_dashboard.html:73
@@ -3202,18 +3498,6 @@ msgstr "Inscrire"
 msgid "New Benefit Plan"
 msgstr "Nouveau Régime d'Avantages"
 
-#: manufacturing/templates/benefit_plan_new.html:29
-#: manufacturing/templates/compliance_template_new.html:29
-#: manufacturing/templates/control_plan_new.html:37
-#: manufacturing/templates/maint_equipment_detail.html:62
-#: manufacturing/templates/maint_equipment_list.html:105
-#: manufacturing/templates/maint_mechanic_detail.html:47
-#: manufacturing/templates/maint_mechanics_list.html:100
-#: manufacturing/templates/maint_part_detail.html:47
-#: manufacturing/templates/maint_parts_list.html:106
-msgid "Name *"
-msgstr "Nom *"
-
 #: manufacturing/templates/benefit_plan_new.html:30
 msgid "e.g. PPO Gold"
 msgstr "p. ex. PPO Or"
@@ -3803,47 +4087,6 @@ msgstr "En attente"
 msgid "Certificate Header"
 msgstr "En-tête du Certificat"
 
-#: manufacturing/templates/coa_detail.html:36
-#: manufacturing/templates/coa_list.html:29
-#: manufacturing/templates/control_plan_list.html:24
-#: manufacturing/templates/po_detail.html:165
-#: manufacturing/templates/prod_daily_report.html:83
-#: manufacturing/templates/prod_dashboard.html:112
-#: manufacturing/templates/prod_labor_report.html:94
-#: manufacturing/templates/prod_performance_report.html:107
-#: manufacturing/templates/prod_reports.html:86
-#: manufacturing/templates/prod_reports.html:113
-#: manufacturing/templates/prod_schedule.html:68
-#: manufacturing/templates/prod_shipping_detail.html:152
-#: manufacturing/templates/qa_inspection_detail.html:92
-#: manufacturing/templates/qa_inspection_list.html:80
-#: manufacturing/templates/qa_inspection_list.html:114
-#: manufacturing/templates/qa_ncr_list.html:87
-#: manufacturing/templates/reports_dashboard.html:199
-#: manufacturing/templates/sales_demand.html:149
-#: manufacturing/templates/sales_order_detail.html:121
-#: manufacturing/templates/sales_order_detail.html:170
-#: manufacturing/templates/sales_reports_kpis.html:34
-#: manufacturing/templates/so_detail.html:196
-#: manufacturing/templates/spc_list.html:41
-#: manufacturing/templates/spc_list.html:88
-#: manufacturing/templates/spc_list.html:117
-#: manufacturing/templates/spc_log.html:47
-#: manufacturing/templates/wms_bin_detail.html:26
-#: manufacturing/templates/wms_pack_station.html:22
-#: manufacturing/templates/wms_pack_station.html:54
-#: manufacturing/templates/wms_pick_list_detail.html:37
-#: manufacturing/templates/wms_receive.html:33
-#: manufacturing/templates/wms_rfid_tag_list.html:59
-#: manufacturing/templates/wms_ship_confirm.html:17
-#: manufacturing/templates/wms_transfer_detail.html:36
-#: manufacturing/templates/wms_wave_detail.html:26
-#: manufacturing/templates/wo_detail.html:156
-#: manufacturing/templates/wo_detail.html:184
-#: manufacturing/templates/wo_list.html:33
-msgid "Product"
-msgstr "Produit"
-
 #: manufacturing/templates/coa_detail.html:37
 msgid "Lot Number"
 msgstr "Numéro de Lot"
@@ -4297,15 +4540,6 @@ msgstr "Risque"
 #: manufacturing/templates/control_plan_detail.html:92
 msgid "Re-score"
 msgstr "Réévaluer"
-
-#: manufacturing/templates/control_plan_detail.html:108
-#: manufacturing/templates/payroll_deductions.html:141
-#: manufacturing/templates/po_detail.html:202
-#: manufacturing/templates/rfq_detail.html:57
-#: manufacturing/templates/so_detail.html:220
-#: manufacturing/templates/wms_transfer_detail.html:53
-msgid "Remove"
-msgstr "Supprimer"
 
 #: manufacturing/templates/control_plan_detail.html:118
 msgid "No characteristics added yet."
@@ -9971,25 +10205,6 @@ msgstr "Hrs Est."
 msgid "Actual Hrs"
 msgstr "Hrs Réelles"
 
-#: manufacturing/templates/maint_labor_report.html:96
-#: manufacturing/templates/maint_labor_report.html:128
-#: manufacturing/templates/prod_labor_report.html:96
-#: manufacturing/templates/prod_labor_report.html:127
-#: manufacturing/templates/sales_demand.html:94
-#: manufacturing/templates/sales_forecast_list.html:146
-#: manufacturing/templates/sales_performance_kpis.html:11
-#: manufacturing/templates/sales_targets.html:77
-msgid "Variance"
-msgstr "Écart"
-
-#: manufacturing/templates/maint_labor_report.html:96
-#: manufacturing/templates/maint_labor_report.html:128
-#: manufacturing/templates/prod_labor_report.html:96
-#: manufacturing/templates/prod_labor_report.html:127
-#, python-format
-msgid "Variance %%"
-msgstr "Écart %%"
-
 #: manufacturing/templates/maint_labor_report.html:97
 #: manufacturing/templates/prod_labor_report.html:97
 msgid "Labor Cost"
@@ -11677,11 +11892,6 @@ msgstr "Prévu :"
 #: manufacturing/templates/so_detail.html:121
 msgid "Currency:"
 msgstr "Devise :"
-
-#: manufacturing/templates/po_detail.html:129
-#: manufacturing/templates/so_detail.html:130
-msgid "Rate"
-msgstr "Taux"
 
 #: manufacturing/templates/po_detail.html:130
 #: manufacturing/templates/so_detail.html:131
@@ -15923,7 +16133,10 @@ msgstr "Nouvel Emplacement"
 msgid ""
 "Warehouse &rarr; zone &rarr; bin locations. Aisle/rack/shelf are recorded\n"
 "    on each bin rather than as their own hierarchy levels."
-msgstr "Entrepôt &rarr; zone &rarr; emplacements. L'allée/le rayonnage/l'étagère sont enregistrés\n    sur chaque emplacement plutôt que comme niveaux de hiérarchie distincts."
+msgstr ""
+"Entrepôt &rarr; zone &rarr; emplacements. L'allée/le rayonnage/l'étagère "
+"sont enregistrés\n"
+"    sur chaque emplacement plutôt que comme niveaux de hiérarchie distincts."
 
 #: manufacturing/templates/wms_bin_list.html:28
 msgid "All Zones"
@@ -16120,7 +16333,13 @@ msgid ""
 "Match a product's category or ABC class to a target zone. Rules are\n"
 "    evaluated by priority (highest first); the first match wins. Products\n"
 "    matching no active rule fall back to the unassigned bin at receipt time."
-msgstr "Associe la catégorie ou la classe ABC d'un produit à une zone cible. Les règles sont\n    évaluées par priorité (la plus élevée d'abord) ; la première correspondance l'emporte. Les produits\n    ne correspondant à aucune règle active retombent dans l'emplacement non assigné à la réception."
+msgstr ""
+"Associe la catégorie ou la classe ABC d'un produit à une zone cible. Les "
+"règles sont\n"
+"    évaluées par priorité (la plus élevée d'abord) ; la première "
+"correspondance l'emporte. Les produits\n"
+"    ne correspondant à aucune règle active retombent dans l'emplacement non "
+"assigné à la réception."
 
 #: manufacturing/templates/wms_putaway_rule_list.html:29
 msgid "e.g. 'raw material' or 'A'"
@@ -16145,7 +16364,9 @@ msgstr "Zone Cible"
 #: manufacturing/templates/wms_putaway_rule_list.html:70
 msgid ""
 "No put-away rules configured — everything receives into the unassigned bin."
-msgstr "Aucune règle de rangement configurée — tout est reçu dans l'emplacement non assigné."
+msgstr ""
+"Aucune règle de rangement configurée — tout est reçu dans l'emplacement non "
+"assigné."
 
 #: manufacturing/templates/wms_receive.html:19
 msgid ""
@@ -16155,7 +16376,19 @@ msgid ""
 "    those from the PO's own detail page. When an item has orders waiting on\n"
 "    it with nothing in stock, a cross-dock option appears below it to route\n"
 "    the receipt straight to that order instead of putting it away first."
-msgstr "Lignes ouvertes de commandes envoyées/partielles avec un produit lié. Réceptionner ici\n    met à jour à la fois la quantité reçue de la commande et le stock suivi de l'emplacement en\n    une seule étape. Les lignes de commande en texte libre (sans produit lié) ne sont pas affichées — réceptionnez-les\n    depuis la propre page de détail de la commande. Lorsqu'un article a des commandes en attente\n    sans rien en stock, une option de cross-dock apparaît en dessous pour acheminer\n    la réception directement vers cette commande plutôt que de la ranger d'abord."
+msgstr ""
+"Lignes ouvertes de commandes envoyées/partielles avec un produit lié. "
+"Réceptionner ici\n"
+"    met à jour à la fois la quantité reçue de la commande et le stock suivi "
+"de l'emplacement en\n"
+"    une seule étape. Les lignes de commande en texte libre (sans produit "
+"lié) ne sont pas affichées — réceptionnez-les\n"
+"    depuis la propre page de détail de la commande. Lorsqu'un article a des "
+"commandes en attente\n"
+"    sans rien en stock, une option de cross-dock apparaît en dessous pour "
+"acheminer\n"
+"    la réception directement vers cette commande plutôt que de la ranger "
+"d'abord."
 
 #: manufacturing/templates/wms_receive.html:33
 msgid "Owed"
@@ -16198,7 +16431,9 @@ msgstr "Cross-Dock Direct vers la Commande"
 msgid ""
 "Routes received qty directly to the selected order instead of putting it "
 "away — skips storage entirely."
-msgstr "Achemine la quantité reçue directement vers la commande sélectionnée au lieu de la ranger — évite complètement le stockage."
+msgstr ""
+"Achemine la quantité reçue directement vers la commande sélectionnée au lieu "
+"de la ranger — évite complètement le stockage."
 
 #: manufacturing/templates/wms_receive.html:93
 msgid "No open PO lines awaiting receipt."
@@ -16221,7 +16456,12 @@ msgid ""
 "A reader is a virtual antenna tied to one zone — there is no real RFID\n"
 "    hardware in this environment, so \"reading\" a tag is a manual action\n"
 "    standing in for what a real antenna would capture automatically."
-msgstr "Un lecteur est une antenne virtuelle associée à une zone — il n'y a pas de matériel RFID réel\n    dans cet environnement, donc « lire » une étiquette est une action manuelle\n    qui remplace ce qu'une antenne réelle capturerait automatiquement."
+msgstr ""
+"Un lecteur est une antenne virtuelle associée à une zone — il n'y a pas de "
+"matériel RFID réel\n"
+"    dans cet environnement, donc « lire » une étiquette est une action "
+"manuelle\n"
+"    qui remplace ce qu'une antenne réelle capturerait automatiquement."
 
 #: manufacturing/templates/wms_rfid_reader_list.html:23
 msgid "New Reader"
@@ -16270,7 +16510,12 @@ msgid ""
 "    reader whose zone differs from the tag's current zone relocates the\n"
 "    tagged qty there automatically; reading the same zone again is just a\n"
 "    \"still here\" heartbeat."
-msgstr "Remplace une antenne RFID réelle capturant cette étiquette. La lire à un\n    lecteur dont la zone diffère de la zone actuelle de l'étiquette la relocalise\n    automatiquement là-bas ; lire la même zone à nouveau n'est qu'un\n    signal « toujours ici »."
+msgstr ""
+"Remplace une antenne RFID réelle capturant cette étiquette. La lire à un\n"
+"    lecteur dont la zone diffère de la zone actuelle de l'étiquette la "
+"relocalise\n"
+"    automatiquement là-bas ; lire la même zone à nouveau n'est qu'un\n"
+"    signal « toujours ici »."
 
 #: manufacturing/templates/wms_rfid_tag_detail.html:37
 msgid "Simulate Read"
@@ -16327,7 +16572,13 @@ msgid ""
 "A tag labels a qty of one product already tracked in a bin — it doesn't\n"
 "    create new stock. Simulate a read at a different zone's reader from the\n"
 "    tag's own detail page to see it relocate automatically."
-msgstr "Une étiquette identifie une quantité d'un produit déjà suivi dans un emplacement — elle ne\n    crée pas de nouveau stock. Simulez une lecture sur le lecteur d'une autre zone depuis\n    la propre page de détail de l'étiquette pour la voir se relocaliser automatiquement."
+msgstr ""
+"Une étiquette identifie une quantité d'un produit déjà suivi dans un "
+"emplacement — elle ne\n"
+"    crée pas de nouveau stock. Simulez une lecture sur le lecteur d'une "
+"autre zone depuis\n"
+"    la propre page de détail de l'étiquette pour la voir se relocaliser "
+"automatiquement."
 
 #: manufacturing/templates/wms_rfid_tag_list.html:30
 msgid "New Tag"
@@ -16398,7 +16649,9 @@ msgstr "Aucun stock suivi disponible dans %(wh)s à transférer."
 
 #: manufacturing/templates/wms_transfer_detail.html:102
 msgid "Ship this transfer? Source bins will be decremented immediately."
-msgstr "Expédier ce transfert ? Les emplacements source seront décrémentés immédiatement."
+msgstr ""
+"Expédier ce transfert ? Les emplacements source seront décrémentés "
+"immédiatement."
 
 #: manufacturing/templates/wms_transfer_detail.html:105
 msgid "Ship Transfer"
@@ -16464,7 +16717,11 @@ msgid ""
 "Add line items on the next screen, then ship — this decrements the\n"
 "    source bins immediately. Stock is only credited to a destination bin\n"
 "    once each line is received there."
-msgstr "Ajoutez des lignes à l'écran suivant, puis expédiez — cela décrémente\n    immédiatement les emplacements source. Le stock n'est crédité à un emplacement\n    de destination qu'une fois chaque ligne reçue là-bas."
+msgstr ""
+"Ajoutez des lignes à l'écran suivant, puis expédiez — cela décrémente\n"
+"    immédiatement les emplacements source. Le stock n'est crédité à un "
+"emplacement\n"
+"    de destination qu'une fois chaque ligne reçue là-bas."
 
 #: manufacturing/templates/wms_warehouse_list.html:19
 msgid "New Warehouse"
@@ -16501,7 +16758,12 @@ msgid ""
 "    pick the full row quantity in one trip, then it's automatically "
 "allocated\n"
 "    back across every order line that needed it."
-msgstr "Une ligne par combinaison produit/emplacement encore nécessaire dans cette vague —\n    prélevez la quantité totale de la ligne en un seul passage, puis elle est automatiquement réaffectée\n    à chaque ligne de commande qui en avait besoin."
+msgstr ""
+"Une ligne par combinaison produit/emplacement encore nécessaire dans cette "
+"vague —\n"
+"    prélevez la quantité totale de la ligne en un seul passage, puis elle "
+"est automatiquement réaffectée\n"
+"    à chaque ligne de commande qui en avait besoin."
 
 #: manufacturing/templates/wms_wave_detail.html:26
 msgid "Qty Needed"
@@ -16510,7 +16772,9 @@ msgstr "Qté Nécessaire"
 #: manufacturing/templates/wms_wave_detail.html:53
 msgid ""
 "Nothing left to pick — every consolidatable line in this wave is resolved."
-msgstr "Plus rien à prélever — toutes les lignes consolidables de cette vague sont résolues."
+msgstr ""
+"Plus rien à prélever — toutes les lignes consolidables de cette vague sont "
+"résolues."
 
 #: manufacturing/templates/wms_wave_detail.html:56
 msgid "Orders in this Wave"
@@ -16518,7 +16782,9 @@ msgstr "Commandes de cette Vague"
 
 #: manufacturing/templates/wms_wave_detail.html:74
 msgid "Cancel this wave? Every order in it will need a new pick list."
-msgstr "Annuler cette vague ? Chaque commande qu'elle contient nécessitera une nouvelle liste de prélèvement."
+msgstr ""
+"Annuler cette vague ? Chaque commande qu'elle contient nécessitera une "
+"nouvelle liste de prélèvement."
 
 #: manufacturing/templates/wms_wave_detail.html:77
 msgid "Cancel Wave"
@@ -16532,7 +16798,14 @@ msgid ""
 "generated\n"
 "    one per SO underneath, but the picker works from a single consolidated\n"
 "    sheet until every order in the wave is resolved."
-msgstr "Regroupez plusieurs commandes confirmées en une vague afin qu'un préparateur parcoure chaque produit/emplacement\n    une fois par vague au lieu d'une fois par commande — les listes de prélèvement sont toujours générées\n    une par commande en dessous, mais le préparateur travaille à partir d'une seule feuille\n    consolidée jusqu'à ce que chaque commande de la vague soit résolue."
+msgstr ""
+"Regroupez plusieurs commandes confirmées en une vague afin qu'un préparateur "
+"parcoure chaque produit/emplacement\n"
+"    une fois par vague au lieu d'une fois par commande — les listes de "
+"prélèvement sont toujours générées\n"
+"    une par commande en dessous, mais le préparateur travaille à partir "
+"d'une seule feuille\n"
+"    consolidée jusqu'à ce que chaque commande de la vague soit résolue."
 
 #: manufacturing/templates/wms_wave_list.html:49
 msgid "Create Wave from Selected"

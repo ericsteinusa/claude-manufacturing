@@ -1625,6 +1625,31 @@ Transfers + a completed transfer's detail page, RFID Readers, RFID Tags
 heartbeat sentence), in Spanish, French, and German with real sample
 data, no console or server errors.
 
+Also translated: the **ABC (Activity-Based) Costing** feature
+(`abc_activity_list.html`, `abc_activity_new.html`, `abc_activity_detail.html`,
+`abc_product_output.html`, `abc_report.html` — 5 templates, routed at
+`/gl/abc-costing/`). Small enough to do by hand rather than delegating —
+44 unique strings across 5 languages, all simple except one
+`{% blocktrans count %}`-free `%(pct)s%%` variance-threshold sentence
+(the bare-`%`-gets-doubled-to-`%%` gotcha first documented in the Payroll
+pass, confirmed here too: `msgfmt --check` and a live `% {'pct': ...}`
+substitution both came back clean). Caught and fixed a bare
+`{{ x|default:"no driver UOM set" }}` fallback bug in
+`abc_activity_detail.html` (same class as every prior pass) — expanded to
+the standard `{% if %}/{% else %}/{% trans %}` form, but split into two
+full independent `{% blocktrans %}` sentences (one with the UOM, one
+without) rather than trying to interpolate the fallback text mid-sentence,
+matching the "each branch is a complete, natural sentence" precedent from
+the IT Asset Depreciation Summary. Full suite 3475 passed (unchanged),
+`manage.py check` and `ruff check .` clean, `msgfmt --check` clean on all
+5 files, zero fuzzy/blank entries. Verified end-to-end against the real
+dev server: Activity Cost Pools list, a real activity's detail page
+(confirmed both the with-UOM and no-UOM-set variants), the New Activity
+form, the ABC vs. Traditional report (confirmed the `%(pct)s%%` sentence
+renders as a real single `%`), and a product's ABC output-quantity page,
+in Spanish, French, and German with real sample data, no console or
+server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
