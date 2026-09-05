@@ -1,33 +1,34 @@
 {% extends "base_supplier_portal.html" %}
-{% block page_title %}Dashboard — Supplier Portal{% endblock %}
-{% block menu_title %}Welcome, {{ portal_company }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Dashboard" %} — {% trans "Supplier Portal" %}{% endblock %}
+{% block menu_title %}{% blocktrans with company=portal_company %}Welcome, {{ company }}{% endblocktrans %}{% endblock %}
 
 {% block body %}
 <div class="kpi-grid">
     <div class="kpi-card">
-        <div class="kpi-label">Open Purchase Orders</div>
+        <div class="kpi-label">{% trans "Open Purchase Orders" %}</div>
         <div class="kpi-value">{{ dashboard.open_po_count }}</div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-label">Needs Acknowledgement</div>
+        <div class="kpi-label">{% trans "Needs Acknowledgement" %}</div>
         <div class="kpi-value">{{ dashboard.unacknowledged_po_count }}</div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-label">Open Invoice Balance</div>
+        <div class="kpi-label">{% trans "Open Invoice Balance" %}</div>
         <div class="kpi-value">${{ dashboard.open_invoice_balance|floatformat:2 }}</div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-label">Open RFQs to Quote</div>
+        <div class="kpi-label">{% trans "Open RFQs to Quote" %}</div>
         <div class="kpi-value">{{ dashboard.open_rfq_count }}</div>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-title">Purchase Orders</div>
+    <div class="card-title">{% trans "Purchase Orders" %}</div>
     {% if pos %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>PO #</th><th>Order Date</th><th class="num">Total</th><th>Status</th><th>Acknowledged</th></tr></thead>
+            <thead><tr><th>{% trans "PO #" %}</th><th>{% trans "Order Date" %}</th><th class="num">{% trans "Total" %}</th><th>{% trans "Status" %}</th><th>{% trans "Acknowledged" %}</th></tr></thead>
             <tbody>
                 {% for po in pos %}
                 <tr>
@@ -42,7 +43,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No purchase orders yet.</div>
+    <div class="empty-state">{% trans "No purchase orders yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

@@ -42,6 +42,7 @@ import uuid
 from datetime import date, datetime, timedelta
 
 import bcrypt
+from django.utils.translation import gettext_lazy as _
 
 from .production_core import create_rma, RMA_REASONS
 from .sales_orders_core import get_so
@@ -233,7 +234,7 @@ def get_tracking_events(shipment: dict) -> list:
     by tracking_number — replace this function's body only.
     """
     status = shipment.get("status") or "pending"
-    carrier = shipment.get("carrier") or "Carrier"
+    carrier = shipment.get("carrier") or str(_("Carrier"))
     try:
         ship_date = datetime.strptime(shipment["ship_date"], "%Y-%m-%d")
     except (KeyError, TypeError, ValueError):
@@ -242,25 +243,25 @@ def get_tracking_events(shipment: dict) -> list:
     def _d(offset):
         return (ship_date + timedelta(days=offset)).date().isoformat() if ship_date else None
 
-    events = [{"date": _d(0), "label": "Shipping Label Created", "done": True}]
+    events = [{"date": _d(0), "label": _("Shipping Label Created"), "done": True}]
     if status == "cancelled":
-        events.append({"date": _d(0), "label": "Shipment Cancelled", "done": True})
+        events.append({"date": _d(0), "label": _("Shipment Cancelled"), "done": True})
         return events
 
     events.append({
-        "date": _d(0), "label": f"Picked up by {carrier}",
+        "date": _d(0), "label": _("Picked up by %(carrier)s") % {"carrier": carrier},
         "done": status in ("in_transit", "delivered"),
     })
     events.append({
-        "date": _d(1), "label": "In Transit",
+        "date": _d(1), "label": _("In Transit"),
         "done": status in ("in_transit", "delivered"),
     })
     events.append({
-        "date": _d(2), "label": "Out for Delivery",
+        "date": _d(2), "label": _("Out for Delivery"),
         "done": status == "delivered",
     })
     events.append({
-        "date": _d(3), "label": "Delivered",
+        "date": _d(3), "label": _("Delivered"),
         "done": status == "delivered",
     })
     return events

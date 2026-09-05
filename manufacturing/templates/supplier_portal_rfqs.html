@@ -1,13 +1,14 @@
 {% extends "base_supplier_portal.html" %}
-{% block page_title %}RFQs — Supplier Portal{% endblock %}
-{% block menu_title %}Requests for Quote{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "RFQs" %} — {% trans "Supplier Portal" %}{% endblock %}
+{% block menu_title %}{% trans "Requests for Quote" %}{% endblock %}
 
 {% block body %}
 <div class="card">
     {% if rfqs %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>RFQ #</th><th>Status</th><th>Notes</th></tr></thead>
+            <thead><tr><th>{% trans "RFQ #" %}</th><th>{% trans "Status" %}</th><th>{% trans "Notes" %}</th></tr></thead>
             <tbody>
                 {% for r in rfqs %}
                 <tr>
@@ -20,7 +21,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No RFQs yet — your buyer will invite you to quote when there's a request.</div>
+    <div class="empty-state">{% trans "No RFQs yet — your buyer will invite you to quote when there's a request." %}</div>
     {% endif %}
 </div>
 {% endblock %}

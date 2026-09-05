@@ -1,15 +1,16 @@
 {% extends "base_supplier_portal.html" %}
-{% block page_title %}Invoice {{ invoice.invoice_number }} — Supplier Portal{% endblock %}
-{% block menu_title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=invoice.invoice_number %}Invoice {{ num }}{% endblocktrans %} — {% trans "Supplier Portal" %}{% endblock %}
+{% block menu_title %}{% blocktrans with num=invoice.invoice_number %}Invoice {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block body %}
 <div class="card">
-    <div class="card-title">Invoice Summary</div>
-    <p><strong>Status:</strong> <span class="pill pill-{{ invoice.status }}">{{ invoice.status|capfirst }}</span></p>
-    <p><strong>Invoice Date:</strong> {{ invoice.invoice_date|default:"—" }}</p>
-    <p><strong>Due Date:</strong> {{ invoice.due_date|default:"—" }}</p>
-    {% if invoice.description %}<p><strong>Description:</strong> {{ invoice.description }}</p>{% endif %}
-    <p><strong>Amount:</strong> ${{ invoice.amount|floatformat:2 }}</p>
-    <p><strong>Balance Due:</strong> ${{ invoice.balance|floatformat:2 }}</p>
+    <div class="card-title">{% trans "Invoice Summary" %}</div>
+    <p><strong>{% trans "Status:" %}</strong> <span class="pill pill-{{ invoice.status }}">{{ invoice.status|capfirst }}</span></p>
+    <p><strong>{% trans "Invoice Date:" %}</strong> {{ invoice.invoice_date|default:"—" }}</p>
+    <p><strong>{% trans "Due Date:" %}</strong> {{ invoice.due_date|default:"—" }}</p>
+    {% if invoice.description %}<p><strong>{% trans "Description:" %}</strong> {{ invoice.description }}</p>{% endif %}
+    <p><strong>{% trans "Amount:" %}</strong> ${{ invoice.amount|floatformat:2 }}</p>
+    <p><strong>{% trans "Balance Due:" %}</strong> ${{ invoice.balance|floatformat:2 }}</p>
 </div>
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "base_card.html" %}
+{% load i18n %}
 
-{% block page_title %}Supplier Portal Login — Manufacturing ERP{% endblock %}
+{% block page_title %}{% trans "Supplier Portal Login" %} — {% trans "Manufacturing ERP" %}{% endblock %}
 
 {% block card_content %}
 
@@ -14,22 +15,22 @@
 <form method="post" action="">
     {% csrf_token %}
     <div class="form-row">
-        <label for="email">Email</label>
+        <label for="email">{% trans "Email" %}</label>
         <input type="email" id="email" name="email"
                placeholder="you@company.com"
                value="{{ email_value }}" required autofocus>
     </div>
     <div class="form-row">
-        <label for="password">Password</label>
+        <label for="password">{% trans "Password" %}</label>
         <input type="password" id="password" name="password"
-               placeholder="Enter your password" required>
+               placeholder="{% trans 'Enter your password' %}" required>
     </div>
-    <button type="submit" class="btn-submit">Sign In</button>
+    <button type="submit" class="btn-submit">{% trans "Sign In" %}</button>
 </form>
 
 <div class="links">
-    <a href="{% url 'supplier_portal_register' %}">Set up portal access</a>
-    <a href="{% url 'home' %}">Employee login</a>
+    <a href="{% url 'supplier_portal_register' %}">{% trans "Set up portal access" %}</a>
+    <a href="{% url 'home' %}">{% trans "Employee login" %}</a>
 </div>
 
 {% endblock %}

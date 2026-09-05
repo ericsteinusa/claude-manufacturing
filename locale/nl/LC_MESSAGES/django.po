@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 15:57+0000\n"
+"POT-Creation-Date: 2026-09-05 16:21+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -16,6 +16,47 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: manufacturing/customer_portal_core.py:237
+#: manufacturing/templates/benefit_plan_new.html:41
+#: manufacturing/templates/benefits_dashboard.html:73
+#: manufacturing/templates/portal_order_detail.html:42
+#: manufacturing/templates/prod_delivery_status.html:63
+#: manufacturing/templates/prod_shipping_detail.html:110
+#: manufacturing/templates/prod_shipping_detail.html:138
+#: manufacturing/templates/prod_shipping_list.html:81
+#: manufacturing/templates/prod_shipping_list.html:123
+#: manufacturing/templates/prod_tracking_dashboard.html:74
+msgid "Carrier"
+msgstr "Verzekeraar"
+
+#: manufacturing/customer_portal_core.py:246
+msgid "Shipping Label Created"
+msgstr "Verzendlabel Aangemaakt"
+
+#: manufacturing/customer_portal_core.py:248
+msgid "Shipment Cancelled"
+msgstr "Zending Geannuleerd"
+
+#: manufacturing/customer_portal_core.py:252
+#, python-format
+msgid "Picked up by %(carrier)s"
+msgstr "Opgehaald door %(carrier)s"
+
+#: manufacturing/customer_portal_core.py:256
+msgid "In Transit"
+msgstr "Onderweg"
+
+#: manufacturing/customer_portal_core.py:260
+msgid "Out for Delivery"
+msgstr "Wordt Bezorgd"
+
+#: manufacturing/customer_portal_core.py:264
+#: manufacturing/templates/prod_performance_report.html:72
+#: manufacturing/templates/prod_performance_report.html:96
+#: manufacturing/templates/prod_tracking_dashboard.html:58
+msgid "Delivered"
+msgstr "Geleverd"
 
 #: manufacturing/menus.py:1689 manufacturing/templates/acct_dashboard.html:6
 #: manufacturing/templates/base.html:540
@@ -644,6 +685,8 @@ msgstr "Journaalposten: Geboekt vs. Concept"
 #: manufacturing/templates/ar_list_kpis.html:4
 #: manufacturing/templates/finance_dashboard_kpis.html:5
 #: manufacturing/templates/finance_dashboard_kpis.html:21
+#: manufacturing/templates/portal_home.html:13
+#: manufacturing/templates/portal_home.html:46
 msgid "Open Invoices"
 msgstr "Openstaande Facturen"
 
@@ -698,6 +741,7 @@ msgstr "Recente Journaalposten"
 #: manufacturing/templates/maint_downtime_detail.html:94
 #: manufacturing/templates/maint_downtime_list.html:79
 #: manufacturing/templates/maint_downtime_list.html:117
+#: manufacturing/templates/portal_invoice_detail.html:32
 #: manufacturing/templates/qa_inspection_detail.html:100
 #: manufacturing/templates/qa_inspection_list.html:81
 #: manufacturing/templates/req_detail.html:126
@@ -724,6 +768,7 @@ msgstr "Datum"
 #: manufacturing/templates/gl_journals.html:59
 #: manufacturing/templates/legal_governance_list.html:75
 #: manufacturing/templates/legal_governance_list.html:123
+#: manufacturing/templates/portal_invoice_detail.html:32
 msgid "Reference"
 msgstr "Referentie"
 
@@ -769,6 +814,9 @@ msgstr "Referentie"
 #: manufacturing/templates/po_detail.html:270
 #: manufacturing/templates/po_landed_cost_detail.html:30
 #: manufacturing/templates/po_landed_cost_new.html:50
+#: manufacturing/templates/portal_order_detail.html:19
+#: manufacturing/templates/portal_rma_new.html:30
+#: manufacturing/templates/portal_shipment_detail.html:36
 #: manufacturing/templates/prod_daily_report.html:82
 #: manufacturing/templates/prod_dashboard.html:111
 #: manufacturing/templates/prod_reports.html:112
@@ -789,6 +837,9 @@ msgstr "Referentie"
 #: manufacturing/templates/sales_quotes.html:139
 #: manufacturing/templates/so_detail.html:195
 #: manufacturing/templates/so_detail.html:255
+#: manufacturing/templates/supplier_portal_invoice_new.html:38
+#: manufacturing/templates/supplier_portal_po_detail.html:52
+#: manufacturing/templates/supplier_portal_rfq_detail.html:20
 #: manufacturing/templates/wo_form.html:46
 #: manufacturing/templates/wo_list.html:34
 msgid "Description"
@@ -993,6 +1044,13 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/po_form.html:57
 #: manufacturing/templates/po_form.html:62
 #: manufacturing/templates/po_list.html:42
+#: manufacturing/templates/portal_home.html:27
+#: manufacturing/templates/portal_home.html:50
+#: manufacturing/templates/portal_home.html:73
+#: manufacturing/templates/portal_invoices.html:11
+#: manufacturing/templates/portal_order_detail.html:42
+#: manufacturing/templates/portal_orders.html:11
+#: manufacturing/templates/portal_rma_list.html:13
 #: manufacturing/templates/prod_daily_report.html:85
 #: manufacturing/templates/prod_dashboard.html:114
 #: manufacturing/templates/prod_delivery_status.html:65
@@ -1061,6 +1119,10 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/so_form.html:62
 #: manufacturing/templates/so_list.html:44
 #: manufacturing/templates/spc_log.html:101
+#: manufacturing/templates/supplier_portal_home.html:31
+#: manufacturing/templates/supplier_portal_invoices.html:15
+#: manufacturing/templates/supplier_portal_pos.html:11
+#: manufacturing/templates/supplier_portal_rfqs.html:11
 #: manufacturing/templates/tc_device_form.html:221
 #: manufacturing/templates/tc_device_list.html:45
 #: manufacturing/templates/termination_list.html:72
@@ -1169,6 +1231,7 @@ msgstr "G/L"
 #: manufacturing/templates/maint_wo_detail.html:57
 #: manufacturing/templates/payroll_stub_detail.html:36
 #: manufacturing/templates/po_detail.html:90
+#: manufacturing/templates/portal_rma_detail.html:19
 #: manufacturing/templates/prod_shipping_detail.html:73
 #: manufacturing/templates/purch_contract_detail.html:54
 #: manufacturing/templates/qa_audit_detail.html:54
@@ -1178,6 +1241,7 @@ msgstr "G/L"
 #: manufacturing/templates/req_detail.html:59
 #: manufacturing/templates/sales_contracts_detail.html:62
 #: manufacturing/templates/so_detail.html:91
+#: manufacturing/templates/supplier_portal_po_detail.html:21
 #: manufacturing/templates/wo_detail.html:90
 msgid "Print / Save PDF"
 msgstr "Afdrukken / PDF Opslaan"
@@ -1190,6 +1254,8 @@ msgstr "Factuur: %(num)s"
 
 #: manufacturing/templates/ap_invoice_detail.html:64
 #: manufacturing/templates/ar_invoice_detail.html:64
+#: manufacturing/templates/portal_invoice_detail.html:16
+#: manufacturing/templates/supplier_portal_invoice_detail.html:13
 msgid "Amount:"
 msgstr "Bedrag:"
 
@@ -1254,6 +1320,9 @@ msgstr "Factuurnr. *"
 #: manufacturing/templates/ar_invoice_detail.html:152
 #: manufacturing/templates/ar_list.html:64
 #: manufacturing/templates/ar_list.html:114
+#: manufacturing/templates/portal_invoices.html:11
+#: manufacturing/templates/supplier_portal_invoice_new.html:26
+#: manufacturing/templates/supplier_portal_invoices.html:15
 msgid "Invoice Date"
 msgstr "Factuurdatum"
 
@@ -1261,6 +1330,7 @@ msgstr "Factuurdatum"
 #: manufacturing/templates/ap_list.html:118
 #: manufacturing/templates/ar_invoice_detail.html:117
 #: manufacturing/templates/ar_list.html:118
+#: manufacturing/templates/supplier_portal_invoice_new.html:30
 msgid "Due Date *"
 msgstr "Vervaldatum *"
 
@@ -1274,8 +1344,11 @@ msgstr "Vervaldatum *"
 #: manufacturing/templates/ar_list.html:65
 #: manufacturing/templates/mkt_budget_list.html:83
 #: manufacturing/templates/payroll_deductions.html:121
+#: manufacturing/templates/portal_invoice_detail.html:32
+#: manufacturing/templates/portal_invoices.html:11
 #: manufacturing/templates/sales_dashboard_kpis.html:32
 #: manufacturing/templates/sales_quotes.html:68
+#: manufacturing/templates/supplier_portal_invoices.html:15
 msgid "Amount"
 msgstr "Bedrag"
 
@@ -1357,6 +1430,9 @@ msgstr "Factuur Aanmaken"
 #: manufacturing/templates/ap_list.html:64
 #: manufacturing/templates/ar_invoice_detail.html:150
 #: manufacturing/templates/ar_list.html:64
+#: manufacturing/templates/portal_home.html:50
+#: manufacturing/templates/portal_invoices.html:11
+#: manufacturing/templates/supplier_portal_invoices.html:15
 msgid "Invoice #"
 msgstr "Factuurnr."
 
@@ -1398,6 +1474,8 @@ msgstr "Factuurnr."
 #: manufacturing/templates/mkt_content_list.html:150
 #: manufacturing/templates/offboarding_list.html:73
 #: manufacturing/templates/offboarding_list.html:127
+#: manufacturing/templates/portal_home.html:50
+#: manufacturing/templates/portal_invoices.html:11
 #: manufacturing/templates/prod_dashboard.html:113
 #: manufacturing/templates/prod_labor_report.html:94
 #: manufacturing/templates/prod_reports.html:114
@@ -1405,6 +1483,7 @@ msgstr "Factuurnr."
 #: manufacturing/templates/qa_capa_detail.html:127
 #: manufacturing/templates/qa_capa_list.html:85
 #: manufacturing/templates/qa_capa_list.html:132
+#: manufacturing/templates/supplier_portal_invoices.html:15
 #: manufacturing/templates/wo_form.html:61
 #: manufacturing/templates/wo_list.html:36
 msgid "Due Date"
@@ -1412,6 +1491,7 @@ msgstr "Vervaldatum"
 
 #: manufacturing/templates/ap_invoice_detail.html:162
 #: manufacturing/templates/ar_invoice_detail.html:162
+#: manufacturing/templates/portal_invoice_detail.html:28
 #: manufacturing/templates/sales_commission_history.html:8
 #: manufacturing/templates/sales_commission_plans.html:8
 #: manufacturing/templates/sales_commissions.html:8
@@ -1441,6 +1521,7 @@ msgstr "Bedrag ($)"
 #: manufacturing/templates/payroll_deductions.html:121
 #: manufacturing/templates/payroll_deductions.html:179
 #: manufacturing/templates/po_detail.html:231
+#: manufacturing/templates/portal_invoice_detail.html:32
 msgid "Method"
 msgstr "Methode"
 
@@ -1619,6 +1700,7 @@ msgstr "Chequenr., enz."
 #: manufacturing/templates/sales_territories.html:173
 #: manufacturing/templates/so_form.html:74
 #: manufacturing/templates/spc_log.html:72
+#: manufacturing/templates/supplier_portal_rfqs.html:11
 #: manufacturing/templates/termination_detail.html:46
 #: manufacturing/templates/termination_list.html:141
 #: manufacturing/templates/wo_detail.html:159
@@ -1680,10 +1762,17 @@ msgstr "Excel Exporteren"
 #: manufacturing/templates/eng_ecrs.html:47
 #: manufacturing/templates/eng_projects.html:50
 #: manufacturing/templates/po_list.html:23
+#: manufacturing/templates/portal_invoice_detail.html:12
+#: manufacturing/templates/portal_order_detail.html:9
+#: manufacturing/templates/portal_rma_detail.html:23
+#: manufacturing/templates/portal_shipment_detail.html:13
 #: manufacturing/templates/rfq_list.html:19
 #: manufacturing/templates/sales_orders.html:48
 #: manufacturing/templates/sales_quotes.html:51
 #: manufacturing/templates/so_list.html:25
+#: manufacturing/templates/supplier_portal_invoice_detail.html:9
+#: manufacturing/templates/supplier_portal_po_detail.html:25
+#: manufacturing/templates/supplier_portal_rfq_detail.html:11
 #: manufacturing/templates/wo_list.html:19
 msgid "Status:"
 msgstr "Status:"
@@ -1857,6 +1946,9 @@ msgstr "Betaald"
 #: manufacturing/templates/ap_list.html:65
 #: manufacturing/templates/ar_list.html:65
 #: manufacturing/templates/gl_accounts.html:63
+#: manufacturing/templates/portal_home.html:50
+#: manufacturing/templates/portal_invoices.html:11
+#: manufacturing/templates/supplier_portal_invoices.html:15
 msgid "Balance"
 msgstr "Saldo"
 
@@ -2242,6 +2334,10 @@ msgstr "Naam"
 #: manufacturing/templates/mkt_lead_list.html:89
 #: manufacturing/templates/mkt_lead_list.html:129
 #: manufacturing/templates/personnel_dashboard.html:122
+#: manufacturing/templates/portal_login.html:18
+#: manufacturing/templates/portal_register.html:15
+#: manufacturing/templates/supplier_portal_login.html:18
+#: manufacturing/templates/supplier_portal_register.html:15
 msgid "Email"
 msgstr "E-mail"
 
@@ -2583,6 +2679,8 @@ msgid "Loading…"
 msgstr "Laden…"
 
 #: manufacturing/templates/base.html:482 manufacturing/templates/home.html:24
+#: manufacturing/templates/portal_login.html:24
+#: manufacturing/templates/supplier_portal_login.html:24
 msgid "Password"
 msgstr "Wachtwoord"
 
@@ -2591,10 +2689,14 @@ msgid "2FA"
 msgstr "2FA"
 
 #: manufacturing/templates/base.html:484
+#: manufacturing/templates/base_portal.html:171
+#: manufacturing/templates/base_supplier_portal.html:160
 msgid "Logout"
 msgstr "Afmelden"
 
 #: manufacturing/templates/base.html:494
+#: manufacturing/templates/base_portal.html:154
+#: manufacturing/templates/base_supplier_portal.html:143
 #: manufacturing/templates/dashboard.html:4
 #: manufacturing/templates/eng_ecr_detail.html:8
 #: manufacturing/templates/eng_ecrs.html:6
@@ -2623,6 +2725,7 @@ msgstr "Afmelden"
 #: manufacturing/templates/payroll_run_detail.html:7
 #: manufacturing/templates/payroll_run_new.html:7
 #: manufacturing/templates/payroll_ytd.html:6
+#: manufacturing/templates/portal_home.html:3
 #: manufacturing/templates/prod_labor_report.html:6
 #: manufacturing/templates/qa_audit_detail.html:7
 #: manufacturing/templates/qa_audit_list.html:6
@@ -2639,6 +2742,7 @@ msgstr "Afmelden"
 #: manufacturing/templates/sales_quotes.html:6
 #: manufacturing/templates/sales_reports.html:6
 #: manufacturing/templates/sales_targets.html:6
+#: manufacturing/templates/supplier_portal_home.html:3
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -2692,6 +2796,7 @@ msgid "Procurement"
 msgstr "Inkoop"
 
 #: manufacturing/templates/base.html:513
+#: manufacturing/templates/base_supplier_portal.html:144
 #: manufacturing/templates/po_approvals.html:6
 #: manufacturing/templates/po_list.html:4
 #: manufacturing/templates/po_list.html:19
@@ -2703,6 +2808,9 @@ msgstr "Inkoop"
 #: manufacturing/templates/reports_dashboard.html:144
 #: manufacturing/templates/req_list.html:7
 #: manufacturing/templates/rfq_list.html:6
+#: manufacturing/templates/supplier_portal_home.html:27
+#: manufacturing/templates/supplier_portal_pos.html:3
+#: manufacturing/templates/supplier_portal_pos.html:4
 msgid "Purchase Orders"
 msgstr "Inkooporders"
 
@@ -2836,6 +2944,77 @@ msgstr "Datagovernance"
 #: manufacturing/templates/dashboard.html:12
 msgid "Periods"
 msgstr "Periodes"
+
+#: manufacturing/templates/base_portal.html:7
+#: manufacturing/templates/base_portal.html:152
+#: manufacturing/templates/portal_home.html:3
+#: manufacturing/templates/portal_invoice_detail.html:3
+#: manufacturing/templates/portal_invoices.html:3
+#: manufacturing/templates/portal_order_detail.html:3
+#: manufacturing/templates/portal_orders.html:3
+#: manufacturing/templates/portal_rma_detail.html:3
+#: manufacturing/templates/portal_rma_list.html:3
+#: manufacturing/templates/portal_rma_new.html:3
+#: manufacturing/templates/portal_shipment_detail.html:3
+msgid "Customer Portal"
+msgstr "Klantenportaal"
+
+#: manufacturing/templates/base_portal.html:155
+#: manufacturing/templates/sales_contracts_detail.html:7
+#: manufacturing/templates/sales_contracts_list.html:7
+#: manufacturing/templates/sales_dashboard.html:6
+#: manufacturing/templates/sales_leads_detail.html:7
+#: manufacturing/templates/sales_leads_list.html:7
+#: manufacturing/templates/sales_performance_kpis.html:55
+#: manufacturing/templates/sales_quotes.html:7
+#: manufacturing/templates/sales_reports.html:7
+#: manufacturing/templates/sales_reports_kpis.html:9
+#: manufacturing/templates/sales_targets.html:7
+msgid "Orders"
+msgstr "Orders"
+
+#: manufacturing/templates/base_portal.html:156
+#: manufacturing/templates/base_supplier_portal.html:145
+#: manufacturing/templates/supplier_portal_invoices.html:3
+#: manufacturing/templates/supplier_portal_invoices.html:4
+msgid "Invoices"
+msgstr "Facturen"
+
+#: manufacturing/templates/base_portal.html:157
+#: manufacturing/templates/cs_dashboard.html:10
+#: manufacturing/templates/cs_kb_detail.html:8
+#: manufacturing/templates/cs_kb_list.html:8
+#: manufacturing/templates/cs_returns_detail.html:8
+#: manufacturing/templates/cs_returns_list.html:8
+#: manufacturing/templates/cs_surveys_detail.html:8
+#: manufacturing/templates/cs_surveys_list.html:8
+#: manufacturing/templates/prod_returns_detail.html:7
+#: manufacturing/templates/prod_returns_list.html:8
+#: manufacturing/templates/prod_returns_reports.html:7
+msgid "Returns"
+msgstr "Retouren"
+
+#: manufacturing/templates/base_supplier_portal.html:7
+#: manufacturing/templates/base_supplier_portal.html:141
+#: manufacturing/templates/purchasing_dashboard.html:13
+#: manufacturing/templates/supplier_portal_home.html:3
+#: manufacturing/templates/supplier_portal_invoice_detail.html:3
+#: manufacturing/templates/supplier_portal_invoice_new.html:3
+#: manufacturing/templates/supplier_portal_invoices.html:3
+#: manufacturing/templates/supplier_portal_po_detail.html:3
+#: manufacturing/templates/supplier_portal_pos.html:3
+#: manufacturing/templates/supplier_portal_rfq_detail.html:3
+#: manufacturing/templates/supplier_portal_rfqs.html:3
+msgid "Supplier Portal"
+msgstr "Leveranciersportaal"
+
+#: manufacturing/templates/base_supplier_portal.html:146
+#: manufacturing/templates/po_list.html:9
+#: manufacturing/templates/rfq_detail.html:6
+#: manufacturing/templates/rfq_new.html:6
+#: manufacturing/templates/supplier_portal_rfqs.html:3
+msgid "RFQs"
+msgstr "RFQ's"
 
 #: manufacturing/templates/benefit_plan_detail.html:6
 #: manufacturing/templates/benefit_plan_new.html:6
@@ -2999,17 +3178,6 @@ msgstr "bijv. PPO Gold"
 #: manufacturing/templates/benefits_dashboard.html:50
 msgid "Plan Type"
 msgstr "Plantype"
-
-#: manufacturing/templates/benefit_plan_new.html:41
-#: manufacturing/templates/benefits_dashboard.html:73
-#: manufacturing/templates/prod_delivery_status.html:63
-#: manufacturing/templates/prod_shipping_detail.html:110
-#: manufacturing/templates/prod_shipping_detail.html:138
-#: manufacturing/templates/prod_shipping_list.html:81
-#: manufacturing/templates/prod_shipping_list.html:123
-#: manufacturing/templates/prod_tracking_dashboard.html:74
-msgid "Carrier"
-msgstr "Verzekeraar"
 
 #: manufacturing/templates/benefit_plan_new.html:42
 msgid "e.g. Acme Health"
@@ -3189,6 +3357,9 @@ msgid "Supplier:"
 msgstr "Leverancier:"
 
 #: manufacturing/templates/blanket_po_detail.html:63
+#: manufacturing/templates/portal_invoice_detail.html:15
+#: manufacturing/templates/portal_rma_detail.html:26
+#: manufacturing/templates/supplier_portal_invoice_detail.html:12
 #: manufacturing/templates/wo_detail.html:111
 msgid "Description:"
 msgstr "Omschrijving:"
@@ -3222,6 +3393,8 @@ msgstr ""
 #: manufacturing/templates/pers_training_detail.html:109
 #: manufacturing/templates/po_detail.html:113
 #: manufacturing/templates/so_detail.html:114
+#: manufacturing/templates/supplier_portal_po_detail.html:28
+#: manufacturing/templates/supplier_portal_rfq_detail.html:12
 #: manufacturing/templates/wo_detail.html:113
 msgid "Notes:"
 msgstr "Notities:"
@@ -3252,6 +3425,8 @@ msgstr "Afroepnr."
 #: manufacturing/templates/maint_parts_list.html:78
 #: manufacturing/templates/po_detail.html:166
 #: manufacturing/templates/po_detail.html:274
+#: manufacturing/templates/portal_order_detail.html:19
+#: manufacturing/templates/portal_shipment_detail.html:36
 #: manufacturing/templates/prod_daily_report.html:84
 #: manufacturing/templates/prod_schedule.html:69
 #: manufacturing/templates/prod_shipping_detail.html:153
@@ -3264,6 +3439,7 @@ msgstr "Afroepnr."
 #: manufacturing/templates/sales_order_detail.html:178
 #: manufacturing/templates/so_detail.html:197
 #: manufacturing/templates/so_detail.html:259
+#: manufacturing/templates/supplier_portal_rfq_detail.html:20
 #: manufacturing/templates/wo_list.html:35
 msgid "Qty"
 msgstr "Aantal"
@@ -3366,11 +3542,15 @@ msgstr "Geldigheid"
 #: manufacturing/templates/po_detail.html:211
 #: manufacturing/templates/po_detail.html:233
 #: manufacturing/templates/po_list.html:41
+#: manufacturing/templates/portal_home.html:27
+#: manufacturing/templates/portal_orders.html:11
 #: manufacturing/templates/reports_dashboard.html:229
 #: manufacturing/templates/sales_dashboard_kpis.html:15
 #: manufacturing/templates/sales_orders.html:75
 #: manufacturing/templates/so_detail.html:229
 #: manufacturing/templates/so_list.html:43
+#: manufacturing/templates/supplier_portal_home.html:31
+#: manufacturing/templates/supplier_portal_pos.html:11
 #: manufacturing/templates/time_clock_attendance.html:77
 #: manufacturing/templates/time_clock_hours.html:84
 msgid "Total"
@@ -3502,6 +3682,7 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/payroll_pay_rates.html:131
 #: manufacturing/templates/po_form.html:82
 #: manufacturing/templates/po_landed_cost_new.html:76
+#: manufacturing/templates/portal_rma_new.html:35
 #: manufacturing/templates/qa_audit_detail.html:167
 #: manufacturing/templates/qa_capa_detail.html:154
 #: manufacturing/templates/qa_ncr_detail.html:177
@@ -3542,6 +3723,7 @@ msgid "Certificates of Analysis"
 msgstr "Analysecertificaten"
 
 #: manufacturing/templates/coa_detail.html:7
+#: manufacturing/templates/portal_invoice_detail.html:10
 msgid "Download PDF"
 msgstr "PDF Downloaden"
 
@@ -4234,6 +4416,9 @@ msgstr "Limiet"
 #: manufacturing/templates/maint_downtime_detail.html:118
 #: manufacturing/templates/maint_downtime_list.html:78
 #: manufacturing/templates/maint_downtime_list.html:129
+#: manufacturing/templates/portal_home.html:73
+#: manufacturing/templates/portal_rma_list.html:13
+#: manufacturing/templates/portal_rma_new.html:22
 #: manufacturing/templates/prod_returns_detail.html:69
 #: manufacturing/templates/prod_returns_detail.html:111
 #: manufacturing/templates/prod_returns_list.html:82
@@ -4550,19 +4735,6 @@ msgstr "Nieuw ticket"
 #: manufacturing/templates/cs_reports.html:7
 msgid "Escalations"
 msgstr "Escalaties"
-
-#: manufacturing/templates/cs_dashboard.html:10
-#: manufacturing/templates/cs_kb_detail.html:8
-#: manufacturing/templates/cs_kb_list.html:8
-#: manufacturing/templates/cs_returns_detail.html:8
-#: manufacturing/templates/cs_returns_list.html:8
-#: manufacturing/templates/cs_surveys_detail.html:8
-#: manufacturing/templates/cs_surveys_list.html:8
-#: manufacturing/templates/prod_returns_detail.html:7
-#: manufacturing/templates/prod_returns_list.html:8
-#: manufacturing/templates/prod_returns_reports.html:7
-msgid "Returns"
-msgstr "Retouren"
 
 #: manufacturing/templates/cs_dashboard.html:11
 #: manufacturing/templates/cs_dashboard.html:49
@@ -5397,6 +5569,7 @@ msgid "No returns found."
 msgstr "Geen retouren gevonden."
 
 #: manufacturing/templates/cs_returns_list.html:104
+#: manufacturing/templates/portal_home.html:69
 msgid "New Return"
 msgstr "Nieuwe retour"
 
@@ -5529,6 +5702,10 @@ msgid "Create Survey"
 msgstr "Enquête aanmaken"
 
 #: manufacturing/templates/dashboard.html:4 manufacturing/templates/home.html:4
+#: manufacturing/templates/portal_login.html:4
+#: manufacturing/templates/portal_register.html:4
+#: manufacturing/templates/supplier_portal_login.html:4
+#: manufacturing/templates/supplier_portal_register.html:4
 msgid "Manufacturing ERP"
 msgstr "Productie-ERP"
 
@@ -6510,7 +6687,9 @@ msgstr "Nog geen loonstroken."
 
 #: manufacturing/templates/ess_profile.html:36
 msgid "— name/email/department are managed by HR, not editable here."
-msgstr "— naam, e-mail en afdeling worden beheerd door HR en zijn hier niet bewerkbaar."
+msgstr ""
+"— naam, e-mail en afdeling worden beheerd door HR en zijn hier niet "
+"bewerkbaar."
 
 #: manufacturing/templates/ess_profile.html:42
 msgid "Address"
@@ -7844,10 +8023,14 @@ msgid "Login"
 msgstr "Inloggen"
 
 #: manufacturing/templates/home.html:26
+#: manufacturing/templates/portal_login.html:26
+#: manufacturing/templates/supplier_portal_login.html:26
 msgid "Enter your password"
 msgstr "Voer uw wachtwoord in"
 
 #: manufacturing/templates/home.html:28
+#: manufacturing/templates/portal_login.html:28
+#: manufacturing/templates/supplier_portal_login.html:28
 msgid "Sign In"
 msgstr "Inloggen"
 
@@ -8807,6 +8990,7 @@ msgstr "Ticket %(num)s"
 
 #: manufacturing/templates/it_ticket_detail.html:91
 #: manufacturing/templates/it_ticket_list.html:69
+#: manufacturing/templates/portal_rma_list.html:13
 msgid "Submitted"
 msgstr "Ingediend"
 
@@ -11394,11 +11578,14 @@ msgstr "Ontvangstlabel afdrukken"
 #: manufacturing/templates/po_detail.html:105
 #: manufacturing/templates/po_landed_cost_detail.html:20
 #: manufacturing/templates/so_detail.html:106
+#: manufacturing/templates/supplier_portal_po_detail.html:29
 msgid "Total:"
 msgstr "Totaal:"
 
 #: manufacturing/templates/po_detail.html:110
+#: manufacturing/templates/portal_order_detail.html:10
 #: manufacturing/templates/so_detail.html:111
+#: manufacturing/templates/supplier_portal_po_detail.html:26
 msgid "Order Date:"
 msgstr "Besteldatum:"
 
@@ -11445,10 +11632,12 @@ msgstr "Deze PO annuleren?"
 #: manufacturing/templates/po_detail.html:167
 #: manufacturing/templates/po_detail.html:278
 #: manufacturing/templates/po_landed_cost_new.html:52
+#: manufacturing/templates/portal_order_detail.html:19
 #: manufacturing/templates/sales_order_detail.html:122
 #: manufacturing/templates/sales_order_detail.html:180
 #: manufacturing/templates/so_detail.html:198
 #: manufacturing/templates/so_detail.html:264
+#: manufacturing/templates/supplier_portal_po_detail.html:52
 msgid "Unit Price"
 msgstr "Stukprijs"
 
@@ -11457,6 +11646,7 @@ msgid "Receive"
 msgstr "Ontvangen"
 
 #: manufacturing/templates/po_detail.html:170
+#: manufacturing/templates/portal_order_detail.html:19
 #: manufacturing/templates/req_detail.html:83
 #: manufacturing/templates/sales_order_detail.html:123
 #: manufacturing/templates/so_detail.html:199
@@ -11532,6 +11722,8 @@ msgstr "Nieuwe Inkooporder"
 
 #: manufacturing/templates/po_form.html:46
 #: manufacturing/templates/po_list.html:38
+#: manufacturing/templates/portal_home.html:27
+#: manufacturing/templates/portal_orders.html:11
 #: manufacturing/templates/purchasing_dashboard_kpis.html:36
 #: manufacturing/templates/sales_order_detail.html:66
 #: manufacturing/templates/sales_order_detail.html:107
@@ -11539,11 +11731,14 @@ msgstr "Nieuwe Inkooporder"
 #: manufacturing/templates/sales_orders.html:110
 #: manufacturing/templates/so_form.html:46
 #: manufacturing/templates/so_list.html:40
+#: manufacturing/templates/supplier_portal_home.html:31
+#: manufacturing/templates/supplier_portal_pos.html:11
 msgid "Order Date"
 msgstr "Besteldatum"
 
 #: manufacturing/templates/po_form.html:51
 #: manufacturing/templates/purchasing_dashboard_kpis.html:37
+#: manufacturing/templates/supplier_portal_pos.html:11
 msgid "Expected Date"
 msgstr "Verwachte Datum"
 
@@ -11596,6 +11791,7 @@ msgstr "Toewijzingsdetail"
 
 #: manufacturing/templates/po_landed_cost_detail.html:31
 #: manufacturing/templates/po_landed_cost_new.html:51
+#: manufacturing/templates/supplier_portal_po_detail.html:52
 msgid "Qty Received"
 msgstr "Aantal Ontvangen"
 
@@ -11651,12 +11847,6 @@ msgstr ""
 msgid "New PO"
 msgstr "Nieuwe PO"
 
-#: manufacturing/templates/po_list.html:9
-#: manufacturing/templates/rfq_detail.html:6
-#: manufacturing/templates/rfq_new.html:6
-msgid "RFQs"
-msgstr "RFQ's"
-
 #: manufacturing/templates/po_list.html:10
 msgid "Blanket POs"
 msgstr "Raam-PO's"
@@ -11667,6 +11857,8 @@ msgstr "Consignatie"
 
 #: manufacturing/templates/po_list.html:36
 #: manufacturing/templates/purchasing_dashboard_kpis.html:34
+#: manufacturing/templates/supplier_portal_home.html:31
+#: manufacturing/templates/supplier_portal_pos.html:11
 msgid "PO #"
 msgstr "PO-nr."
 
@@ -11675,6 +11867,9 @@ msgid "Expected"
 msgstr "Verwacht"
 
 #: manufacturing/templates/po_list.html:40
+#: manufacturing/templates/portal_order_detail.html:15
+#: manufacturing/templates/portal_orders.html:11
+#: manufacturing/templates/portal_shipment_detail.html:32
 #: manufacturing/templates/sales_orders.html:75
 #: manufacturing/templates/so_list.html:42
 msgid "Items"
@@ -11688,6 +11883,309 @@ msgstr "Geen inkooporders met status „%(s)s”."
 #: manufacturing/templates/po_list.html:69
 msgid "No purchase orders."
 msgstr "Geen inkooporders."
+
+#: manufacturing/templates/portal_home.html:4
+#: manufacturing/templates/supplier_portal_home.html:4
+#, python-format
+msgid "Welcome, %(company)s"
+msgstr "Welkom, %(company)s"
+
+#: manufacturing/templates/portal_home.html:9
+msgid "Open Orders"
+msgstr "Openstaande Orders"
+
+#: manufacturing/templates/portal_home.html:17
+#: manufacturing/templates/portal_home.html:69
+msgid "Open Returns"
+msgstr "Openstaande Retouren"
+
+#: manufacturing/templates/portal_home.html:23
+#: manufacturing/templates/sales_dashboard_kpis.html:13
+msgid "Recent Orders"
+msgstr "Recente orders"
+
+#: manufacturing/templates/portal_home.html:27
+#: manufacturing/templates/portal_orders.html:11
+msgid "Order #"
+msgstr "Bestelnr."
+
+#: manufacturing/templates/portal_home.html:41
+#: manufacturing/templates/sales_dashboard_kpis.html:24
+msgid "No orders yet."
+msgstr "Nog geen orders."
+
+#: manufacturing/templates/portal_home.html:64
+msgid "No open invoices."
+msgstr "Geen openstaande facturen."
+
+#: manufacturing/templates/portal_home.html:73
+#: manufacturing/templates/portal_rma_list.html:13
+#: manufacturing/templates/prod_returns_list.html:79
+#: manufacturing/templates/prod_returns_reports.html:81
+msgid "RMA #"
+msgstr "RMA-nr."
+
+#: manufacturing/templates/portal_home.html:73
+#: manufacturing/templates/portal_rma_list.html:13
+msgid "Order"
+msgstr "Bestelling"
+
+#: manufacturing/templates/portal_home.html:87
+msgid "No open returns."
+msgstr "Geen openstaande retouren."
+
+#: manufacturing/templates/portal_invoice_detail.html:3
+#: manufacturing/templates/portal_invoice_detail.html:4
+#: manufacturing/templates/supplier_portal_invoice_detail.html:3
+#: manufacturing/templates/supplier_portal_invoice_detail.html:4
+#, python-format
+msgid "Invoice %(num)s"
+msgstr "Factuur %(num)s"
+
+#: manufacturing/templates/portal_invoice_detail.html:9
+#: manufacturing/templates/supplier_portal_invoice_detail.html:8
+msgid "Invoice Summary"
+msgstr "Factuuroverzicht"
+
+#: manufacturing/templates/portal_invoice_detail.html:13
+#: manufacturing/templates/supplier_portal_invoice_detail.html:10
+msgid "Invoice Date:"
+msgstr "Factuurdatum:"
+
+#: manufacturing/templates/portal_invoice_detail.html:14
+#: manufacturing/templates/supplier_portal_invoice_detail.html:11
+#: manufacturing/templates/wo_detail.html:109
+msgid "Due Date:"
+msgstr "Vervaldatum:"
+
+#: manufacturing/templates/portal_invoice_detail.html:17
+#: manufacturing/templates/supplier_portal_invoice_detail.html:14
+msgid "Balance Due:"
+msgstr "Verschuldigd Saldo:"
+
+#: manufacturing/templates/portal_invoice_detail.html:22
+#, python-format
+msgid "Pay $%(bal)s Now"
+msgstr "Nu $%(bal)s Betalen"
+
+#: manufacturing/templates/portal_invoice_detail.html:46
+msgid "No payments recorded yet."
+msgstr "Er zijn nog geen betalingen geregistreerd."
+
+#: manufacturing/templates/portal_invoices.html:3
+#: manufacturing/templates/portal_invoices.html:4
+msgid "My Invoices"
+msgstr "Mijn Facturen"
+
+#: manufacturing/templates/portal_invoices.html:28
+msgid "You have no invoices yet."
+msgstr "U heeft nog geen facturen."
+
+#: manufacturing/templates/portal_login.html:4
+msgid "Customer Portal Login"
+msgstr "Klantenportaal Inloggen"
+
+#: manufacturing/templates/portal_login.html:32
+#: manufacturing/templates/supplier_portal_login.html:32
+msgid "Set up portal access"
+msgstr "Portaaltoegang instellen"
+
+#: manufacturing/templates/portal_login.html:33
+#: manufacturing/templates/supplier_portal_login.html:33
+msgid "Employee login"
+msgstr "Werknemersinlog"
+
+#: manufacturing/templates/portal_order_detail.html:3
+#: manufacturing/templates/portal_order_detail.html:4
+#, python-format
+msgid "Order %(num)s"
+msgstr "Bestelling %(num)s"
+
+#: manufacturing/templates/portal_order_detail.html:8
+#: manufacturing/templates/supplier_portal_po_detail.html:24
+msgid "Order Summary"
+msgstr "Besteloverzicht"
+
+#: manufacturing/templates/portal_order_detail.html:11
+#: manufacturing/templates/so_detail.html:112
+msgid "Ship Date:"
+msgstr "Verzenddatum:"
+
+#: manufacturing/templates/portal_order_detail.html:33
+#: manufacturing/templates/supplier_portal_po_detail.html:66
+msgid "No line items."
+msgstr "Geen regelitems."
+
+#: manufacturing/templates/portal_order_detail.html:38
+#: manufacturing/templates/prod_performance_report.html:68
+msgid "Shipments"
+msgstr "Zendingen"
+
+#: manufacturing/templates/portal_order_detail.html:42
+msgid "Shipment #"
+msgstr "Zendingnr."
+
+#: manufacturing/templates/portal_order_detail.html:42
+#: manufacturing/templates/portal_orders.html:11
+#: manufacturing/templates/prod_delivery_status.html:62
+#: manufacturing/templates/prod_shipping_detail.html:106
+#: manufacturing/templates/prod_shipping_detail.html:137
+#: manufacturing/templates/prod_shipping_list.html:80
+#: manufacturing/templates/prod_shipping_list.html:119
+#: manufacturing/templates/prod_tracking_dashboard.html:73
+#: manufacturing/templates/sales_order_detail.html:67
+#: manufacturing/templates/sales_order_detail.html:108
+#: manufacturing/templates/sales_orders.html:75
+#: manufacturing/templates/sales_orders.html:111
+#: manufacturing/templates/so_form.html:51
+#: manufacturing/templates/so_list.html:41
+msgid "Ship Date"
+msgstr "Zendingnr."
+
+#: manufacturing/templates/portal_order_detail.html:42
+#: manufacturing/templates/prod_delivery_status.html:64
+#: manufacturing/templates/prod_shipping_detail.html:139
+#: manufacturing/templates/prod_shipping_list.html:82
+#: manufacturing/templates/prod_shipping_list.html:128
+#: manufacturing/templates/prod_tracking_dashboard.html:75
+msgid "Tracking #"
+msgstr "Zendingnr."
+
+#: manufacturing/templates/portal_order_detail.html:57
+msgid "No shipments yet."
+msgstr "Nog geen zendingen."
+
+#: manufacturing/templates/portal_orders.html:3
+#: manufacturing/templates/portal_orders.html:4
+msgid "My Orders"
+msgstr "Mijn Bestellingen"
+
+#: manufacturing/templates/portal_orders.html:28
+msgid "You have no orders yet."
+msgstr "U heeft nog geen bestellingen."
+
+#: manufacturing/templates/portal_register.html:4
+msgid "Set Up Portal Access"
+msgstr "Portaaltoegang Instellen"
+
+#: manufacturing/templates/portal_register.html:17
+msgid "Use the email on file with us"
+msgstr "Gebruik het bij ons geregistreerde e-mailadres"
+
+#: manufacturing/templates/portal_register.html:21
+#: manufacturing/templates/supplier_portal_register.html:21
+msgid "Choose a Password"
+msgstr "Kies een Wachtwoord"
+
+#: manufacturing/templates/portal_register.html:23
+#: manufacturing/templates/supplier_portal_register.html:23
+msgid "At least 8 characters"
+msgstr "Minstens 8 tekens"
+
+#: manufacturing/templates/portal_register.html:25
+#: manufacturing/templates/supplier_portal_register.html:25
+msgid "Create Portal Account"
+msgstr "Portaalaccount Aanmaken"
+
+#: manufacturing/templates/portal_register.html:29
+#: manufacturing/templates/supplier_portal_register.html:29
+msgid "Already have portal access? Log in"
+msgstr "Heeft u al portaaltoegang? Log in"
+
+#: manufacturing/templates/portal_rma_detail.html:3
+#: manufacturing/templates/portal_rma_detail.html:4
+#, python-format
+msgid "Return %(num)s"
+msgstr "Retour %(num)s"
+
+#: manufacturing/templates/portal_rma_detail.html:21
+msgid "Return Details"
+msgstr "Retourdetails"
+
+#: manufacturing/templates/portal_rma_detail.html:22
+#: manufacturing/templates/portal_shipment_detail.html:12
+msgid "Order:"
+msgstr "Bestelling:"
+
+#: manufacturing/templates/portal_rma_detail.html:24
+msgid "Reason:"
+msgstr "Reden:"
+
+#: manufacturing/templates/portal_rma_detail.html:25
+msgid "Submitted:"
+msgstr "Ingediend:"
+
+#: manufacturing/templates/portal_rma_detail.html:27
+msgid "Resolution:"
+msgstr "Oplossing:"
+
+#: manufacturing/templates/portal_rma_list.html:3
+#: manufacturing/templates/portal_rma_list.html:4
+msgid "My Returns"
+msgstr "Mijn Retouren"
+
+#: manufacturing/templates/portal_rma_list.html:7
+#: manufacturing/templates/portal_rma_new.html:3
+#: manufacturing/templates/portal_rma_new.html:4
+msgid "New Return Request"
+msgstr "Nieuw Retourverzoek"
+
+#: manufacturing/templates/portal_rma_list.html:29
+msgid "You have no return requests yet."
+msgstr "U heeft nog geen retourverzoeken."
+
+#: manufacturing/templates/portal_rma_new.html:13
+#: manufacturing/templates/prod_returns_detail.html:65
+#: manufacturing/templates/prod_returns_detail.html:100
+#: manufacturing/templates/prod_returns_list.html:115
+#: manufacturing/templates/prod_shipping_detail.html:95
+#: manufacturing/templates/prod_shipping_list.html:110
+msgid "Sales Order"
+msgstr "Verkooporder"
+
+#: manufacturing/templates/portal_rma_new.html:15
+msgid "Select an order…"
+msgstr "Selecteer een bestelling…"
+
+#: manufacturing/templates/portal_rma_new.html:31
+msgid "Tell us what happened…"
+msgstr "Vertel ons wat er is gebeurd…"
+
+#: manufacturing/templates/portal_rma_new.html:34
+msgid "Submit Return Request"
+msgstr "Retourverzoek Indienen"
+
+#: manufacturing/templates/portal_shipment_detail.html:3
+#: manufacturing/templates/portal_shipment_detail.html:4
+#, python-format
+msgid "Shipment %(num)s"
+msgstr "Zending %(num)s"
+
+#: manufacturing/templates/portal_shipment_detail.html:9
+msgid "Shipment Details"
+msgstr "Zendingsdetails"
+
+#: manufacturing/templates/portal_shipment_detail.html:10
+msgid "Packing Slip"
+msgstr "Pakbon"
+
+#: manufacturing/templates/portal_shipment_detail.html:14
+msgid "Carrier:"
+msgstr "Vervoerder:"
+
+#: manufacturing/templates/portal_shipment_detail.html:15
+msgid "Tracking #:"
+msgstr "Trackingnr.:"
+
+#: manufacturing/templates/portal_shipment_detail.html:19
+#: manufacturing/templates/prod_delivery_status.html:8
+#: manufacturing/templates/prod_tracking_dashboard.html:8
+msgid "Tracking"
+msgstr "Tracking"
+
+#: manufacturing/templates/portal_shipment_detail.html:45
+msgid "No items recorded."
+msgstr "Geen items geregistreerd."
 
 #: manufacturing/templates/prod_daily_report.html:3
 #: manufacturing/templates/prod_daily_report.html:49
@@ -11838,11 +12336,6 @@ msgstr "Lage Voorraad"
 msgid "Delivery Status"
 msgstr "Leveringsstatus"
 
-#: manufacturing/templates/prod_delivery_status.html:8
-#: manufacturing/templates/prod_tracking_dashboard.html:8
-msgid "Tracking"
-msgstr "Tracking"
-
 #: manufacturing/templates/prod_delivery_status.html:51
 msgid "Ship # / carrier / tracking…"
 msgstr "Verzendnr. / vervoerder / tracking…"
@@ -11864,29 +12357,6 @@ msgstr "Verzendnr."
 #: manufacturing/templates/so_list.html:38
 msgid "SO #"
 msgstr "SO-nr."
-
-#: manufacturing/templates/prod_delivery_status.html:62
-#: manufacturing/templates/prod_shipping_detail.html:106
-#: manufacturing/templates/prod_shipping_detail.html:137
-#: manufacturing/templates/prod_shipping_list.html:80
-#: manufacturing/templates/prod_shipping_list.html:119
-#: manufacturing/templates/prod_tracking_dashboard.html:73
-#: manufacturing/templates/sales_order_detail.html:67
-#: manufacturing/templates/sales_order_detail.html:108
-#: manufacturing/templates/sales_orders.html:75
-#: manufacturing/templates/sales_orders.html:111
-#: manufacturing/templates/so_form.html:51
-#: manufacturing/templates/so_list.html:41
-msgid "Ship Date"
-msgstr "Verzenddatum"
-
-#: manufacturing/templates/prod_delivery_status.html:64
-#: manufacturing/templates/prod_shipping_detail.html:139
-#: manufacturing/templates/prod_shipping_list.html:82
-#: manufacturing/templates/prod_shipping_list.html:128
-#: manufacturing/templates/prod_tracking_dashboard.html:75
-msgid "Tracking #"
-msgstr "Trackingnr."
 
 #: manufacturing/templates/prod_delivery_status.html:81
 #: manufacturing/templates/prod_shipping_list.html:97
@@ -11960,16 +12430,6 @@ msgstr "Laatste 90 dagen"
 #: manufacturing/templates/prod_performance_report.html:56
 msgid "WOs Scheduled"
 msgstr "WO's Gepland"
-
-#: manufacturing/templates/prod_performance_report.html:68
-msgid "Shipments"
-msgstr "Zendingen"
-
-#: manufacturing/templates/prod_performance_report.html:72
-#: manufacturing/templates/prod_performance_report.html:96
-#: manufacturing/templates/prod_tracking_dashboard.html:58
-msgid "Delivered"
-msgstr "Geleverd"
 
 #: manufacturing/templates/prod_performance_report.html:78
 #, python-format
@@ -12093,14 +12553,6 @@ msgstr "Retourrapporten"
 msgid "RMA Number"
 msgstr "RMA-nummer"
 
-#: manufacturing/templates/prod_returns_detail.html:65
-#: manufacturing/templates/prod_returns_detail.html:100
-#: manufacturing/templates/prod_returns_list.html:115
-#: manufacturing/templates/prod_shipping_detail.html:95
-#: manufacturing/templates/prod_shipping_list.html:110
-msgid "Sales Order"
-msgstr "Verkooporder"
-
 #: manufacturing/templates/prod_returns_detail.html:91
 msgid "Edit RMA"
 msgstr "RMA Bewerken"
@@ -12113,11 +12565,6 @@ msgstr "Retouren / RMA"
 #: manufacturing/templates/prod_returns_list.html:70
 msgid "RMA # / customer / description…"
 msgstr "RMA-nr. / klant / omschrijving…"
-
-#: manufacturing/templates/prod_returns_list.html:79
-#: manufacturing/templates/prod_returns_reports.html:81
-msgid "RMA #"
-msgstr "RMA-nr."
 
 #: manufacturing/templates/prod_returns_list.html:106
 msgid "New Return / RMA"
@@ -12350,10 +12797,6 @@ msgstr "Inkoopdashboard"
 msgid "Consultants"
 msgstr "Consultants"
 
-#: manufacturing/templates/purchasing_dashboard.html:13
-msgid "Supplier Portal"
-msgstr "Leveranciersportaal"
-
 #: manufacturing/templates/purchasing_dashboard.html:55
 #: manufacturing/templates/purchasing_dashboard_kpis.html:8
 msgid "Pending Approval"
@@ -12404,6 +12847,8 @@ msgid "Recent Purchase Orders"
 msgstr "Recente inkooporders"
 
 #: manufacturing/templates/purchasing_dashboard_kpis.html:51
+#: manufacturing/templates/supplier_portal_home.html:46
+#: manufacturing/templates/supplier_portal_pos.html:27
 msgid "No purchase orders yet."
 msgstr "Nog geen inkooporders."
 
@@ -13259,6 +13704,7 @@ msgstr "Motivering"
 
 #: manufacturing/templates/req_detail.html:80
 #: manufacturing/templates/sales_order_detail.html:118
+#: manufacturing/templates/supplier_portal_po_detail.html:48
 msgid "Line Items"
 msgstr "Regelitems"
 
@@ -13410,6 +13856,7 @@ msgstr "Voeg regelitems toe om offertes te gaan verzamelen."
 
 #: manufacturing/templates/rfq_list.html:3
 #: manufacturing/templates/rfq_list.html:16
+#: manufacturing/templates/supplier_portal_rfqs.html:4
 msgid "Requests for Quote"
 msgstr "Offerteaanvragen"
 
@@ -13419,6 +13866,7 @@ msgid "New RFQ"
 msgstr "Nieuwe RFQ"
 
 #: manufacturing/templates/rfq_list.html:31
+#: manufacturing/templates/supplier_portal_rfqs.html:11
 msgid "RFQ #"
 msgstr "RFQ-nr."
 
@@ -13436,6 +13884,7 @@ msgid "New Request for Quote"
 msgstr "Nieuwe offerteaanvraag"
 
 #: manufacturing/templates/rfq_new.html:29
+#: manufacturing/templates/supplier_portal_po_detail.html:39
 #: manufacturing/templates/wo_detail.html:197
 msgid "Notes (optional)"
 msgstr "Notities (optioneel)"
@@ -13688,19 +14137,6 @@ msgstr "Commissieregistratie toevoegen"
 msgid "Contract — %(customer)s"
 msgstr "Contract — %(customer)s"
 
-#: manufacturing/templates/sales_contracts_detail.html:7
-#: manufacturing/templates/sales_contracts_list.html:7
-#: manufacturing/templates/sales_dashboard.html:6
-#: manufacturing/templates/sales_leads_detail.html:7
-#: manufacturing/templates/sales_leads_list.html:7
-#: manufacturing/templates/sales_performance_kpis.html:55
-#: manufacturing/templates/sales_quotes.html:7
-#: manufacturing/templates/sales_reports.html:7
-#: manufacturing/templates/sales_reports_kpis.html:9
-#: manufacturing/templates/sales_targets.html:7
-msgid "Orders"
-msgstr "Orders"
-
 #: manufacturing/templates/sales_contracts_detail.html:8
 #: manufacturing/templates/sales_contracts_list.html:8
 #: manufacturing/templates/sales_dashboard.html:7
@@ -13822,14 +14258,6 @@ msgstr "Totale orderwaarde"
 #: manufacturing/templates/sales_dashboard_kpis.html:8
 msgid "Won Quote Value"
 msgstr "Waarde gewonnen offertes"
-
-#: manufacturing/templates/sales_dashboard_kpis.html:13
-msgid "Recent Orders"
-msgstr "Recente orders"
-
-#: manufacturing/templates/sales_dashboard_kpis.html:24
-msgid "No orders yet."
-msgstr "Nog geen orders."
 
 #: manufacturing/templates/sales_dashboard_kpis.html:30
 msgid "Recent Quotes"
@@ -14501,10 +14929,6 @@ msgstr "Geen plan ingesteld voor deze ploeg"
 msgid "No active workcenters found."
 msgstr "Geen actieve werkplekken gevonden."
 
-#: manufacturing/templates/so_detail.html:112
-msgid "Ship Date:"
-msgstr "Verzenddatum:"
-
 #: manufacturing/templates/so_detail.html:139
 msgid "Cancel this order?"
 msgstr "Deze bestelling annuleren?"
@@ -14741,6 +15165,135 @@ msgstr "Buiten Controle"
 #: manufacturing/templates/spc_log.html:122
 msgid "No measurements logged yet for this characteristic."
 msgstr "Nog geen metingen geregistreerd voor dit kenmerk."
+
+#: manufacturing/templates/supplier_portal_home.html:9
+msgid "Open Purchase Orders"
+msgstr "Openstaande Inkooporders"
+
+#: manufacturing/templates/supplier_portal_home.html:13
+msgid "Needs Acknowledgement"
+msgstr "Vereist Bevestiging"
+
+#: manufacturing/templates/supplier_portal_home.html:17
+msgid "Open Invoice Balance"
+msgstr "Openstaand Factuursaldo"
+
+#: manufacturing/templates/supplier_portal_home.html:21
+msgid "Open RFQs to Quote"
+msgstr "Openstaande Offerteaanvragen"
+
+#: manufacturing/templates/supplier_portal_home.html:31
+#: manufacturing/templates/supplier_portal_pos.html:11
+msgid "Acknowledged"
+msgstr "Bevestigd"
+
+#: manufacturing/templates/supplier_portal_invoice_new.html:3
+#: manufacturing/templates/supplier_portal_invoice_new.html:42
+#: manufacturing/templates/supplier_portal_po_detail.html:72
+msgid "Submit Invoice"
+msgstr "Factuur Indienen"
+
+#: manufacturing/templates/supplier_portal_invoice_new.html:4
+msgid "Submit an Invoice"
+msgstr "Een Factuur Indienen"
+
+#: manufacturing/templates/supplier_portal_invoice_new.html:13
+msgid "Purchase Order (optional)"
+msgstr "Inkooporder (optioneel)"
+
+#: manufacturing/templates/supplier_portal_invoice_new.html:15
+msgid "No PO reference"
+msgstr "Geen PO-referentie"
+
+#: manufacturing/templates/supplier_portal_invoice_new.html:22
+msgid "Invoice Number *"
+msgstr "Factuurnummer *"
+
+#: manufacturing/templates/supplier_portal_invoice_new.html:34
+msgid "Amount *"
+msgstr "Bedrag *"
+
+#: manufacturing/templates/supplier_portal_invoices.html:8
+msgid "Submit New Invoice"
+msgstr "Nieuwe Factuur Indienen"
+
+#: manufacturing/templates/supplier_portal_invoices.html:31
+msgid "No invoices submitted yet."
+msgstr "Er zijn nog geen facturen ingediend."
+
+#: manufacturing/templates/supplier_portal_login.html:4
+msgid "Supplier Portal Login"
+msgstr "Leveranciersportaal Inloggen"
+
+#: manufacturing/templates/supplier_portal_po_detail.html:27
+msgid "Expected Date:"
+msgstr "Verwachte Datum:"
+
+#: manufacturing/templates/supplier_portal_po_detail.html:32
+msgid "Acknowledged:"
+msgstr "Bevestigd:"
+
+#: manufacturing/templates/supplier_portal_po_detail.html:40
+msgid "Confirm ship date, etc."
+msgstr "Bevestig de verzenddatum, enz."
+
+#: manufacturing/templates/supplier_portal_po_detail.html:42
+msgid "Acknowledge This Order"
+msgstr "Deze Bestelling Bevestigen"
+
+#: manufacturing/templates/supplier_portal_po_detail.html:52
+msgid "Qty Ordered"
+msgstr "Bestelde Hoeveelheid"
+
+#: manufacturing/templates/supplier_portal_po_detail.html:71
+msgid "Submit an Invoice Against This Order"
+msgstr "Een Factuur Indienen voor Deze Bestelling"
+
+#: manufacturing/templates/supplier_portal_register.html:4
+msgid "Set Up Supplier Portal Access"
+msgstr "Leveranciersportaaltoegang Instellen"
+
+#: manufacturing/templates/supplier_portal_register.html:17
+msgid "Use the email on file with your buyer"
+msgstr "Gebruik het bij uw inkoper geregistreerde e-mailadres"
+
+#: manufacturing/templates/supplier_portal_rfq_detail.html:16
+msgid "Line Items — Enter Your Quote"
+msgstr "Regelitems — Voer Uw Offerte In"
+
+#: manufacturing/templates/supplier_portal_rfq_detail.html:33
+msgid "Price"
+msgstr "Prijs"
+
+#: manufacturing/templates/supplier_portal_rfq_detail.html:36
+msgid "Lead days"
+msgstr "Levertijd (dagen)"
+
+#: manufacturing/templates/supplier_portal_rfq_detail.html:38
+msgid "Update Quote"
+msgstr "Offerte Bijwerken"
+
+#: manufacturing/templates/supplier_portal_rfq_detail.html:38
+msgid "Submit Quote"
+msgstr "Offerte Indienen"
+
+#: manufacturing/templates/supplier_portal_rfq_detail.html:43
+#, python-format
+msgid "$%(price)s · %(days)s days"
+msgstr "$%(price)s · %(days)s dagen"
+
+#: manufacturing/templates/supplier_portal_rfq_detail.html:45
+msgid "No quote submitted"
+msgstr "Geen offerte ingediend"
+
+#: manufacturing/templates/supplier_portal_rfq_detail.html:55
+msgid "No line items on this RFQ."
+msgstr "Geen regelitems in deze offerteaanvraag."
+
+#: manufacturing/templates/supplier_portal_rfqs.html:24
+msgid ""
+"No RFQs yet — your buyer will invite you to quote when there's a request."
+msgstr "Nog geen offerteaanvragen — uw inkoper nodigt u uit om een offerte in te dienen zodra er een aanvraag is."
 
 #: manufacturing/templates/tc_device_form.html:3
 msgid "Add Time Clock"
@@ -15312,10 +15865,6 @@ msgstr "Product:"
 #: manufacturing/templates/wo_detail.html:107
 msgid "Quantity:"
 msgstr "Hoeveelheid:"
-
-#: manufacturing/templates/wo_detail.html:109
-msgid "Due Date:"
-msgstr "Vervaldatum:"
 
 #: manufacturing/templates/wo_detail.html:115
 msgid "Assigned To:"

@@ -1,13 +1,14 @@
 {% extends "base_portal.html" %}
-{% block page_title %}My Invoices — Customer Portal{% endblock %}
-{% block menu_title %}My Invoices{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "My Invoices" %} — {% trans "Customer Portal" %}{% endblock %}
+{% block menu_title %}{% trans "My Invoices" %}{% endblock %}
 
 {% block body %}
 {% if invoices %}
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Invoice #</th><th>Invoice Date</th><th>Due Date</th><th class="num">Amount</th><th class="num">Balance</th><th>Status</th></tr>
+            <tr><th>{% trans "Invoice #" %}</th><th>{% trans "Invoice Date" %}</th><th>{% trans "Due Date" %}</th><th class="num">{% trans "Amount" %}</th><th class="num">{% trans "Balance" %}</th><th>{% trans "Status" %}</th></tr>
         </thead>
         <tbody>
             {% for inv in invoices %}
@@ -24,6 +25,6 @@
     </table>
 </div>
 {% else %}
-<div class="empty-state">You have no invoices yet.</div>
+<div class="empty-state">{% trans "You have no invoices yet." %}</div>
 {% endif %}
 {% endblock %}

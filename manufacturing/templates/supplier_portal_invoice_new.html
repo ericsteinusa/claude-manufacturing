@@ -1,6 +1,7 @@
 {% extends "base_supplier_portal.html" %}
-{% block page_title %}Submit Invoice — Supplier Portal{% endblock %}
-{% block menu_title %}Submit an Invoice{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Submit Invoice" %} — {% trans "Supplier Portal" %}{% endblock %}
+{% block menu_title %}{% trans "Submit an Invoice" %}{% endblock %}
 
 {% block body %}
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
@@ -9,36 +10,36 @@
     <form method="post" class="erp-form">
         {% csrf_token %}
         <div class="form-row">
-            <label>Purchase Order (optional)</label>
+            <label>{% trans "Purchase Order (optional)" %}</label>
             <select name="po_id">
-                <option value="">— No PO reference —</option>
+                <option value="">— {% trans "No PO reference" %} —</option>
                 {% for po in pos %}
                 <option value="{{ po.id }}" {% if po.id|stringformat:"s" == po_id_value %}selected{% endif %}>{{ po.po_number }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="form-row">
-            <label>Invoice Number *</label>
+            <label>{% trans "Invoice Number *" %}</label>
             <input type="text" name="invoice_number" required>
         </div>
         <div class="form-row">
-            <label>Invoice Date</label>
+            <label>{% trans "Invoice Date" %}</label>
             <input type="date" name="invoice_date">
         </div>
         <div class="form-row">
-            <label>Due Date *</label>
+            <label>{% trans "Due Date *" %}</label>
             <input type="date" name="due_date" required>
         </div>
         <div class="form-row">
-            <label>Amount *</label>
+            <label>{% trans "Amount *" %}</label>
             <input type="number" name="amount" step="0.01" min="0" required>
         </div>
         <div class="form-row">
-            <label>Description</label>
+            <label>{% trans "Description" %}</label>
             <textarea name="description" rows="2"></textarea>
         </div>
         <div class="form-actions">
-            <button type="submit" class="btn">Submit Invoice</button>
+            <button type="submit" class="btn">{% trans "Submit Invoice" %}</button>
         </div>
     </form>
 </div>

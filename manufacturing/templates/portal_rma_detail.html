@@ -1,6 +1,7 @@
 {% extends "base_portal.html" %}
-{% block page_title %}Return {{ rma.rma_number }} — Customer Portal{% endblock %}
-{% block menu_title %}Return {{ rma.rma_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=rma.rma_number %}Return {{ num }}{% endblocktrans %} — {% trans "Customer Portal" %}{% endblock %}
+{% block menu_title %}{% blocktrans with num=rma.rma_number %}Return {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block extra_styles %}
 .print-btn {
@@ -15,14 +16,14 @@
 {% endblock %}
 
 {% block body %}
-<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="card">
-    <div class="card-title">Return Details</div>
-    <p><strong>Order:</strong> {{ rma.so_number|default:"—" }}</p>
-    <p><strong>Status:</strong> <span class="pill pill-{{ rma.status }}">{{ rma.status|capfirst }}</span></p>
-    <p><strong>Reason:</strong> {{ rma.reason|capfirst }}</p>
-    <p><strong>Submitted:</strong> {{ rma.created_at|default:"" }}</p>
-    {% if rma.description %}<p><strong>Description:</strong> {{ rma.description }}</p>{% endif %}
-    {% if rma.resolution %}<p><strong>Resolution:</strong> {{ rma.resolution }}</p>{% endif %}
+    <div class="card-title">{% trans "Return Details" %}</div>
+    <p><strong>{% trans "Order:" %}</strong> {{ rma.so_number|default:"—" }}</p>
+    <p><strong>{% trans "Status:" %}</strong> <span class="pill pill-{{ rma.status }}">{{ rma.status|capfirst }}</span></p>
+    <p><strong>{% trans "Reason:" %}</strong> {{ rma.reason|capfirst }}</p>
+    <p><strong>{% trans "Submitted:" %}</strong> {{ rma.created_at|default:"" }}</p>
+    {% if rma.description %}<p><strong>{% trans "Description:" %}</strong> {{ rma.description }}</p>{% endif %}
+    {% if rma.resolution %}<p><strong>{% trans "Resolution:" %}</strong> {{ rma.resolution }}</p>{% endif %}
 </div>
 {% endblock %}

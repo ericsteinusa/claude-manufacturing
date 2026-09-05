@@ -1461,6 +1461,102 @@ NETO: — byte-for-byte), My Time Off, My Reviews, My Training, and My
 YTD Summary, in Spanish, French, German, Portuguese, and Dutch with
 real sample data, no console or server errors.
 
+Also translated: the **Customer and Supplier Portals** (`base_portal.html`,
+`portal_home.html`, `portal_orders.html`, `portal_order_detail.html`,
+`portal_invoices.html`, `portal_invoice_detail.html`, `portal_login.html`,
+`portal_register.html`, `portal_rma_list.html`, `portal_rma_detail.html`,
+`portal_rma_new.html`, `portal_shipment_detail.html` — 12 templates —
+plus `base_supplier_portal.html`, `supplier_portal_home.html`,
+`supplier_portal_pos.html`, `supplier_portal_po_detail.html`,
+`supplier_portal_invoices.html`, `supplier_portal_invoice_detail.html`,
+`supplier_portal_invoice_new.html`, `supplier_portal_rfqs.html`,
+`supplier_portal_rfq_detail.html`, `supplier_portal_login.html`,
+`supplier_portal_register.html` — 11 more; 23 templates total, routed at
+`/portal/` and `/supplier-portal/`). The first external-facing surface in
+this series — every prior pass translated pages only employees see.
+`base_portal.html`/`base_supplier_portal.html` are their own standalone
+base templates (not `base.html`), had zero i18n infrastructure before
+this pass (no `{% load i18n %}`, no `<html lang>`, no language switcher),
+and are used by non-employee customer/supplier accounts with their own
+separate login systems — so this pass had to add the switcher itself
+(same `{% get_available_languages %}` / `set_language` form as
+`base.html`'s, adapted to the portal header's `.btn-sm-nav` styling)
+before any translated content on those pages would be reachable by a
+real portal user. `portal_login.html`/`portal_register.html` and their
+supplier-portal counterparts extend a third base (`base_card.html`,
+shared with the already-translated `home.html`) which itself carries no
+i18n either — same pattern, each child just adds its own `{% load i18n %}`.
+209 unique strings across 5 languages, marked up by two parallel
+subagents (one per portal, working from the established conventions
+verbatim) and then centrally reviewed, makemessages'd, fuzzy-stripped,
+translated, and verified by hand — the same division of labor first used
+for the ATS/Benefits/Offboarding cluster. Both subagents' work checked
+out clean on review (`manage.py check`, full diff read), with a few
+small polish fixes applied afterward: a no-op `{% blocktrans %}` wrapping
+a bare variable with no literal text (`supplier_portal_po_detail.html`/
+`supplier_portal_rfq_detail.html`'s page titles) collapsed back to a
+plain variable, and two "*"-suffixed required-field labels
+(`supplier_portal_invoice_new.html`) moved the asterisk inside the
+`{% trans %}` string to match the established `"Due Date *"`-style
+convention instead of concatenating it outside — cosmetically identical
+output, but the inside-the-string form is what lets a future required
+field named the same thing merge onto the existing translation instead
+of creating a near-duplicate msgid.
+
+Two real bugs found and fixed in this pass, both surfaced by translating
+content that was previously invisible in English:
+- `portal_shipment_detail.html`'s tracking timeline renders labels built
+  in Python (`customer_portal_core.get_tracking_events()`:
+  "Shipping Label Created", "Picked up by {carrier}", "In Transit", "Out
+  for Delivery", "Shipment Cancelled"), not in the template — the
+  now-familiar non-template-rendered-string gap first hit by `menus.py`'s
+  `DASHBOARD_DEPARTMENTS` and the WO/SO pass's `*_STATUS_ACTION_LABELS`.
+  Fixed by wrapping each with `gettext_lazy` and switching the
+  `f"Picked up by {carrier}"` f-string to `_("Picked up by %(carrier)s")
+  % {"carrier": carrier}` (an f-string can't be lazily translated — the
+  interpolation has already happened by the time gettext would see it).
+  `tests/test_customer_portal_core.py`'s `assert events[0]['label'] ==
+  'Shipping Label Created'` still passes unchanged — Django's lazy
+  translation proxy compares equal to a plain `str` in the active
+  (default English) locale, confirmed by re-running that test file
+  specifically before trusting it more broadly.
+- `portal_rma_list.html`'s new `{% trans "RMA #" %}` column header
+  exact-matched an **already-existing but wrong** translation: `"RMA #"`
+  was first marked up in the Production department pass
+  (`prod_returns_list.html`/`prod_returns_reports.html`) and had been
+  mistranslated as the equivalent of "Order" in **all five languages**
+  the entire time (es "Pedido", fr "Commande", de "Bestellung", pt
+  "Pedido", nl "Bestelling") — invisible on those two pages since their
+  adjacent "Order" column (`{{ r.so_number }}`) doesn't sit right next to
+  it, but immediately obvious on the portal list page where "RMA #" and
+  "Order" are neighboring columns and both rendered as literally the same
+  word. Fixed to "N.º de RMA" / "N° RMA" / "RMA-Nr." / "N.º da RMA" /
+  "RMA-nr." (keeping the RMA acronym itself untranslated, matching NCR/
+  CAPA/PO/SO/WO precedent) across all 5 `.po` files — this also
+  retroactively corrects the two Production-department pages that had
+  been shipping the wrong label since that pass. A reminder that
+  exact-msgid-text reuse, while usually the right behavior (it's what
+  makes the WO/SO and ESS passes' high merge rates possible), can also
+  propagate a wrong translation silently into a brand-new page — worth a
+  quick sanity read of what a surprisingly-already-translated string
+  actually says before trusting the merge, not just checking that it's
+  non-blank.
+
+Full suite 3475 passed (unchanged), `manage.py check` and `ruff check .`
+clean, `msgfmt --check` clean on all 5 files, zero fuzzy/blank entries.
+Verified end-to-end against the real dev server logged in as both a real
+customer and a real supplier portal account (reset via a narrowly-scoped
+`UPDATE ... WHERE id = <n>` on the single existing sample login row for
+each, not a blanket update): the customer portal's dashboard, an order's
+detail page, Returns list (confirmed the "RMA #" fix renders as a
+distinct column from "Order"), and the New Return form in Spanish; the
+supplier portal's dashboard, a PO's detail page (confirmed "Print / Save
+PDF", the acknowledge-order form, and the line-items table), and an
+RFQ's detail page (confirmed the "Update Quote" button rendering for an
+item with an existing quote) in French and German — including confirming
+the newly-added language switcher itself lists and switches between all
+6 languages from within the portal header, not just the main app.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

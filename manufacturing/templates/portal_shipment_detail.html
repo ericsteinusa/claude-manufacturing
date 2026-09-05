@@ -1,21 +1,22 @@
 {% extends "base_portal.html" %}
-{% block page_title %}Shipment {{ shipment.ship_number }} — Customer Portal{% endblock %}
-{% block menu_title %}Shipment {{ shipment.ship_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=shipment.ship_number %}Shipment {{ num }}{% endblocktrans %} — {% trans "Customer Portal" %}{% endblock %}
+{% block menu_title %}{% blocktrans with num=shipment.ship_number %}Shipment {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block body %}
 <div class="card">
     <div class="card-title">
-        Shipment Details
-        <a href="{% url 'portal_packing_slip_pdf' shipment.id %}" class="btn" style="float:right;" target="_blank">⬇ Packing Slip</a>
+        {% trans "Shipment Details" %}
+        <a href="{% url 'portal_packing_slip_pdf' shipment.id %}" class="btn" style="float:right;" target="_blank">⬇ {% trans "Packing Slip" %}</a>
     </div>
-    <p><strong>Order:</strong> {{ shipment.so_number|default:"—" }}</p>
-    <p><strong>Status:</strong> <span class="pill pill-{{ shipment.status }}">{{ shipment.status|capfirst }}</span></p>
-    <p><strong>Carrier:</strong> {{ shipment.carrier|default:"—" }}</p>
-    <p><strong>Tracking #:</strong> {{ shipment.tracking_number|default:"—" }}</p>
+    <p><strong>{% trans "Order:" %}</strong> {{ shipment.so_number|default:"—" }}</p>
+    <p><strong>{% trans "Status:" %}</strong> <span class="pill pill-{{ shipment.status }}">{{ shipment.status|capfirst }}</span></p>
+    <p><strong>{% trans "Carrier:" %}</strong> {{ shipment.carrier|default:"—" }}</p>
+    <p><strong>{% trans "Tracking #:" %}</strong> {{ shipment.tracking_number|default:"—" }}</p>
 </div>
 
 <div class="card">
-    <div class="card-title">Tracking</div>
+    <div class="card-title">{% trans "Tracking" %}</div>
     <ul class="timeline">
         {% for e in events %}
         <li class="{% if e.done %}done{% endif %}">
@@ -28,11 +29,11 @@
 </div>
 
 <div class="card">
-    <div class="card-title">Items</div>
+    <div class="card-title">{% trans "Items" %}</div>
     {% if items %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Description</th><th class="num">Qty</th></tr></thead>
+            <thead><tr><th>{% trans "Description" %}</th><th class="num">{% trans "Qty" %}</th></tr></thead>
             <tbody>
                 {% for it in items %}
                 <tr><td>{{ it.description }}</td><td class="num">{{ it.qty }}</td></tr>
@@ -41,7 +42,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No items recorded.</div>
+    <div class="empty-state">{% trans "No items recorded." %}</div>
     {% endif %}
 </div>
 {% endblock %}
