@@ -2086,6 +2086,34 @@ non-`active` service is now logged even when there is nothing to pull.
 `fuser -k -9 8000/tcp` clears such a squatter; a plain reboot fixes it
 permanently, since it is not a service and does not come back.
 
+**Port 8000 belongs to `manufacture.service` — do not point a dev server
+at it.** `.claude/launch.json` is gitignored and per-checkout, so each
+worktree carries its own copy and they are easy to create by copy-paste;
+one aimed at `0.0.0.0:8000` silently takes the port from systemd on the
+next restart, and because that dev server *also* serves the app, the box
+keeps answering and nothing looks wrong. That is exactly the eight-hour
+outage above. Give every preview config a distinct high port bound to
+`127.0.0.1` (the ones on this box now use 8010/8011/8012). Since the file
+is untracked, this convention only survives by being written down here.
+
+**An empty autopull log is the normal, healthy state — it is not evidence
+that the timer has stopped.** The script is deliberately silent on the
+quiet path: nothing to pull and the service `active` means it exits 0
+without a word, so `journalctl` over a window where nothing was deployed
+correctly prints `-- No entries --`. During the incident above that
+silence was twice misread as "the deploy never ran". To ask *"is autopull
+alive?"* query the unit's own bookkeeping instead, which is populated
+whether or not anything was logged:
+
+    systemctl show manufacture-autopull.service -p Result -p ExecMainStatus \
+        -p ExecMainStartTimestamp --value
+    systemctl list-timers manufacture-autopull.timer
+
+`journalctl -t manufacture-autopull` shows the script's `logger` lines;
+`journalctl -u manufacture-autopull.service` shows those *plus* the unit's
+stdout (the pytest run, git output) and systemd's own start/stop records,
+which is usually what you want when a deploy misbehaved.
+
 ## Windows deployment (`scripts/windows/`)
 `manufacture-autopull.ps1` (polls `origin/main` and redeploys) and
 `manufacture-run.ps1` (start/restart the dev server, tracked by port
