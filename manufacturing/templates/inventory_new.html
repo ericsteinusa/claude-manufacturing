@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Product — Inventory{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Product — Inventory" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/inventory/" class="btn">Back to Inventory</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/inventory/" class="btn">{% trans "Back to Inventory" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -28,7 +29,7 @@
 {% block body %}
 <div class="content">
 <div class="inv-wrap">
-    <h2>New Product / Part</h2>
+    <h2>{% trans "New Product / Part" %}</h2>
 
     {% if error %}
     <div class="msg-err">{{ error }}</div>
@@ -39,25 +40,25 @@
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row full">
-                    <label>Name *</label>
+                    <label>{% trans "Name *" %}</label>
                     <input type="text" name="name" value="{{ form.name|default:'' }}" required
-                           placeholder="Product or part name" autofocus>
+                           placeholder="{% trans 'Product or part name' %}" autofocus>
                 </div>
                 <div class="form-row">
-                    <label>Item Type</label>
+                    <label>{% trans "Item Type" %}</label>
                     <select name="item_type">
-                        <option value="buy" {% if form.item_type != 'make' %}selected{% endif %}>Buy</option>
-                        <option value="make" {% if form.item_type == 'make' %}selected{% endif %}>Make</option>
+                        <option value="buy" {% if form.item_type != 'make' %}selected{% endif %}>{% trans "Buy" %}</option>
+                        <option value="make" {% if form.item_type == 'make' %}selected{% endif %}>{% trans "Make" context "item_type" %}</option>
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>UOM</label>
+                    <label>{% trans "UOM" %}</label>
                     <input type="text" name="uom" value="{{ form.uom|default:'ea' }}" placeholder="ea">
                 </div>
                 <div class="form-row">
-                    <label>Supplier</label>
+                    <label>{% trans "Supplier" %}</label>
                     <select name="supplier_id">
-                        <option value="">(none)</option>
+                        <option value="">{% trans "(none)" %}</option>
                         {% for s in suppliers %}
                         <option value="{{ s.id }}"
                             {% if form.supplier_id == s.id|stringformat:"s" %}selected{% endif %}>
@@ -66,32 +67,32 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Bin / Location</label>
+                    <label>{% trans "Bin / Location" %}</label>
                     <input type="text" name="bin_loc" value="{{ form.bin_loc|default:'' }}"
-                           placeholder="Shelf, bin, or location">
+                           placeholder="{% trans 'Shelf, bin, or location' %}">
                 </div>
                 <div class="form-row">
-                    <label>Initial Qty on Hand</label>
+                    <label>{% trans "Initial Qty on Hand" %}</label>
                     <input type="number" name="amount" min="0" step="any"
                            value="{{ form.amount|default:'0' }}">
                 </div>
                 <div class="form-row">
-                    <label>Reorder Point</label>
+                    <label>{% trans "Reorder Point" %}</label>
                     <input type="number" name="reorder_point" min="0" step="any"
                            value="{{ form.reorder_point|default:'0' }}">
                 </div>
                 <div class="form-row">
-                    <label>Lead Time (days)</label>
+                    <label>{% trans "Lead Time (days)" %}</label>
                     <input type="number" name="lead_time_days" min="0"
                            value="{{ form.lead_time_days|default:'0' }}">
                 </div>
                 <div class="form-row">
-                    <label>Unit Cost ($)</label>
+                    <label>{% trans "Unit Cost ($)" %}</label>
                     <input type="number" name="purchase_price" min="0" step="0.01"
                            value="{{ form.purchase_price|default:'0' }}">
                 </div>
             </div>
-            <button type="submit" class="save-btn">Create Product</button>
+            <button type="submit" class="save-btn">{% trans "Create Product" %}</button>
         </form>
     </div>
 </div>

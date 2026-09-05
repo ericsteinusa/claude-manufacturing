@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Lot Tracking{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Lot Tracking" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/lots/new/" class="btn">+ New Lot</a>
+<a href="/lots/new/" class="btn">+ {% trans "New Lot" %}</a>
 {% endif %}
-<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if product_id %}&product_id={{ product_id|urlencode }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if product_id %}&product_id={{ product_id|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if product_id %}&product_id={{ product_id|urlencode }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if product_id %}&product_id={{ product_id|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -39,17 +40,17 @@
 {% block body %}
 <div class="content">
 <div class="lot-wrap">
-    <h2>Lot Tracking</h2>
+    <h2>{% trans "Lot Tracking" %}</h2>
 
     {% if expiry_alerts %}
     <div class="expiry-bar">
-        ⚠ {{ expiry_alerts|length }} lot{{ expiry_alerts|length|pluralize }} expiring within 30 days
-        — <a href="?status=available" style="color:#856404;">view available</a>
+        ⚠ {% blocktrans count counter=expiry_alerts|length %}{{ counter }} lot expiring within 30 days{% plural %}{{ counter }} lots expiring within 30 days{% endblocktrans %}
+        — <a href="?status=available" style="color:#856404;">{% trans "view available" %}</a>
     </div>
     {% endif %}
 
     <div class="filter-row">
-        <a href="/lots/" class="{% if not status_filter %}active{% endif %}">All</a>
+        <a href="/lots/" class="{% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
         {% for s in LOT_STATUSES %}
         <a href="/lots/?status={{ s }}" class="{% if status_filter == s %}active{% endif %}">
             {{ s|title }}</a>
@@ -60,12 +61,12 @@
     <table class="lot-table">
         <thead>
             <tr>
-                <th>Lot #</th>
-                <th>Product</th>
-                <th class="num">Qty</th>
-                <th>Status</th>
-                <th>Received</th>
-                <th>Expires</th>
+                <th>{% trans "Lot #" %}</th>
+                <th>{% trans "Product" %}</th>
+                <th class="num">{% trans "Qty" %}</th>
+                <th>{% trans "Status" %}</th>
+                <th>{% trans "Received" %}</th>
+                <th>{% trans "Expires" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -82,7 +83,7 @@
         </tbody>
     </table>
     {% else %}
-    <p class="empty-note">No lots found.</p>
+    <p class="empty-note">{% trans "No lots found." %}</p>
     {% endif %}
 </div>
 </div>

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}MRP Release Results{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "MRP Release Results" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mrp/" class="btn">New MRP Run</a>
-<a href="/wo/" class="btn">Work Orders</a>
-<a href="/po/" class="btn">Purchase Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mrp/" class="btn">{% trans "New MRP Run" %}</a>
+<a href="/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/po/" class="btn">{% trans "Purchase Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -29,24 +30,26 @@
 {% block body %}
 <div class="content">
 <div class="mrp-wrap">
-    <h2>MRP Plan Released</h2>
-    <p class="sub">The following orders were created. Edit each one to set
-        dates, assign suppliers, and confirm before production begins.</p>
+    <h2>{% trans "MRP Plan Released" %}</h2>
+    <p class="sub">{% blocktrans %}The following orders were created. Edit each one to set
+        dates, assign suppliers, and confirm before production begins.{% endblocktrans %}</p>
 
     <div class="success-banner">
-        &#10003; Released {{ created_wos|length }} Work Order{{ created_wos|length|pluralize }}
-        and {{ created_pos|length }} Purchase Order{{ created_pos|length|pluralize }}.
+        &#10003;
+        {% blocktrans count counter=created_wos|length %}Released {{ counter }} Work Order{% plural %}Released {{ counter }} Work Orders{% endblocktrans %}
+        {% trans "and" %}
+        {% blocktrans count counter=created_pos|length %}{{ counter }} Purchase Order.{% plural %}{{ counter }} Purchase Orders.{% endblocktrans %}
     </div>
 
     {% if created_wos %}
     <div class="result-section">
-        <h3>Work Orders Created</h3>
+        <h3>{% trans "Work Orders Created" %}</h3>
         <table class="result-table">
             <thead>
                 <tr>
-                    <th>WO Number</th>
-                    <th>Product</th>
-                    <th class="num" style="text-align:right;">Qty</th>
+                    <th>{% trans "WO Number" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th class="num" style="text-align:right;">{% trans "Qty" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -57,7 +60,7 @@
                     <td>{{ wo.product_name }}</td>
                     <td style="text-align:right;">{{ wo.qty|floatformat:0 }}</td>
                     <td><a href="/wo/{{ wo.wo_id }}/" class="btn"
-                           style="padding:2px 10px;font-size:12px;">View WO</a></td>
+                           style="padding:2px 10px;font-size:12px;">{% trans "View WO" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -67,21 +70,19 @@
 
     {% if created_pos %}
     <div class="result-section">
-        <h3>Draft Purchase Orders Created</h3>
+        <h3>{% trans "Draft Purchase Orders Created" %}</h3>
         {% if pos_missing_supplier %}
         <p style="color:#fc9;font-size:12px;margin-bottom:8px;">
-            {{ pos_missing_supplier }} PO{{ pos_missing_supplier|pluralize }} below
-            {{ pos_missing_supplier|pluralize:"has,have" }} no preferred supplier on
-            file — open and assign one before sending.
+            {% blocktrans count counter=pos_missing_supplier %}{{ counter }} PO below has no preferred supplier on file — open and assign one before sending.{% plural %}{{ counter }} POs below have no preferred supplier on file — open and assign one before sending.{% endblocktrans %}
         </p>
         {% endif %}
         <table class="result-table">
             <thead>
                 <tr>
-                    <th>PO Number</th>
-                    <th>Product</th>
-                    <th>Supplier</th>
-                    <th class="num" style="text-align:right;">Qty</th>
+                    <th>{% trans "PO Number" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th class="num" style="text-align:right;">{% trans "Qty" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -94,12 +95,12 @@
                         {% if po.supplier_name %}
                         {{ po.supplier_name }}
                         {% else %}
-                        <span style="color:#c33;">none on file</span>
+                        <span style="color:#c33;">{% trans "none on file" %}</span>
                         {% endif %}
                     </td>
                     <td style="text-align:right;">{{ po.qty|floatformat:0 }}</td>
                     <td><a href="/po/{{ po.po_id }}/" class="btn"
-                           style="padding:2px 10px;font-size:12px;">View PO</a></td>
+                           style="padding:2px 10px;font-size:12px;">{% trans "View PO" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -108,7 +109,7 @@
     {% endif %}
 
     {% if not created_wos and not created_pos %}
-    <p class="empty-note">No orders were released.</p>
+    <p class="empty-note">{% trans "No orders were released." %}</p>
     {% endif %}
 </div>
 </div>

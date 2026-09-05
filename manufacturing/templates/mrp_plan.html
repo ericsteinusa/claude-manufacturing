@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}MRP Plan{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "MRP Plan" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mrp/" class="btn">Back to MRP</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mrp/" class="btn">{% trans "Back to MRP" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -44,17 +45,17 @@
 {% block body %}
 <div class="content">
 <div class="mrp-wrap">
-    <h2>MRP Plan — Review &amp; Release</h2>
+    <h2>{% trans "MRP Plan — Review &amp; Release" %}</h2>
     <p class="sub">
-        Select the planned orders you want to release.
+        {% blocktrans %}Select the planned orders you want to release.
         Make orders create Work Orders; Buy orders create draft Purchase Orders,
-        pre-assigned to the product's preferred supplier when one is on file.
+        pre-assigned to the product's preferred supplier when one is on file.{% endblocktrans %}
     </p>
 
     <div class="summary-bar">
-        <div class="sum-card"><strong>{{ make_count }}</strong> Make orders</div>
-        <div class="sum-card"><strong>{{ buy_count }}</strong> Buy orders</div>
-        <div class="sum-card"><strong>{{ make_count|add:buy_count }}</strong> Total</div>
+        <div class="sum-card">{% blocktrans count counter=make_count %}<strong>{{ counter }}</strong> Make order{% plural %}<strong>{{ counter }}</strong> Make orders{% endblocktrans %}</div>
+        <div class="sum-card">{% blocktrans count counter=buy_count %}<strong>{{ counter }}</strong> Buy order{% plural %}<strong>{{ counter }}</strong> Buy orders{% endblocktrans %}</div>
+        <div class="sum-card">{% blocktrans count counter=make_count|add:buy_count %}<strong>{{ counter }}</strong> Total{% plural %}<strong>{{ counter }}</strong> Total{% endblocktrans %}</div>
     </div>
 
     {% if plan_list %}
@@ -62,25 +63,25 @@
         {% csrf_token %}
 
         <div class="select-all-bar">
-            <span style="color: var(--text-muted);font-size:12px;">Select:</span>
-            <a onclick="setAll(true)">All</a>
-            <a onclick="setAll(false)">None</a>
-            <a onclick="setType('make')">All Make</a>
-            <a onclick="setType('buy')">All Buy</a>
+            <span style="color: var(--text-muted);font-size:12px;">{% trans "Select:" %}</span>
+            <a onclick="setAll(true)">{% trans "All" %}</a>
+            <a onclick="setAll(false)">{% trans "None" %}</a>
+            <a onclick="setType('make')">{% trans "All Make" %}</a>
+            <a onclick="setType('buy')">{% trans "All Buy" %}</a>
         </div>
 
         <table class="plan-table">
             <thead>
                 <tr>
                     <th style="width:36px;"><input type="checkbox" id="chkAll" onclick="toggleAll(this)"></th>
-                    <th>Product</th>
-                    <th>Type</th>
-                    <th>Action</th>
-                    <th>Supplier</th>
-                    <th class="num">Qty</th>
-                    <th class="num">Lead Time</th>
-                    <th class="num">Start Date</th>
-                    <th class="num">Due Date</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Action" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th class="num">{% trans "Qty" %}</th>
+                    <th class="num">{% trans "Lead Time" %}</th>
+                    <th class="num">{% trans "Start Date" %}</th>
+                    <th class="num">{% trans "Due Date" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -98,9 +99,9 @@
                         {{ item.order_type|capfirst }}</span></td>
                     <td>
                         {% if item.order_type == 'make' %}
-                        <span class="badge badge-wo">&#10003; Work Order</span>
+                        <span class="badge badge-wo">&#10003; {% trans "Work Order" %}</span>
                         {% else %}
-                        <span class="badge badge-po">&#10003; Draft PO</span>
+                        <span class="badge badge-po">&#10003; {% trans "Draft PO" %}</span>
                         {% endif %}
                     </td>
                     <td>
@@ -108,7 +109,7 @@
                             {% if item.supplier_name %}
                             {{ item.supplier_name }}
                             {% else %}
-                            <span style="color:#c33;font-size:12px;">none on file</span>
+                            <span style="color:#c33;font-size:12px;">{% trans "none on file" %}</span>
                             {% endif %}
                         {% else %}
                         —
@@ -120,7 +121,7 @@
                                min="0.0001" step="any">
                     </td>
                     <td class="num">
-                        {% if item.lead_time_days %}{{ item.lead_time_days }} d{% else %}—{% endif %}
+                        {% if item.lead_time_days %}{% blocktrans with d=item.lead_time_days %}{{ d }} d{% endblocktrans %}{% else %}—{% endif %}
                     </td>
                     <td class="num">{{ item.start_date|default:"—" }}</td>
                     <td class="num">{{ item.due_date }}</td>
@@ -130,15 +131,15 @@
         </table>
 
         {% if can_edit %}
-        <button type="submit" class="release-btn">Release Selected Orders</button>
-        <a href="/mrp/" style="margin-left:16px;color: var(--text-muted);font-size:13px;">Discard plan</a>
+        <button type="submit" class="release-btn">{% trans "Release Selected Orders" %}</button>
+        <a href="/mrp/" style="margin-left:16px;color: var(--text-muted);font-size:13px;">{% trans "Discard plan" %}</a>
         {% else %}
-        <p style="color:#fc9;font-size:13px;">Read-only role — cannot release orders.</p>
+        <p style="color:#fc9;font-size:13px;">{% trans "Read-only role — cannot release orders." %}</p>
         {% endif %}
     </form>
     {% else %}
-    <p class="empty-note">No planned orders. The MRP run found no net requirements.
-        <a href="/mrp/" style="color:#99f;">Back to MRP &rarr;</a>
+    <p class="empty-note">{% trans "No planned orders. The MRP run found no net requirements." %}
+        <a href="/mrp/" style="color:#99f;">{% trans "Back to MRP" %} &rarr;</a>
     </p>
     {% endif %}
 </div>
