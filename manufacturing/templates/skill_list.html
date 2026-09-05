@@ -1,23 +1,24 @@
 {% extends "base.html" %}
-{% block page_title %}Skills{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Skills" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/skills/requirements/" class="btn">Job Requirements</a>
-<a href="/skills/matrix/" class="btn">Skills Matrix</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/skills/requirements/" class="btn">{% trans "Job Requirements" %}</a>
+<a href="/skills/matrix/" class="btn">{% trans "Skills Matrix" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/skills/new/" class="btn btn-primary">+ New Skill</a>
+<a href="/skills/new/" class="btn btn-primary">+ {% trans "New Skill" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Skills</div>
+    <div class="menu-title">{% trans "Skills" %}</div>
 
     <form method="get" style="margin-bottom:14px;">
-        <input type="text" name="q" value="{{ q }}" placeholder="Search by name or category..."
+        <input type="text" name="q" value="{{ q }}" placeholder="{% trans 'Search by name or category...' %}"
                style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:260px;">
-        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+        <button type="submit" class="btn" style="padding:6px 12px;">{% trans "Search" %}</button>
     </form>
 
     {% if skills %}
@@ -25,9 +26,9 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Description</th>
+                    <th>{% trans "Name" %}</th>
+                    <th>{% trans "Category" %}</th>
+                    <th>{% trans "Description" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,7 +43,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No skills defined yet.</div>
+    <div class="empty-state">{% trans "No skills defined yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

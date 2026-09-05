@@ -1,22 +1,23 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Time-Off Requests{% endblock %}
+{% block page_title %}{% trans "Time-Off Requests" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">← Back</a>
-<a href="/time-off/new/" class="btn btn-primary">+ New Request</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-<a href="?export=1{% if status %}&status={{ status|urlencode }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status %}&status={{ status|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="{{ back_url }}" class="btn">← {% trans "Back" %}</a>
+<a href="/time-off/new/" class="btn btn-primary">+ {% trans "New Request" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
+<a href="?export=1{% if status %}&status={{ status|urlencode }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status %}&status={{ status|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Time-Off Requests</div>
+    <div class="menu-title">{% trans "Time-Off Requests" %}</div>
 
     <div class="filter-bar">
-        <label>Status:</label>
-        <a href="/time-off/" class="{% if not status %}active{% endif %}">All</a>
+        <label>{% trans "Status:" %}</label>
+        <a href="/time-off/" class="{% if not status %}active{% endif %}">{% trans "All" %}</a>
         {% for s in statuses %}
         <a href="/time-off/?status={{ s }}"
            class="{% if s == status %}active{% endif %}">{{ s }}</a>
@@ -29,12 +30,12 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    {% if is_hr %}<th>Employee</th>{% endif %}
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Type</th>
-                    <th>Submitted</th>
-                    <th>Status</th>
+                    {% if is_hr %}<th>{% trans "Employee" %}</th>{% endif %}
+                    <th>{% trans "Start Date" %}</th>
+                    <th>{% trans "End Date" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Submitted" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,7 +58,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No time-off requests found.</div>
+    <div class="empty-state">{% trans "No time-off requests found." %}</div>
     {% endif %}
 </div>
 {% endblock %}

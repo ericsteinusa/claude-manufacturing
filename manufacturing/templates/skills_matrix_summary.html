@@ -1,18 +1,19 @@
 {% extends "base.html" %}
-{% block page_title %}Skills Matrix{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Skills Matrix" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/skills/" class="btn">Skills</a>
-<a href="/skills/requirements/" class="btn">Job Requirements</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/skills/" class="btn">{% trans "Skills" %}</a>
+<a href="/skills/requirements/" class="btn">{% trans "Job Requirements" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Skills Matrix — Competency Gaps</div>
+    <div class="menu-title">{% trans "Skills Matrix — Competency Gaps" %}</div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        One row per employee whose job title has at least one required skill defined.
-        Sorted by largest gap first.
+        {% trans "One row per employee whose job title has at least one required skill defined." %}
+        {% trans "Sorted by largest gap first." %}
     </p>
 
     {% if summary %}
@@ -20,12 +21,12 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Employee</th>
-                    <th>Department</th>
-                    <th>Job Title</th>
-                    <th class="num">Required Skills</th>
-                    <th class="num">Skills Met</th>
-                    <th class="num">Gaps</th>
+                    <th>{% trans "Employee" %}</th>
+                    <th>{% trans "Department" %}</th>
+                    <th>{% trans "Job Title" %}</th>
+                    <th class="num">{% trans "Required Skills" %}</th>
+                    <th class="num">{% trans "Skills Met" %}</th>
+                    <th class="num">{% trans "Gaps" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -44,14 +45,14 @@
                         <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">0</span>
                         {% endif %}
                     </td>
-                    <td><a href="/skills/employee/{{ row.people_id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/skills/employee/{{ row.people_id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No job skill requirements configured yet — add some under Job Requirements.</div>
+    <div class="empty-state">{% trans "No job skill requirements configured yet — add some under Job Requirements." %}</div>
     {% endif %}
 </div>
 {% endblock %}

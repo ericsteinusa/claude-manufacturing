@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}{% if mode == 'edit' %}Edit {{ person.first_name }} {{ person.last_name }}{% else %}New Employee{% endif %}{% endblock %}
+{% block page_title %}{% if mode == 'edit' %}{% blocktrans with fn=person.first_name ln=person.last_name %}Edit {{ fn }} {{ ln }}{% endblocktrans %}{% else %}{% trans "New Employee" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">{% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -35,7 +36,7 @@
 <div class="content">
     <div class="pf-wrap">
         <div class="menu-title">
-            {% if mode == 'edit' %}Edit {{ person.first_name }} {{ person.last_name }}{% else %}New Employee{% endif %}
+            {% if mode == 'edit' %}{% blocktrans with fn=person.first_name ln=person.last_name %}Edit {{ fn }} {{ ln }}{% endblocktrans %}{% else %}{% trans "New Employee" %}{% endif %}
         </div>
 
         {% if error %}<div class="pf-error">{{ error }}</div>{% endif %}
@@ -44,38 +45,38 @@
               action="{% if mode == 'edit' %}/people/{{ person.id }}/edit/{% else %}/people/new/{% endif %}">
             {% csrf_token %}
 
-            <div class="pf-section">Identity</div>
+            <div class="pf-section">{% trans "Identity" %}</div>
             <div class="row2">
                 <div>
-                    <label>First Name *</label>
+                    <label>{% trans "First Name *" %}</label>
                     <input type="text" name="first_name" value="{{ form.first_name }}" required>
                 </div>
                 <div>
-                    <label>Last Name *</label>
+                    <label>{% trans "Last Name *" %}</label>
                     <input type="text" name="last_name" value="{{ form.last_name }}" required>
                 </div>
             </div>
             <div class="row2">
                 <div>
-                    <label>Employee #</label>
+                    <label>{% trans "Employee #" %}</label>
                     <input type="number" name="employee_id" value="{{ form.employee_id }}" min="0">
                 </div>
                 <div>
-                    <label>Email</label>
+                    <label>{% trans "Email" %}</label>
                     <input type="email" name="email" value="{{ form.email }}">
                 </div>
             </div>
 
-            <div class="pf-section">Role & Department</div>
+            <div class="pf-section">{% trans "Role & Department" %}</div>
             <div class="row">
-                <label>Job Title</label>
+                <label>{% trans "Job Title" %}</label>
                 <input type="text" name="job_title" value="{{ form.job_title }}">
             </div>
             <div class="row2">
                 <div>
-                    <label>Department</label>
+                    <label>{% trans "Department" %}</label>
                     <select name="dept_id">
-                        <option value="">(none)</option>
+                        <option value="">{% trans "(none)" %}</option>
                         {% for d in depts %}
                         <option value="{{ d.dept_id }}"
                             {% if d.dept_id == form.dept_id %}selected{% endif %}>
@@ -84,9 +85,9 @@
                     </select>
                 </div>
                 <div>
-                    <label>Sub-Department</label>
+                    <label>{% trans "Sub-Department" %}</label>
                     <select name="dept_sub_id">
-                        <option value="">(none)</option>
+                        <option value="">{% trans "(none)" %}</option>
                         {% for ds in dept_subs %}
                         <option value="{{ ds.dept_sub_id }}"
                             {% if ds.dept_sub_id == form.dept_sub_id %}selected{% endif %}>
@@ -96,30 +97,30 @@
                 </div>
             </div>
 
-            <div class="pf-section">Address</div>
+            <div class="pf-section">{% trans "Address" %}</div>
             <div class="row">
-                <label>Street Address</label>
+                <label>{% trans "Street Address" %}</label>
                 <input type="text" name="address" value="{{ form.address }}">
             </div>
             <div class="row2">
                 <div>
-                    <label>City</label>
+                    <label>{% trans "City" %}</label>
                     <input type="text" name="city" value="{{ form.city }}">
                 </div>
                 <div>
-                    <label>State</label>
+                    <label>{% trans "State" %}</label>
                     <input type="text" name="state" value="{{ form.state }}" maxlength="2">
                 </div>
             </div>
             <div class="row">
-                <label>Zip Code</label>
+                <label>{% trans "Zip Code" %}</label>
                 <input type="text" name="zip_code" value="{{ form.zip_code }}" style="max-width:120px;">
             </div>
 
             <div class="pf-actions">
                 <button type="submit" class="btn">
-                    {% if mode == 'edit' %}Save{% else %}Add Employee{% endif %}</button>
-                <a href="{{ back_url }}" class="btn">Cancel</a>
+                    {% if mode == 'edit' %}{% trans "Save" %}{% else %}{% trans "Add Employee" %}{% endif %}</button>
+                <a href="{{ back_url }}" class="btn">{% trans "Cancel" %}</a>
             </div>
         </form>
     </div>
