@@ -1,38 +1,39 @@
 {% extends "base.html" %}
-{% block page_title %}New Transfer{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Transfer" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/transfers/" class="btn">Back to Transfers</a>
+<a href="/wms/transfers/" class="btn">{% trans "Back to Transfers" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-<div class="menu-title">New Warehouse Transfer</div>
+<div class="menu-title">{% trans "New Warehouse Transfer" %}</div>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
 <form method="post" class="card" style="padding:16px;max-width:420px;">
     {% csrf_token %}
-    <label>From Warehouse<br>
+    <label>{% trans "From Warehouse" %}<br>
         <select name="from_warehouse_id" required>
             {% for wh in warehouses %}
             <option value="{{ wh.id }}">{{ wh.code }} — {{ wh.name }}</option>
             {% endfor %}
         </select>
     </label><br><br>
-    <label>To Warehouse<br>
+    <label>{% trans "To Warehouse" %}<br>
         <select name="to_warehouse_id" required>
             {% for wh in warehouses %}
             <option value="{{ wh.id }}">{{ wh.code }} — {{ wh.name }}</option>
             {% endfor %}
         </select>
     </label><br><br>
-    <label>Notes<br><textarea name="notes" rows="3" style="width:100%;"></textarea></label><br><br>
-    <button type="submit" class="btn btn-primary">Create Draft Transfer</button>
+    <label>{% trans "Notes" %}<br><textarea name="notes" rows="3" style="width:100%;"></textarea></label><br><br>
+    <button type="submit" class="btn btn-primary">{% trans "Create Draft Transfer" %}</button>
 </form>
 <p style="font-size:12px;color:var(--text-muted);max-width:420px;margin-top:10px;">
-    Add line items on the next screen, then ship — this decrements the
+    {% blocktrans %}Add line items on the next screen, then ship — this decrements the
     source bins immediately. Stock is only credited to a destination bin
-    once each line is received there.
+    once each line is received there.{% endblocktrans %}
 </p>
 </div>
 {% endblock %}

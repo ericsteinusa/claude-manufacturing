@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Wave Picking{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Wave Picking" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/picks/" class="btn">Pick Lists</a>
-<a href="/wms/bins/" class="btn">Bin Master</a>
+<a href="/wms/picks/" class="btn">{% trans "Pick Lists" %}</a>
+<a href="/wms/bins/" class="btn">{% trans "Bin Master" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -15,23 +16,23 @@
 
 {% block body %}
 <div class="content">
-<div class="menu-title">Wave Picking</div>
+<div class="menu-title">{% trans "Wave Picking" %}</div>
 <p style="font-size:12px;color:var(--text-muted);max-width:700px;">
-    Batch several confirmed SOs into one wave so a picker walks each product/bin
+    {% blocktrans %}Batch several confirmed SOs into one wave so a picker walks each product/bin
     once per wave instead of once per order — pick lists are still generated
     one per SO underneath, but the picker works from a single consolidated
-    sheet until every order in the wave is resolved.
+    sheet until every order in the wave is resolved.{% endblocktrans %}
 </p>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
-<h3>Confirmed SOs Awaiting a Pick List</h3>
+<h3>{% trans "Confirmed SOs Awaiting a Pick List" %}</h3>
 {% if awaiting %}
 <form method="post">
     {% csrf_token %}
     <input type="hidden" name="action" value="create">
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th></th><th>SO #</th><th>Order Date</th><th>Ship Date</th></tr></thead>
+            <thead><tr><th></th><th>{% trans "SO #" %}</th><th>{% trans "Order Date" %}</th><th>{% trans "Ship Date" %}</th></tr></thead>
             <tbody>
                 {% for so in awaiting %}
                 <tr>
@@ -45,16 +46,16 @@
         </table>
     </div>
     {% if can_edit %}
-    <button type="submit" class="btn btn-primary" style="margin-top:10px;">Create Wave from Selected</button>
+    <button type="submit" class="btn btn-primary" style="margin-top:10px;">{% trans "Create Wave from Selected" %}</button>
     {% endif %}
 </form>
 {% else %}
-<div class="empty-state">No confirmed SOs waiting on a pick list.</div>
+<div class="empty-state">{% trans "No confirmed SOs waiting on a pick list." %}</div>
 {% endif %}
 
-<h3 style="margin-top:28px;">Waves</h3>
+<h3 style="margin-top:28px;">{% trans "Waves" %}</h3>
 <div class="chip-row" style="display:flex;gap:7px;margin-bottom:12px;">
-    <a href="/wms/waves/" class="chip {% if not status %}active{% endif %}">All</a>
+    <a href="/wms/waves/" class="chip {% if not status %}active{% endif %}">{% trans "All" %}</a>
     {% for s in wave_statuses %}
     <a href="/wms/waves/?status={{ s }}" class="chip {% if status == s %}active{% endif %}">{{ s|title }}</a>
     {% endfor %}
@@ -62,21 +63,27 @@
 {% if waves %}
 <div class="erp-table-wrap">
     <table class="erp-table">
-        <thead><tr><th>Wave #</th><th>Status</th><th>Created</th><th></th></tr></thead>
+        <thead><tr><th>{% trans "Wave #" %}</th><th>{% trans "Status" %}</th><th>{% trans "Created" %}</th><th></th></tr></thead>
         <tbody>
             {% for w in waves %}
             <tr>
                 <td><a href="/wms/waves/{{ w.id }}/">{{ w.wave_number }}</a></td>
                 <td><span class="pill pill-{{ w.status }}">{{ w.status|title }}</span></td>
                 <td>{{ w.created_at }}</td>
-                <td><a href="/wms/waves/{{ w.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                <td><a href="/wms/waves/{{ w.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% else %}
-<div class="empty-state">No waves{% if status %} with status "{{ status|title }}"{% endif %}.</div>
+<div class="empty-state">
+{% if status %}
+{% blocktrans with s=status|title %}No waves with status "{{ s }}".{% endblocktrans %}
+{% else %}
+{% trans "No waves." %}
+{% endif %}
+</div>
 {% endif %}
 </div>
 {% endblock %}

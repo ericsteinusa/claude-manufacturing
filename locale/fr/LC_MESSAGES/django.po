@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 16:21+0000\n"
+"POT-Creation-Date: 2026-09-05 16:56+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -29,6 +29,7 @@ msgstr ""
 #: manufacturing/templates/prod_shipping_list.html:81
 #: manufacturing/templates/prod_shipping_list.html:123
 #: manufacturing/templates/prod_tracking_dashboard.html:74
+#: manufacturing/templates/wms_ship_confirm.html:31
 msgid "Carrier"
 msgstr "Transporteur"
 
@@ -124,6 +125,7 @@ msgstr "Personnel"
 #: manufacturing/templates/prod_shipping_detail.html:6
 #: manufacturing/templates/prod_shipping_list.html:6
 #: manufacturing/templates/prod_tracking_dashboard.html:6
+#: manufacturing/templates/wms_bin_list.html:12
 msgid "Production"
 msgstr "Production"
 
@@ -842,6 +844,8 @@ msgstr "Référence"
 #: manufacturing/templates/supplier_portal_invoice_new.html:38
 #: manufacturing/templates/supplier_portal_po_detail.html:52
 #: manufacturing/templates/supplier_portal_rfq_detail.html:20
+#: manufacturing/templates/wms_rfid_reader_list.html:32
+#: manufacturing/templates/wms_rfid_reader_list.html:40
 #: manufacturing/templates/wo_form.html:46
 #: manufacturing/templates/wo_list.html:34
 msgid "Description"
@@ -1130,6 +1134,18 @@ msgstr "Total Débit"
 #: manufacturing/templates/termination_list.html:72
 #: manufacturing/templates/termination_list.html:133
 #: manufacturing/templates/time_clock_attendance.html:89
+#: manufacturing/templates/wms_bin_detail.html:19
+#: manufacturing/templates/wms_bin_list.html:47
+#: manufacturing/templates/wms_pack_station.html:22
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_rfid_reader_list.html:40
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+#: manufacturing/templates/wms_transfer_detail.html:36
+#: manufacturing/templates/wms_transfer_list.html:33
+#: manufacturing/templates/wms_warehouse_list.html:29
+#: manufacturing/templates/wms_wave_detail.html:59
+#: manufacturing/templates/wms_wave_list.html:66
 #: manufacturing/templates/wo_detail.html:230
 #: manufacturing/templates/wo_form.html:67
 #: manufacturing/templates/wo_form.html:72
@@ -1242,6 +1258,8 @@ msgstr "G/L"
 #: manufacturing/templates/sales_contracts_detail.html:62
 #: manufacturing/templates/so_detail.html:91
 #: manufacturing/templates/supplier_portal_po_detail.html:21
+#: manufacturing/templates/wms_pick_list_detail.html:28
+#: manufacturing/templates/wms_transfer_detail.html:23
 #: manufacturing/templates/wo_detail.html:90
 msgid "Print / Save PDF"
 msgstr "Imprimer / Enregistrer en PDF"
@@ -1703,6 +1721,7 @@ msgstr "N° de chèque, etc."
 #: manufacturing/templates/supplier_portal_rfqs.html:11
 #: manufacturing/templates/termination_detail.html:46
 #: manufacturing/templates/termination_list.html:141
+#: manufacturing/templates/wms_transfer_new.html:30
 #: manufacturing/templates/wo_detail.html:159
 #: manufacturing/templates/wo_form.html:84
 msgid "Notes"
@@ -1773,6 +1792,11 @@ msgstr "Exporter en Excel"
 #: manufacturing/templates/supplier_portal_invoice_detail.html:9
 #: manufacturing/templates/supplier_portal_po_detail.html:25
 #: manufacturing/templates/supplier_portal_rfq_detail.html:11
+#: manufacturing/templates/wms_pack_station.html:15
+#: manufacturing/templates/wms_pick_list_detail.html:30
+#: manufacturing/templates/wms_rfid_tag_detail.html:15
+#: manufacturing/templates/wms_transfer_detail.html:27
+#: manufacturing/templates/wms_wave_detail.html:12
 #: manufacturing/templates/wo_list.html:19
 msgid "Status:"
 msgstr "Statut :"
@@ -2063,6 +2087,7 @@ msgstr "Client :"
 
 #: manufacturing/templates/ar_list.html:65
 #: manufacturing/templates/po_detail.html:168
+#: manufacturing/templates/wms_receive.html:33
 msgid "Received"
 msgstr "Reçu"
 
@@ -2249,6 +2274,12 @@ msgstr "Demandé"
 #: manufacturing/templates/control_plan_list.html:45
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/rfq_list.html:55
+#: manufacturing/templates/wms_bin_list.html:60
+#: manufacturing/templates/wms_pick_list_list.html:71
+#: manufacturing/templates/wms_rfid_tag_list.html:68
+#: manufacturing/templates/wms_transfer_list.html:43
+#: manufacturing/templates/wms_wave_detail.html:66
+#: manufacturing/templates/wms_wave_list.html:73
 msgid "Detail"
 msgstr "Détail"
 
@@ -2322,6 +2353,9 @@ msgstr "Rechercher"
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/report_builder_list.html:20
 #: manufacturing/templates/tc_device_list.html:40
+#: manufacturing/templates/wms_bin_new.html:27
+#: manufacturing/templates/wms_warehouse_list.html:21
+#: manufacturing/templates/wms_warehouse_list.html:29
 msgid "Name"
 msgstr "Nom"
 
@@ -2970,6 +3004,7 @@ msgstr "Portail Client"
 #: manufacturing/templates/sales_reports.html:7
 #: manufacturing/templates/sales_reports_kpis.html:9
 #: manufacturing/templates/sales_targets.html:7
+#: manufacturing/templates/wms_wave_detail.html:26
 msgid "Orders"
 msgstr "Commandes"
 
@@ -3046,6 +3081,11 @@ msgstr "Avantages Sociaux"
 #: manufacturing/templates/sales_commission_plans.html:63
 #: manufacturing/templates/sales_commission_plans.html:76
 #: manufacturing/templates/sales_commission_plans.html:118
+#: manufacturing/templates/wms_bin_detail.html:19
+#: manufacturing/templates/wms_bin_list.html:59
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+#: manufacturing/templates/wms_rfid_reader_list.html:47
+#: manufacturing/templates/wms_warehouse_list.html:36
 msgid "Active"
 msgstr "Actif"
 
@@ -3055,6 +3095,10 @@ msgstr "Actif"
 #: manufacturing/templates/gl_accounts.html:75
 #: manufacturing/templates/payroll_deductions.html:66
 #: manufacturing/templates/sales_commission_plans.html:76
+#: manufacturing/templates/wms_bin_detail.html:19
+#: manufacturing/templates/wms_bin_list.html:59
+#: manufacturing/templates/wms_rfid_reader_list.html:47
+#: manufacturing/templates/wms_warehouse_list.html:36
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -3440,6 +3484,12 @@ msgstr "N° de Livraison"
 #: manufacturing/templates/so_detail.html:197
 #: manufacturing/templates/so_detail.html:259
 #: manufacturing/templates/supplier_portal_rfq_detail.html:20
+#: manufacturing/templates/wms_bin_detail.html:26
+#: manufacturing/templates/wms_pack_station.html:54
+#: manufacturing/templates/wms_rfid_tag_list.html:41
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+#: manufacturing/templates/wms_transfer_detail.html:36
+#: manufacturing/templates/wms_transfer_detail.html:94
 #: manufacturing/templates/wo_list.html:35
 msgid "Qty"
 msgstr "Qté"
@@ -3503,6 +3553,10 @@ msgstr "Nouvelle Commande Ouverte"
 #: manufacturing/templates/sales_orders.html:57
 #: manufacturing/templates/sales_quotes.html:53
 #: manufacturing/templates/so_list.html:26
+#: manufacturing/templates/wms_pick_list_list.html:55
+#: manufacturing/templates/wms_rfid_tag_list.html:50
+#: manufacturing/templates/wms_transfer_list.html:23
+#: manufacturing/templates/wms_wave_list.html:58
 #: manufacturing/templates/wo_list.html:20
 msgid "All"
 msgstr "Tous"
@@ -3775,6 +3829,15 @@ msgstr "En-tête du Certificat"
 #: manufacturing/templates/spc_list.html:88
 #: manufacturing/templates/spc_list.html:117
 #: manufacturing/templates/spc_log.html:47
+#: manufacturing/templates/wms_bin_detail.html:26
+#: manufacturing/templates/wms_pack_station.html:22
+#: manufacturing/templates/wms_pack_station.html:54
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+#: manufacturing/templates/wms_ship_confirm.html:17
+#: manufacturing/templates/wms_transfer_detail.html:36
+#: manufacturing/templates/wms_wave_detail.html:26
 #: manufacturing/templates/wo_detail.html:156
 #: manufacturing/templates/wo_detail.html:184
 #: manufacturing/templates/wo_list.html:33
@@ -4213,6 +4276,7 @@ msgid "Characteristics &amp; FMEA"
 msgstr "Caractéristiques et FMEA"
 
 #: manufacturing/templates/control_plan_detail.html:64
+#: manufacturing/templates/wms_pick_list_detail.html:37
 #: manufacturing/templates/wo_detail.html:225
 msgid "Seq"
 msgstr "Séq."
@@ -4239,6 +4303,7 @@ msgstr "Réévaluer"
 #: manufacturing/templates/po_detail.html:202
 #: manufacturing/templates/rfq_detail.html:57
 #: manufacturing/templates/so_detail.html:220
+#: manufacturing/templates/wms_transfer_detail.html:53
 msgid "Remove"
 msgstr "Supprimer"
 
@@ -5035,6 +5100,8 @@ msgstr "Jours d'ouverture"
 #: manufacturing/templates/sales_leads_detail.html:116
 #: manufacturing/templates/sales_leads_list.html:89
 #: manufacturing/templates/sales_leads_list.html:140
+#: manufacturing/templates/wms_putaway_rule_list.html:35
+#: manufacturing/templates/wms_putaway_rule_list.html:44
 msgid "Priority"
 msgstr "Priorité"
 
@@ -5117,6 +5184,7 @@ msgstr "Date de publication"
 #: manufacturing/templates/cs_kb_detail.html:107
 #: manufacturing/templates/cs_kb_list.html:86
 #: manufacturing/templates/cs_kb_list.html:143
+#: manufacturing/templates/wms_bin_list.html:11
 msgid "Tags"
 msgstr "Étiquettes"
 
@@ -5386,6 +5454,9 @@ msgstr "Date cible"
 #: manufacturing/templates/sales_forecast_detail.html:184
 #: manufacturing/templates/sales_leads_detail.html:118
 #: manufacturing/templates/sales_leads_list.html:91
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_transfer_list.html:33
+#: manufacturing/templates/wms_wave_list.html:66
 msgid "Created"
 msgstr "Créé"
 
@@ -7232,6 +7303,7 @@ msgstr "Numéro d'Acheminement"
 #: manufacturing/templates/gl_dashboard_kpis.html:58
 #: manufacturing/templates/payroll_deductions.html:64
 #: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/wms_putaway_rule_list.html:53
 msgid "Yes"
 msgstr "Oui"
 
@@ -7240,6 +7312,7 @@ msgstr "Oui"
 #: manufacturing/templates/gl_dashboard_kpis.html:58
 #: manufacturing/templates/payroll_deductions.html:64
 #: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/wms_putaway_rule_list.html:53
 msgid "No"
 msgstr "Non"
 
@@ -7402,6 +7475,8 @@ msgstr "Montant Budgété ($)"
 
 #: manufacturing/templates/finance_budget_detail.html:168
 #: manufacturing/templates/gl_journal_detail.html:153
+#: manufacturing/templates/wms_transfer_detail.html:81
+#: manufacturing/templates/wms_transfer_detail.html:95
 msgid "Add Line"
 msgstr "Ajouter une Ligne"
 
@@ -9169,6 +9244,7 @@ msgstr "p. ex. OSHA 29 CFR 1910"
 #: manufacturing/templates/req_detail.html:117
 #: manufacturing/templates/rfq_detail.html:108
 #: manufacturing/templates/sales_order_detail.html:183
+#: manufacturing/templates/wms_pack_station.html:72
 msgid "Add Item"
 msgstr "Ajouter un élément"
 
@@ -9631,6 +9707,7 @@ msgstr "Arrêts d'Équipement"
 #: manufacturing/templates/qa_ncr_list.html:78
 #: manufacturing/templates/qa_supplier_list.html:76
 #: manufacturing/templates/sales_reports.html:54
+#: manufacturing/templates/wms_bin_list.html:34
 msgid "Go"
 msgstr "Aller"
 
@@ -11645,6 +11722,8 @@ msgid "Unit Price"
 msgstr "Prix Unitaire"
 
 #: manufacturing/templates/po_detail.html:169
+#: manufacturing/templates/wms_receive.html:58
+#: manufacturing/templates/wms_transfer_detail.html:65
 msgid "Receive"
 msgstr "Réceptionner"
 
@@ -11736,6 +11815,8 @@ msgstr "Nouveau Bon de Commande"
 #: manufacturing/templates/so_list.html:40
 #: manufacturing/templates/supplier_portal_home.html:31
 #: manufacturing/templates/supplier_portal_pos.html:11
+#: manufacturing/templates/wms_pick_list_list.html:27
+#: manufacturing/templates/wms_wave_list.html:35
 msgid "Order Date"
 msgstr "Date de Commande"
 
@@ -11862,6 +11943,7 @@ msgstr "Dépôt-Vente"
 #: manufacturing/templates/purchasing_dashboard_kpis.html:34
 #: manufacturing/templates/supplier_portal_home.html:31
 #: manufacturing/templates/supplier_portal_pos.html:11
+#: manufacturing/templates/wms_receive.html:33
 msgid "PO #"
 msgstr "N° Commande"
 
@@ -12042,6 +12124,9 @@ msgstr "N° d'Expédition"
 #: manufacturing/templates/sales_orders.html:111
 #: manufacturing/templates/so_form.html:51
 #: manufacturing/templates/so_list.html:41
+#: manufacturing/templates/wms_pick_list_list.html:27
+#: manufacturing/templates/wms_ship_confirm.html:33
+#: manufacturing/templates/wms_wave_list.html:35
 msgid "Ship Date"
 msgstr "N° d'Expédition"
 
@@ -12358,6 +12443,10 @@ msgstr "N° d'Expédition"
 #: manufacturing/templates/sales_dashboard_kpis.html:15
 #: manufacturing/templates/sales_orders.html:74
 #: manufacturing/templates/so_list.html:38
+#: manufacturing/templates/wms_pick_list_list.html:27
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_wave_detail.html:59
+#: manufacturing/templates/wms_wave_list.html:35
 msgid "SO #"
 msgstr "N° de Commande"
 
@@ -12666,6 +12755,7 @@ msgstr "Modifier l'Expédition"
 
 #: manufacturing/templates/prod_shipping_detail.html:114
 #: manufacturing/templates/prod_shipping_list.html:127
+#: manufacturing/templates/wms_ship_confirm.html:32
 msgid "Tracking Number"
 msgstr "Numéro de Suivi"
 
@@ -13643,6 +13733,7 @@ msgid "Custom Reports"
 msgstr "Rapports personnalisés"
 
 #: manufacturing/templates/report_builder_list.html:41
+#: manufacturing/templates/wms_putaway_rule_list.html:60
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -15293,7 +15384,9 @@ msgstr "Aucune ligne d'article dans cette demande de devis."
 #: manufacturing/templates/supplier_portal_rfqs.html:24
 msgid ""
 "No RFQs yet — your buyer will invite you to quote when there's a request."
-msgstr "Aucune demande de devis pour l'instant — votre acheteur vous invitera à soumettre un devis lorsqu'il y aura une demande."
+msgstr ""
+"Aucune demande de devis pour l'instant — votre acheteur vous invitera à "
+"soumettre un devis lorsqu'il y aura une demande."
 
 #: manufacturing/templates/tc_device_form.html:3
 msgid "Add Time Clock"
@@ -15724,6 +15817,743 @@ msgstr "Journal d'aujourd'hui"
 #, python-format
 msgid "Total today: %(total)s"
 msgstr "Total aujourd'hui : %(total)s"
+
+#: manufacturing/templates/wms_bin_detail.html:3
+#, python-format
+msgid "Bin %(num)s"
+msgstr "Emplacement %(num)s"
+
+#: manufacturing/templates/wms_bin_detail.html:6
+#: manufacturing/templates/wms_bin_new.html:6
+msgid "Back to Bins"
+msgstr "Retour aux Emplacements"
+
+#: manufacturing/templates/wms_bin_detail.html:15
+#: manufacturing/templates/wms_bin_list.html:43
+#: manufacturing/templates/wms_bin_new.html:36
+#: manufacturing/templates/wms_rfid_reader_list.html:24
+#: manufacturing/templates/wms_rfid_reader_list.html:40
+msgid "Zone"
+msgstr "Zone"
+
+#: manufacturing/templates/wms_bin_detail.html:16
+#: manufacturing/templates/wms_bin_list.html:44
+#: manufacturing/templates/wms_bin_new.html:43
+msgid "Aisle"
+msgstr "Allée"
+
+#: manufacturing/templates/wms_bin_detail.html:17
+#: manufacturing/templates/wms_bin_list.html:45
+#: manufacturing/templates/wms_bin_new.html:44
+msgid "Rack"
+msgstr "Rayonnage"
+
+#: manufacturing/templates/wms_bin_detail.html:18
+#: manufacturing/templates/wms_bin_list.html:46
+#: manufacturing/templates/wms_bin_new.html:45
+msgid "Shelf"
+msgstr "Étagère"
+
+#: manufacturing/templates/wms_bin_detail.html:22
+msgid "Current Stock"
+msgstr "Stock Actuel"
+
+#: manufacturing/templates/wms_bin_detail.html:35
+msgid "No stock tracked in this bin."
+msgstr "Aucun stock suivi dans cet emplacement."
+
+#: manufacturing/templates/wms_bin_detail.html:42
+msgid "Deactivate Bin"
+msgstr "Désactiver l'Emplacement"
+
+#: manufacturing/templates/wms_bin_list.html:3
+#: manufacturing/templates/wms_bin_list.html:20
+#: manufacturing/templates/wms_pick_list_list.html:6
+#: manufacturing/templates/wms_putaway_rule_list.html:6
+#: manufacturing/templates/wms_receive.html:6
+#: manufacturing/templates/wms_rfid_reader_list.html:6
+#: manufacturing/templates/wms_rfid_tag_list.html:6
+#: manufacturing/templates/wms_transfer_list.html:6
+#: manufacturing/templates/wms_warehouse_list.html:6
+#: manufacturing/templates/wms_wave_list.html:7
+msgid "Bin Master"
+msgstr "Référentiel des Emplacements"
+
+#: manufacturing/templates/wms_bin_list.html:6
+#: manufacturing/templates/wms_transfer_list.html:7
+#: manufacturing/templates/wms_warehouse_list.html:3
+#: manufacturing/templates/wms_warehouse_list.html:12
+msgid "Warehouses"
+msgstr "Entrepôts"
+
+#: manufacturing/templates/wms_bin_list.html:7
+#: manufacturing/templates/wms_pick_list_list.html:3
+#: manufacturing/templates/wms_pick_list_list.html:20
+#: manufacturing/templates/wms_pick_list_list.html:53
+#: manufacturing/templates/wms_wave_list.html:6
+msgid "Pick Lists"
+msgstr "Listes de Prélèvement"
+
+#: manufacturing/templates/wms_bin_list.html:8
+#: manufacturing/templates/wms_pick_list_list.html:8
+#: manufacturing/templates/wms_wave_list.html:3
+#: manufacturing/templates/wms_wave_list.html:19
+msgid "Wave Picking"
+msgstr "Prélèvement par Vagues"
+
+#: manufacturing/templates/wms_bin_list.html:9
+#: manufacturing/templates/wms_putaway_rule_list.html:3
+#: manufacturing/templates/wms_putaway_rule_list.html:12
+#: manufacturing/templates/wms_receive.html:7
+msgid "Put-Away Rules"
+msgstr "Règles de Rangement"
+
+#: manufacturing/templates/wms_bin_list.html:10
+#: manufacturing/templates/wms_warehouse_list.html:7
+msgid "Transfers"
+msgstr "Transferts"
+
+#: manufacturing/templates/wms_bin_list.html:14
+#: manufacturing/templates/wms_bin_new.html:3
+#: manufacturing/templates/wms_bin_new.html:35
+msgid "New Bin"
+msgstr "Nouvel Emplacement"
+
+#: manufacturing/templates/wms_bin_list.html:22
+msgid ""
+"Warehouse &rarr; zone &rarr; bin locations. Aisle/rack/shelf are recorded\n"
+"    on each bin rather than as their own hierarchy levels."
+msgstr "Entrepôt &rarr; zone &rarr; emplacements. L'allée/le rayonnage/l'étagère sont enregistrés\n    sur chaque emplacement plutôt que comme niveaux de hiérarchie distincts."
+
+#: manufacturing/templates/wms_bin_list.html:28
+msgid "All Zones"
+msgstr "Toutes les Zones"
+
+#: manufacturing/templates/wms_bin_list.html:33
+msgid "Search bin code…"
+msgstr "Rechercher un code d'emplacement…"
+
+#: manufacturing/templates/wms_bin_list.html:42
+#: manufacturing/templates/wms_bin_new.html:46
+msgid "Bin Code"
+msgstr "Code d'Emplacement"
+
+#: manufacturing/templates/wms_bin_list.html:67
+msgid "No bins found."
+msgstr "Aucun emplacement trouvé."
+
+#: manufacturing/templates/wms_bin_new.html:11
+msgid "New Zone / Bin"
+msgstr "Nouvelle Zone / Emplacement"
+
+#: manufacturing/templates/wms_bin_new.html:18
+msgid "New Zone"
+msgstr "Nouvelle Zone"
+
+#: manufacturing/templates/wms_bin_new.html:19
+msgid "Warehouse"
+msgstr "Entrepôt"
+
+#: manufacturing/templates/wms_bin_new.html:26
+#: manufacturing/templates/wms_warehouse_list.html:20
+#: manufacturing/templates/wms_warehouse_list.html:29
+msgid "Code"
+msgstr "Code"
+
+#: manufacturing/templates/wms_bin_new.html:28
+msgid "Pick Sequence"
+msgstr "Séquence de Prélèvement"
+
+#: manufacturing/templates/wms_bin_new.html:29
+msgid "Create Zone"
+msgstr "Créer une Zone"
+
+#: manufacturing/templates/wms_bin_new.html:47
+msgid "Create Bin"
+msgstr "Créer un Emplacement"
+
+#: manufacturing/templates/wms_pack_station.html:3
+#: manufacturing/templates/wms_pack_station.html:14
+#: manufacturing/templates/wms_pick_list_detail.html:8
+msgid "Pack Station"
+msgstr "Poste d'Emballage"
+
+#: manufacturing/templates/wms_pack_station.html:6
+#: manufacturing/templates/wms_ship_confirm.html:6
+msgid "Back to Pick List"
+msgstr "Retour à la Liste de Prélèvement"
+
+#: manufacturing/templates/wms_pack_station.html:8
+#: manufacturing/templates/wms_pick_list_detail.html:10
+#: manufacturing/templates/wms_ship_confirm.html:3
+#: manufacturing/templates/wms_ship_confirm.html:11
+#: manufacturing/templates/wms_ship_confirm.html:34
+msgid "Confirm Shipment"
+msgstr "Confirmer l'Expédition"
+
+#: manufacturing/templates/wms_pack_station.html:19
+msgid "Picked Lines"
+msgstr "Lignes Prélevées"
+
+#: manufacturing/templates/wms_pack_station.html:22
+msgid "Line"
+msgstr "Ligne"
+
+#: manufacturing/templates/wms_pack_station.html:22
+msgid "Picked Qty"
+msgstr "Qté Prélevée"
+
+#: manufacturing/templates/wms_pack_station.html:40
+msgid "New Carton"
+msgstr "Nouveau Carton"
+
+#: manufacturing/templates/wms_pack_station.html:44
+msgid "Cartons"
+msgstr "Cartons"
+
+#: manufacturing/templates/wms_pack_station.html:49
+msgid "Weight:"
+msgstr "Poids :"
+
+#: manufacturing/templates/wms_pack_station.html:50
+msgid "Dims:"
+msgstr "Dimensions :"
+
+#: manufacturing/templates/wms_pack_station.html:69
+#, python-format
+msgid "Line %(lid)s — %(lname)s"
+msgstr "Ligne %(lid)s — %(lname)s"
+
+#: manufacturing/templates/wms_pack_station.html:79
+msgid "Weight"
+msgstr "Poids"
+
+#: manufacturing/templates/wms_pack_station.html:80
+msgid "L"
+msgstr "L"
+
+#: manufacturing/templates/wms_pack_station.html:81
+msgid "W"
+msgstr "W"
+
+#: manufacturing/templates/wms_pack_station.html:82
+msgid "H"
+msgstr "H"
+
+#: manufacturing/templates/wms_pack_station.html:83
+msgid "Set Dims"
+msgstr "Définir les Dimensions"
+
+#: manufacturing/templates/wms_pack_station.html:90
+msgid "Close Carton"
+msgstr "Fermer le Carton"
+
+#: manufacturing/templates/wms_pack_station.html:96
+msgid "No cartons yet."
+msgstr "Aucun carton pour l'instant."
+
+#: manufacturing/templates/wms_pack_station.html:103
+msgid "Mark Pick List Packed"
+msgstr "Marquer la Liste comme Emballée"
+
+#: manufacturing/templates/wms_pick_list_detail.html:3
+#, python-format
+msgid "Pick List %(num)s"
+msgstr "Liste de Prélèvement %(num)s"
+
+#: manufacturing/templates/wms_pick_list_detail.html:6
+msgid "Back to Pick Lists"
+msgstr "Retour aux Listes de Prélèvement"
+
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+#: manufacturing/templates/wms_wave_detail.html:26
+msgid "Bin"
+msgstr "Emplacement"
+
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+msgid "Ordered"
+msgstr "Commandé"
+
+#: manufacturing/templates/wms_pick_list_detail.html:37
+msgid "Picked"
+msgstr "Prélevé"
+
+#: manufacturing/templates/wms_pick_list_detail.html:56
+#: manufacturing/templates/wms_wave_detail.html:43
+msgid "Pick"
+msgstr "Prélever"
+
+#: manufacturing/templates/wms_pick_list_list.html:7
+#: manufacturing/templates/wms_putaway_rule_list.html:7
+#: manufacturing/templates/wms_receive.html:3
+#: manufacturing/templates/wms_receive.html:17
+msgid "Receive &amp; Put-Away"
+msgstr "Réception et Rangement"
+
+#: manufacturing/templates/wms_pick_list_list.html:23
+#: manufacturing/templates/wms_wave_list.html:28
+msgid "Confirmed SOs Awaiting a Pick List"
+msgstr "Commandes Confirmées en Attente d'une Liste de Prélèvement"
+
+#: manufacturing/templates/wms_pick_list_list.html:40
+msgid "Generate Pick List"
+msgstr "Générer la Liste de Prélèvement"
+
+#: manufacturing/templates/wms_pick_list_list.html:50
+#: manufacturing/templates/wms_wave_list.html:53
+msgid "No confirmed SOs waiting on a pick list."
+msgstr "Aucune commande confirmée en attente d'une liste de prélèvement."
+
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_wave_detail.html:59
+msgid "Pick #"
+msgstr "N° de Prélèvement"
+
+#: manufacturing/templates/wms_pick_list_list.html:78
+msgid "No pick lists yet."
+msgstr "Aucune liste de prélèvement pour l'instant."
+
+#: manufacturing/templates/wms_putaway_rule_list.html:14
+msgid ""
+"Match a product's category or ABC class to a target zone. Rules are\n"
+"    evaluated by priority (highest first); the first match wins. Products\n"
+"    matching no active rule fall back to the unassigned bin at receipt time."
+msgstr "Associe la catégorie ou la classe ABC d'un produit à une zone cible. Les règles sont\n    évaluées par priorité (la plus élevée d'abord) ; la première correspondance l'emporte. Les produits\n    ne correspondant à aucune règle active retombent dans l'emplacement non assigné à la réception."
+
+#: manufacturing/templates/wms_putaway_rule_list.html:29
+msgid "e.g. 'raw material' or 'A'"
+msgstr "par ex. 'matière première' ou 'A'"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:36
+msgid "Add Rule"
+msgstr "Ajouter une Règle"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+msgid "Match Type"
+msgstr "Type de Correspondance"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+msgid "Match Value"
+msgstr "Valeur de Correspondance"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+msgid "Target Zone"
+msgstr "Zone Cible"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:70
+msgid ""
+"No put-away rules configured — everything receives into the unassigned bin."
+msgstr "Aucune règle de rangement configurée — tout est reçu dans l'emplacement non assigné."
+
+#: manufacturing/templates/wms_receive.html:19
+msgid ""
+"Open lines on sent/partial POs with a linked product. Receiving here\n"
+"    updates both the PO's received quantity and the bin's tracked stock in\n"
+"    one step. Free-text PO lines (no linked product) aren't shown — receive\n"
+"    those from the PO's own detail page. When an item has orders waiting on\n"
+"    it with nothing in stock, a cross-dock option appears below it to route\n"
+"    the receipt straight to that order instead of putting it away first."
+msgstr "Lignes ouvertes de commandes envoyées/partielles avec un produit lié. Réceptionner ici\n    met à jour à la fois la quantité reçue de la commande et le stock suivi de l'emplacement en\n    une seule étape. Les lignes de commande en texte libre (sans produit lié) ne sont pas affichées — réceptionnez-les\n    depuis la propre page de détail de la commande. Lorsqu'un article a des commandes en attente\n    sans rien en stock, une option de cross-dock apparaît en dessous pour acheminer\n    la réception directement vers cette commande plutôt que de la ranger d'abord."
+
+#: manufacturing/templates/wms_receive.html:33
+msgid "Owed"
+msgstr "Dû"
+
+#: manufacturing/templates/wms_receive.html:33
+msgid "Qty to Receive"
+msgstr "Qté à Recevoir"
+
+#: manufacturing/templates/wms_receive.html:53
+msgid "Suggested:"
+msgstr "Suggéré :"
+
+#: manufacturing/templates/wms_receive.html:66
+msgid "Cross-dock opportunity"
+msgstr "Opportunité de cross-dock"
+
+#: manufacturing/templates/wms_receive.html:67
+#, python-format
+msgid "%(counter)s order line waiting on this product with nothing in stock:"
+msgid_plural ""
+"%(counter)s order lines waiting on this product with nothing in stock:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: manufacturing/templates/wms_receive.html:77
+#, python-format
+msgid "needs %(n)s"
+msgstr "a besoin de %(n)s"
+
+#: manufacturing/templates/wms_receive.html:80
+msgid "qty"
+msgstr "qté"
+
+#: manufacturing/templates/wms_receive.html:81
+msgid "Cross-Dock Straight to Order"
+msgstr "Cross-Dock Direct vers la Commande"
+
+#: manufacturing/templates/wms_receive.html:83
+msgid ""
+"Routes received qty directly to the selected order instead of putting it "
+"away — skips storage entirely."
+msgstr "Achemine la quantité reçue directement vers la commande sélectionnée au lieu de la ranger — évite complètement le stockage."
+
+#: manufacturing/templates/wms_receive.html:93
+msgid "No open PO lines awaiting receipt."
+msgstr "Aucune ligne de commande ouverte en attente de réception."
+
+#: manufacturing/templates/wms_rfid_reader_list.html:3
+#: manufacturing/templates/wms_rfid_reader_list.html:12
+#: manufacturing/templates/wms_rfid_tag_list.html:7
+msgid "RFID Readers"
+msgstr "Lecteurs RFID"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:7
+#: manufacturing/templates/wms_rfid_tag_list.html:3
+#: manufacturing/templates/wms_rfid_tag_list.html:19
+msgid "RFID Tags"
+msgstr "Étiquettes RFID"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:14
+msgid ""
+"A reader is a virtual antenna tied to one zone — there is no real RFID\n"
+"    hardware in this environment, so \"reading\" a tag is a manual action\n"
+"    standing in for what a real antenna would capture automatically."
+msgstr "Un lecteur est une antenne virtuelle associée à une zone — il n'y a pas de matériel RFID réel\n    dans cet environnement, donc « lire » une étiquette est une action manuelle\n    qui remplace ce qu'une antenne réelle capturerait automatiquement."
+
+#: manufacturing/templates/wms_rfid_reader_list.html:23
+msgid "New Reader"
+msgstr "Nouveau Lecteur"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:31
+#: manufacturing/templates/wms_rfid_reader_list.html:40
+msgid "Reader Code"
+msgstr "Code du Lecteur"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:33
+msgid "Create Reader"
+msgstr "Créer un Lecteur"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:54
+msgid "No readers yet."
+msgstr "Aucun lecteur pour l'instant."
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:3
+msgid "Tag"
+msgstr "Étiquette"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:6
+msgid "Back to Tags"
+msgstr "Retour aux Étiquettes"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:7
+msgid "Readers"
+msgstr "Lecteurs"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:14
+msgid "Qty:"
+msgstr "Qté :"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:17
+msgid "Current bin:"
+msgstr "Emplacement actuel :"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:22
+msgid "Simulate a Read"
+msgstr "Simuler une Lecture"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:24
+msgid ""
+"Stands in for a real RFID antenna capturing this tag. Reading it at a\n"
+"    reader whose zone differs from the tag's current zone relocates the\n"
+"    tagged qty there automatically; reading the same zone again is just a\n"
+"    \"still here\" heartbeat."
+msgstr "Remplace une antenne RFID réelle capturant cette étiquette. La lire à un\n    lecteur dont la zone diffère de la zone actuelle de l'étiquette la relocalise\n    automatiquement là-bas ; lire la même zone à nouveau n'est qu'un\n    signal « toujours ici »."
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:37
+msgid "Simulate Read"
+msgstr "Simuler la Lecture"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:40
+msgid "Retire this tag?"
+msgstr "Retirer cette étiquette ?"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:43
+msgid "Retire Tag"
+msgstr "Retirer l'Étiquette"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:47
+msgid "Read History"
+msgstr "Historique des Lectures"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+msgid "Read At"
+msgstr "Lu à"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+msgid "Reader"
+msgstr "Lecteur"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+#: manufacturing/templates/wms_transfer_detail.html:36
+msgid "From Bin"
+msgstr "Emplacement d'Origine"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+#: manufacturing/templates/wms_transfer_detail.html:36
+msgid "To Bin"
+msgstr "Emplacement de Destination"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+msgid "Moved?"
+msgstr "Déplacé ?"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:59
+msgid "Moved"
+msgstr "Déplacé"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:59
+msgid "Heartbeat"
+msgstr "Signal"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:66
+msgid "No reads recorded yet."
+msgstr "Aucune lecture enregistrée pour l'instant."
+
+#: manufacturing/templates/wms_rfid_tag_list.html:21
+msgid ""
+"A tag labels a qty of one product already tracked in a bin — it doesn't\n"
+"    create new stock. Simulate a read at a different zone's reader from the\n"
+"    tag's own detail page to see it relocate automatically."
+msgstr "Une étiquette identifie une quantité d'un produit déjà suivi dans un emplacement — elle ne\n    crée pas de nouveau stock. Simulez une lecture sur le lecteur d'une autre zone depuis\n    la propre page de détail de l'étiquette pour la voir se relocaliser automatiquement."
+
+#: manufacturing/templates/wms_rfid_tag_list.html:30
+msgid "New Tag"
+msgstr "Nouvelle Étiquette"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:32
+#: manufacturing/templates/wms_transfer_detail.html:86
+msgid "Product / Bin"
+msgstr "Produit / Emplacement"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:35
+#: manufacturing/templates/wms_transfer_detail.html:89
+#, python-format
+msgid "%(q)s available"
+msgstr "%(q)s disponible"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:40
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+msgid "Tag Code"
+msgstr "Code d'Étiquette"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:42
+msgid "Create Tag"
+msgstr "Créer une Étiquette"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:44
+msgid "No tracked stock available anywhere to tag."
+msgstr "Aucun stock suivi disponible nulle part à étiqueter."
+
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+msgid "Current Bin"
+msgstr "Emplacement Actuel"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:77
+#, python-format
+msgid "No tags with status \"%(s)s\"."
+msgstr "Aucune étiquette avec le statut « %(s)s »."
+
+#: manufacturing/templates/wms_rfid_tag_list.html:79
+msgid "No tags."
+msgstr "Aucune étiquette."
+
+#: manufacturing/templates/wms_ship_confirm.html:14
+msgid "Lines to Ship"
+msgstr "Lignes à Expédier"
+
+#: manufacturing/templates/wms_ship_confirm.html:17
+msgid "Qty Picked"
+msgstr "Qté Prélevée"
+
+#: manufacturing/templates/wms_transfer_detail.html:3
+msgid "Transfer"
+msgstr "Transfert"
+
+#: manufacturing/templates/wms_transfer_detail.html:6
+#: manufacturing/templates/wms_transfer_new.html:6
+msgid "Back to Transfers"
+msgstr "Retour aux Transferts"
+
+#: manufacturing/templates/wms_transfer_detail.html:73
+msgid "No lines yet."
+msgstr "Aucune ligne pour l'instant."
+
+#: manufacturing/templates/wms_transfer_detail.html:98
+#, python-format
+msgid "No tracked stock available in %(wh)s to transfer."
+msgstr "Aucun stock suivi disponible dans %(wh)s à transférer."
+
+#: manufacturing/templates/wms_transfer_detail.html:102
+msgid "Ship this transfer? Source bins will be decremented immediately."
+msgstr "Expédier ce transfert ? Les emplacements source seront décrémentés immédiatement."
+
+#: manufacturing/templates/wms_transfer_detail.html:105
+msgid "Ship Transfer"
+msgstr "Expédier le Transfert"
+
+#: manufacturing/templates/wms_transfer_detail.html:107
+msgid "Cancel this transfer?"
+msgstr "Annuler ce transfert ?"
+
+#: manufacturing/templates/wms_transfer_detail.html:110
+msgid "Cancel Transfer"
+msgstr "Annuler le Transfert"
+
+#: manufacturing/templates/wms_transfer_list.html:3
+#: manufacturing/templates/wms_transfer_list.html:20
+msgid "Warehouse Transfers"
+msgstr "Transferts entre Entrepôts"
+
+#: manufacturing/templates/wms_transfer_list.html:8
+#: manufacturing/templates/wms_transfer_new.html:3
+msgid "New Transfer"
+msgstr "Nouveau Transfert"
+
+#: manufacturing/templates/wms_transfer_list.html:33
+msgid "Transfer #"
+msgstr "N° de Transfert"
+
+#: manufacturing/templates/wms_transfer_list.html:33
+msgid "From"
+msgstr "De"
+
+#: manufacturing/templates/wms_transfer_list.html:33
+msgid "To"
+msgstr "À"
+
+#: manufacturing/templates/wms_transfer_list.html:52
+#, python-format
+msgid "No transfers with status \"%(s)s\"."
+msgstr "Aucun transfert avec le statut « %(s)s »."
+
+#: manufacturing/templates/wms_transfer_list.html:54
+msgid "No transfers."
+msgstr "Aucun transfert."
+
+#: manufacturing/templates/wms_transfer_new.html:11
+msgid "New Warehouse Transfer"
+msgstr "Nouveau Transfert entre Entrepôts"
+
+#: manufacturing/templates/wms_transfer_new.html:16
+msgid "From Warehouse"
+msgstr "Entrepôt Source"
+
+#: manufacturing/templates/wms_transfer_new.html:23
+msgid "To Warehouse"
+msgstr "Entrepôt Destination"
+
+#: manufacturing/templates/wms_transfer_new.html:31
+msgid "Create Draft Transfer"
+msgstr "Créer un Brouillon de Transfert"
+
+#: manufacturing/templates/wms_transfer_new.html:34
+msgid ""
+"Add line items on the next screen, then ship — this decrements the\n"
+"    source bins immediately. Stock is only credited to a destination bin\n"
+"    once each line is received there."
+msgstr "Ajoutez des lignes à l'écran suivant, puis expédiez — cela décrémente\n    immédiatement les emplacements source. Le stock n'est crédité à un emplacement\n    de destination qu'une fois chaque ligne reçue là-bas."
+
+#: manufacturing/templates/wms_warehouse_list.html:19
+msgid "New Warehouse"
+msgstr "Nouvel Entrepôt"
+
+#: manufacturing/templates/wms_warehouse_list.html:22
+msgid "Create Warehouse"
+msgstr "Créer un Entrepôt"
+
+#: manufacturing/templates/wms_warehouse_list.html:29
+msgid "Zones"
+msgstr "Zones"
+
+#: manufacturing/templates/wms_warehouse_list.html:43
+msgid "No warehouses yet."
+msgstr "Aucun entrepôt pour l'instant."
+
+#: manufacturing/templates/wms_wave_detail.html:3
+#, python-format
+msgid "Wave %(num)s"
+msgstr "Vague %(num)s"
+
+#: manufacturing/templates/wms_wave_detail.html:6
+msgid "Back to Waves"
+msgstr "Retour aux Vagues"
+
+#: manufacturing/templates/wms_wave_detail.html:16
+msgid "Consolidated Pick Sheet"
+msgstr "Feuille de Prélèvement Consolidée"
+
+#: manufacturing/templates/wms_wave_detail.html:18
+msgid ""
+"One row per product/bin combination still needed anywhere in this wave —\n"
+"    pick the full row quantity in one trip, then it's automatically "
+"allocated\n"
+"    back across every order line that needed it."
+msgstr "Une ligne par combinaison produit/emplacement encore nécessaire dans cette vague —\n    prélevez la quantité totale de la ligne en un seul passage, puis elle est automatiquement réaffectée\n    à chaque ligne de commande qui en avait besoin."
+
+#: manufacturing/templates/wms_wave_detail.html:26
+msgid "Qty Needed"
+msgstr "Qté Nécessaire"
+
+#: manufacturing/templates/wms_wave_detail.html:53
+msgid ""
+"Nothing left to pick — every consolidatable line in this wave is resolved."
+msgstr "Plus rien à prélever — toutes les lignes consolidables de cette vague sont résolues."
+
+#: manufacturing/templates/wms_wave_detail.html:56
+msgid "Orders in this Wave"
+msgstr "Commandes de cette Vague"
+
+#: manufacturing/templates/wms_wave_detail.html:74
+msgid "Cancel this wave? Every order in it will need a new pick list."
+msgstr "Annuler cette vague ? Chaque commande qu'elle contient nécessitera une nouvelle liste de prélèvement."
+
+#: manufacturing/templates/wms_wave_detail.html:77
+msgid "Cancel Wave"
+msgstr "Annuler la Vague"
+
+#: manufacturing/templates/wms_wave_list.html:21
+msgid ""
+"Batch several confirmed SOs into one wave so a picker walks each product/"
+"bin\n"
+"    once per wave instead of once per order — pick lists are still "
+"generated\n"
+"    one per SO underneath, but the picker works from a single consolidated\n"
+"    sheet until every order in the wave is resolved."
+msgstr "Regroupez plusieurs commandes confirmées en une vague afin qu'un préparateur parcoure chaque produit/emplacement\n    une fois par vague au lieu d'une fois par commande — les listes de prélèvement sont toujours générées\n    une par commande en dessous, mais le préparateur travaille à partir d'une seule feuille\n    consolidée jusqu'à ce que chaque commande de la vague soit résolue."
+
+#: manufacturing/templates/wms_wave_list.html:49
+msgid "Create Wave from Selected"
+msgstr "Créer une Vague avec la Sélection"
+
+#: manufacturing/templates/wms_wave_list.html:56
+msgid "Waves"
+msgstr "Vagues"
+
+#: manufacturing/templates/wms_wave_list.html:66
+msgid "Wave #"
+msgstr "N° de Vague"
+
+#: manufacturing/templates/wms_wave_list.html:82
+#, python-format
+msgid "No waves with status \"%(s)s\"."
+msgstr "Aucune vague avec le statut « %(s)s »."
+
+#: manufacturing/templates/wms_wave_list.html:84
+msgid "No waves."
+msgstr "Aucune vague."
 
 #: manufacturing/templates/wo_carbon_detail.html:3
 #: manufacturing/templates/wo_carbon_detail.html:31

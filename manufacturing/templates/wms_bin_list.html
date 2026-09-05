@@ -1,36 +1,37 @@
 {% extends "base.html" %}
-{% block page_title %}Bin Master{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Bin Master" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/warehouses/" class="btn">Warehouses</a>
-<a href="/wms/picks/" class="btn">Pick Lists</a>
-<a href="/wms/waves/" class="btn">Wave Picking</a>
-<a href="/wms/putaway-rules/" class="btn">Put-Away Rules</a>
-<a href="/wms/transfers/" class="btn">Transfers</a>
-<a href="/wms/rfid/tags/" class="btn">RFID Tags</a>
-<a href="/prod/" class="btn">Production</a>
+<a href="/wms/warehouses/" class="btn">{% trans "Warehouses" %}</a>
+<a href="/wms/picks/" class="btn">{% trans "Pick Lists" %}</a>
+<a href="/wms/waves/" class="btn">{% trans "Wave Picking" %}</a>
+<a href="/wms/putaway-rules/" class="btn">{% trans "Put-Away Rules" %}</a>
+<a href="/wms/transfers/" class="btn">{% trans "Transfers" %}</a>
+<a href="/wms/rfid/tags/" class="btn">RFID {% trans "Tags" %}</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
 {% if can_edit %}
-<a href="/wms/bins/new/" class="btn btn-primary">+ New Bin</a>
+<a href="/wms/bins/new/" class="btn btn-primary">+ {% trans "New Bin" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-<div class="menu-title">Bin Master</div>
+<div class="menu-title">{% trans "Bin Master" %}</div>
 <p style="font-size:12px;color:var(--text-muted);max-width:700px;">
-    Warehouse &rarr; zone &rarr; bin locations. Aisle/rack/shelf are recorded
-    on each bin rather than as their own hierarchy levels.
+    {% blocktrans %}Warehouse &rarr; zone &rarr; bin locations. Aisle/rack/shelf are recorded
+    on each bin rather than as their own hierarchy levels.{% endblocktrans %}
 </p>
 
 <form method="get" style="display:flex;gap:6px;align-items:center;margin-bottom:14px;">
     <select name="zone_id" onchange="this.form.submit()">
-        <option value="">All Zones</option>
+        <option value="">{% trans "All Zones" %}</option>
         {% for z in zones %}
         <option value="{{ z.id }}" {% if zone_id == z.id %}selected{% endif %}>{{ z.code }} — {{ z.name }}</option>
         {% endfor %}
     </select>
-    <input type="text" name="q" value="{{ search }}" placeholder="Search bin code…">
-    <button type="submit" class="btn btn-primary">Go</button>
+    <input type="text" name="q" value="{{ search }}" placeholder="{% trans 'Search bin code…' %}">
+    <button type="submit" class="btn btn-primary">{% trans "Go" %}</button>
 </form>
 
 {% if bins %}
@@ -38,12 +39,12 @@
     <table class="erp-table">
         <thead>
             <tr>
-                <th>Bin Code</th>
-                <th>Zone</th>
-                <th>Aisle</th>
-                <th>Rack</th>
-                <th>Shelf</th>
-                <th>Status</th>
+                <th>{% trans "Bin Code" %}</th>
+                <th>{% trans "Zone" %}</th>
+                <th>{% trans "Aisle" %}</th>
+                <th>{% trans "Rack" %}</th>
+                <th>{% trans "Shelf" %}</th>
+                <th>{% trans "Status" %}</th>
                 <th></th>
             </tr>
         </thead>
@@ -55,15 +56,15 @@
                 <td>{{ b.aisle|default:"—" }}</td>
                 <td>{{ b.rack|default:"—" }}</td>
                 <td>{{ b.shelf|default:"—" }}</td>
-                <td>{% if b.is_active %}<span class="pill pill-active">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}</td>
-                <td><a href="/wms/bins/{{ b.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                <td>{% if b.is_active %}<span class="pill pill-active">{% trans "Active" %}</span>{% else %}<span class="pill pill-cancelled">{% trans "Inactive" %}</span>{% endif %}</td>
+                <td><a href="/wms/bins/{{ b.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% else %}
-<div class="empty-state">No bins found.</div>
+<div class="empty-state">{% trans "No bins found." %}</div>
 {% endif %}
 </div>
 {% endblock %}

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Pick Lists{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Pick Lists" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/bins/" class="btn">Bin Master</a>
-<a href="/wms/receive/" class="btn">Receive &amp; Put-Away</a>
-<a href="/wms/waves/" class="btn">Wave Picking</a>
+<a href="/wms/bins/" class="btn">{% trans "Bin Master" %}</a>
+<a href="/wms/receive/" class="btn">{% trans "Receive &amp; Put-Away" %}</a>
+<a href="/wms/waves/" class="btn">{% trans "Wave Picking" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -16,14 +17,14 @@
 
 {% block body %}
 <div class="content">
-<div class="menu-title">Pick Lists</div>
+<div class="menu-title">{% trans "Pick Lists" %}</div>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
-<h3>Confirmed SOs Awaiting a Pick List</h3>
+<h3>{% trans "Confirmed SOs Awaiting a Pick List" %}</h3>
 {% if awaiting %}
 <div class="erp-table-wrap">
     <table class="erp-table">
-        <thead><tr><th>SO #</th><th>Order Date</th><th>Ship Date</th><th></th></tr></thead>
+        <thead><tr><th>{% trans "SO #" %}</th><th>{% trans "Order Date" %}</th><th>{% trans "Ship Date" %}</th><th></th></tr></thead>
         <tbody>
             {% for so in awaiting %}
             <tr>
@@ -36,7 +37,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="action" value="generate">
                         <input type="hidden" name="so_id" value="{{ so.id }}">
-                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Generate Pick List</button>
+                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">{% trans "Generate Pick List" %}</button>
                     </form>
                     {% endif %}
                 </td>
@@ -46,12 +47,12 @@
     </table>
 </div>
 {% else %}
-<div class="empty-state">No confirmed SOs waiting on a pick list.</div>
+<div class="empty-state">{% trans "No confirmed SOs waiting on a pick list." %}</div>
 {% endif %}
 
-<h3 style="margin-top:28px;">Pick Lists</h3>
+<h3 style="margin-top:28px;">{% trans "Pick Lists" %}</h3>
 <div class="chip-row" style="display:flex;gap:7px;margin-bottom:12px;">
-    <a href="/wms/picks/" class="chip {% if not status %}active{% endif %}">All</a>
+    <a href="/wms/picks/" class="chip {% if not status %}active{% endif %}">{% trans "All" %}</a>
     {% for s in pick_statuses %}
     <a href="/wms/picks/?status={{ s }}" class="chip {% if status == s %}active{% endif %}">{{ s|title }}</a>
     {% endfor %}
@@ -59,7 +60,7 @@
 {% if pick_lists %}
 <div class="erp-table-wrap">
     <table class="erp-table">
-        <thead><tr><th>Pick #</th><th>SO #</th><th>Status</th><th>Created</th><th></th></tr></thead>
+        <thead><tr><th>{% trans "Pick #" %}</th><th>{% trans "SO #" %}</th><th>{% trans "Status" %}</th><th>{% trans "Created" %}</th><th></th></tr></thead>
         <tbody>
             {% for p in pick_lists %}
             <tr>
@@ -67,14 +68,14 @@
                 <td>{{ p.so_number }}</td>
                 <td><span class="pill pill-{{ p.status }}">{{ p.status|title }}</span></td>
                 <td>{{ p.created_at }}</td>
-                <td><a href="/wms/picks/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                <td><a href="/wms/picks/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% else %}
-<div class="empty-state">No pick lists yet.</div>
+<div class="empty-state">{% trans "No pick lists yet." %}</div>
 {% endif %}
 </div>
 {% endblock %}

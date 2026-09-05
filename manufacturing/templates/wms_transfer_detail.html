@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block page_title %}Transfer {{ transfer.transfer_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Transfer" %} {{ transfer.transfer_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/transfers/" class="btn">Back to Transfers</a>
+<a href="/wms/transfers/" class="btn">{% trans "Back to Transfers" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -19,11 +20,11 @@
 
 {% block body %}
 <div class="content">
-<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="menu-title">{{ transfer.transfer_number }}</div>
 <p>
     {{ transfer.from_warehouse_code }} &rarr; {{ transfer.to_warehouse_code }}
-    &middot; Status: <span class="pill pill-{{ transfer.status }}">{{ transfer.status|title }}</span>
+    &middot; {% trans "Status:" %} <span class="pill pill-{{ transfer.status }}">{{ transfer.status|title }}</span>
 </p>
 {% if transfer.notes %}<p style="color:var(--text-muted);">{{ transfer.notes }}</p>{% endif %}
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
@@ -32,7 +33,7 @@
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Product</th><th>From Bin</th><th>To Bin</th><th>Qty</th><th>Status</th>{% if can_edit %}<th class="no-print"></th>{% endif %}</tr>
+            <tr><th>{% trans "Product" %}</th><th>{% trans "From Bin" %}</th><th>{% trans "To Bin" %}</th><th>{% trans "Qty" %}</th><th>{% trans "Status" %}</th>{% if can_edit %}<th class="no-print"></th>{% endif %}</tr>
         </thead>
         <tbody>
             {% for l in lines %}
@@ -49,7 +50,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="action" value="remove_line">
                         <input type="hidden" name="line_id" value="{{ l.id }}">
-                        <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Remove</button>
+                        <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Remove" %}</button>
                     </form>
                     {% elif l.status == 'in_transit' and transfer.status == 'in_transit' %}
                     <form method="post" style="display:flex;gap:6px;align-items:center;">
@@ -61,7 +62,7 @@
                             <option value="{{ b.id }}">{{ b.full_code }}</option>
                             {% endfor %}
                         </select>
-                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Receive</button>
+                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">{% trans "Receive" %}</button>
                     </form>
                     {% endif %}
                 </td>
@@ -69,7 +70,7 @@
             </tr>
             {% endfor %}
             {% if not lines %}
-            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" class="empty-state">No lines yet.</td></tr>
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" class="empty-state">{% trans "No lines yet." %}</td></tr>
             {% endif %}
         </tbody>
     </table>
@@ -77,36 +78,36 @@
 
 {% if can_edit and transfer.status == 'draft' %}
 <div class="no-print">
-<h3 style="margin-top:24px;">Add Line</h3>
+<h3 style="margin-top:24px;">{% trans "Add Line" %}</h3>
 {% if available_stock %}
 <form method="post" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
     {% csrf_token %}
     <input type="hidden" name="action" value="add_line">
-    <label>Product / Bin<br>
+    <label>{% trans "Product / Bin" %}<br>
         <select name="from_bin_id" id="from_bin_id" required onchange="document.getElementById('product_id').value = this.selectedOptions[0].dataset.product;">
             {% for s in available_stock %}
-            <option value="{{ s.bin_id }}" data-product="{{ s.product_id }}">{{ s.product_name }} — {{ s.full_code }} ({{ s.qty }} available)</option>
+            <option value="{{ s.bin_id }}" data-product="{{ s.product_id }}">{{ s.product_name }} — {{ s.full_code }} ({% blocktrans with q=s.qty %}{{ q }} available{% endblocktrans %})</option>
             {% endfor %}
         </select>
     </label>
     <input type="hidden" name="product_id" id="product_id" value="{{ available_stock.0.product_id }}">
-    <label>Qty<br><input type="number" step="any" name="qty" required style="width:100px;"></label>
-    <button type="submit" class="btn btn-primary">Add Line</button>
+    <label>{% trans "Qty" %}<br><input type="number" step="any" name="qty" required style="width:100px;"></label>
+    <button type="submit" class="btn btn-primary">{% trans "Add Line" %}</button>
 </form>
 {% else %}
-<div class="empty-state">No tracked stock available in {{ transfer.from_warehouse_code }} to transfer.</div>
+<div class="empty-state">{% blocktrans with wh=transfer.from_warehouse_code %}No tracked stock available in {{ wh }} to transfer.{% endblocktrans %}</div>
 {% endif %}
 
 <div style="margin-top:20px;">
-    <form method="post" onsubmit="return confirm('Ship this transfer? Source bins will be decremented immediately.');">
+    <form method="post" onsubmit="return confirm('{% trans "Ship this transfer? Source bins will be decremented immediately." %}');">
         {% csrf_token %}
         <input type="hidden" name="action" value="ship">
-        <button type="submit" class="btn btn-primary" {% if not lines %}disabled{% endif %}>Ship Transfer</button>
+        <button type="submit" class="btn btn-primary" {% if not lines %}disabled{% endif %}>{% trans "Ship Transfer" %}</button>
     </form>
-    <form method="post" style="margin-top:8px;" onsubmit="return confirm('Cancel this transfer?');">
+    <form method="post" style="margin-top:8px;" onsubmit="return confirm('{% trans "Cancel this transfer?" %}');">
         {% csrf_token %}
         <input type="hidden" name="action" value="cancel">
-        <button type="submit" class="btn">Cancel Transfer</button>
+        <button type="submit" class="btn">{% trans "Cancel Transfer" %}</button>
     </form>
 </div>
 </div>

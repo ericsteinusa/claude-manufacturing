@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block page_title %}Bin {{ bin.full_code }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=bin.full_code %}Bin {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/bins/" class="btn">Back to Bins</a>
+<a href="/wms/bins/" class="btn">{% trans "Back to Bins" %}</a>
 {% endblock %}
 
 {% block body %}
@@ -11,18 +12,18 @@
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
 <table class="kv-table" style="margin-bottom:20px;">
-    <tr><th>Zone</th><td>{{ bin.zone_code }}</td></tr>
-    <tr><th>Aisle</th><td>{{ bin.aisle|default:"—" }}</td></tr>
-    <tr><th>Rack</th><td>{{ bin.rack|default:"—" }}</td></tr>
-    <tr><th>Shelf</th><td>{{ bin.shelf|default:"—" }}</td></tr>
-    <tr><th>Status</th><td>{% if bin.is_active %}Active{% else %}Inactive{% endif %}</td></tr>
+    <tr><th>{% trans "Zone" %}</th><td>{{ bin.zone_code }}</td></tr>
+    <tr><th>{% trans "Aisle" %}</th><td>{{ bin.aisle|default:"—" }}</td></tr>
+    <tr><th>{% trans "Rack" %}</th><td>{{ bin.rack|default:"—" }}</td></tr>
+    <tr><th>{% trans "Shelf" %}</th><td>{{ bin.shelf|default:"—" }}</td></tr>
+    <tr><th>{% trans "Status" %}</th><td>{% if bin.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}</td></tr>
 </table>
 
-<h3>Current Stock</h3>
+<h3>{% trans "Current Stock" %}</h3>
 {% if stock %}
 <div class="erp-table-wrap">
     <table class="erp-table">
-        <thead><tr><th>Product</th><th>Qty</th></tr></thead>
+        <thead><tr><th>{% trans "Product" %}</th><th>{% trans "Qty" %}</th></tr></thead>
         <tbody>
             {% for s in stock %}
             <tr><td>{{ s.product_name }}</td><td>{{ s.qty }}</td></tr>
@@ -31,14 +32,14 @@
     </table>
 </div>
 {% else %}
-<div class="empty-state">No stock tracked in this bin.</div>
+<div class="empty-state">{% trans "No stock tracked in this bin." %}</div>
 {% endif %}
 
 {% if can_edit and bin.is_active %}
 <form method="post" style="margin-top:16px;">
     {% csrf_token %}
     <input type="hidden" name="action" value="deactivate">
-    <button type="submit" class="btn">Deactivate Bin</button>
+    <button type="submit" class="btn">{% trans "Deactivate Bin" %}</button>
 </form>
 {% endif %}
 </div>
