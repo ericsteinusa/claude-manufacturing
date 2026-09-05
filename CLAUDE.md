@@ -1650,6 +1650,46 @@ renders as a real single `%`), and a product's ABC output-quantity page,
 in Spanish, French, and German with real sample data, no console or
 server errors.
 
+Also translated: **Personnel's remaining named links** — Employees
+(`people_list.html`, `people_detail.html`, `people_form.html`), Time Off
+(`time_off_list.html`, `time_off_detail.html`, `time_off_form.html`),
+Skills Matrix/Workforce Analytics (`skill_list.html`, `skill_new.html`,
+`skill_requirements.html`, `skills_matrix_summary.html`,
+`workforce_analytics.html`, `headcount_plan_new.html`), plus two detail
+pages reached only from those (`employee_employment_dates.html`,
+`employee_gap_detail.html`) — 14 templates. This closes the "translate
+the link, not yet the target" gap the Personnel core pass explicitly
+named as still open — Personnel now has **zero** remaining untranslated
+templates of its own, core and long-tail cluster alike, unlike most other
+departments in this series which still carry at least one deliberately-
+excluded sub-cluster (Purchasing's Consignment/Supplier-Portal/Scorecard,
+Maintenance's APM/Predictive-Maintenance, Sales' Demand Forecast). Marked
+up by two parallel
+subagents (Employees & Time Off vs. Workforce Planning), reviewed and
+translated centrally — same pipeline as every batch since Portals. 82
+unique strings across 5 languages. Both subagents' diffs checked out
+clean; the only fix needed was cosmetic, not a bug — `workforce_analytics
+.html`'s tenure/headcount-trend hint was split into two separate
+`{% trans %}` tags at an em-dash where it's actually one continuous
+sentence, joined into a single `{% blocktrans %}` for better translation
+quality (a translator working from two disconnected fragments can't see
+they're one sentence). Two bare `default:"literal english"` fallback
+bugs caught and fixed, continuing the class first found on IT's Network
+Device page: `people_detail.html`'s `"No title on record"` and
+`employee_gap_detail.html`'s `"No job title on file"` (the latter
+embedded in a dynamic `menu-title` line with a literal " — " separator,
+left un-wrapped per the established "data fields + literal separator"
+precedent). Full suite 3475 passed (unchanged), `manage.py check` and
+`ruff check .` clean, `msgfmt --check` clean on all 5 files, zero fuzzy/
+blank entries. Verified end-to-end against the real dev server: Employee
+Directory + a real employee's detail page (confirmed the "No title on
+record" fix), Time-Off Requests + a real request's detail page, Skills,
+Skills Matrix (confirmed the two-sentence description), Job Requirements,
+and Workforce Analytics (confirmed the tenure/headcount hint now renders
+as one continuous sentence with a real line break, not two disconnected
+fragments), in Spanish, French, and German with real sample data, no
+console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

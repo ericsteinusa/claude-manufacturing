@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Job Skill Requirements{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Job Skill Requirements" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/skills/" class="btn">Skills</a>
-<a href="/skills/matrix/" class="btn">Skills Matrix</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/skills/" class="btn">{% trans "Skills" %}</a>
+<a href="/skills/matrix/" class="btn">{% trans "Skills Matrix" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -18,22 +19,22 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Job Skill Requirements</div>
+    <div class="menu-title">{% trans "Job Skill Requirements" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Requirements</h3>
+        <h3>{% trans "Requirements" %}</h3>
         {% if requirements %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
                     <tr>
-                        <th>Job Title</th>
-                        <th>Skill</th>
-                        <th class="num">Required Level</th>
-                        <th>Notes</th>
+                        <th>{% trans "Job Title" %}</th>
+                        <th>{% trans "Skill" %}</th>
+                        <th class="num">{% trans "Required Level" %}</th>
+                        <th>{% trans "Notes" %}</th>
                         {% if can_edit %}<th></th>{% endif %}
                     </tr>
                 </thead>
@@ -50,7 +51,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="req_id" value="{{ r.id }}">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Remove" %}</button>
                             </form>
                         </td>
                         {% endif %}
@@ -60,20 +61,20 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No requirements defined yet.</div>
+        <div class="empty-state">{% trans "No requirements defined yet." %}</div>
         {% endif %}
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Requirement</h3>
+        <h3>{% trans "Add Requirement" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Job Title</label>
-                    <input type="text" name="job_title" required list="job-title-options" placeholder="e.g. Welder">
+                    <label>{% trans "Job Title" %}</label>
+                    <input type="text" name="job_title" required list="job-title-options" placeholder="{% trans 'e.g. Welder' %}">
                     <datalist id="job-title-options">
                         {% for jt in job_titles %}
                         <option value="{{ jt }}">
@@ -81,7 +82,7 @@
                     </datalist>
                 </div>
                 <div class="form-row">
-                    <label>Skill</label>
+                    <label>{% trans "Skill" %}</label>
                     <select name="skill_id" required>
                         {% for s in skills %}
                         <option value="{{ s.id }}">{{ s.name }}</option>
@@ -89,7 +90,7 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Required Level</label>
+                    <label>{% trans "Required Level" %}</label>
                     <select name="required_level">
                         {% for lvl, label in skill_level_choices %}
                         <option value="{{ lvl }}">{{ lvl }} — {{ label }}</option>
@@ -97,11 +98,11 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans 'Optional' %}">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Add Requirement</button>
+            <button type="submit" class="btn btn-primary">{% trans "Add Requirement" %}</button>
         </form>
     </div>
     {% endif %}

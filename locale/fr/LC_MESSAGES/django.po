@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 19:09+0000\n"
+"POT-Creation-Date: 2026-09-05 19:19+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -301,6 +301,8 @@ msgstr "Rapport ABC vs. Traditionnel"
 #: manufacturing/templates/cs_surveys_detail.html:11
 #: manufacturing/templates/cs_surveys_list.html:11
 #: manufacturing/templates/employee_benefits.html:7
+#: manufacturing/templates/employee_employment_dates.html:8
+#: manufacturing/templates/employee_gap_detail.html:7
 #: manufacturing/templates/eng_dashboard.html:12
 #: manufacturing/templates/eng_ecr_detail.html:9
 #: manufacturing/templates/eng_ecrs.html:9
@@ -340,6 +342,7 @@ msgstr "Rapport ABC vs. Traditionnel"
 #: manufacturing/templates/gl_journal_detail.html:9
 #: manufacturing/templates/gl_journals.html:11
 #: manufacturing/templates/gl_trial_balance.html:9
+#: manufacturing/templates/headcount_plan_new.html:7
 #: manufacturing/templates/inventory_dashboard.html:10
 #: manufacturing/templates/inventory_detail.html:7
 #: manufacturing/templates/inventory_list.html:6
@@ -418,6 +421,9 @@ msgstr "Rapport ABC vs. Traditionnel"
 #: manufacturing/templates/payroll_run_new.html:8
 #: manufacturing/templates/payroll_stub_detail.html:8
 #: manufacturing/templates/payroll_ytd.html:8
+#: manufacturing/templates/people_detail.html:14
+#: manufacturing/templates/people_form.html:8
+#: manufacturing/templates/people_list.html:9
 #: manufacturing/templates/pers_depts.html:11
 #: manufacturing/templates/pers_review_detail.html:10
 #: manufacturing/templates/pers_reviews_list.html:12
@@ -489,6 +495,10 @@ msgstr "Rapport ABC vs. Traditionnel"
 #: manufacturing/templates/sales_targets.html:9
 #: manufacturing/templates/sales_territories.html:10
 #: manufacturing/templates/sales_territory_performance.html:9
+#: manufacturing/templates/skill_list.html:8
+#: manufacturing/templates/skill_new.html:7
+#: manufacturing/templates/skill_requirements.html:8
+#: manufacturing/templates/skills_matrix_summary.html:8
 #: manufacturing/templates/so_detail.html:13
 #: manufacturing/templates/so_form.html:8
 #: manufacturing/templates/so_list.html:17
@@ -501,9 +511,13 @@ msgstr "Rapport ABC vs. Traditionnel"
 #: manufacturing/templates/time_clock_attendance.html:7
 #: manufacturing/templates/time_clock_hours.html:7
 #: manufacturing/templates/time_clock_status.html:9
+#: manufacturing/templates/time_off_detail.html:11
+#: manufacturing/templates/time_off_form.html:8
+#: manufacturing/templates/time_off_list.html:9
 #: manufacturing/templates/wo_detail.html:12
 #: manufacturing/templates/wo_form.html:8
 #: manufacturing/templates/wo_list.html:11
+#: manufacturing/templates/workforce_analytics.html:8
 msgid "Home"
 msgstr "Accueil"
 
@@ -584,6 +598,7 @@ msgstr "Qté d'Inducteur"
 #: manufacturing/templates/payroll_deductions.html:141
 #: manufacturing/templates/po_detail.html:202
 #: manufacturing/templates/rfq_detail.html:57
+#: manufacturing/templates/skill_requirements.html:54
 #: manufacturing/templates/so_detail.html:220
 #: manufacturing/templates/wms_transfer_detail.html:53
 msgid "Remove"
@@ -623,6 +638,8 @@ msgstr "Rechercher par nom..."
 #: manufacturing/templates/ats_requisition_list.html:27
 #: manufacturing/templates/coa_list.html:20
 #: manufacturing/templates/cs_list.html:44
+#: manufacturing/templates/people_list.html:31
+#: manufacturing/templates/skill_list.html:21
 msgid "Search"
 msgstr "Rechercher"
 
@@ -653,6 +670,7 @@ msgstr "Pool de Coûts"
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/inventory_list.html:102
 #: manufacturing/templates/rfq_list.html:55
+#: manufacturing/templates/skills_matrix_summary.html:48
 #: manufacturing/templates/wms_bin_list.html:60
 #: manufacturing/templates/wms_pick_list_list.html:71
 #: manufacturing/templates/wms_rfid_tag_list.html:68
@@ -681,6 +699,7 @@ msgstr "Nouveau Pool de Coûts par Activité"
 #: manufacturing/templates/maint_mechanics_list.html:100
 #: manufacturing/templates/maint_part_detail.html:47
 #: manufacturing/templates/maint_parts_list.html:106
+#: manufacturing/templates/skill_new.html:29
 msgid "Name *"
 msgstr "Nom *"
 
@@ -731,6 +750,7 @@ msgstr "par ex. par réglage, par heure machine"
 #: manufacturing/templates/cs_returns_detail.html:109
 #: manufacturing/templates/cs_returns_detail.html:124
 #: manufacturing/templates/cs_returns_list.html:137
+#: manufacturing/templates/employee_gap_detail.html:95
 #: manufacturing/templates/eng_ecr_detail.html:116
 #: manufacturing/templates/eng_ecr_detail.html:124
 #: manufacturing/templates/eng_ecr_detail.html:160
@@ -765,6 +785,7 @@ msgstr "par ex. par réglage, par heure machine"
 #: manufacturing/templates/finance_tax_list.html:157
 #: manufacturing/templates/gl_accounts.html:109
 #: manufacturing/templates/gl_accounts.html:136
+#: manufacturing/templates/headcount_plan_new.html:45
 #: manufacturing/templates/inventory_detail.html:129
 #: manufacturing/templates/inventory_detail.html:231
 #: manufacturing/templates/it_asset_detail.html:112
@@ -878,11 +899,14 @@ msgstr "par ex. par réglage, par heure machine"
 #: manufacturing/templates/sales_territories.html:80
 #: manufacturing/templates/sales_territories.html:136
 #: manufacturing/templates/sales_territories.html:173
+#: manufacturing/templates/skill_requirements.html:37
+#: manufacturing/templates/skill_requirements.html:101
 #: manufacturing/templates/so_form.html:74
 #: manufacturing/templates/spc_log.html:72
 #: manufacturing/templates/supplier_portal_rfqs.html:11
 #: manufacturing/templates/termination_detail.html:46
 #: manufacturing/templates/termination_list.html:141
+#: manufacturing/templates/time_off_form.html:61
 #: manufacturing/templates/wms_transfer_new.html:30
 #: manufacturing/templates/wo_detail.html:159
 #: manufacturing/templates/wo_form.html:84
@@ -895,8 +919,10 @@ msgstr "Notes"
 #: manufacturing/templates/ats_requisition_detail.html:92
 #: manufacturing/templates/benefit_plan_detail.html:123
 #: manufacturing/templates/control_plan_detail.html:159
+#: manufacturing/templates/employee_gap_detail.html:96
 #: manufacturing/templates/qa_ncr_list.html:131
 #: manufacturing/templates/req_detail.html:166
+#: manufacturing/templates/skill_requirements.html:102
 msgid "Optional"
 msgstr "Facultatif"
 
@@ -1395,6 +1421,8 @@ msgstr "Référence"
 #: manufacturing/templates/sales_quotes.html:66
 #: manufacturing/templates/sales_quotes.html:114
 #: manufacturing/templates/sales_quotes.html:139
+#: manufacturing/templates/skill_list.html:31
+#: manufacturing/templates/skill_new.html:37
 #: manufacturing/templates/so_detail.html:195
 #: manufacturing/templates/so_detail.html:255
 #: manufacturing/templates/supplier_portal_invoice_new.html:38
@@ -1464,6 +1492,7 @@ msgstr "Total Débit"
 #: manufacturing/templates/cs_surveys_detail.html:97
 #: manufacturing/templates/cs_surveys_list.html:87
 #: manufacturing/templates/cs_surveys_list.html:127
+#: manufacturing/templates/employee_gap_detail.html:39
 #: manufacturing/templates/eng_dashboard_kpis.html:15
 #: manufacturing/templates/eng_dashboard_kpis.html:32
 #: manufacturing/templates/eng_ecr_detail.html:108
@@ -1693,6 +1722,7 @@ msgstr "Total Débit"
 #: manufacturing/templates/termination_list.html:72
 #: manufacturing/templates/termination_list.html:133
 #: manufacturing/templates/time_clock_attendance.html:89
+#: manufacturing/templates/time_off_list.html:38
 #: manufacturing/templates/wms_bin_detail.html:19
 #: manufacturing/templates/wms_bin_list.html:47
 #: manufacturing/templates/wms_pack_station.html:22
@@ -1875,6 +1905,8 @@ msgstr "Fournisseur"
 #: manufacturing/templates/blanket_po_new.html:23
 #: manufacturing/templates/inventory_detail.html:165
 #: manufacturing/templates/inventory_new.html:61
+#: manufacturing/templates/people_form.html:79
+#: manufacturing/templates/people_form.html:90
 #: manufacturing/templates/po_detail.html:263
 #: manufacturing/templates/po_form.html:36
 #: manufacturing/templates/rfq_detail.html:93
@@ -2179,6 +2211,7 @@ msgstr "Exporter en Excel"
 #: manufacturing/templates/supplier_portal_invoice_detail.html:9
 #: manufacturing/templates/supplier_portal_po_detail.html:25
 #: manufacturing/templates/supplier_portal_rfq_detail.html:11
+#: manufacturing/templates/time_off_list.html:19
 #: manufacturing/templates/wms_pack_station.html:15
 #: manufacturing/templates/wms_pick_list_detail.html:30
 #: manufacturing/templates/wms_rfid_tag_detail.html:15
@@ -2255,6 +2288,7 @@ msgstr "À :"
 #: manufacturing/templates/mkt_lead_list.html:79
 #: manufacturing/templates/mkt_research_list.html:80
 #: manufacturing/templates/offboarding_list.html:65
+#: manufacturing/templates/people_list.html:37
 #: manufacturing/templates/pers_reviews_list.html:71
 #: manufacturing/templates/pers_training_list.html:77
 #: manufacturing/templates/prod_delivery_status.html:52
@@ -2322,6 +2356,7 @@ msgstr "Filtrer"
 #: manufacturing/templates/mkt_research_list.html:81
 #: manufacturing/templates/offboarding_list.html:66
 #: manufacturing/templates/payroll_pay_rates.html:58
+#: manufacturing/templates/people_list.html:38
 #: manufacturing/templates/pers_reviews_list.html:72
 #: manufacturing/templates/pers_training_list.html:78
 #: manufacturing/templates/prod_delivery_status.html:53
@@ -2587,19 +2622,30 @@ msgstr "Date d'Embauche *"
 #: manufacturing/templates/it_ticket_detail.html:79
 #: manufacturing/templates/it_ticket_detail.html:145
 #: manufacturing/templates/it_ticket_list.html:113
+#: manufacturing/templates/people_form.html:77
+#: manufacturing/templates/people_list.html:20
+#: manufacturing/templates/people_list.html:49
 #: manufacturing/templates/pers_depts.html:54
 #: manufacturing/templates/pers_depts.html:95
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/req_detail.html:70
 #: manufacturing/templates/req_list.html:81
+#: manufacturing/templates/skills_matrix_summary.html:25
 #: manufacturing/templates/tc_ot_report.html:113
 #: manufacturing/templates/termination_detail.html:40
 #: manufacturing/templates/termination_list.html:71
 #: manufacturing/templates/time_clock_attendance.html:85
+#: manufacturing/templates/workforce_analytics.html:57
+#: manufacturing/templates/workforce_analytics.html:91
 msgid "Department"
 msgstr "Département"
 
 #: manufacturing/templates/ats_application_detail.html:109
+#: manufacturing/templates/people_form.html:72
+#: manufacturing/templates/people_list.html:51
+#: manufacturing/templates/skill_requirements.html:34
+#: manufacturing/templates/skill_requirements.html:76
+#: manufacturing/templates/skills_matrix_summary.html:26
 msgid "Job Title"
 msgstr "Intitulé du Poste"
 
@@ -2703,8 +2749,10 @@ msgstr "Rechercher nom ou e-mail..."
 #: manufacturing/templates/mkt_lead_list.html:121
 #: manufacturing/templates/payroll_deductions.html:56
 #: manufacturing/templates/payroll_deductions.html:83
+#: manufacturing/templates/people_list.html:47
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/report_builder_list.html:20
+#: manufacturing/templates/skill_list.html:29
 #: manufacturing/templates/tc_device_list.html:40
 #: manufacturing/templates/wms_bin_new.html:27
 #: manufacturing/templates/wms_warehouse_list.html:21
@@ -2720,6 +2768,8 @@ msgstr "Nom"
 #: manufacturing/templates/mkt_lead_detail.html:103
 #: manufacturing/templates/mkt_lead_list.html:89
 #: manufacturing/templates/mkt_lead_list.html:129
+#: manufacturing/templates/people_form.html:65
+#: manufacturing/templates/people_list.html:52
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/portal_login.html:18
 #: manufacturing/templates/portal_register.html:15
@@ -2761,10 +2811,12 @@ msgid "No candidates found."
 msgstr "Aucun candidat trouvé."
 
 #: manufacturing/templates/ats_candidate_new.html:29
+#: manufacturing/templates/people_form.html:51
 msgid "First Name *"
 msgstr "Prénom *"
 
 #: manufacturing/templates/ats_candidate_new.html:33
+#: manufacturing/templates/people_form.html:55
 msgid "Last Name *"
 msgstr "Nom de Famille *"
 
@@ -2802,6 +2854,7 @@ msgstr "Nouvelle Demande d'Achat"
 #: manufacturing/templates/benefits_dashboard.html:7
 #: manufacturing/templates/personnel_dashboard.html:3
 #: manufacturing/templates/personnel_dashboard.html:49
+#: manufacturing/templates/workforce_analytics.html:7
 msgid "Personnel Dashboard"
 msgstr "Tableau de Bord du Personnel"
 
@@ -3415,6 +3468,7 @@ msgstr "Demandes de Devis"
 #: manufacturing/templates/benefit_plan_new.html:6
 #: manufacturing/templates/benefits_dashboard.html:3
 #: manufacturing/templates/employee_benefits.html:6
+#: manufacturing/templates/people_detail.html:9
 #: manufacturing/templates/personnel_dashboard.html:12
 #: manufacturing/templates/personnel_dashboard.html:57
 msgid "Benefits"
@@ -3446,6 +3500,7 @@ msgstr "Avantages Sociaux"
 #: manufacturing/templates/wms_putaway_rule_list.html:44
 #: manufacturing/templates/wms_rfid_reader_list.html:47
 #: manufacturing/templates/wms_warehouse_list.html:36
+#: manufacturing/templates/workforce_analytics.html:57
 msgid "Active"
 msgstr "Actif"
 
@@ -3506,9 +3561,11 @@ msgstr "Inscriptions"
 #: manufacturing/templates/payroll_ytd.html:55
 #: manufacturing/templates/pers_reviews_list.html:79
 #: manufacturing/templates/pers_training_list.html:85
+#: manufacturing/templates/skills_matrix_summary.html:24
 #: manufacturing/templates/tc_ot_report.html:112
 #: manufacturing/templates/termination_list.html:71
 #: manufacturing/templates/time_clock_attendance.html:84
+#: manufacturing/templates/time_off_list.html:33
 msgid "Employee"
 msgstr "Employé"
 
@@ -3587,6 +3644,7 @@ msgstr "Coût Employeur / Période de Paie"
 
 #: manufacturing/templates/benefit_plan_new.html:56
 #: manufacturing/templates/cs_plans.html:137
+#: manufacturing/templates/headcount_plan_new.html:48
 #: manufacturing/templates/sales_commission_plans.html:159
 msgid "Create Plan"
 msgstr "Créer le plan"
@@ -3709,6 +3767,7 @@ msgstr "Plans"
 #: manufacturing/templates/termination_detail.html:42
 #: manufacturing/templates/termination_list.html:72
 #: manufacturing/templates/termination_list.html:113
+#: manufacturing/templates/time_off_list.html:36
 msgid "Type"
 msgstr "Type"
 
@@ -3732,6 +3791,9 @@ msgstr "Aucun régime d'avantages pour l'instant."
 #: manufacturing/templates/blanket_po_release_new.html:7
 #: manufacturing/templates/bom_list.html:6
 #: manufacturing/templates/inventory_detail.html:6
+#: manufacturing/templates/people_detail.html:7
+#: manufacturing/templates/people_form.html:7
+#: manufacturing/templates/people_list.html:7
 #: manufacturing/templates/po_detail.html:7
 #: manufacturing/templates/po_form.html:7
 #: manufacturing/templates/po_list.html:7
@@ -3747,6 +3809,9 @@ msgstr "Aucun régime d'avantages pour l'instant."
 #: manufacturing/templates/time_clock_attendance.html:6
 #: manufacturing/templates/time_clock_hours.html:6
 #: manufacturing/templates/time_clock_status.html:6
+#: manufacturing/templates/time_off_detail.html:7
+#: manufacturing/templates/time_off_form.html:7
+#: manufacturing/templates/time_off_list.html:7
 #: manufacturing/templates/wo_detail.html:7
 #: manufacturing/templates/wo_form.html:7
 #: manufacturing/templates/wo_list.html:7
@@ -3797,6 +3862,7 @@ msgstr ""
 #: manufacturing/templates/so_detail.html:114
 #: manufacturing/templates/supplier_portal_po_detail.html:28
 #: manufacturing/templates/supplier_portal_rfq_detail.html:12
+#: manufacturing/templates/time_off_detail.html:57
 #: manufacturing/templates/wo_detail.html:113
 msgid "Notes:"
 msgstr "Notes :"
@@ -3923,6 +3989,7 @@ msgstr "Nouvelle Commande Ouverte"
 #: manufacturing/templates/sales_orders.html:57
 #: manufacturing/templates/sales_quotes.html:53
 #: manufacturing/templates/so_list.html:26
+#: manufacturing/templates/time_off_list.html:20
 #: manufacturing/templates/wms_pick_list_list.html:55
 #: manufacturing/templates/wms_rfid_tag_list.html:50
 #: manufacturing/templates/wms_transfer_list.html:23
@@ -4052,6 +4119,7 @@ msgstr "Quantité Totale (laisser 0 pour un suivi par valeur)"
 #: manufacturing/templates/sales_contracts_detail.html:118
 #: manufacturing/templates/sales_contracts_detail.html:141
 #: manufacturing/templates/sales_contracts_list.html:141
+#: manufacturing/templates/time_off_list.html:34
 #: manufacturing/templates/wo_form.html:56
 msgid "Start Date"
 msgstr "Date de début"
@@ -4088,6 +4156,7 @@ msgstr "Date de début"
 #: manufacturing/templates/sales_contracts_detail.html:122
 #: manufacturing/templates/sales_contracts_detail.html:142
 #: manufacturing/templates/sales_contracts_list.html:145
+#: manufacturing/templates/time_off_list.html:35
 msgid "End Date"
 msgstr "Date de fin"
 
@@ -4112,6 +4181,7 @@ msgstr "Créer une Commande Ouverte"
 #: manufacturing/templates/maint_wo_detail.html:207
 #: manufacturing/templates/mrp_safety_stock.html:98
 #: manufacturing/templates/payroll_pay_rates.html:131
+#: manufacturing/templates/people_form.html:123
 #: manufacturing/templates/po_form.html:82
 #: manufacturing/templates/po_landed_cost_new.html:76
 #: manufacturing/templates/portal_rma_new.html:35
@@ -4126,6 +4196,7 @@ msgstr "Créer une Commande Ouverte"
 #: manufacturing/templates/sales_territories.html:142
 #: manufacturing/templates/so_form.html:82
 #: manufacturing/templates/tc_device_form.html:194
+#: manufacturing/templates/time_off_form.html:66
 #: manufacturing/templates/wo_form.html:92
 msgid "Cancel"
 msgstr "Annuler"
@@ -4189,6 +4260,7 @@ msgstr "BOM Éclatée"
 #: manufacturing/templates/mkt_campaign_list.html:12
 #: manufacturing/templates/mkt_lead_list.html:12
 #: manufacturing/templates/mkt_research_list.html:15
+#: manufacturing/templates/people_list.html:10
 #: manufacturing/templates/pers_reviews_list.html:13
 #: manufacturing/templates/pers_training_list.html:13
 #: manufacturing/templates/prod_returns_list.html:11
@@ -4202,6 +4274,7 @@ msgstr "BOM Éclatée"
 #: manufacturing/templates/rfq_list.html:11
 #: manufacturing/templates/sales_contracts_list.html:13
 #: manufacturing/templates/sales_leads_list.html:13
+#: manufacturing/templates/time_off_list.html:10
 msgid "CSV"
 msgstr "CSV"
 
@@ -4233,6 +4306,7 @@ msgstr "CSV"
 #: manufacturing/templates/mkt_campaign_list.html:13
 #: manufacturing/templates/mkt_lead_list.html:13
 #: manufacturing/templates/mkt_research_list.html:16
+#: manufacturing/templates/people_list.html:11
 #: manufacturing/templates/pers_reviews_list.html:14
 #: manufacturing/templates/pers_training_list.html:14
 #: manufacturing/templates/prod_returns_list.html:12
@@ -4244,6 +4318,7 @@ msgstr "CSV"
 #: manufacturing/templates/qa_supplier_list.html:11
 #: manufacturing/templates/sales_contracts_list.html:14
 #: manufacturing/templates/sales_leads_list.html:14
+#: manufacturing/templates/time_off_list.html:11
 msgid "Excel"
 msgstr "Excel"
 
@@ -4270,8 +4345,11 @@ msgstr "Délai (jours)"
 
 #: manufacturing/templates/bom_detail.html:96
 #: manufacturing/templates/bom_detail.html:189
+#: manufacturing/templates/employee_employment_dates.html:49
+#: manufacturing/templates/employee_gap_detail.html:99
 #: manufacturing/templates/gl_accounts.html:113
 #: manufacturing/templates/payroll_pay_rates.html:127
+#: manufacturing/templates/people_form.html:122
 #: manufacturing/templates/pers_depts.html:67
 #: manufacturing/templates/pers_depts.html:117
 #: manufacturing/templates/po_detail.html:191
@@ -4288,6 +4366,7 @@ msgstr "Enregistrer"
 #: manufacturing/templates/bom_detail.html:102
 #: manufacturing/templates/gl_accounts.html:51
 #: manufacturing/templates/inventory_list.html:43
+#: manufacturing/templates/time_off_detail.html:50
 msgid "Type:"
 msgstr "Type :"
 
@@ -4346,6 +4425,7 @@ msgstr "Rebut %%"
 #: manufacturing/templates/it_software_detail.html:94
 #: manufacturing/templates/payroll_pay_rates.html:65
 #: manufacturing/templates/payroll_pay_rates.html:87
+#: manufacturing/templates/people_detail.html:8
 #: manufacturing/templates/po_detail.html:8
 #: manufacturing/templates/report_builder_detail.html:7
 #: manufacturing/templates/report_builder_list.html:37
@@ -4429,10 +4509,7 @@ msgid ""
 "All components needed at every level to build\n"
 "        <strong style=\"color:var(--text);\">%(q)s %(uom)s</strong>\n"
 "        of <strong style=\"color:var(--text);\">%(name)s</strong>."
-msgstr ""
-"Tous les composants nécessaires à chaque niveau pour fabriquer\n"
-"        <strong style=\"color:var(--text);\">%(q)s %(uom)s</strong>\n"
-"        de <strong style=\"color:var(--text);\">%(name)s</strong>."
+msgstr "Tous les composants nécessaires à chaque niveau pour fabriquer\n        <strong style=\"color:var(--text);\">%(q)s %(uom)s</strong>\n        de <strong style=\"color:var(--text);\">%(name)s</strong>."
 
 #: manufacturing/templates/bom_explode.html:46
 msgid "Build quantity:"
@@ -4601,6 +4678,7 @@ msgstr "Mesuré"
 #: manufacturing/templates/sales_targets.html:76
 #: manufacturing/templates/spc_list.html:53
 #: manufacturing/templates/spc_list.html:88
+#: manufacturing/templates/workforce_analytics.html:91
 msgid "Target"
 msgstr "Cible"
 
@@ -4732,6 +4810,7 @@ msgstr ""
 
 #: manufacturing/templates/compliance_checklist_detail.html:43
 #: manufacturing/templates/compliance_template_detail.html:31
+#: manufacturing/templates/skill_requirements.html:28
 msgid "Requirements"
 msgstr "Exigences"
 
@@ -4878,6 +4957,8 @@ msgstr ""
 #: manufacturing/templates/purch_contract_detail.html:125
 #: manufacturing/templates/purch_contracts_list.html:82
 #: manufacturing/templates/purch_contracts_list.html:128
+#: manufacturing/templates/skill_list.html:30
+#: manufacturing/templates/skill_new.html:33
 msgid "Category"
 msgstr "Catégorie"
 
@@ -4887,6 +4968,8 @@ msgstr "Aucune exigence ajoutée pour l'instant."
 
 #: manufacturing/templates/compliance_template_detail.html:54
 #: manufacturing/templates/compliance_template_detail.html:76
+#: manufacturing/templates/skill_requirements.html:70
+#: manufacturing/templates/skill_requirements.html:105
 msgid "Add Requirement"
 msgstr "Ajouter une Exigence"
 
@@ -5352,11 +5435,13 @@ msgstr "Limite approuvée ($)"
 #: manufacturing/templates/credit_application_detail.html:120
 #: manufacturing/templates/po_approvals.html:58
 #: manufacturing/templates/req_detail.html:168
+#: manufacturing/templates/time_off_detail.html:71
 msgid "Approve"
 msgstr "Approuver"
 
 #: manufacturing/templates/credit_application_detail.html:121
 #: manufacturing/templates/req_detail.html:169
+#: manufacturing/templates/time_off_detail.html:78
 msgid "Deny"
 msgstr "Refuser"
 
@@ -6074,6 +6159,7 @@ msgstr "Plans d'amélioration SC"
 
 #: manufacturing/templates/cs_plans.html:78
 #: manufacturing/templates/cs_plans.html:127
+#: manufacturing/templates/workforce_analytics.html:91
 msgid "Target Date"
 msgstr "Date cible"
 
@@ -6164,6 +6250,7 @@ msgstr "Volume d'appels mensuel"
 #: manufacturing/templates/cs_reports_kpis.html:40
 #: manufacturing/templates/purch_reports.html:91
 #: manufacturing/templates/qa_reports.html:214
+#: manufacturing/templates/workforce_analytics.html:73
 msgid "Month"
 msgstr "Mois"
 
@@ -6502,6 +6589,118 @@ msgstr "Total par période de paie"
 #: manufacturing/templates/employee_benefits.html:50
 msgid "No active benefit enrollments."
 msgstr "Aucune inscription active aux avantages."
+
+#: manufacturing/templates/employee_employment_dates.html:3
+#: manufacturing/templates/employee_employment_dates.html:22
+#, python-format
+msgid "%(fn)s %(ln)s — Employment Dates"
+msgstr "%(fn)s %(ln)s — Dates d'Emploi"
+
+#: manufacturing/templates/employee_employment_dates.html:6
+#: manufacturing/templates/headcount_plan_new.html:6
+#: manufacturing/templates/personnel_dashboard.html:13
+#: manufacturing/templates/personnel_dashboard.html:58
+#: manufacturing/templates/workforce_analytics.html:3
+#: manufacturing/templates/workforce_analytics.html:27
+msgid "Workforce Analytics"
+msgstr "Analyse de la Main-d'Œuvre"
+
+#: manufacturing/templates/employee_employment_dates.html:7
+msgid "Employee Profile"
+msgstr "Profil de l'Employé"
+
+#: manufacturing/templates/employee_employment_dates.html:24
+msgid ""
+"Used by Workforce Analytics for tenure, turnover, and headcount trend — "
+"leave blank if unknown."
+msgstr ""
+"Utilisé par l'Analyse de la Main-d'œuvre pour l'ancienneté, le turnover et "
+"la tendance des effectifs — laissez vide si inconnu."
+
+#: manufacturing/templates/employee_employment_dates.html:34
+msgid "Hire Date"
+msgstr "Date d'Embauche"
+
+#: manufacturing/templates/employee_employment_dates.html:38
+#: manufacturing/templates/termination_detail.html:41
+#: manufacturing/templates/termination_list.html:109
+msgid "Termination Date"
+msgstr "Date de Résiliation"
+
+#: manufacturing/templates/employee_employment_dates.html:42
+msgid "Employment Status"
+msgstr "Statut d'Emploi"
+
+#: manufacturing/templates/employee_gap_detail.html:3
+#, python-format
+msgid "%(fn)s %(ln)s — Skills"
+msgstr "%(fn)s %(ln)s — Compétences"
+
+#: manufacturing/templates/employee_gap_detail.html:6
+#: manufacturing/templates/personnel_dashboard.html:11
+#: manufacturing/templates/skill_list.html:7
+#: manufacturing/templates/skill_requirements.html:7
+#: manufacturing/templates/skills_matrix_summary.html:3
+msgid "Skills Matrix"
+msgstr "Matrice des Compétences"
+
+#: manufacturing/templates/employee_gap_detail.html:23
+msgid "No job title on file"
+msgstr "Aucun poste enregistré"
+
+#: manufacturing/templates/employee_gap_detail.html:29
+msgid "Competency Gap Report"
+msgstr "Rapport d'Écarts de Compétences"
+
+#: manufacturing/templates/employee_gap_detail.html:35
+#: manufacturing/templates/employee_gap_detail.html:75
+#: manufacturing/templates/skill_requirements.html:35
+#: manufacturing/templates/skill_requirements.html:85
+msgid "Skill"
+msgstr "Compétence"
+
+#: manufacturing/templates/employee_gap_detail.html:36
+msgid "Required"
+msgstr "Requis"
+
+#: manufacturing/templates/employee_gap_detail.html:37
+#: manufacturing/templates/sales_forecast_detail.html:77
+#: manufacturing/templates/sales_performance_kpis.html:10
+#: manufacturing/templates/sales_targets.html:76
+#: manufacturing/templates/workforce_analytics.html:91
+msgid "Actual"
+msgstr "Réel"
+
+#: manufacturing/templates/employee_gap_detail.html:38
+#: manufacturing/templates/employee_gap_detail.html:55
+#: manufacturing/templates/workforce_analytics.html:91
+msgid "Gap"
+msgstr "Écart"
+
+#: manufacturing/templates/employee_gap_detail.html:51
+msgid "Met"
+msgstr "Atteint"
+
+#: manufacturing/templates/employee_gap_detail.html:53
+msgid "Not Assessed"
+msgstr "Non Évalué"
+
+#: manufacturing/templates/employee_gap_detail.html:64
+msgid "No skill requirements defined for this job title yet."
+msgstr "Aucune exigence de compétence définie pour ce poste pour l'instant."
+
+#: manufacturing/templates/employee_gap_detail.html:70
+msgid "Record Skill Level"
+msgstr "Enregistrer le Niveau de Compétence"
+
+#: manufacturing/templates/employee_gap_detail.html:83
+#: manufacturing/templates/req_detail.html:126
+msgid "Level"
+msgstr "Niveau"
+
+#: manufacturing/templates/employee_gap_detail.html:91
+msgid "Certified Date"
+msgstr "Date de Certification"
 
 #: manufacturing/templates/eng_dashboard.html:3
 #: manufacturing/templates/eng_dashboard.html:52
@@ -7186,6 +7385,8 @@ msgstr "Mes heures"
 
 #: manufacturing/templates/ess_home.html:72
 #: manufacturing/templates/ess_time_off.html:6
+#: manufacturing/templates/time_off_form.html:4
+#: manufacturing/templates/time_off_form.html:35
 msgid "Request Time Off"
 msgstr "Demander un Congé"
 
@@ -7228,6 +7429,7 @@ msgstr "BULLETIN DE PAIE"
 #: manufacturing/templates/payroll_stub_detail.html:42
 #: manufacturing/templates/payroll_ytd.html:40
 #: manufacturing/templates/pers_training_detail.html:50
+#: manufacturing/templates/time_off_detail.html:49
 msgid "Employee:"
 msgstr "Employé :"
 
@@ -7374,22 +7576,27 @@ msgstr ""
 "modifiables ici."
 
 #: manufacturing/templates/ess_profile.html:42
+#: manufacturing/templates/people_form.html:100
 msgid "Address"
 msgstr "Adresse"
 
 #: manufacturing/templates/ess_profile.html:44
+#: manufacturing/templates/people_form.html:102
 msgid "Street Address"
 msgstr "Adresse Postale"
 
 #: manufacturing/templates/ess_profile.html:48
+#: manufacturing/templates/people_form.html:107
 msgid "City"
 msgstr "Ville"
 
 #: manufacturing/templates/ess_profile.html:52
+#: manufacturing/templates/people_form.html:111
 msgid "State"
 msgstr "État / Région"
 
 #: manufacturing/templates/ess_profile.html:56
+#: manufacturing/templates/people_form.html:116
 msgid "Zip Code"
 msgstr "Code Postal"
 
@@ -7679,6 +7886,7 @@ msgid "Cash Flow Statement"
 msgstr "Tableau des Flux de Trésorerie"
 
 #: manufacturing/templates/fin_cash_forecast.html:35
+#: manufacturing/templates/time_off_detail.html:51
 #: manufacturing/templates/wo_detail.html:108
 msgid "Start Date:"
 msgstr "Date de Début :"
@@ -8686,6 +8894,24 @@ msgstr ""
 "Aucune écriture comptabilisée trouvée. Comptabilisez des écritures pour "
 "afficher la balance générale."
 
+#: manufacturing/templates/headcount_plan_new.html:3
+#: manufacturing/templates/headcount_plan_new.html:21
+#: manufacturing/templates/workforce_analytics.html:6
+msgid "New Headcount Plan"
+msgstr "Nouveau Plan d'Effectifs"
+
+#: manufacturing/templates/headcount_plan_new.html:29
+msgid "Department *"
+msgstr "Service *"
+
+#: manufacturing/templates/headcount_plan_new.html:37
+msgid "Target Headcount *"
+msgstr "Effectif Cible *"
+
+#: manufacturing/templates/headcount_plan_new.html:41
+msgid "Target Date *"
+msgstr "Date Cible *"
+
 #: manufacturing/templates/home.html:4
 msgid "Login"
 msgstr "Connexion"
@@ -8860,13 +9086,7 @@ msgid ""
 "                Issue: subtracts from stock &nbsp;|&nbsp;\n"
 "                Adjust: enter a positive or negative signed quantity\n"
 "                "
-msgstr ""
-"\n"
-"                Recevoir / Retourner : ajoute au stock &nbsp;|&nbsp;\n"
-"                Sortie : soustrait du stock &nbsp;|&nbsp;\n"
-"                Ajuster : saisissez une quantité signée positive ou "
-"négative\n"
-"                "
+msgstr "\n                Recevoir / Retourner : ajoute au stock &nbsp;|&nbsp;\n                Sortie : soustrait du stock &nbsp;|&nbsp;\n                Ajuster : saisissez une quantité signée positive ou négative\n                "
 
 #: manufacturing/templates/inventory_detail.html:146
 #: manufacturing/templates/inventory_detail.html:206
@@ -9000,6 +9220,7 @@ msgstr[0] "%(counter)s produit"
 msgstr[1] "%(counter)s produits"
 
 #: manufacturing/templates/inventory_list.html:112
+#: manufacturing/templates/people_list.html:71
 #, python-format
 msgid " matching \"%(s)s\""
 msgstr " correspondant à \"%(s)s\""
@@ -9949,6 +10170,7 @@ msgid "Short descriptive name"
 msgstr "Nom descriptif court"
 
 #: manufacturing/templates/it_task_list.html:132
+#: manufacturing/templates/people_list.html:33
 msgid "Name or email"
 msgstr "Nom ou e-mail"
 
@@ -9965,6 +10187,7 @@ msgstr "Ticket %(num)s"
 #: manufacturing/templates/it_ticket_detail.html:91
 #: manufacturing/templates/it_ticket_list.html:69
 #: manufacturing/templates/portal_rma_list.html:13
+#: manufacturing/templates/time_off_list.html:37
 msgid "Submitted"
 msgstr "Soumis"
 
@@ -11791,6 +12014,7 @@ msgid "e.g. Trade show booth"
 msgstr "p. ex. Stand de salon professionnel"
 
 #: manufacturing/templates/mkt_budget_list.html:153
+#: manufacturing/templates/time_off_form.html:65
 msgid "Submit Request"
 msgstr "Soumettre la demande"
 
@@ -11958,9 +12182,7 @@ msgstr "Planification des Besoins en Composants"
 msgid ""
 "Net requirements based on confirmed Sales Orders vs on-hand stock and open "
 "Work Orders."
-msgstr ""
-"Besoins nets basés sur les Commandes Client confirmées par rapport au stock "
-"disponible et aux Ordres de Fabrication ouverts."
+msgstr "Besoins nets basés sur les Commandes Client confirmées par rapport au stock disponible et aux Ordres de Fabrication ouverts."
 
 #: manufacturing/templates/mrp_home.html:48
 msgid "Demand source:"
@@ -12028,14 +12250,7 @@ msgid ""
 "        Checking \"Include forecasted demand\" also adds AI-generated "
 "future\n"
 "        demand from the Demand Forecast page."
-msgstr ""
-"L'exécution du plan éclate toute la demande confirmée des Commandes Client à "
-"travers la nomenclature (BOM),\n"
-"        la compense avec le stock disponible et les Ordres de Fabrication "
-"ouverts, et calcule les ordres planifiés.\n"
-"        Cocher « Inclure la demande prévue » ajoute également la demande "
-"future\n"
-"        générée par IA depuis la page Prévision de la Demande."
+msgstr "L'exécution du plan éclate toute la demande confirmée des Commandes Client à travers la nomenclature (BOM),\n        la compense avec le stock disponible et les Ordres de Fabrication ouverts, et calcule les ordres planifiés.\n        Cocher « Inclure la demande prévue » ajoute également la demande future\n        générée par IA depuis la page Prévision de la Demande."
 
 #: manufacturing/templates/mrp_home.html:112
 msgid "No confirmed Sales Orders with product lines found."
@@ -12072,12 +12287,7 @@ msgid ""
 "        Make orders create Work Orders; Buy orders create draft Purchase "
 "Orders,\n"
 "        pre-assigned to the product's preferred supplier when one is on file."
-msgstr ""
-"Sélectionnez les ordres planifiés que vous souhaitez libérer.\n"
-"        Les ordres Fabriquer créent des Ordres de Fabrication ; les ordres "
-"Acheter créent des Bons de Commande en brouillon,\n"
-"        préaffectés au fournisseur préféré du produit lorsqu'il y en a un "
-"enregistré."
+msgstr "Sélectionnez les ordres planifiés que vous souhaitez libérer.\n        Les ordres Fabriquer créent des Ordres de Fabrication ; les ordres Acheter créent des Bons de Commande en brouillon,\n        préaffectés au fournisseur préféré du produit lorsqu'il y en a un enregistré."
 
 #: manufacturing/templates/mrp_plan.html:56
 #, python-format
@@ -12168,10 +12378,7 @@ msgstr "Plan MRP Libéré"
 msgid ""
 "The following orders were created. Edit each one to set\n"
 "        dates, assign suppliers, and confirm before production begins."
-msgstr ""
-"Les ordres suivants ont été créés. Modifiez chacun pour définir\n"
-"        les dates, affecter les fournisseurs, et confirmer avant le début de "
-"la production."
+msgstr "Les ordres suivants ont été créés. Modifiez chacun pour définir\n        les dates, affecter les fournisseurs, et confirmer avant le début de la production."
 
 #: manufacturing/templates/mrp_release.html:39
 #, python-format
@@ -12216,12 +12423,8 @@ msgid ""
 msgid_plural ""
 "%(counter)s POs below have no preferred supplier on file — open and assign "
 "one before sending."
-msgstr[0] ""
-"%(counter)s Bon de Commande ci-dessous n'a aucun fournisseur préféré "
-"enregistré — ouvrez-le et assignez-en un avant l'envoi."
-msgstr[1] ""
-"%(counter)s Bons de Commande ci-dessous n'ont aucun fournisseur préféré "
-"enregistré — ouvrez-les et assignez-en un avant l'envoi."
+msgstr[0] "%(counter)s Bon de Commande ci-dessous n'a aucun fournisseur préféré enregistré — ouvrez-le et assignez-en un avant l'envoi."
+msgstr[1] "%(counter)s Bons de Commande ci-dessous n'ont aucun fournisseur préféré enregistré — ouvrez-les et assignez-en un avant l'envoi."
 
 #: manufacturing/templates/mrp_release.html:82
 #: manufacturing/templates/po_approvals.html:35
@@ -12250,11 +12453,7 @@ msgstr "Accueil MRP"
 msgid ""
 "Set the minimum on-hand buffer MRP must maintain after fulfilling demand.\n"
 "        Uses each product's <strong>Reorder Point</strong> value."
-msgstr ""
-"Définit le tampon minimum en stock que le MRP doit maintenir après avoir "
-"satisfait la demande.\n"
-"        Utilise la valeur du <strong>Point de Commande</strong> de chaque "
-"produit."
+msgstr "Définit le tampon minimum en stock que le MRP doit maintenir après avoir satisfait la demande.\n        Utilise la valeur du <strong>Point de Commande</strong> de chaque produit."
 
 #: manufacturing/templates/mrp_safety_stock.html:41
 msgid "Safety stock values saved successfully."
@@ -12310,8 +12509,10 @@ msgstr "Déductions"
 #: manufacturing/templates/payroll_deductions.html:8
 #: manufacturing/templates/payroll_pay_rates.html:8
 #: manufacturing/templates/payroll_ytd.html:7
+#: manufacturing/templates/people_detail.html:12
 #: manufacturing/templates/po_detail.html:10
 #: manufacturing/templates/so_detail.html:10
+#: manufacturing/templates/time_off_detail.html:9
 #: manufacturing/templates/wo_detail.html:10
 msgid "History"
 msgstr "Historique"
@@ -12693,6 +12894,102 @@ msgstr "Net total :"
 msgid "No payroll data found for %(year)s."
 msgstr "Aucune donnée de paie trouvée pour %(year)s."
 
+#: manufacturing/templates/people_detail.html:10
+msgid "Employment Dates"
+msgstr "Dates d'Emploi"
+
+#: manufacturing/templates/people_detail.html:53
+msgid "No title on record"
+msgstr "Aucun poste enregistré"
+
+#: manufacturing/templates/people_detail.html:55
+msgid "Employee #:"
+msgstr "N° d'Employé :"
+
+#: manufacturing/templates/people_detail.html:56
+msgid "Role:"
+msgstr "Rôle :"
+
+#: manufacturing/templates/people_detail.html:57
+msgid "Department:"
+msgstr "Service :"
+
+#: manufacturing/templates/people_detail.html:58
+msgid "Sub-Dept:"
+msgstr "Sous-service :"
+
+#: manufacturing/templates/people_detail.html:59
+msgid "Email:"
+msgstr "E-mail :"
+
+#: manufacturing/templates/people_detail.html:61
+msgid "Address:"
+msgstr "Adresse :"
+
+#: manufacturing/templates/people_detail.html:67
+msgid "Created by:"
+msgstr "Créé par :"
+
+#: manufacturing/templates/people_form.html:4
+#: manufacturing/templates/people_form.html:39
+#, python-format
+msgid "Edit %(fn)s %(ln)s"
+msgstr "Modifier %(fn)s %(ln)s"
+
+#: manufacturing/templates/people_form.html:4
+#: manufacturing/templates/people_form.html:39
+#: manufacturing/templates/people_list.html:8
+#: manufacturing/templates/personnel_dashboard.html:7
+#: manufacturing/templates/personnel_dashboard.html:53
+msgid "New Employee"
+msgstr "Nouvel Employé"
+
+#: manufacturing/templates/people_form.html:48
+msgid "Identity"
+msgstr "Identité"
+
+#: manufacturing/templates/people_form.html:61
+msgid "Employee #"
+msgstr "N° d'Employé"
+
+#: manufacturing/templates/people_form.html:70
+msgid "Role & Department"
+msgstr "Rôle et Service"
+
+#: manufacturing/templates/people_form.html:88
+#: manufacturing/templates/pers_depts.html:94
+msgid "Sub-Department"
+msgstr "Sous-Département"
+
+#: manufacturing/templates/people_form.html:122
+msgid "Add Employee"
+msgstr "Ajouter un Employé"
+
+#: manufacturing/templates/people_list.html:4
+#: manufacturing/templates/people_list.html:16
+msgid "Employee Directory"
+msgstr "Répertoire des Employés"
+
+#: manufacturing/templates/people_list.html:22
+msgid "All Departments"
+msgstr "Tous les Services"
+
+#: manufacturing/templates/people_list.html:48
+msgid "Emp #"
+msgstr "N° Empl."
+
+#: manufacturing/templates/people_list.html:50
+msgid "Sub-Dept"
+msgstr "Sous-serv."
+
+#: manufacturing/templates/people_list.html:70
+msgid "No employees found"
+msgstr "Aucun employé trouvé"
+
+#: manufacturing/templates/people_list.html:72
+msgid " in the selected department"
+msgstr " dans le service sélectionné"
+
 #: manufacturing/templates/pers_depts.html:43
 msgid "Departments &amp; Sub-Departments"
 msgstr "Départements et Sous-Départements"
@@ -12708,10 +13005,6 @@ msgstr "Nom du nouveau département"
 #: manufacturing/templates/pers_depts.html:90
 msgid "Sub-Departments"
 msgstr "Sous-Départements"
-
-#: manufacturing/templates/pers_depts.html:94
-msgid "Sub-Department"
-msgstr "Sous-Département"
 
 #: manufacturing/templates/pers_depts.html:123
 msgid "No sub-departments."
@@ -12816,20 +13109,6 @@ msgstr "Nom du cours ou de la formation"
 msgid "Add Training Record"
 msgstr "Ajouter un Enregistrement de Formation"
 
-#: manufacturing/templates/personnel_dashboard.html:7
-#: manufacturing/templates/personnel_dashboard.html:53
-msgid "New Employee"
-msgstr "Nouvel Employé"
-
-#: manufacturing/templates/personnel_dashboard.html:11
-msgid "Skills Matrix"
-msgstr "Matrice des Compétences"
-
-#: manufacturing/templates/personnel_dashboard.html:13
-#: manufacturing/templates/personnel_dashboard.html:58
-msgid "Workforce Analytics"
-msgstr "Analyse de la Main-d'Œuvre"
-
 #: manufacturing/templates/personnel_dashboard.html:62
 #: manufacturing/templates/tc_ot_report.html:7
 #: manufacturing/templates/tc_schedule.html:7
@@ -12846,6 +13125,7 @@ msgid "Approved Time Off"
 msgstr "Congés Approuvés"
 
 #: manufacturing/templates/personnel_dashboard.html:88
+#: manufacturing/templates/workforce_analytics.html:54
 msgid "Headcount by Department"
 msgstr "Effectif par Département"
 
@@ -13473,6 +13753,7 @@ msgid "Reason:"
 msgstr "Motif :"
 
 #: manufacturing/templates/portal_rma_detail.html:25
+#: manufacturing/templates/time_off_detail.html:53
 msgid "Submitted:"
 msgstr "Soumis :"
 
@@ -15045,10 +15326,6 @@ msgid "Approval History"
 msgstr "Historique d'Approbation"
 
 #: manufacturing/templates/req_detail.html:126
-msgid "Level"
-msgstr "Niveau"
-
-#: manufacturing/templates/req_detail.html:126
 msgid "Approver"
 msgstr "Approbateur"
 
@@ -15718,12 +15995,6 @@ msgstr "Probabilité"
 msgid "Weighted Value"
 msgstr "Valeur Pondérée"
 
-#: manufacturing/templates/sales_forecast_detail.html:77
-#: manufacturing/templates/sales_performance_kpis.html:10
-#: manufacturing/templates/sales_targets.html:76
-msgid "Actual"
-msgstr "Réel"
-
 #: manufacturing/templates/sales_forecast_detail.html:86
 msgid "Attainment vs Weighted Forecast"
 msgstr "Atteinte vs Prévision Pondérée"
@@ -16243,6 +16514,101 @@ msgstr "Aucun plan défini pour cette équipe"
 #: manufacturing/templates/sf_tv_grid.html:28
 msgid "No active workcenters found."
 msgstr "Aucun poste de travail actif trouvé."
+
+#: manufacturing/templates/skill_list.html:3
+#: manufacturing/templates/skill_list.html:16
+#: manufacturing/templates/skill_new.html:6
+#: manufacturing/templates/skill_requirements.html:6
+#: manufacturing/templates/skills_matrix_summary.html:6
+msgid "Skills"
+msgstr "Compétences"
+
+#: manufacturing/templates/skill_list.html:6
+#: manufacturing/templates/skills_matrix_summary.html:7
+msgid "Job Requirements"
+msgstr "Exigences du Poste"
+
+#: manufacturing/templates/skill_list.html:10
+#: manufacturing/templates/skill_new.html:3
+#: manufacturing/templates/skill_new.html:21
+msgid "New Skill"
+msgstr "Nouvelle Compétence"
+
+#: manufacturing/templates/skill_list.html:19
+msgid "Search by name or category..."
+msgstr "Rechercher par nom ou catégorie..."
+
+#: manufacturing/templates/skill_list.html:46
+msgid "No skills defined yet."
+msgstr "Aucune compétence définie pour l'instant."
+
+#: manufacturing/templates/skill_new.html:30
+msgid "e.g. TIG Welding"
+msgstr "par ex. Soudage TIG"
+
+#: manufacturing/templates/skill_new.html:34
+msgid "e.g. Fabrication"
+msgstr "par ex. Fabrication"
+
+#: manufacturing/templates/skill_new.html:38
+msgid "Optional description"
+msgstr "Description facultative"
+
+#: manufacturing/templates/skill_new.html:40
+msgid "Create Skill"
+msgstr "Créer une Compétence"
+
+#: manufacturing/templates/skill_requirements.html:3
+#: manufacturing/templates/skill_requirements.html:22
+msgid "Job Skill Requirements"
+msgstr "Exigences de Compétences du Poste"
+
+#: manufacturing/templates/skill_requirements.html:36
+#: manufacturing/templates/skill_requirements.html:93
+msgid "Required Level"
+msgstr "Niveau Requis"
+
+#: manufacturing/templates/skill_requirements.html:64
+msgid "No requirements defined yet."
+msgstr "Aucune exigence définie pour l'instant."
+
+#: manufacturing/templates/skill_requirements.html:77
+msgid "e.g. Welder"
+msgstr "par ex. Soudeur"
+
+#: manufacturing/templates/skills_matrix_summary.html:13
+msgid "Skills Matrix — Competency Gaps"
+msgstr "Matrice des Compétences — Écarts de Compétences"
+
+#: manufacturing/templates/skills_matrix_summary.html:15
+msgid ""
+"One row per employee whose job title has at least one required skill defined."
+msgstr ""
+"Une ligne par employé dont le poste a au moins une compétence requise "
+"définie."
+
+#: manufacturing/templates/skills_matrix_summary.html:16
+msgid "Sorted by largest gap first."
+msgstr "Trié par le plus grand écart en premier."
+
+#: manufacturing/templates/skills_matrix_summary.html:27
+msgid "Required Skills"
+msgstr "Compétences Requises"
+
+#: manufacturing/templates/skills_matrix_summary.html:28
+msgid "Skills Met"
+msgstr "Compétences Atteintes"
+
+#: manufacturing/templates/skills_matrix_summary.html:29
+msgid "Gaps"
+msgstr "Écarts"
+
+#: manufacturing/templates/skills_matrix_summary.html:55
+msgid ""
+"No job skill requirements configured yet — add some under Job Requirements."
+msgstr ""
+"Aucune exigence de compétence de poste configurée pour l'instant — ajoutez-"
+"en sous Exigences du Poste."
 
 #: manufacturing/templates/so_detail.html:139
 msgid "Cancel this order?"
@@ -16929,11 +17295,6 @@ msgstr "Aucun pointage pour cette période."
 msgid "Termination — %(name)s"
 msgstr "Résiliation — %(name)s"
 
-#: manufacturing/templates/termination_detail.html:41
-#: manufacturing/templates/termination_list.html:109
-msgid "Termination Date"
-msgstr "Date de Résiliation"
-
 #: manufacturing/templates/termination_detail.html:43
 #: manufacturing/templates/termination_list.html:72
 #: manufacturing/templates/termination_list.html:121
@@ -17032,6 +17393,49 @@ msgstr "Journal d'aujourd'hui"
 #, python-format
 msgid "Total today: %(total)s"
 msgstr "Total aujourd'hui : %(total)s"
+
+#: manufacturing/templates/time_off_detail.html:4
+#, python-format
+msgid "Time-Off Request #%(num)s"
+msgstr "Demande de Congé N° %(num)s"
+
+#: manufacturing/templates/time_off_detail.html:43
+#, python-format
+msgid "Request #%(num)s"
+msgstr "Demande N° %(num)s"
+
+#: manufacturing/templates/time_off_detail.html:52
+msgid "End Date:"
+msgstr "Date de Fin :"
+
+#: manufacturing/templates/time_off_detail.html:54
+msgid "Submitted by:"
+msgstr "Soumis par :"
+
+#: manufacturing/templates/time_off_form.html:43
+msgid "Start Date *"
+msgstr "Date de Début *"
+
+#: manufacturing/templates/time_off_form.html:47
+msgid "End Date *"
+msgstr "Date de Fin *"
+
+#: manufacturing/templates/time_off_form.html:52
+msgid "Request Type"
+msgstr "Type de Demande"
+
+#: manufacturing/templates/time_off_list.html:4
+#: manufacturing/templates/time_off_list.html:16
+msgid "Time-Off Requests"
+msgstr "Demandes de Congé"
+
+#: manufacturing/templates/time_off_list.html:8
+msgid "New Request"
+msgstr "Nouvelle Demande"
+
+#: manufacturing/templates/time_off_list.html:61
+msgid "No time-off requests found."
+msgstr "Aucune demande de congé trouvée."
 
 #: manufacturing/templates/wms_bin_detail.html:3
 #, python-format
@@ -17411,8 +17815,7 @@ msgid "%(counter)s order line waiting on this product with nothing in stock:"
 msgid_plural ""
 "%(counter)s order lines waiting on this product with nothing in stock:"
 msgstr[0] "%(counter)s ligne de commande en attente de ce produit sans stock :"
-msgstr[1] ""
-"%(counter)s lignes de commande en attente de ce produit sans stock :"
+msgstr[1] "%(counter)s lignes de commande en attente de ce produit sans stock :"
 
 #: manufacturing/templates/wms_receive.html:77
 #, python-format
@@ -18084,6 +18487,57 @@ msgstr "Aucun ordre de fabrication avec ce statut."
 #: manufacturing/templates/wo_list.html:69
 msgid "No work orders."
 msgstr "Aucun ordre de fabrication."
+
+#: manufacturing/templates/workforce_analytics.html:29
+msgid ""
+"Tenure and headcount trend are computed only from employees with a hire date "
+"on file —\n"
+"        set an employee's hire date from their profile to include them."
+msgstr ""
+"L'ancienneté et la tendance des effectifs sont calculées uniquement à partir "
+"des employés ayant une date d'embauche enregistrée —\n"
+"        définissez la date d'embauche d'un employé depuis son profil pour "
+"l'inclure."
+
+#: manufacturing/templates/workforce_analytics.html:35
+msgid "Active Headcount"
+msgstr "Effectif Actif"
+
+#: manufacturing/templates/workforce_analytics.html:39
+msgid "Terminated (All-Time)"
+msgstr "Départs (Cumul)"
+
+#: manufacturing/templates/workforce_analytics.html:43
+msgid "Avg Tenure (Years)"
+msgstr "Ancienneté Moyenne (Années)"
+
+#: manufacturing/templates/workforce_analytics.html:47
+msgid "Turnover Rate (TTM)"
+msgstr "Taux de Turnover (12 Derniers Mois)"
+
+#: manufacturing/templates/workforce_analytics.html:65
+msgid "No active employees."
+msgstr "Aucun employé actif."
+
+#: manufacturing/templates/workforce_analytics.html:70
+msgid "12-Month Headcount Trend"
+msgstr "Tendance des Effectifs (12 Mois)"
+
+#: manufacturing/templates/workforce_analytics.html:73
+msgid "Headcount"
+msgstr "Effectif"
+
+#: manufacturing/templates/workforce_analytics.html:81
+msgid "No hire-date data available."
+msgstr "Aucune donnée de date d'embauche disponible."
+
+#: manufacturing/templates/workforce_analytics.html:87
+msgid "Headcount Plan vs. Actual"
+msgstr "Plan d'Effectifs vs Réel"
+
+#: manufacturing/templates/workforce_analytics.html:108
+msgid "No headcount plans yet."
+msgstr "Aucun plan d'effectifs pour l'instant."
 
 #: manufacturing/work_orders_core.py:37
 msgid "Cancel WO"
