@@ -1,15 +1,16 @@
 {% extends "base_portal.html" %}
-{% block page_title %}My Returns — Customer Portal{% endblock %}
-{% block menu_title %}My Returns{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "My Returns" %} — {% trans "Customer Portal" %}{% endblock %}
+{% block menu_title %}{% trans "My Returns" %}{% endblock %}
 
 {% block body %}
-<a href="{% url 'portal_rma_new' %}" class="btn" style="margin-bottom:16px;display:inline-block;">+ New Return Request</a>
+<a href="{% url 'portal_rma_new' %}" class="btn" style="margin-bottom:16px;display:inline-block;">+ {% trans "New Return Request" %}</a>
 
 {% if rmas %}
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>RMA #</th><th>Order</th><th>Reason</th><th>Submitted</th><th>Status</th></tr>
+            <tr><th>{% trans "RMA #" %}</th><th>{% trans "Order" %}</th><th>{% trans "Reason" %}</th><th>{% trans "Submitted" %}</th><th>{% trans "Status" %}</th></tr>
         </thead>
         <tbody>
             {% for r in rmas %}
@@ -25,6 +26,6 @@
     </table>
 </div>
 {% else %}
-<div class="empty-state">You have no return requests yet.</div>
+<div class="empty-state">{% trans "You have no return requests yet." %}</div>
 {% endif %}
 {% endblock %}

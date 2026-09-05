@@ -1,21 +1,22 @@
 {% extends "base_portal.html" %}
-{% block page_title %}Order {{ so.so_number }} — Customer Portal{% endblock %}
-{% block menu_title %}Order {{ so.so_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=so.so_number %}Order {{ num }}{% endblocktrans %} — {% trans "Customer Portal" %}{% endblock %}
+{% block menu_title %}{% blocktrans with num=so.so_number %}Order {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block body %}
 <div class="card">
-    <div class="card-title">Order Summary</div>
-    <p><strong>Status:</strong> <span class="pill pill-{{ so.status }}">{{ so.status|capfirst }}</span></p>
-    <p><strong>Order Date:</strong> {{ so.order_date|default:"—" }}</p>
-    <p><strong>Ship Date:</strong> {{ so.ship_date|default:"—" }}</p>
+    <div class="card-title">{% trans "Order Summary" %}</div>
+    <p><strong>{% trans "Status:" %}</strong> <span class="pill pill-{{ so.status }}">{{ so.status|capfirst }}</span></p>
+    <p><strong>{% trans "Order Date:" %}</strong> {{ so.order_date|default:"—" }}</p>
+    <p><strong>{% trans "Ship Date:" %}</strong> {{ so.ship_date|default:"—" }}</p>
 </div>
 
 <div class="card">
-    <div class="card-title">Items</div>
+    <div class="card-title">{% trans "Items" %}</div>
     {% if items %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit Price</th><th class="num">Line Total</th></tr></thead>
+            <thead><tr><th>{% trans "Description" %}</th><th class="num">{% trans "Qty" %}</th><th class="num">{% trans "Unit Price" %}</th><th class="num">{% trans "Line Total" %}</th></tr></thead>
             <tbody>
                 {% for it in items %}
                 <tr>
@@ -29,16 +30,16 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No line items.</div>
+    <div class="empty-state">{% trans "No line items." %}</div>
     {% endif %}
 </div>
 
 <div class="card">
-    <div class="card-title">Shipments</div>
+    <div class="card-title">{% trans "Shipments" %}</div>
     {% if shipments %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Shipment #</th><th>Ship Date</th><th>Carrier</th><th>Tracking #</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Shipment #" %}</th><th>{% trans "Ship Date" %}</th><th>{% trans "Carrier" %}</th><th>{% trans "Tracking #" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
                 {% for s in shipments %}
                 <tr>
@@ -53,7 +54,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No shipments yet.</div>
+    <div class="empty-state">{% trans "No shipments yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

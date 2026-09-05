@@ -1,5 +1,6 @@
 {% extends "base_supplier_portal.html" %}
-{% block page_title %}{{ rfq.rfq_number }} — Supplier Portal{% endblock %}
+{% load i18n %}
+{% block page_title %}{{ rfq.rfq_number }} — {% trans "Supplier Portal" %}{% endblock %}
 {% block menu_title %}{{ rfq.rfq_number }}{% endblock %}
 
 {% block body %}
@@ -7,16 +8,16 @@
 {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
 <div class="card">
-    <p><strong>Status:</strong> <span class="pill pill-{{ rfq.status }}">{{ rfq.status|capfirst }}</span></p>
-    {% if rfq.notes %}<p><strong>Notes:</strong> {{ rfq.notes }}</p>{% endif %}
+    <p><strong>{% trans "Status:" %}</strong> <span class="pill pill-{{ rfq.status }}">{{ rfq.status|capfirst }}</span></p>
+    {% if rfq.notes %}<p><strong>{% trans "Notes:" %}</strong> {{ rfq.notes }}</p>{% endif %}
 </div>
 
 <div class="card">
-    <div class="card-title">Line Items — Enter Your Quote</div>
+    <div class="card-title">{% trans "Line Items — Enter Your Quote" %}</div>
     {% if rfq.items %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Description</th><th class="num">Qty</th><th></th></tr></thead>
+            <thead><tr><th>{% trans "Description" %}</th><th class="num">{% trans "Qty" %}</th><th></th></tr></thead>
             <tbody>
                 {% for item in rfq.items %}
                 <tr>
@@ -29,19 +30,19 @@
                             <input type="hidden" name="rfq_item_id" value="{{ item.id }}">
                             <input type="number" name="quoted_price" step="0.01" min="0"
                                    value="{{ item.my_quoted_price|default_if_none:'' }}"
-                                   placeholder="Price" style="width:90px;padding:5px;border:1px solid var(--border);border-radius:4px;">
+                                   placeholder="{% trans 'Price' %}" style="width:90px;padding:5px;border:1px solid var(--border);border-radius:4px;">
                             <input type="number" name="lead_time_days" min="0"
                                    value="{{ item.my_lead_time_days|default_if_none:'' }}"
-                                   placeholder="Lead days" style="width:90px;padding:5px;border:1px solid var(--border);border-radius:4px;">
+                                   placeholder="{% trans 'Lead days' %}" style="width:90px;padding:5px;border:1px solid var(--border);border-radius:4px;">
                             <button type="submit" class="btn" style="padding:5px 12px;font-size:12px;">
-                                {% if item.my_quoted_price != None %}Update{% else %}Submit{% endif %} Quote
+                                {% if item.my_quoted_price != None %}{% trans "Update Quote" %}{% else %}{% trans "Submit Quote" %}{% endif %}
                             </button>
                         </form>
                         {% else %}
                         {% if item.my_quoted_price != None %}
-                        ${{ item.my_quoted_price|floatformat:2 }} · {{ item.my_lead_time_days }} days
+                        {% blocktrans with price=item.my_quoted_price|floatformat:2 days=item.my_lead_time_days %}${{ price }} · {{ days }} days{% endblocktrans %}
                         {% else %}
-                        No quote submitted
+                        {% trans "No quote submitted" %}
                         {% endif %}
                         {% endif %}
                     </td>
@@ -51,7 +52,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No line items on this RFQ.</div>
+    <div class="empty-state">{% trans "No line items on this RFQ." %}</div>
     {% endif %}
 </div>
 {% endblock %}

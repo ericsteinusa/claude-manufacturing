@@ -1,9 +1,10 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block page_title %}Customer Portal{% endblock %}</title>
+    <title>{% block page_title %}{% trans "Customer Portal" %}{% endblock %}</title>
     <style>
         :root {
             --hdr-bg: #0f1d3a;
@@ -148,15 +149,26 @@
 <body>
 
 <header class="portal-header">
-    <a href="{% url 'portal_home' %}" class="portal-brand">⚙ <span>MFG</span> Customer Portal</a>
+    <a href="{% url 'portal_home' %}" class="portal-brand">⚙ <span>MFG</span> {% trans "Customer Portal" %}</a>
     <nav class="portal-nav">
-        <a href="{% url 'portal_home' %}" class="{% if request.path == '/portal/' %}active{% endif %}">Dashboard</a>
-        <a href="{% url 'portal_orders' %}" class="{% if '/portal/orders/' in request.path %}active{% endif %}">Orders</a>
-        <a href="{% url 'portal_invoices' %}" class="{% if '/portal/invoices/' in request.path %}active{% endif %}">Invoices</a>
-        <a href="{% url 'portal_rma_list' %}" class="{% if '/portal/rma/' in request.path %}active{% endif %}">Returns</a>
+        <a href="{% url 'portal_home' %}" class="{% if request.path == '/portal/' %}active{% endif %}">{% trans "Dashboard" %}</a>
+        <a href="{% url 'portal_orders' %}" class="{% if '/portal/orders/' in request.path %}active{% endif %}">{% trans "Orders" %}</a>
+        <a href="{% url 'portal_invoices' %}" class="{% if '/portal/invoices/' in request.path %}active{% endif %}">{% trans "Invoices" %}</a>
+        <a href="{% url 'portal_rma_list' %}" class="{% if '/portal/rma/' in request.path %}active{% endif %}">{% trans "Returns" %}</a>
     </nav>
     <span class="portal-user"><strong>{{ portal_company }}</strong> · {{ portal_email }}</span>
-    <a href="{% url 'portal_logout' %}" class="btn-sm-nav">Logout</a>
+    <form action="{% url 'set_language' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()" class="btn-sm-nav" style="cursor:pointer;">
+            {% get_current_language as CURRENT_LANGUAGE %}
+            {% get_available_languages as AVAILABLE_LANGUAGES %}
+            {% for code, name in AVAILABLE_LANGUAGES %}
+            <option value="{{ code }}"{% if code == CURRENT_LANGUAGE %} selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <a href="{% url 'portal_logout' %}" class="btn-sm-nav">{% trans "Logout" %}</a>
 </header>
 
 <div class="content">

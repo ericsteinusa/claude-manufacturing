@@ -1,13 +1,14 @@
 {% extends "base_supplier_portal.html" %}
-{% block page_title %}Purchase Orders — Supplier Portal{% endblock %}
-{% block menu_title %}Purchase Orders{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Purchase Orders" %} — {% trans "Supplier Portal" %}{% endblock %}
+{% block menu_title %}{% trans "Purchase Orders" %}{% endblock %}
 
 {% block body %}
 <div class="card">
     {% if pos %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>PO #</th><th>Order Date</th><th>Expected Date</th><th class="num">Total</th><th>Status</th><th>Acknowledged</th></tr></thead>
+            <thead><tr><th>{% trans "PO #" %}</th><th>{% trans "Order Date" %}</th><th>{% trans "Expected Date" %}</th><th class="num">{% trans "Total" %}</th><th>{% trans "Status" %}</th><th>{% trans "Acknowledged" %}</th></tr></thead>
             <tbody>
                 {% for po in pos %}
                 <tr>
@@ -23,7 +24,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No purchase orders yet.</div>
+    <div class="empty-state">{% trans "No purchase orders yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

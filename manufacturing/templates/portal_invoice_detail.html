@@ -1,34 +1,35 @@
 {% extends "base_portal.html" %}
-{% block page_title %}Invoice {{ invoice.invoice_number }} — Customer Portal{% endblock %}
-{% block menu_title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=invoice.invoice_number %}Invoice {{ num }}{% endblocktrans %} — {% trans "Customer Portal" %}{% endblock %}
+{% block menu_title %}{% blocktrans with num=invoice.invoice_number %}Invoice {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block body %}
 <div class="card">
     <div class="card-title">
-        Invoice Summary
-        <a href="{% url 'portal_invoice_pdf' invoice.id %}" class="btn" style="float:right;" target="_blank">⬇ Download PDF</a>
+        {% trans "Invoice Summary" %}
+        <a href="{% url 'portal_invoice_pdf' invoice.id %}" class="btn" style="float:right;" target="_blank">⬇ {% trans "Download PDF" %}</a>
     </div>
-    <p><strong>Status:</strong> <span class="pill pill-{{ invoice.status }}">{{ invoice.status|capfirst }}</span></p>
-    <p><strong>Invoice Date:</strong> {{ invoice.invoice_date|default:"—" }}</p>
-    <p><strong>Due Date:</strong> {{ invoice.due_date|default:"—" }}</p>
-    {% if invoice.description %}<p><strong>Description:</strong> {{ invoice.description }}</p>{% endif %}
-    <p><strong>Amount:</strong> ${{ invoice.amount|floatformat:2 }}</p>
-    <p><strong>Balance Due:</strong> ${{ invoice.balance|floatformat:2 }}</p>
+    <p><strong>{% trans "Status:" %}</strong> <span class="pill pill-{{ invoice.status }}">{{ invoice.status|capfirst }}</span></p>
+    <p><strong>{% trans "Invoice Date:" %}</strong> {{ invoice.invoice_date|default:"—" }}</p>
+    <p><strong>{% trans "Due Date:" %}</strong> {{ invoice.due_date|default:"—" }}</p>
+    {% if invoice.description %}<p><strong>{% trans "Description:" %}</strong> {{ invoice.description }}</p>{% endif %}
+    <p><strong>{% trans "Amount:" %}</strong> ${{ invoice.amount|floatformat:2 }}</p>
+    <p><strong>{% trans "Balance Due:" %}</strong> ${{ invoice.balance|floatformat:2 }}</p>
 
     {% if invoice.balance > 0 %}
     <form method="post" action="{% url 'portal_invoice_pay' invoice.id %}" style="margin-top:16px;">
         {% csrf_token %}
-        <button type="submit" class="btn">Pay ${{ invoice.balance|floatformat:2 }} Now</button>
+        <button type="submit" class="btn">{% blocktrans with bal=invoice.balance|floatformat:2 %}Pay ${{ bal }} Now{% endblocktrans %}</button>
     </form>
     {% endif %}
 </div>
 
 <div class="card">
-    <div class="card-title">Payment History</div>
+    <div class="card-title">{% trans "Payment History" %}</div>
     {% if payments %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Date</th><th>Method</th><th class="num">Amount</th><th>Reference</th></tr></thead>
+            <thead><tr><th>{% trans "Date" %}</th><th>{% trans "Method" %}</th><th class="num">{% trans "Amount" %}</th><th>{% trans "Reference" %}</th></tr></thead>
             <tbody>
                 {% for p in payments %}
                 <tr>
@@ -42,7 +43,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No payments recorded yet.</div>
+    <div class="empty-state">{% trans "No payments recorded yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

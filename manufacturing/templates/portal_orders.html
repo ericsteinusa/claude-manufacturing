@@ -1,13 +1,14 @@
 {% extends "base_portal.html" %}
-{% block page_title %}My Orders — Customer Portal{% endblock %}
-{% block menu_title %}My Orders{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "My Orders" %} — {% trans "Customer Portal" %}{% endblock %}
+{% block menu_title %}{% trans "My Orders" %}{% endblock %}
 
 {% block body %}
 {% if orders %}
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Order #</th><th>Order Date</th><th>Ship Date</th><th class="num">Items</th><th class="num">Total</th><th>Status</th></tr>
+            <tr><th>{% trans "Order #" %}</th><th>{% trans "Order Date" %}</th><th>{% trans "Ship Date" %}</th><th class="num">{% trans "Items" %}</th><th class="num">{% trans "Total" %}</th><th>{% trans "Status" %}</th></tr>
         </thead>
         <tbody>
             {% for so in orders %}
@@ -24,6 +25,6 @@
     </table>
 </div>
 {% else %}
-<div class="empty-state">You have no orders yet.</div>
+<div class="empty-state">{% trans "You have no orders yet." %}</div>
 {% endif %}
 {% endblock %}

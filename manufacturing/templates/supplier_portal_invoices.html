@@ -1,17 +1,18 @@
 {% extends "base_supplier_portal.html" %}
-{% block page_title %}Invoices — Supplier Portal{% endblock %}
-{% block menu_title %}Invoices{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Invoices" %} — {% trans "Supplier Portal" %}{% endblock %}
+{% block menu_title %}{% trans "Invoices" %}{% endblock %}
 
 {% block body %}
 <div style="margin-bottom:16px;">
-    <a href="{% url 'supplier_portal_invoice_new' %}" class="btn">+ Submit New Invoice</a>
+    <a href="{% url 'supplier_portal_invoice_new' %}" class="btn">+ {% trans "Submit New Invoice" %}</a>
 </div>
 
 <div class="card">
     {% if invoices %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Invoice #</th><th>Invoice Date</th><th>Due Date</th><th class="num">Amount</th><th class="num">Balance</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Invoice #" %}</th><th>{% trans "Invoice Date" %}</th><th>{% trans "Due Date" %}</th><th class="num">{% trans "Amount" %}</th><th class="num">{% trans "Balance" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
                 {% for inv in invoices %}
                 <tr>
@@ -27,7 +28,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No invoices submitted yet.</div>
+    <div class="empty-state">{% trans "No invoices submitted yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

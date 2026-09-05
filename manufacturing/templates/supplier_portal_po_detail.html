@@ -1,5 +1,6 @@
 {% extends "base_supplier_portal.html" %}
-{% block page_title %}{{ po.po_number }} — Supplier Portal{% endblock %}
+{% load i18n %}
+{% block page_title %}{{ po.po_number }} — {% trans "Supplier Portal" %}{% endblock %}
 {% block menu_title %}{{ po.po_number }}{% endblock %}
 
 {% block extra_styles %}
@@ -17,38 +18,38 @@
 {% block body %}
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
-<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 
 <div class="card">
-    <div class="card-title">Order Summary</div>
-    <p><strong>Status:</strong> <span class="pill pill-{{ po.status }}">{{ po.status|capfirst }}</span></p>
-    <p><strong>Order Date:</strong> {{ po.order_date|default:"—" }}</p>
-    <p><strong>Expected Date:</strong> {{ po.expected_date|default:"—" }}</p>
-    {% if po.notes %}<p><strong>Notes:</strong> {{ po.notes }}</p>{% endif %}
-    <p><strong>Total:</strong> ${{ po.total|floatformat:2 }}</p>
+    <div class="card-title">{% trans "Order Summary" %}</div>
+    <p><strong>{% trans "Status:" %}</strong> <span class="pill pill-{{ po.status }}">{{ po.status|capfirst }}</span></p>
+    <p><strong>{% trans "Order Date:" %}</strong> {{ po.order_date|default:"—" }}</p>
+    <p><strong>{% trans "Expected Date:" %}</strong> {{ po.expected_date|default:"—" }}</p>
+    {% if po.notes %}<p><strong>{% trans "Notes:" %}</strong> {{ po.notes }}</p>{% endif %}
+    <p><strong>{% trans "Total:" %}</strong> ${{ po.total|floatformat:2 }}</p>
 
     {% if po.supplier_acknowledged_at %}
-    <p style="margin-top:12px;"><strong>Acknowledged:</strong> {{ po.supplier_acknowledged_at }}
+    <p style="margin-top:12px;"><strong>{% trans "Acknowledged:" %}</strong> {{ po.supplier_acknowledged_at }}
         {% if po.supplier_ack_notes %} — {{ po.supplier_ack_notes }}{% endif %}</p>
     {% else %}
     <form method="post" style="margin-top:16px;">
         {% csrf_token %}
         <input type="hidden" name="action" value="acknowledge">
         <div class="form-row">
-            <label>Notes (optional)</label>
-            <textarea name="notes" rows="2" placeholder="Confirm ship date, etc."></textarea>
+            <label>{% trans "Notes (optional)" %}</label>
+            <textarea name="notes" rows="2" placeholder="{% trans 'Confirm ship date, etc.' %}"></textarea>
         </div>
-        <button type="submit" class="btn">Acknowledge This Order</button>
+        <button type="submit" class="btn">{% trans "Acknowledge This Order" %}</button>
     </form>
     {% endif %}
 </div>
 
 <div class="card">
-    <div class="card-title">Line Items</div>
+    <div class="card-title">{% trans "Line Items" %}</div>
     {% if items %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Description</th><th class="num">Qty Ordered</th><th class="num">Unit Price</th><th class="num">Qty Received</th></tr></thead>
+            <thead><tr><th>{% trans "Description" %}</th><th class="num">{% trans "Qty Ordered" %}</th><th class="num">{% trans "Unit Price" %}</th><th class="num">{% trans "Qty Received" %}</th></tr></thead>
             <tbody>
                 {% for it in items %}
                 <tr>
@@ -62,12 +63,12 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No line items.</div>
+    <div class="empty-state">{% trans "No line items." %}</div>
     {% endif %}
 </div>
 
 <div class="card">
-    <div class="card-title">Submit an Invoice Against This Order</div>
-    <a href="{% url 'supplier_portal_invoice_new' %}?po_id={{ po.id }}" class="btn">Submit Invoice</a>
+    <div class="card-title">{% trans "Submit an Invoice Against This Order" %}</div>
+    <a href="{% url 'supplier_portal_invoice_new' %}?po_id={{ po.id }}" class="btn">{% trans "Submit Invoice" %}</a>
 </div>
 {% endblock %}
