@@ -237,6 +237,7 @@ def get_fixed_asset_summary(conn) -> dict:
     total_cost = sum(float(a.get('purchase_price') or 0) for a in assets)
     total_book = sum(calc_book_value(a) for a in assets)
     total_depreciation = sum(calc_accumulated_depreciation(a) for a in assets)
+    total_annual_dep = sum(calc_annual_depreciation(a) for a in assets)
     active = sum(1 for a in assets if a.get('status') == 'Active')
     return {
         'count': len(assets),
@@ -244,4 +245,5 @@ def get_fixed_asset_summary(conn) -> dict:
         'total_cost': round(total_cost, 2),
         'total_book_value': round(total_book, 2),
         'total_accumulated_depreciation': round(total_depreciation, 2),
+        'total_annual_dep': round(total_annual_dep, 2),
     }

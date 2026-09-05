@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Approval Rules{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Approval Rules" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/dashboard/" class="btn">Home</a>
-<a href="/approval-rules/new/" class="btn btn-primary">+ New Rule</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="/approval-rules/new/" class="btn btn-primary">+ {% trans "New Rule" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -13,17 +14,17 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Approval Rules</div>
+    <div class="menu-title">{% trans "Approval Rules" %}</div>
     <p style="color:var(--text-muted);margin-bottom:14px;font-size:13px;">
-        Rules determine who must sign off on purchase orders, requisitions, GL journals,
+        {% blocktrans %}Rules determine who must sign off on purchase orders, requisitions, GL journals,
         cycle counts, and documents — and in what order. A rule applies once the entity's
-        amount meets its threshold; leave department blank to apply it to every department.
+        amount meets its threshold; leave department blank to apply it to every department.{% endblocktrans %}
     </p>
 
     <form method="get" class="ar-filter">
-        <label for="entity_type" style="font-size:12px;font-weight:bold;color:#555;">Filter by type:</label>
+        <label for="entity_type" style="font-size:12px;font-weight:bold;color:#555;">{% trans "Filter by type:" %}</label>
         <select name="entity_type" id="entity_type" onchange="this.form.submit()">
-            <option value="">All types</option>
+            <option value="">{% trans "All types" %}</option>
             {% for et in entity_types %}
             <option value="{{ et }}"{% if et == entity_type %} selected{% endif %}>{{ et }}</option>
             {% endfor %}
@@ -35,13 +36,13 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Entity Type</th>
-                    <th>Department</th>
-                    <th class="num">Threshold</th>
-                    <th>Approver Role</th>
-                    <th class="num">Seq</th>
-                    <th class="num">Escalate After</th>
-                    <th>Status</th>
+                    <th>{% trans "Entity Type" %}</th>
+                    <th>{% trans "Department" %}</th>
+                    <th class="num">{% trans "Threshold" %}</th>
+                    <th>{% trans "Approver Role" %}</th>
+                    <th class="num">{% trans "Seq" %}</th>
+                    <th class="num">{% trans "Escalate After" %}</th>
+                    <th>{% trans "Status" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -49,26 +50,32 @@
                 {% for r in rules %}
                 <tr>
                     <td>{{ r.entity_type }}</td>
-                    <td>{{ r.dept_key|default:"— All —" }}</td>
+                    <td>{% if r.dept_key %}{{ r.dept_key }}{% else %}{% trans "— All —" %}{% endif %}</td>
                     <td class="num">${{ r.threshold_amount|floatformat:2 }}</td>
                     <td>{{ r.approver_role }}</td>
                     <td class="num">{{ r.seq }}</td>
                     <td class="num">{{ r.escalate_after_hours }}h</td>
                     <td>
                         {% if r.is_active %}
-                        <span class="pill pill-ok">Active</span>
+                        <span class="pill pill-ok">{% trans "Active" %}</span>
                         {% else %}
-                        <span class="pill pill-cancelled">Inactive</span>
+                        <span class="pill pill-cancelled">{% trans "Inactive" %}</span>
                         {% endif %}
                     </td>
-                    <td><a href="/approval-rules/{{ r.id }}/" class="btn btn-sm">Edit</a></td>
+                    <td><a href="/approval-rules/{{ r.id }}/" class="btn btn-sm">{% trans "Edit" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No approval rules configured{% if entity_type %} for {{ entity_type }}{% endif %}.</div>
+    <div class="empty-state">
+        {% if entity_type %}
+        {% blocktrans %}No approval rules configured for {{ entity_type }}.{% endblocktrans %}
+        {% else %}
+        {% trans "No approval rules configured." %}
+        {% endif %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}

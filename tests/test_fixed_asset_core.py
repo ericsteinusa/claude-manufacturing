@@ -317,6 +317,7 @@ def test_get_fixed_asset_summary_aggregates_across_assets():
     assert summary['total_cost'] == 15000.0
     assert summary['total_book_value'] == 1000.0 + 5000.0
     assert summary['total_accumulated_depreciation'] == 9000.0 + 0.0
+    assert summary['total_annual_dep'] == 4500.0 + 1000.0
 
 
 def test_get_fixed_asset_summary_returns_empty_dict_on_query_error():

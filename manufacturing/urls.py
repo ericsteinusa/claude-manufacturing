@@ -546,7 +546,7 @@ urlpatterns = [
     path('assets/fixed/', views.fixed_asset_list, name='fixed_asset_list'),
     path('assets/fixed/<int:asset_id>/', views.fixed_asset_detail, name='fixed_asset_detail'),
     # Currency Management
-    path('admin/currencies/', views.currency_list, name='currency_list'),
+    path('currencies/', views.currency_list, name='currency_list'),
     # Approval Rule Management
     path('approval-rules/', views.approval_rule_list, name='approval_rule_list'),
     path('approval-rules/new/', views.approval_rule_new, name='approval_rule_new'),

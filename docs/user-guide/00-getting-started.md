@@ -96,7 +96,7 @@ These aren't tied to one department — they apply company-wide:
   get an inline error telling you the period is closed.
 - **Fixed Asset Management** (`/assets/fixed/`) — company asset register with
   depreciation schedules.
-- **Currency Management** (`/admin/currencies/`) — exchange rates used
+- **Currency Management** (`/currencies/`) — exchange rates used
   whenever a PO, SO, AP, or AR transaction is in a foreign currency.
 - **Approval Rule Management** (`/approval-rules/`) — configures who approves
   what, for departments with custom approval workflows.

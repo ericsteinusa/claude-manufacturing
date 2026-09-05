@@ -1,24 +1,25 @@
 {% extends "base.html" %}
-{% block page_title %}Audit Log — Manufacturing System{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Audit Log — Manufacturing System" %}{% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Audit Log</div>
+    <div class="menu-title">{% trans "Audit Log" %}</div>
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;">
-        <label>Table:</label>
+        <label>{% trans "Table:" %}</label>
         <select name="table" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All tables</option>
+            <option value="">{% trans "All tables" %}</option>
             {% for t in audited_tables %}
             <option value="{{ t }}" {% if t == table_filter %}selected{% endif %}>{{ t }}</option>
             {% endfor %}
         </select>
-        <label>User:</label>
-        <input type="text" name="user" value="{{ user_filter }}" placeholder="email fragment"
+        <label>{% trans "User:" %}</label>
+        <input type="text" name="user" value="{{ user_filter }}" placeholder="{% trans 'email fragment' %}"
                style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:180px;">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
         {% if table_filter or user_filter %}
-        <a href="{% url 'audit_log' %}" class="btn">Clear</a>
+        <a href="{% url 'audit_log' %}" class="btn">{% trans "Clear" %}</a>
         {% endif %}
     </form>
 
@@ -26,11 +27,11 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>When</th>
-                    <th>Table</th>
-                    <th>Record</th>
-                    <th>Action</th>
-                    <th>Changed by</th>
+                    <th>{% trans "When" %}</th>
+                    <th>{% trans "Table" %}</th>
+                    <th>{% trans "Record" %}</th>
+                    <th>{% trans "Action" %}</th>
+                    <th>{% trans "Changed by" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -53,11 +54,11 @@
                     </td>
                     <td>{{ entry.changed_by|default:"—" }}</td>
                     <td>
-                        <a href="{% url 'audit_record' entry.table_name entry.record_id %}" class="btn" style="padding:3px 10px;font-size:12px;">History</a>
+                        <a href="{% url 'audit_record' entry.table_name entry.record_id %}" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "History" %}</a>
                     </td>
                 </tr>
             {% empty %}
-                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;font-style:italic;">No audit entries found.</td></tr>
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;font-style:italic;">{% trans "No audit entries found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

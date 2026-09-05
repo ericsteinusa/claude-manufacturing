@@ -1,41 +1,42 @@
 {% extends "base.html" %}
-{% block page_title %}Period Management{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Period Management" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/dashboard/" class="btn">Home</a>
-<a href="/audit/" class="btn">Audit Log</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="/audit/" class="btn">{% trans "Audit Log" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Period Management</div>
+    <div class="menu-title">{% trans "Period Management" %}</div>
     <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px;">
-        Close a period to prevent any new or edited records from being dated
-        within it. Only President and Vice President may close or reopen periods.
+        {% blocktrans %}Close a period to prevent any new or edited records from being dated
+        within it. Only President and Vice President may close or reopen periods.{% endblocktrans %}
     </p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     {% if can_write %}
     <div class="card" style="max-width:700px;margin-bottom:24px;">
-        <div class="card-title">Close a Period</div>
+        <div class="card-title">{% trans "Close a Period" %}</div>
         <form method="post" action="/periods/">
             {% csrf_token %}
             <input type="hidden" name="action" value="close">
             <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
                 <div class="form-row" style="flex:0 0 auto;">
-                    <label>Period</label>
+                    <label>{% trans "Period" %}</label>
                     <select name="month">
-                        <option value="1">January</option><option value="2">February</option>
-                        <option value="3">March</option><option value="4">April</option>
-                        <option value="5">May</option><option value="6">June</option>
-                        <option value="7">July</option><option value="8">August</option>
-                        <option value="9">September</option><option value="10">October</option>
-                        <option value="11">November</option><option value="12">December</option>
+                        <option value="1">{% trans "January" %}</option><option value="2">{% trans "February" %}</option>
+                        <option value="3">{% trans "March" %}</option><option value="4">{% trans "April" %}</option>
+                        <option value="5">{% trans "May" %}</option><option value="6">{% trans "June" %}</option>
+                        <option value="7">{% trans "July" %}</option><option value="8">{% trans "August" %}</option>
+                        <option value="9">{% trans "September" %}</option><option value="10">{% trans "October" %}</option>
+                        <option value="11">{% trans "November" %}</option><option value="12">{% trans "December" %}</option>
                     </select>
                 </div>
                 <div class="form-row" style="flex:0 0 auto;">
-                    <label>Year</label>
+                    <label>{% trans "Year" %}</label>
                     <select name="year">
                         <option value="2024">2024</option>
                         <option value="2025">2025</option>
@@ -44,13 +45,13 @@
                     </select>
                 </div>
                 <div class="form-row" style="flex:1;min-width:200px;">
-                    <label>Notes (optional)</label>
-                    <input type="text" name="notes" placeholder="e.g. Year-end close">
+                    <label>{% trans "Notes (optional)" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans 'e.g. Year-end close' %}">
                 </div>
                 <div>
                     <button type="submit" class="btn btn-primary"
-                            onclick="return confirm('Close this period? Writes dated in this period will be blocked.');">
-                        Close Period
+                            onclick="return confirm('{% trans "Close this period? Writes dated in this period will be blocked." %}');">
+                        {% trans "Close Period" %}
                     </button>
                 </div>
             </div>
@@ -62,11 +63,11 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Period</th>
-                    <th>Status</th>
-                    <th>Closed By</th>
-                    <th>Closed At</th>
-                    <th>Notes</th>
+                    <th>{% trans "Period" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Closed By" %}</th>
+                    <th>{% trans "Closed At" %}</th>
+                    <th>{% trans "Notes" %}</th>
                     {% if can_write %}<th></th>{% endif %}
                 </tr>
             </thead>
@@ -76,9 +77,9 @@
                     <td><strong>{{ p.label }}</strong></td>
                     <td>
                         {% if p.closed %}
-                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Closed</span>
+                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{% trans "Closed" %}</span>
                         {% else %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Open</span>
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Open" %}</span>
                         {% endif %}
                     </td>
                     <td>{{ p.closed_by|default:"" }}</td>
@@ -88,11 +89,11 @@
                     <td>
                         {% if p.closed %}
                         <form method="post" action="/periods/"
-                              onsubmit="return confirm('Reopen {{ p.label }}? Writes will be allowed again.');">
+                              onsubmit="return confirm('{% blocktrans with label=p.label %}Reopen {{ label }}? Writes will be allowed again.{% endblocktrans %}');">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="reopen">
                             <input type="hidden" name="period_id" value="{{ p.period_id }}">
-                            <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;background:#fee2e2;color:#991b1b;border-color:#fecaca;">Reopen</button>
+                            <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;background:#fee2e2;color:#991b1b;border-color:#fecaca;">{% trans "Reopen" %}</button>
                         </form>
                         {% endif %}
                     </td>

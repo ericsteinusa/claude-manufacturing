@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Edit Approval Rule{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Edit Approval Rule" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/approval-rules/" class="btn">Approval Rules</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/approval-rules/" class="btn">{% trans "Approval Rules" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -22,8 +23,8 @@
 <div class="content">
 <div class="ar-wrap">
     <div class="menu-title">
-        Edit Approval Rule
-        {% if rule.is_active %}<span class="pill pill-ok">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}
+        {% trans "Edit Approval Rule" %}
+        {% if rule.is_active %}<span class="pill pill-ok">{% trans "Active" %}</span>{% else %}<span class="pill pill-cancelled">{% trans "Inactive" %}</span>{% endif %}
     </div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
@@ -34,7 +35,7 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-row">
-                <label>Entity Type *</label>
+                <label>{% trans "Entity Type *" %}</label>
                 <select name="entity_type" required>
                     {% for et in entity_types %}
                     <option value="{{ et }}"{% if et == rule.entity_type %} selected{% endif %}>{{ et }}</option>
@@ -42,62 +43,62 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Department</label>
+                <label>{% trans "Department" %}</label>
                 <select name="dept_key">
-                    <option value=""{% if not rule.dept_key %} selected{% endif %}>— All departments —</option>
+                    <option value=""{% if not rule.dept_key %} selected{% endif %}>{% trans "— All departments —" %}</option>
                     {% for key, label in departments %}
                     <option value="{{ key }}"{% if key == rule.dept_key %} selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Threshold Amount *</label>
+                <label>{% trans "Threshold Amount *" %}</label>
                 <input type="number" name="threshold_amount" step="0.01" min="0" value="{{ rule.threshold_amount }}" required>
             </div>
             <div class="form-row">
-                <label>Approver Role *</label>
+                <label>{% trans "Approver Role *" %}</label>
                 <select name="approver_role" required>
-                    <option value="">— Select role —</option>
+                    <option value="">{% trans "— Select role —" %}</option>
                     {% for role in roles %}
                     <option value="{{ role.role_name }}"{% if role.role_name == rule.approver_role %} selected{% endif %}>{{ role.role_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Sequence *</label>
+                <label>{% trans "Sequence *" %}</label>
                 <input type="number" name="seq" value="{{ rule.seq }}" step="1" required>
             </div>
             <div class="form-row">
-                <label>Escalate After (hours) *</label>
+                <label>{% trans "Escalate After (hours) *" %}</label>
                 <input type="number" name="escalate_after_hours" value="{{ rule.escalate_after_hours }}" step="0.5" min="0" required>
             </div>
             <div class="form-row">
-                <label>Notes</label>
-                <input type="text" name="notes" value="{{ rule.notes }}" placeholder="Optional notes">
+                <label>{% trans "Notes" %}</label>
+                <input type="text" name="notes" value="{{ rule.notes }}" placeholder="{% trans 'Optional notes' %}">
             </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
         </form>
     </div>
 
     <div class="card danger-zone">
-        <h3>Danger Zone</h3>
+        <h3>{% trans "Danger Zone" %}</h3>
         <div class="btn-row">
-            <form method="post" onsubmit="return confirm('{% if rule.is_active %}Deactivate{% else %}Activate{% endif %} this rule?');">
+            <form method="post" onsubmit="return confirm('{% if rule.is_active %}{% trans "Deactivate this rule?" %}{% else %}{% trans "Activate this rule?" %}{% endif %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="toggle_active">
                 <button type="submit" class="btn">
-                    {% if rule.is_active %}Deactivate{% else %}Activate{% endif %}
+                    {% if rule.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}
                 </button>
             </form>
-            <form method="post" onsubmit="return confirm('Delete this rule permanently? This cannot be undone.');">
+            <form method="post" onsubmit="return confirm('{% trans "Delete this rule permanently? This cannot be undone." %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="delete">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">{% trans "Delete" %}</button>
             </form>
         </div>
         <div class="form-hint" style="margin-top:10px;">
-            Deleting fails if approval steps have already been created against this rule —
-            deactivate it instead to stop it from applying to new entities.
+            {% blocktrans %}Deleting fails if approval steps have already been created against this rule —
+            deactivate it instead to stop it from applying to new entities.{% endblocktrans %}
         </div>
     </div>
 </div>
