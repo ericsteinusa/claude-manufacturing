@@ -7,6 +7,7 @@ and lifetime (pass a db_pg.get_db_connection() connection, %s placeholders).
 from datetime import date
 
 import psycopg2
+from django.utils.translation import gettext_lazy as _
 
 from .mrp_core import next_sequence_number
 
@@ -29,10 +30,10 @@ SO_STATUS_TRANSITIONS = {
 }
 
 SO_STATUS_ACTION_LABELS = {
-    "confirmed": "Confirm",
-    "shipped":   "Mark Shipped",
-    "invoiced":  "Mark Invoiced",
-    "cancelled": "Cancel Order",
+    "confirmed": _("Confirm"),
+    "shipped":   _("Mark Shipped"),
+    "invoiced":  _("Mark Invoiced"),
+    "cancelled": _("Cancel Order"),
 }
 
 

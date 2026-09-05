@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 17:10+0000\n"
+"POT-Creation-Date: 2026-09-05 15:28+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -20,18 +20,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: manufacturing/menus.py:1689 manufacturing/templates/acct_dashboard.html:6
-#: manufacturing/templates/base.html:524
+#: manufacturing/templates/base.html:540
 msgid "Accounting"
 msgstr "Comptabilité"
 
-#: manufacturing/menus.py:1690 manufacturing/templates/base.html:511
+#: manufacturing/menus.py:1690 manufacturing/templates/base.html:527
 #: manufacturing/templates/cs_dashboard.html:3
 #: manufacturing/templates/reports_dashboard.html:223
 msgid "Customer Service"
 msgstr "Service client"
 
-#: manufacturing/menus.py:1691 manufacturing/templates/base.html:553
-#: manufacturing/templates/base.html:555
+#: manufacturing/menus.py:1691 manufacturing/templates/base.html:569
+#: manufacturing/templates/base.html:571
 msgid "Engineering"
 msgstr "Ingénierie"
 
@@ -39,13 +39,13 @@ msgstr "Ingénierie"
 msgid "Information Tech"
 msgstr "Technologies de l'Information"
 
-#: manufacturing/menus.py:1693 manufacturing/templates/base.html:563
-#: manufacturing/templates/base.html:565
+#: manufacturing/menus.py:1693 manufacturing/templates/base.html:579
+#: manufacturing/templates/base.html:581
 #: manufacturing/templates/dashboard_kpis.html:29
 msgid "Maintenance"
 msgstr "Maintenance"
 
-#: manufacturing/menus.py:1694 manufacturing/templates/base.html:576
+#: manufacturing/menus.py:1694 manufacturing/templates/base.html:592
 #: manufacturing/templates/marketing_dashboard.html:6
 #: manufacturing/templates/mkt_ad_detail.html:6
 #: manufacturing/templates/mkt_ad_list.html:6
@@ -56,7 +56,7 @@ msgstr "Maintenance"
 msgid "Marketing"
 msgstr "Marketing"
 
-#: manufacturing/menus.py:1695 manufacturing/templates/base.html:541
+#: manufacturing/menus.py:1695 manufacturing/templates/base.html:557
 #: manufacturing/templates/exit_interview_list.html:6
 #: manufacturing/templates/offboarding_list.html:6
 #: manufacturing/templates/pers_depts.html:6
@@ -86,8 +86,8 @@ msgstr "Personnel"
 msgid "Production"
 msgstr "Production"
 
-#: manufacturing/menus.py:1697 manufacturing/templates/base.html:514
-#: manufacturing/templates/base.html:516
+#: manufacturing/menus.py:1697 manufacturing/templates/base.html:530
+#: manufacturing/templates/base.html:532
 #: manufacturing/templates/prod_dashboard.html:16
 #: manufacturing/templates/prod_dashboard.html:64
 #: manufacturing/templates/prod_reports.html:11
@@ -105,11 +105,11 @@ msgstr "Inventaire"
 msgid "Purchasing"
 msgstr "Achats"
 
-#: manufacturing/menus.py:1699 manufacturing/templates/base.html:560
+#: manufacturing/menus.py:1699 manufacturing/templates/base.html:576
 msgid "Quality Assurance"
 msgstr "Assurance qualité"
 
-#: manufacturing/menus.py:1700 manufacturing/templates/base.html:503
+#: manufacturing/menus.py:1700 manufacturing/templates/base.html:519
 msgid "Sales"
 msgstr "Ventes"
 
@@ -117,12 +117,12 @@ msgstr "Ventes"
 msgid "Budget Management"
 msgstr "Gestion du Budget"
 
-#: manufacturing/menus.py:1702 manufacturing/templates/base.html:522
+#: manufacturing/menus.py:1702 manufacturing/templates/base.html:538
 #: manufacturing/templates/dashboard_kpis.html:39
 msgid "Finance"
 msgstr "Finance"
 
-#: manufacturing/menus.py:1703 manufacturing/templates/base.html:573
+#: manufacturing/menus.py:1703 manufacturing/templates/base.html:589
 msgid "Legal"
 msgstr "Juridique"
 
@@ -132,7 +132,7 @@ msgstr "Gestion des risques"
 
 #: manufacturing/menus.py:1705
 #: manufacturing/templates/ai_insights_dashboard.html:6
-#: manufacturing/templates/base.html:603
+#: manufacturing/templates/base.html:619
 #: manufacturing/templates/cs_dashboard.html:9
 #: manufacturing/templates/cs_dashboard.html:46
 #: manufacturing/templates/cs_escalations.html:8
@@ -168,6 +168,22 @@ msgstr "Gestion des risques"
 msgid "Reports"
 msgstr "Rapports"
 
+#: manufacturing/sales_orders_core.py:33
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: manufacturing/sales_orders_core.py:34
+msgid "Mark Shipped"
+msgstr "Marquer comme Expédié"
+
+#: manufacturing/sales_orders_core.py:35
+msgid "Mark Invoiced"
+msgstr "Marquer comme Facturé"
+
+#: manufacturing/sales_orders_core.py:36
+msgid "Cancel Order"
+msgstr "Annuler la Commande"
+
 #: manufacturing/templates/acct_dashboard.html:3
 #: manufacturing/templates/acct_dashboard.html:20
 msgid "Accounting Dashboard"
@@ -178,7 +194,7 @@ msgstr "Tableau de Bord Comptabilité"
 #: manufacturing/templates/acct_dashboard_kpis.html:2
 #: manufacturing/templates/ap_list.html:3
 #: manufacturing/templates/ap_list.html:26
-#: manufacturing/templates/ar_list.html:6 manufacturing/templates/base.html:527
+#: manufacturing/templates/ar_list.html:6 manufacturing/templates/base.html:543
 #: manufacturing/templates/finance_dashboard.html:7
 #: manufacturing/templates/finance_dashboard.html:59
 #: manufacturing/templates/finance_dashboard_kpis.html:2
@@ -192,7 +208,7 @@ msgstr "Comptes fournisseurs"
 #: manufacturing/templates/ap_list.html:6
 #: manufacturing/templates/ar_list.html:3
 #: manufacturing/templates/ar_list.html:26
-#: manufacturing/templates/base.html:530
+#: manufacturing/templates/base.html:546
 #: manufacturing/templates/finance_dashboard.html:8
 #: manufacturing/templates/finance_dashboard.html:60
 #: manufacturing/templates/finance_dashboard_kpis.html:18
@@ -204,7 +220,7 @@ msgstr "Comptes clients"
 #: manufacturing/templates/acct_dashboard.html:9
 #: manufacturing/templates/acct_dashboard.html:25
 #: manufacturing/templates/ap_list.html:7
-#: manufacturing/templates/ar_list.html:7 manufacturing/templates/base.html:533
+#: manufacturing/templates/ar_list.html:7 manufacturing/templates/base.html:549
 #: manufacturing/templates/finance_dashboard.html:6
 #: manufacturing/templates/gl_dashboard.html:3
 #: manufacturing/templates/gl_dashboard.html:44
@@ -269,7 +285,7 @@ msgid "Tax"
 msgstr "Taxes"
 
 #: manufacturing/templates/acct_dashboard.html:14
-#: manufacturing/templates/base.html:536
+#: manufacturing/templates/base.html:552
 #: manufacturing/templates/payroll_dashboard.html:3
 #: manufacturing/templates/personnel_dashboard.html:63
 msgid "Payroll"
@@ -497,6 +513,9 @@ msgstr "Paie"
 #: manufacturing/templates/sales_targets.html:9
 #: manufacturing/templates/sales_territories.html:10
 #: manufacturing/templates/sales_territory_performance.html:9
+#: manufacturing/templates/so_detail.html:13
+#: manufacturing/templates/so_form.html:8
+#: manufacturing/templates/so_list.html:17
 #: manufacturing/templates/spc_list.html:8
 #: manufacturing/templates/spc_log.html:8
 #: manufacturing/templates/tc_ot_report.html:9
@@ -506,6 +525,9 @@ msgstr "Paie"
 #: manufacturing/templates/time_clock_attendance.html:7
 #: manufacturing/templates/time_clock_hours.html:7
 #: manufacturing/templates/time_clock_status.html:9
+#: manufacturing/templates/wo_detail.html:12
+#: manufacturing/templates/wo_form.html:8
+#: manufacturing/templates/wo_list.html:11
 msgid "Home"
 msgstr "Accueil"
 
@@ -756,6 +778,10 @@ msgstr "Référence"
 #: manufacturing/templates/sales_quotes.html:66
 #: manufacturing/templates/sales_quotes.html:114
 #: manufacturing/templates/sales_quotes.html:139
+#: manufacturing/templates/so_detail.html:195
+#: manufacturing/templates/so_detail.html:255
+#: manufacturing/templates/wo_form.html:46
+#: manufacturing/templates/wo_list.html:34
 msgid "Description"
 msgstr "Description"
 
@@ -1016,12 +1042,19 @@ msgstr "Total Débit"
 #: manufacturing/templates/sales_territories.html:128
 #: manufacturing/templates/sales_territories.html:165
 #: manufacturing/templates/sales_territory_performance.html:40
+#: manufacturing/templates/so_form.html:57
+#: manufacturing/templates/so_form.html:62
+#: manufacturing/templates/so_list.html:44
 #: manufacturing/templates/spc_log.html:101
 #: manufacturing/templates/tc_device_form.html:221
 #: manufacturing/templates/tc_device_list.html:45
 #: manufacturing/templates/termination_list.html:72
 #: manufacturing/templates/termination_list.html:133
 #: manufacturing/templates/time_clock_attendance.html:89
+#: manufacturing/templates/wo_detail.html:230
+#: manufacturing/templates/wo_form.html:67
+#: manufacturing/templates/wo_form.html:72
+#: manufacturing/templates/wo_list.html:37
 msgid "Status"
 msgstr "Statut"
 
@@ -1126,6 +1159,8 @@ msgstr "G/L"
 #: manufacturing/templates/qa_ncr_detail.html:54
 #: manufacturing/templates/req_detail.html:59
 #: manufacturing/templates/sales_contracts_detail.html:62
+#: manufacturing/templates/so_detail.html:91
+#: manufacturing/templates/wo_detail.html:90
 msgid "Print / Save PDF"
 msgstr "Imprimer / Enregistrer en PDF"
 
@@ -1180,6 +1215,9 @@ msgstr "Fournisseur"
 #: manufacturing/templates/po_detail.html:263
 #: manufacturing/templates/po_form.html:36
 #: manufacturing/templates/rfq_detail.html:93
+#: manufacturing/templates/so_detail.html:248
+#: manufacturing/templates/so_form.html:36
+#: manufacturing/templates/wo_form.html:36
 msgid "(none)"
 msgstr "(aucun)"
 
@@ -1348,6 +1386,8 @@ msgstr "N° de Facture"
 #: manufacturing/templates/qa_capa_detail.html:127
 #: manufacturing/templates/qa_capa_list.html:85
 #: manufacturing/templates/qa_capa_list.html:132
+#: manufacturing/templates/wo_form.html:61
+#: manufacturing/templates/wo_list.html:36
 msgid "Due Date"
 msgstr "Date d'échéance"
 
@@ -1558,9 +1598,12 @@ msgstr "N° de chèque, etc."
 #: manufacturing/templates/sales_territories.html:80
 #: manufacturing/templates/sales_territories.html:136
 #: manufacturing/templates/sales_territories.html:173
+#: manufacturing/templates/so_form.html:74
 #: manufacturing/templates/spc_log.html:72
 #: manufacturing/templates/termination_detail.html:46
 #: manufacturing/templates/termination_list.html:141
+#: manufacturing/templates/wo_detail.html:159
+#: manufacturing/templates/wo_form.html:84
 msgid "Notes"
 msgstr "Notes"
 
@@ -1588,6 +1631,8 @@ msgstr "Aucun paiement enregistré."
 #: manufacturing/templates/qa_ncr_list.html:10
 #: manufacturing/templates/report_builder_detail.html:8
 #: manufacturing/templates/req_list.html:12
+#: manufacturing/templates/so_list.html:15
+#: manufacturing/templates/wo_list.html:9
 msgid "Export CSV"
 msgstr "Exporter en CSV"
 
@@ -1604,6 +1649,8 @@ msgstr "Exporter en CSV"
 #: manufacturing/templates/po_list.html:13
 #: manufacturing/templates/qa_ncr_list.html:11
 #: manufacturing/templates/req_list.html:13
+#: manufacturing/templates/so_list.html:16
+#: manufacturing/templates/wo_list.html:10
 msgid "Export Excel"
 msgstr "Exporter en Excel"
 
@@ -1617,6 +1664,8 @@ msgstr "Exporter en Excel"
 #: manufacturing/templates/rfq_list.html:19
 #: manufacturing/templates/sales_orders.html:48
 #: manufacturing/templates/sales_quotes.html:51
+#: manufacturing/templates/so_list.html:25
+#: manufacturing/templates/wo_list.html:19
 msgid "Status:"
 msgstr "Statut :"
 
@@ -1890,11 +1939,14 @@ msgstr "(sélectionner un client)"
 #: manufacturing/templates/sales_orders.html:102
 #: manufacturing/templates/sales_quotes.html:66
 #: manufacturing/templates/sales_reports_kpis.html:21
+#: manufacturing/templates/so_form.html:34
+#: manufacturing/templates/so_list.html:39
 msgid "Customer"
 msgstr "Client"
 
 #: manufacturing/templates/ar_list.html:43
 #: manufacturing/templates/sales_orders.html:55
+#: manufacturing/templates/so_detail.html:105
 msgid "Customer:"
 msgstr "Client :"
 
@@ -2368,6 +2420,7 @@ msgstr "Non Assigné"
 #: manufacturing/templates/rfq_detail.html:38
 #: manufacturing/templates/rfq_list.html:21
 #: manufacturing/templates/rfq_list.html:49
+#: manufacturing/work_orders_core.py:34
 msgid "Open"
 msgstr "Ouvert"
 
@@ -2490,35 +2543,35 @@ msgstr "p. ex. Soudeur II"
 msgid "Create Requisition"
 msgstr "Créer la Demande d'Achat"
 
-#: manufacturing/templates/base.html:423
+#: manufacturing/templates/base.html:439
 msgid "Toggle menu"
 msgstr "Afficher/masquer le menu"
 
-#: manufacturing/templates/base.html:437 manufacturing/templates/base.html:442
+#: manufacturing/templates/base.html:453 manufacturing/templates/base.html:458
 msgid "Notifications"
 msgstr "Notifications"
 
-#: manufacturing/templates/base.html:443
+#: manufacturing/templates/base.html:459
 msgid "Mark all read"
 msgstr "Tout marquer comme lu"
 
-#: manufacturing/templates/base.html:446
+#: manufacturing/templates/base.html:462
 msgid "Loading…"
 msgstr "Chargement…"
 
-#: manufacturing/templates/base.html:466 manufacturing/templates/home.html:24
+#: manufacturing/templates/base.html:482 manufacturing/templates/home.html:24
 msgid "Password"
 msgstr "Mot de passe"
 
-#: manufacturing/templates/base.html:467
+#: manufacturing/templates/base.html:483
 msgid "2FA"
 msgstr "Authentification à deux facteurs"
 
-#: manufacturing/templates/base.html:468
+#: manufacturing/templates/base.html:484
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: manufacturing/templates/base.html:478
+#: manufacturing/templates/base.html:494
 #: manufacturing/templates/dashboard.html:4
 #: manufacturing/templates/eng_ecr_detail.html:8
 #: manufacturing/templates/eng_ecrs.html:6
@@ -2566,11 +2619,12 @@ msgstr "Déconnexion"
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
-#: manufacturing/templates/base.html:481
+#: manufacturing/templates/base.html:497
+#: manufacturing/templates/wo_detail.html:211
 msgid "Operations"
 msgstr "Opérations"
 
-#: manufacturing/templates/base.html:483
+#: manufacturing/templates/base.html:499
 #: manufacturing/templates/maint_dashboard.html:6
 #: manufacturing/templates/maint_dashboard.html:125
 #: manufacturing/templates/maint_downtime_list.html:7
@@ -2590,29 +2644,31 @@ msgstr "Opérations"
 #: manufacturing/templates/prod_schedule_gantt.html:10
 #: manufacturing/templates/prod_shipping_list.html:8
 #: manufacturing/templates/reports_dashboard.html:168
+#: manufacturing/templates/wo_list.html:4
+#: manufacturing/templates/wo_list.html:16
 msgid "Work Orders"
 msgstr "Ordres de fabrication"
 
-#: manufacturing/templates/base.html:486
+#: manufacturing/templates/base.html:502
 #: manufacturing/templates/eng_dashboard.html:60
 msgid "Bill of Materials"
 msgstr "Nomenclature"
 
-#: manufacturing/templates/base.html:489
+#: manufacturing/templates/base.html:505
 #: manufacturing/templates/prod_dashboard.html:15
 #: manufacturing/templates/prod_schedule.html:12
 msgid "MRP"
 msgstr "MRP"
 
-#: manufacturing/templates/base.html:492
+#: manufacturing/templates/base.html:508
 msgid "Work Centers"
 msgstr "Postes de travail"
 
-#: manufacturing/templates/base.html:495
+#: manufacturing/templates/base.html:511
 msgid "Procurement"
 msgstr "Achats"
 
-#: manufacturing/templates/base.html:497
+#: manufacturing/templates/base.html:513
 #: manufacturing/templates/po_approvals.html:6
 #: manufacturing/templates/po_list.html:4
 #: manufacturing/templates/po_list.html:19
@@ -2627,7 +2683,7 @@ msgstr "Achats"
 msgid "Purchase Orders"
 msgstr "Bons de commande"
 
-#: manufacturing/templates/base.html:500
+#: manufacturing/templates/base.html:516
 #: manufacturing/templates/purch_contracts_list.html:11
 #: manufacturing/templates/purch_reports.html:11
 #: manufacturing/templates/purchasing_dashboard.html:11
@@ -2637,29 +2693,31 @@ msgstr "Bons de commande"
 msgid "Suppliers"
 msgstr "Fournisseurs"
 
-#: manufacturing/templates/base.html:505
+#: manufacturing/templates/base.html:521
 #: manufacturing/templates/sales_dashboard.html:59
 #: manufacturing/templates/sales_orders.html:3
 #: manufacturing/templates/sales_orders.html:44
+#: manufacturing/templates/so_list.html:4
+#: manufacturing/templates/so_list.html:22
 msgid "Sales Orders"
 msgstr "Commandes clients"
 
-#: manufacturing/templates/base.html:508
+#: manufacturing/templates/base.html:524
 #: manufacturing/templates/credit_dashboard.html:54
 #: manufacturing/templates/cs_dashboard.html:51
 #: manufacturing/templates/marketing_dashboard.html:59
 msgid "Customers"
 msgstr "Clients"
 
-#: manufacturing/templates/base.html:519
+#: manufacturing/templates/base.html:535
 msgid "Lot Tracking"
 msgstr "Suivi des lots"
 
-#: manufacturing/templates/base.html:539
+#: manufacturing/templates/base.html:555
 msgid "Human Resources"
 msgstr "Ressources humaines"
 
-#: manufacturing/templates/base.html:544
+#: manufacturing/templates/base.html:560
 #: manufacturing/templates/personnel_dashboard.html:19
 #: manufacturing/templates/personnel_dashboard.html:61
 #: manufacturing/templates/tc_ot_report.html:6
@@ -2669,7 +2727,7 @@ msgstr "Ressources humaines"
 msgid "Time Clock"
 msgstr "Pointeuse"
 
-#: manufacturing/templates/base.html:547
+#: manufacturing/templates/base.html:563
 #: manufacturing/templates/pers_depts.html:10
 #: manufacturing/templates/pers_reviews_list.html:11
 #: manufacturing/templates/pers_training_list.html:11
@@ -2678,11 +2736,11 @@ msgstr "Pointeuse"
 msgid "Time Off"
 msgstr "Congés"
 
-#: manufacturing/templates/base.html:550
+#: manufacturing/templates/base.html:566
 msgid "My Info"
 msgstr "Mes informations"
 
-#: manufacturing/templates/base.html:558
+#: manufacturing/templates/base.html:574
 #: manufacturing/templates/dashboard_kpis.html:24
 #: manufacturing/templates/maint_oee_report.html:90
 #: manufacturing/templates/maint_oee_report.html:120
@@ -2690,7 +2748,7 @@ msgstr "Mes informations"
 msgid "Quality"
 msgstr "Qualité"
 
-#: manufacturing/templates/base.html:568
+#: manufacturing/templates/base.html:584
 #: manufacturing/templates/dashboard.html:68
 #: manufacturing/templates/pers_depts.html:3
 #: manufacturing/templates/pers_depts.html:52
@@ -2702,45 +2760,45 @@ msgstr "Qualité"
 msgid "Departments"
 msgstr "Départements"
 
-#: manufacturing/templates/base.html:570
+#: manufacturing/templates/base.html:586
 msgid "IT"
 msgstr "Informatique"
 
-#: manufacturing/templates/base.html:580
+#: manufacturing/templates/base.html:596
 msgid "Admin"
 msgstr "Administration"
 
-#: manufacturing/templates/base.html:582
+#: manufacturing/templates/base.html:598
 #: manufacturing/templates/dashboard.html:7
 msgid "User Roles"
 msgstr "Rôles utilisateurs"
 
-#: manufacturing/templates/base.html:585
+#: manufacturing/templates/base.html:601
 #: manufacturing/templates/dashboard.html:9
 msgid "Audit Log"
 msgstr "Journal d'audit"
 
-#: manufacturing/templates/base.html:588
+#: manufacturing/templates/base.html:604
 msgid "Fixed Assets"
 msgstr "Immobilisations"
 
-#: manufacturing/templates/base.html:591
+#: manufacturing/templates/base.html:607
 msgid "Currencies"
 msgstr "Devises"
 
-#: manufacturing/templates/base.html:594
+#: manufacturing/templates/base.html:610
 msgid "Approval Rules"
 msgstr "Règles d'approbation"
 
-#: manufacturing/templates/base.html:597
+#: manufacturing/templates/base.html:613
 msgid "Webhooks"
 msgstr "Webhooks"
 
-#: manufacturing/templates/base.html:600
+#: manufacturing/templates/base.html:616
 msgid "Data Governance"
 msgstr "Gouvernance des données"
 
-#: manufacturing/templates/base.html:606
+#: manufacturing/templates/base.html:622
 #: manufacturing/templates/dashboard.html:12
 msgid "Periods"
 msgstr "Périodes"
@@ -3073,11 +3131,17 @@ msgstr "Aucun régime d'avantages pour l'instant."
 #: manufacturing/templates/report_builder_form.html:6
 #: manufacturing/templates/report_builder_list.html:6
 #: manufacturing/templates/reports_dashboard.html:7
+#: manufacturing/templates/so_detail.html:7
+#: manufacturing/templates/so_form.html:7
+#: manufacturing/templates/so_list.html:7
 #: manufacturing/templates/tc_device_form.html:6
 #: manufacturing/templates/tc_device_list.html:6
 #: manufacturing/templates/time_clock_attendance.html:6
 #: manufacturing/templates/time_clock_hours.html:6
 #: manufacturing/templates/time_clock_status.html:6
+#: manufacturing/templates/wo_detail.html:7
+#: manufacturing/templates/wo_form.html:7
+#: manufacturing/templates/wo_list.html:7
 msgid "Back"
 msgstr "Retour"
 
@@ -3087,6 +3151,7 @@ msgid "Supplier:"
 msgstr "Fournisseur :"
 
 #: manufacturing/templates/blanket_po_detail.html:63
+#: manufacturing/templates/wo_detail.html:111
 msgid "Description:"
 msgstr "Description :"
 
@@ -3116,6 +3181,8 @@ msgstr ""
 #: manufacturing/templates/pers_review_detail.html:112
 #: manufacturing/templates/pers_training_detail.html:109
 #: manufacturing/templates/po_detail.html:113
+#: manufacturing/templates/so_detail.html:114
+#: manufacturing/templates/wo_detail.html:113
 msgid "Notes:"
 msgstr "Notes :"
 
@@ -3155,6 +3222,9 @@ msgstr "N° de Livraison"
 #: manufacturing/templates/rfq_detail.html:123
 #: manufacturing/templates/sales_order_detail.html:122
 #: manufacturing/templates/sales_order_detail.html:178
+#: manufacturing/templates/so_detail.html:197
+#: manufacturing/templates/so_detail.html:259
+#: manufacturing/templates/wo_list.html:35
 msgid "Qty"
 msgstr "Qté"
 
@@ -3216,6 +3286,8 @@ msgstr "Nouvelle Commande Ouverte"
 #: manufacturing/templates/sales_orders.html:50
 #: manufacturing/templates/sales_orders.html:57
 #: manufacturing/templates/sales_quotes.html:53
+#: manufacturing/templates/so_list.html:26
+#: manufacturing/templates/wo_list.html:20
 msgid "All"
 msgstr "Tous"
 
@@ -3257,6 +3329,8 @@ msgstr "Validité"
 #: manufacturing/templates/reports_dashboard.html:229
 #: manufacturing/templates/sales_dashboard_kpis.html:15
 #: manufacturing/templates/sales_orders.html:75
+#: manufacturing/templates/so_detail.html:229
+#: manufacturing/templates/so_list.html:43
 #: manufacturing/templates/time_clock_attendance.html:77
 #: manufacturing/templates/time_clock_hours.html:84
 msgid "Total"
@@ -3325,6 +3399,7 @@ msgstr "Quantité Totale (laisser 0 pour un suivi par valeur)"
 #: manufacturing/templates/sales_contracts_detail.html:118
 #: manufacturing/templates/sales_contracts_detail.html:141
 #: manufacturing/templates/sales_contracts_list.html:141
+#: manufacturing/templates/wo_form.html:56
 msgid "Start Date"
 msgstr "Date de début"
 
@@ -3391,7 +3466,9 @@ msgstr "Créer une Commande Ouverte"
 #: manufacturing/templates/sales_quotes.html:128
 #: manufacturing/templates/sales_targets.html:138
 #: manufacturing/templates/sales_territories.html:142
+#: manufacturing/templates/so_form.html:82
 #: manufacturing/templates/tc_device_form.html:194
+#: manufacturing/templates/wo_form.html:92
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -3468,10 +3545,14 @@ msgstr "En-tête du Certificat"
 #: manufacturing/templates/sales_order_detail.html:121
 #: manufacturing/templates/sales_order_detail.html:170
 #: manufacturing/templates/sales_reports_kpis.html:34
+#: manufacturing/templates/so_detail.html:196
 #: manufacturing/templates/spc_list.html:41
 #: manufacturing/templates/spc_list.html:88
 #: manufacturing/templates/spc_list.html:117
 #: manufacturing/templates/spc_log.html:47
+#: manufacturing/templates/wo_detail.html:156
+#: manufacturing/templates/wo_detail.html:184
+#: manufacturing/templates/wo_list.html:33
 msgid "Product"
 msgstr "Produit"
 
@@ -3626,6 +3707,7 @@ msgstr "Modèles"
 #: manufacturing/templates/compliance_checklist_detail.html:25
 #: manufacturing/templates/compliance_checklist_list.html:20
 #: manufacturing/templates/compliance_checklist_list.html:37
+#: manufacturing/work_orders_core.py:36
 msgid "Complete"
 msgstr "Terminé"
 
@@ -3906,6 +3988,7 @@ msgid "Characteristics &amp; FMEA"
 msgstr "Caractéristiques et FMEA"
 
 #: manufacturing/templates/control_plan_detail.html:64
+#: manufacturing/templates/wo_detail.html:225
 msgid "Seq"
 msgstr "Séq."
 
@@ -3930,6 +4013,7 @@ msgstr "Réévaluer"
 #: manufacturing/templates/payroll_deductions.html:141
 #: manufacturing/templates/po_detail.html:202
 #: manufacturing/templates/rfq_detail.html:57
+#: manufacturing/templates/so_detail.html:220
 msgid "Remove"
 msgstr "Supprimer"
 
@@ -5786,6 +5870,7 @@ msgstr "Ingénieur"
 #: manufacturing/templates/mkt_ad_list.html:101
 #: manufacturing/templates/mkt_campaign_list.html:90
 #: manufacturing/templates/sales_contracts_list.html:84
+#: manufacturing/work_orders_core.py:35
 msgid "Start"
 msgstr "Début"
 
@@ -5826,6 +5911,7 @@ msgstr "Tâche"
 #: manufacturing/templates/maint_wo_list.html:81
 #: manufacturing/templates/offboarding_list.html:74
 #: manufacturing/templates/offboarding_list.html:131
+#: manufacturing/templates/wo_list.html:39
 msgid "Assigned To"
 msgstr "Assigné à"
 
@@ -5843,7 +5929,9 @@ msgstr "Assigné à"
 #: manufacturing/templates/sales_quotes.html:84
 #: manufacturing/templates/sales_targets.html:106
 #: manufacturing/templates/sales_territories.html:96
+#: manufacturing/templates/so_detail.html:8
 #: manufacturing/templates/tc_device_list.html:72
+#: manufacturing/templates/wo_detail.html:8
 msgid "Edit"
 msgstr "Modifier"
 
@@ -6020,10 +6108,10 @@ msgstr "Tâche — %(name)s"
 #: manufacturing/templates/eng_task_detail.html:59
 #, python-format
 msgid ""
-"Project: <a href=\"/eng/projects/%(pid)s/\" style=\"color:#aef;\">\n"
+"Project: <a href=\"/eng/projects/%(pid)s/\" style=\"color:var(--accent);\">\n"
 "        %(num)s — %(title)s</a>"
 msgstr ""
-"Projet : <a href=\"/eng/projects/%(pid)s/\" style=\"color:#aef;\">%(num)s — "
+"Projet : <a href=\"/eng/projects/%(pid)s/\" style=\"color:var(--accent);\">%(num)s — "
 "%(title)s</a>"
 
 #: manufacturing/templates/eng_task_detail.html:80
@@ -6032,6 +6120,8 @@ msgstr ""
 #: manufacturing/templates/maint_schedule_list.html:120
 #: manufacturing/templates/maint_wo_detail.html:147
 #: manufacturing/templates/maint_wo_list.html:133
+#: manufacturing/templates/wo_detail.html:121
+#: manufacturing/templates/wo_detail.html:132
 msgid "— Unassigned —"
 msgstr "— Non assigné —"
 
@@ -6193,6 +6283,7 @@ msgid "Cash Flow Statement"
 msgstr "Tableau des Flux de Trésorerie"
 
 #: manufacturing/templates/fin_cash_forecast.html:35
+#: manufacturing/templates/wo_detail.html:108
 msgid "Start Date:"
 msgstr "Date de Début :"
 
@@ -6298,6 +6389,7 @@ msgstr "Date d'achèvement"
 #: manufacturing/templates/it_task_detail.html:111
 #: manufacturing/templates/maint_inspection_list.html:79
 #: manufacturing/templates/qa_audit_list.html:70
+#: manufacturing/templates/wo_detail.html:231
 msgid "Scheduled"
 msgstr "Planifié"
 
@@ -6578,6 +6670,7 @@ msgstr "Aucune ligne pour le moment."
 #: manufacturing/templates/po_detail.html:256
 #: manufacturing/templates/rfq_detail.html:81
 #: manufacturing/templates/sales_order_detail.html:163
+#: manufacturing/templates/so_detail.html:241
 msgid "Add Line Item"
 msgstr "Ajouter une Ligne"
 
@@ -6825,6 +6918,8 @@ msgstr "p. ex. Courant, Fixe"
 #: manufacturing/templates/sales_commissions.html:191
 #: manufacturing/templates/sales_order_detail.html:111
 #: manufacturing/templates/sales_targets.html:136
+#: manufacturing/templates/so_form.html:80
+#: manufacturing/templates/wo_form.html:90
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -7360,6 +7455,7 @@ msgstr "Incidents"
 
 #: manufacturing/templates/it_asset_detail.html:16
 #: manufacturing/templates/po_detail.html:13
+#: manufacturing/templates/wo_detail.html:13
 msgid "Print Label"
 msgstr "Imprimer l'Étiquette"
 
@@ -9068,6 +9164,7 @@ msgstr "Écart de Temps des Ordres de Fabrication"
 #: manufacturing/templates/prod_labor_report.html:139
 #: manufacturing/templates/prod_reports.html:111
 #: manufacturing/templates/prod_schedule.html:66
+#: manufacturing/templates/wo_list.html:32
 msgid "WO #"
 msgstr "N° OF"
 
@@ -9335,6 +9432,7 @@ msgstr "Référence de Pièce"
 
 #: manufacturing/templates/maint_part_detail.html:83
 #: manufacturing/templates/maint_parts_list.html:124
+#: manufacturing/templates/wo_form.html:51
 msgid "Quantity"
 msgstr "Quantité"
 
@@ -9514,6 +9612,8 @@ msgstr "Aucun ordre de travail trouvé."
 #: manufacturing/templates/maint_wo_list.html:106
 #: manufacturing/templates/prod_dashboard.html:59
 #: manufacturing/templates/prod_schedule.html:93
+#: manufacturing/templates/wo_form.html:4
+#: manufacturing/templates/wo_form.html:14
 msgid "New Work Order"
 msgstr "Nouvel ordre de fabrication"
 
@@ -10132,6 +10232,8 @@ msgstr "Déductions"
 #: manufacturing/templates/payroll_pay_rates.html:8
 #: manufacturing/templates/payroll_ytd.html:7
 #: manufacturing/templates/po_detail.html:10
+#: manufacturing/templates/so_detail.html:10
+#: manufacturing/templates/wo_detail.html:10
 msgid "History"
 msgstr "Historique"
 
@@ -10674,6 +10776,8 @@ msgstr "Nom du nouveau département"
 #: manufacturing/templates/pers_depts.html:82
 #: manufacturing/templates/pers_depts.html:138
 #: manufacturing/templates/po_detail.html:283
+#: manufacturing/templates/so_detail.html:270
+#: manufacturing/templates/wo_detail.html:201
 msgid "Add"
 msgstr "Ajouter"
 
@@ -10944,10 +11048,12 @@ msgstr "Imprimer l'Étiquette de Réception"
 
 #: manufacturing/templates/po_detail.html:105
 #: manufacturing/templates/po_landed_cost_detail.html:20
+#: manufacturing/templates/so_detail.html:106
 msgid "Total:"
 msgstr "Total :"
 
 #: manufacturing/templates/po_detail.html:110
+#: manufacturing/templates/so_detail.html:111
 msgid "Order Date:"
 msgstr "Date de Commande :"
 
@@ -10956,14 +11062,17 @@ msgid "Expected:"
 msgstr "Prévu :"
 
 #: manufacturing/templates/po_detail.html:120
+#: manufacturing/templates/so_detail.html:121
 msgid "Currency:"
 msgstr "Devise :"
 
 #: manufacturing/templates/po_detail.html:129
+#: manufacturing/templates/so_detail.html:130
 msgid "Rate"
 msgstr "Taux"
 
 #: manufacturing/templates/po_detail.html:130
+#: manufacturing/templates/so_detail.html:131
 msgid "Set Currency"
 msgstr "Définir la Devise"
 
@@ -10993,6 +11102,8 @@ msgstr "Annuler ce bon de commande ?"
 #: manufacturing/templates/po_landed_cost_new.html:52
 #: manufacturing/templates/sales_order_detail.html:122
 #: manufacturing/templates/sales_order_detail.html:180
+#: manufacturing/templates/so_detail.html:198
+#: manufacturing/templates/so_detail.html:264
 msgid "Unit Price"
 msgstr "Prix Unitaire"
 
@@ -11003,10 +11114,12 @@ msgstr "Réceptionner"
 #: manufacturing/templates/po_detail.html:170
 #: manufacturing/templates/req_detail.html:83
 #: manufacturing/templates/sales_order_detail.html:123
+#: manufacturing/templates/so_detail.html:199
 msgid "Line Total"
 msgstr "Total de Ligne"
 
 #: manufacturing/templates/po_detail.html:199
+#: manufacturing/templates/so_detail.html:217
 msgid "Remove this line item?"
 msgstr "Supprimer cette ligne ?"
 
@@ -11052,11 +11165,17 @@ msgstr "Aucun coût de revient enregistré pour l'instant."
 
 #: manufacturing/templates/po_detail.html:261
 #: manufacturing/templates/rfq_detail.html:91
+#: manufacturing/templates/so_detail.html:246
+#: manufacturing/templates/wo_form.html:34
 msgid "Product (optional)"
 msgstr "Produit (optionnel)"
 
 #: manufacturing/templates/po_form.html:4
 #: manufacturing/templates/po_form.html:14
+#: manufacturing/templates/so_form.html:4
+#: manufacturing/templates/so_form.html:14
+#: manufacturing/templates/wo_form.html:4
+#: manufacturing/templates/wo_form.html:14
 #, python-format
 msgid "Edit %(num)s"
 msgstr "Modifier %(num)s"
@@ -11073,6 +11192,8 @@ msgstr "Nouveau Bon de Commande"
 #: manufacturing/templates/sales_order_detail.html:107
 #: manufacturing/templates/sales_orders.html:74
 #: manufacturing/templates/sales_orders.html:110
+#: manufacturing/templates/so_form.html:46
+#: manufacturing/templates/so_list.html:40
 msgid "Order Date"
 msgstr "Date de Commande"
 
@@ -11210,6 +11331,7 @@ msgstr "Prévu"
 
 #: manufacturing/templates/po_list.html:40
 #: manufacturing/templates/sales_orders.html:75
+#: manufacturing/templates/so_list.html:42
 msgid "Items"
 msgstr "Articles"
 
@@ -11394,6 +11516,7 @@ msgstr "N° d'Expédition"
 #: manufacturing/templates/prod_tracking_dashboard.html:72
 #: manufacturing/templates/sales_dashboard_kpis.html:15
 #: manufacturing/templates/sales_orders.html:74
+#: manufacturing/templates/so_list.html:38
 msgid "SO #"
 msgstr "N° de Commande"
 
@@ -11407,6 +11530,8 @@ msgstr "N° de Commande"
 #: manufacturing/templates/sales_order_detail.html:108
 #: manufacturing/templates/sales_orders.html:75
 #: manufacturing/templates/sales_orders.html:111
+#: manufacturing/templates/so_form.html:51
+#: manufacturing/templates/so_list.html:41
 msgid "Ship Date"
 msgstr "Date d'Expédition"
 
@@ -12260,6 +12385,8 @@ msgid "New Inspection"
 msgstr "Nouvelle Inspection"
 
 #: manufacturing/templates/qa_inspection_list.html:123
+#: manufacturing/templates/wo_carbon_detail.html:6
+#: manufacturing/templates/wo_cost_detail.html:6
 msgid "Work Order"
 msgstr "Ordre de Fabrication"
 
@@ -12736,6 +12863,7 @@ msgid "Reports Dashboard"
 msgstr "Tableau de bord des rapports"
 
 #: manufacturing/templates/reports_dashboard.html:9
+#: manufacturing/templates/wo_carbon_detail.html:7
 msgid "ESG Dashboard"
 msgstr "Tableau de bord ESG"
 
@@ -12959,6 +13087,7 @@ msgid "New Request for Quote"
 msgstr "Nouvelle Demande de Devis"
 
 #: manufacturing/templates/rfq_new.html:29
+#: manufacturing/templates/wo_detail.html:197
 msgid "Notes (optional)"
 msgstr "Notes (facultatif)"
 
@@ -13685,11 +13814,14 @@ msgid "All Orders"
 msgstr "Toutes les Commandes"
 
 #: manufacturing/templates/sales_order_detail.html:8
+#: manufacturing/templates/so_detail.html:12
 msgid "Download 855 (EDI)"
 msgstr "Télécharger 855 (EDI)"
 
 #: manufacturing/templates/sales_order_detail.html:49
 #: manufacturing/templates/sales_orders.html:96
+#: manufacturing/templates/so_form.html:4
+#: manufacturing/templates/so_form.html:14
 msgid "New Sales Order"
 msgstr "Nouvelle Commande"
 
@@ -13720,6 +13852,7 @@ msgid "No orders found."
 msgstr "Aucune commande trouvée."
 
 #: manufacturing/templates/sales_orders.html:114
+#: manufacturing/templates/so_form.html:80
 msgid "Create Order"
 msgstr "Créer la Commande"
 
@@ -13980,17 +14113,17 @@ msgstr ""
 msgid ""
 "Performance data is sourced from sales targets. To see detailed rep "
 "attainment by territory,\n"
-"        assign reps in <a href=\"/sales/territories/\" style=\"color:#aad;"
-"\">Territory Management</a>\n"
-"        and set targets in <a href=\"/sales/targets/\" style=\"color:#aad;"
-"\">Sales Targets</a>."
+"        assign reps in <a href=\"/sales/territories/\" style=\"color:var(--"
+"accent);\">Territory Management</a>\n"
+"        and set targets in <a href=\"/sales/targets/\" style=\"color:var(--"
+"accent);\">Sales Targets</a>."
 msgstr ""
 "Les données de performance proviennent des objectifs de vente. Pour voir "
 "l'atteinte détaillée par représentant et territoire,\n"
 "        assignez des représentants dans <a href=\"/sales/territories/\" "
-"style=\"color:#aad;\">Gestion des Territoires</a>\n"
+"style=\"color:var(--accent);\">Gestion des Territoires</a>\n"
 "        et définissez des objectifs dans <a href=\"/sales/targets/\" "
-"style=\"color:#aad;\">Objectifs de Vente</a>."
+"style=\"color:var(--accent);\">Objectifs de Vente</a>."
 
 #: manufacturing/templates/sf_tv.html:5 manufacturing/templates/sf_tv.html:38
 #, python-format
@@ -14019,6 +14152,116 @@ msgstr "Aucun plan défini pour cette équipe"
 #: manufacturing/templates/sf_tv_grid.html:28
 msgid "No active workcenters found."
 msgstr "Aucun poste de travail actif trouvé."
+
+#: manufacturing/templates/so_detail.html:112
+msgid "Ship Date:"
+msgstr "Date d'Expédition :"
+
+#: manufacturing/templates/so_detail.html:139
+msgid "Cancel this order?"
+msgstr "Annuler cette commande ?"
+
+#: manufacturing/templates/so_detail.html:152
+msgid "Insufficient stock to confirm this order:"
+msgstr "Stock insuffisant pour confirmer cette commande :"
+
+#: manufacturing/templates/so_detail.html:157
+#, python-format
+msgid ""
+"%(name)s: need %(need)s, ATP %(atp)s (short %(short)s), earliest available "
+"%(date)s"
+msgstr "%(name)s : besoin de %(need)s, ATP %(atp)s (manque %(short)s), disponible au plus tôt le %(date)s"
+
+#: manufacturing/templates/so_detail.html:159
+#, python-format
+msgid ""
+"%(name)s: need %(need)s, ATP %(atp)s (short %(short)s) — not available "
+"within 90 days"
+msgstr "%(name)s : besoin de %(need)s, ATP %(atp)s (manque %(short)s) — non disponible sous 90 jours"
+
+#: manufacturing/templates/so_detail.html:166
+msgid ""
+"Insufficient workcenter capacity to confirm this order by the ship date:"
+msgstr "Capacité de poste de travail insuffisante pour confirmer cette commande avant la date d'expédition :"
+
+#: manufacturing/templates/so_detail.html:170
+#, python-format
+msgid "%(name)s: needs"
+msgstr "%(name)s : nécessite"
+
+#: manufacturing/templates/so_detail.html:173
+#, python-format
+msgid ", earliest capacity available %(date)s"
+msgstr ", capacité disponible au plus tôt le %(date)s"
+
+#: manufacturing/templates/so_detail.html:175
+msgid "— not available within 90 days"
+msgstr "— non disponible sous 90 jours"
+
+#: manufacturing/templates/so_detail.html:185
+msgid "Confirm Anyway"
+msgstr "Confirmer Quand Même"
+
+#: manufacturing/templates/so_detail.html:214
+msgid "Configure"
+msgstr "Configurer"
+
+#: manufacturing/templates/so_detail.html:236
+msgid "This sales order has no line items."
+msgstr "Cette commande client n'a aucune ligne d'article."
+
+#: manufacturing/templates/so_detail.html:315
+msgid "Promo applied:"
+msgstr "Promotion appliquée :"
+
+#: manufacturing/templates/so_detail.html:326
+msgid "ATP:"
+msgstr "ATP :"
+
+#: manufacturing/templates/so_detail.html:327
+msgid "short"
+msgstr "manque"
+
+#: manufacturing/templates/so_form.html:25
+msgid "SO Number"
+msgstr "Numéro de Commande"
+
+#: manufacturing/templates/so_list.html:8
+msgid "New SO"
+msgstr "Nouvelle Commande"
+
+#: manufacturing/templates/so_list.html:9
+msgid "Price Lists"
+msgstr "Listes de Prix"
+
+#: manufacturing/templates/so_list.html:10
+msgid "Discounts &amp; Promotions"
+msgstr "Remises et Promotions"
+
+#: manufacturing/templates/so_list.html:11
+msgid "ATP Inquiry"
+msgstr "Consultation ATP"
+
+#: manufacturing/templates/so_list.html:12
+msgid "CTP Inquiry"
+msgstr "Consultation CTP"
+
+#: manufacturing/templates/so_list.html:13
+msgid "EDI"
+msgstr "EDI"
+
+#: manufacturing/templates/so_list.html:14
+msgid "e-Commerce"
+msgstr "Commerce Électronique"
+
+#: manufacturing/templates/so_list.html:69
+#, python-format
+msgid "No sales orders with status \"%(s)s\"."
+msgstr "Aucune commande client avec le statut « %(s)s »."
+
+#: manufacturing/templates/so_list.html:71
+msgid "No sales orders."
+msgstr "Aucune commande client."
 
 #: manufacturing/templates/spc_list.html:3
 #: manufacturing/templates/spc_list.html:30
@@ -14581,3 +14824,270 @@ msgstr "Journal d'aujourd'hui"
 #, python-format
 msgid "Total today: %(total)s"
 msgstr "Total aujourd'hui : %(total)s"
+
+#: manufacturing/templates/wo_carbon_detail.html:3
+#: manufacturing/templates/wo_carbon_detail.html:31
+#, python-format
+msgid "WO Carbon — %(num)s"
+msgstr "Carbone OF — %(num)s"
+
+#: manufacturing/templates/wo_carbon_detail.html:39
+msgid "Carbon for This Production Run"
+msgstr "Carbone de Cette Série de Production"
+
+#: manufacturing/templates/wo_carbon_detail.html:41
+msgid "Quantity Produced"
+msgstr "Quantité Produite"
+
+#: manufacturing/templates/wo_carbon_detail.html:43
+msgid "Material (Scope 3)"
+msgstr "Matériaux (Scope 3)"
+
+#: manufacturing/templates/wo_carbon_detail.html:45
+msgid "Process (Scope 1)"
+msgstr "Procédé (Scope 1)"
+
+#: manufacturing/templates/wo_carbon_detail.html:47
+msgid "Total for Run"
+msgstr "Total pour la Série"
+
+#: manufacturing/templates/wo_carbon_detail.html:49
+msgid "Carbon Intensity"
+msgstr "Intensité Carbone"
+
+#: manufacturing/templates/wo_carbon_detail.html:53
+#, python-format
+msgid "Computed by %(by)s"
+msgstr "Calculé par %(by)s"
+
+#: manufacturing/templates/wo_carbon_detail.html:58
+msgid "No carbon record computed yet."
+msgstr "Aucun relevé carbone calculé pour l'instant."
+
+#: manufacturing/templates/wo_carbon_detail.html:64
+msgid "Compute Carbon Actual"
+msgstr "Calculer le Carbone Réel"
+
+#: manufacturing/templates/wo_carbon_detail.html:66
+msgid ""
+"Multiplies this product's latest rolled carbon footprint (per unit) by this\n"
+"            work order's actual quantity produced. Roll the product's carbon "
+"footprint\n"
+"            first if it hasn't been rolled yet."
+msgstr "Multiplie la dernière empreinte carbone calculée de ce produit (par unité) par la\n            quantité réelle produite par cet ordre de fabrication. Calculez d'abord l'empreinte carbone\n            du produit si cela n'a pas encore été fait."
+
+#: manufacturing/templates/wo_carbon_detail.html:73
+msgid "Compute Carbon"
+msgstr "Calculer le Carbone"
+
+#: manufacturing/templates/wo_cost_detail.html:3
+#: manufacturing/templates/wo_cost_detail.html:38
+#, python-format
+msgid "WO Cost — %(num)s"
+msgstr "Coût OF — %(num)s"
+
+#: manufacturing/templates/wo_cost_detail.html:7
+msgid "Carbon"
+msgstr "Carbone"
+
+#: manufacturing/templates/wo_cost_detail.html:46
+msgid "Actual vs Standard"
+msgstr "Réel vs Standard"
+
+#: manufacturing/templates/wo_cost_detail.html:48
+msgid "Actual Material"
+msgstr "Matériaux Réels"
+
+#: manufacturing/templates/wo_cost_detail.html:50
+msgid "Std Material"
+msgstr "Matériaux Standard"
+
+#: manufacturing/templates/wo_cost_detail.html:52
+msgid "Actual Labor"
+msgstr "Main-d'œuvre Réelle"
+
+#: manufacturing/templates/wo_cost_detail.html:54
+msgid "Std Labor"
+msgstr "Main-d'œuvre Standard"
+
+#: manufacturing/templates/wo_cost_detail.html:56
+msgid "Actual Total"
+msgstr "Total Réel"
+
+#: manufacturing/templates/wo_cost_detail.html:58
+msgid "Std Total"
+msgstr "Total Standard"
+
+#: manufacturing/templates/wo_cost_detail.html:65
+msgid "Material Variance"
+msgstr "Écart de Matériaux"
+
+#: manufacturing/templates/wo_cost_detail.html:73
+msgid "Labor Variance"
+msgstr "Écart de Main-d'œuvre"
+
+#: manufacturing/templates/wo_cost_detail.html:82
+#, python-format
+msgid "Computed %(computed)s by %(by)s"
+msgstr "Calculé le %(computed)s par %(by)s"
+
+#: manufacturing/templates/wo_cost_detail.html:87
+msgid "No cost record computed yet."
+msgstr "Aucun relevé de coût calculé pour l'instant."
+
+#: manufacturing/templates/wo_cost_detail.html:93
+msgid "Compute Actual Cost"
+msgstr "Calculer le Coût Réel"
+
+#: manufacturing/templates/wo_cost_detail.html:95
+msgid ""
+"Sums WO material issues and labor from completed operations, then compares "
+"to\n"
+"            the product's standard cost to compute variances."
+msgstr "Additionne les sorties de matières et la main-d'œuvre de l'OF à partir des opérations terminées, puis\n            compare au coût standard du produit pour calculer les écarts."
+
+#: manufacturing/templates/wo_cost_detail.html:101
+msgid "Compute Cost"
+msgstr "Calculer le Coût"
+
+#: manufacturing/templates/wo_detail.html:106
+msgid "Product:"
+msgstr "Produit :"
+
+#: manufacturing/templates/wo_detail.html:107
+msgid "Quantity:"
+msgstr "Quantité :"
+
+#: manufacturing/templates/wo_detail.html:109
+msgid "Due Date:"
+msgstr "Date d'échéance :"
+
+#: manufacturing/templates/wo_detail.html:115
+msgid "Assigned To:"
+msgstr "Assigné à :"
+
+#: manufacturing/templates/wo_detail.html:129
+msgid "Assign"
+msgstr "Assigner"
+
+#: manufacturing/templates/wo_detail.html:140
+msgid "Cancel this work order?"
+msgstr "Annuler cet ordre de fabrication ?"
+
+#: manufacturing/templates/wo_detail.html:157
+#: manufacturing/templates/wo_detail.html:193
+msgid "Qty Required"
+msgstr "Qté Requise"
+
+#: manufacturing/templates/wo_detail.html:158
+msgid "Qty Issued"
+msgstr "Qté Sortie"
+
+#: manufacturing/templates/wo_detail.html:174
+msgid "No materials assigned to this work order."
+msgstr "Aucun matériau assigné à cet ordre de fabrication."
+
+#: manufacturing/templates/wo_detail.html:179
+msgid "Add Material"
+msgstr "Ajouter un Matériau"
+
+#: manufacturing/templates/wo_detail.html:186
+msgid "(select product)"
+msgstr "(sélectionner un produit)"
+
+#: manufacturing/templates/wo_detail.html:215
+#, python-format
+msgid "Progress: %(done)s / %(total)s steps complete"
+msgstr "Progression : %(done)s / %(total)s étapes terminées"
+
+#: manufacturing/templates/wo_detail.html:226
+msgid "Operation"
+msgstr "Opération"
+
+#: manufacturing/templates/wo_detail.html:227
+msgid "Work Center"
+msgstr "Poste de Travail"
+
+#: manufacturing/templates/wo_detail.html:228
+msgid "Std hrs"
+msgstr "Hrs Std"
+
+#: manufacturing/templates/wo_detail.html:229
+msgid "Actual hrs"
+msgstr "Hrs Réelles"
+
+#: manufacturing/templates/wo_detail.html:260
+#, python-format
+msgid "Total std hrs: %(hrs)s"
+msgstr "Total hrs std : %(hrs)s"
+
+#: manufacturing/templates/wo_detail.html:261
+#, python-format
+msgid "Actual hrs: %(hrs)s"
+msgstr "Hrs réelles : %(hrs)s"
+
+#: manufacturing/templates/wo_detail.html:262
+#, python-format
+msgid "Labor cost: $%(cost)s"
+msgstr "Coût de main-d'œuvre : $%(cost)s"
+
+#: manufacturing/templates/wo_detail.html:270
+msgid "Auto-Schedule Forward"
+msgstr "Planification Automatique en Avant"
+
+#: manufacturing/templates/wo_detail.html:275
+msgid "Schedule to Due Date"
+msgstr "Planifier selon la Date d'Échéance"
+
+#: manufacturing/templates/wo_detail.html:277
+msgid "View on Gantt"
+msgstr "Voir sur le Gantt"
+
+#: manufacturing/templates/wo_detail.html:280
+msgid ""
+"Forward: packs operations from today, in sequence, into each work center's\n"
+"                available hours per day. Backward: packs from the due date "
+"above, in reverse\n"
+"                sequence, and flags whether the due date is at risk."
+msgstr "En avant : place les opérations à partir d'aujourd'hui, dans l'ordre, dans les heures\n                disponibles par jour de chaque poste de travail. En arrière : place à partir de la date\n                d'échéance ci-dessus, dans l'ordre inverse, et signale si cette date est à risque."
+
+#: manufacturing/templates/wo_detail.html:291
+msgid "View WO Cost Detail"
+msgstr "Voir le Détail du Coût OF"
+
+#: manufacturing/templates/wo_detail.html:291
+#, python-format
+msgid "Actual $%(actual)s vs Std $%(std)s"
+msgstr "Réel $%(actual)s vs Standard $%(std)s"
+
+#: manufacturing/templates/wo_form.html:25
+msgid "WO Number"
+msgstr "Numéro d'OF"
+
+#: manufacturing/templates/wo_form.html:90
+msgid "Create WO"
+msgstr "Créer un OF"
+
+#: manufacturing/templates/wo_list.html:8
+msgid "New WO"
+msgstr "Nouvel OF"
+
+#: manufacturing/templates/wo_list.html:38
+msgid "Materials"
+msgstr "Matériaux"
+
+#: manufacturing/templates/wo_list.html:40
+msgid "Progress"
+msgstr "Progression"
+
+#: manufacturing/templates/wo_list.html:67
+msgid "No work orders with that status."
+msgstr "Aucun ordre de fabrication avec ce statut."
+
+#: manufacturing/templates/wo_list.html:69
+msgid "No work orders."
+msgstr "Aucun ordre de fabrication."
+
+#: manufacturing/work_orders_core.py:37
+msgid "Cancel WO"
+msgstr "Annuler l'OF"

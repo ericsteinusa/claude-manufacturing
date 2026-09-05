@@ -1,22 +1,23 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Work Orders{% endblock %}
+{% block page_title %}{% trans "Work Orders" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">← Back</a>
-{% if can_edit %}<a href="/wo/new/" class="btn btn-primary">+ New WO</a>{% endif %}
-<a href="/wo/export/?status={{ status|urlencode }}" class="btn">⬇ Export CSV</a>
-<a href="/wo/export/?status={{ status|urlencode }}&format=xlsx" class="btn">⬇ Export Excel</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← {% trans "Back" %}</a>
+{% if can_edit %}<a href="/wo/new/" class="btn btn-primary">+ {% trans "New WO" %}</a>{% endif %}
+<a href="/wo/export/?status={{ status|urlencode }}" class="btn">⬇ {% trans "Export CSV" %}</a>
+<a href="/wo/export/?status={{ status|urlencode }}&format=xlsx" class="btn">⬇ {% trans "Export Excel" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Work Orders</div>
+    <div class="menu-title">{% trans "Work Orders" %}</div>
 
     <div class="filter-bar">
-        <label>Status:</label>
-        <a href="/wo/" class="{% if not status %}active{% endif %}">All</a>
+        <label>{% trans "Status:" %}</label>
+        <a href="/wo/" class="{% if not status %}active{% endif %}">{% trans "All" %}</a>
         {% for val, label in statuses %}
         <a href="/wo/?status={{ val }}"
            class="{% if status == val %}active{% endif %}">{{ label }}</a>
@@ -28,15 +29,15 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>WO #</th>
-                    <th>Product</th>
-                    <th>Description</th>
-                    <th class="num">Qty</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th class="num">Materials</th>
-                    <th>Assigned To</th>
-                    <th class="num">Progress</th>
+                    <th>{% trans "WO #" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th class="num">{% trans "Qty" %}</th>
+                    <th>{% trans "Due Date" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th class="num">{% trans "Materials" %}</th>
+                    <th>{% trans "Assigned To" %}</th>
+                    <th class="num">{% trans "Progress" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,7 +62,13 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No work orders{% if status %} with that status{% endif %}.</div>
+    <div class="empty-state">
+        {% if status %}
+        {% trans "No work orders with that status." %}
+        {% else %}
+        {% trans "No work orders." %}
+        {% endif %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}

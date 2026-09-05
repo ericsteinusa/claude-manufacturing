@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page_title %}{{ so.so_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-{% if can_edit %}<a href="/so/{{ so.id }}/edit/" class="btn">Edit</a>{% endif %}
+<a href="{{ back_url }}" class="btn">{% trans "Back" %}</a>
+{% if can_edit %}<a href="/so/{{ so.id }}/edit/" class="btn">{% trans "Edit" %}</a>{% endif %}
 {% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
-<a href="{% url 'audit_record' 'sales_order' so.id %}" class="btn">History</a>
+<a href="{% url 'audit_record' 'sales_order' so.id %}" class="btn">{% trans "History" %}</a>
 {% endif %}
-<a href="/edi/855/{{ so.id }}/download/" class="btn">Download 855 (EDI)</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/edi/855/{{ so.id }}/download/" class="btn">{% trans "Download 855 (EDI)" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -87,7 +88,7 @@
 
 {% block body %}
 <div class="content">
-    <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+    <button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
     <div class="so-wrap">
         <div class="so-card">
             <div class="so-barcode">
@@ -101,23 +102,23 @@
                 </span>
             </div>
             <div class="so-meta">
-                <div><b>Customer:</b> {{ so.customer_name }}</div>
-                <div><b>Total:</b> {{ so.currency|default:"USD" }} {{ so.total|floatformat:2 }}
+                <div><b>{% trans "Customer:" %}</b> {{ so.customer_name }}</div>
+                <div><b>{% trans "Total:" %}</b> {{ so.currency|default:"USD" }} {{ so.total|floatformat:2 }}
                     {% if currencies and so.currency and so.currency != base_currency %}
                     <span style="font-size:12px;color:var(--text-muted);">(≈ ${{ so.total_base|floatformat:2 }} {{ base_currency }})</span>
                     {% endif %}
                 </div>
-                <div><b>Order Date:</b> {{ so.order_date|default:"—" }}</div>
-                <div><b>Ship Date:</b> {{ so.ship_date|default:"—" }}</div>
+                <div><b>{% trans "Order Date:" %}</b> {{ so.order_date|default:"—" }}</div>
+                <div><b>{% trans "Ship Date:" %}</b> {{ so.ship_date|default:"—" }}</div>
                 <div style="grid-column: 1 / -1;">
-                    <b>Notes:</b> {{ so.notes|default:"—" }}</div>
+                    <b>{% trans "Notes:" %}</b> {{ so.notes|default:"—" }}</div>
             </div>
             {% if currencies and can_edit %}
             <div style="margin-top:10px;">
                 <form method="post" action="" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="currency">
-                    <label style="font-size:12px;font-weight:bold;color:#555;">Currency:</label>
+                    <label style="font-size:12px;font-weight:bold;color:#555;">{% trans "Currency:" %}</label>
                     <select name="currency" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
                         {% for cur in currencies %}
                         <option value="{{ cur.code }}" {% if so.currency == cur.code %}selected{% elif not so.currency and cur.code == base_currency %}selected{% endif %}>{{ cur.code }} — {{ cur.name }}</option>
@@ -126,8 +127,8 @@
                     <input type="number" name="exchange_rate" step="0.000001" min="0"
                         value="{{ so.exchange_rate|default:'1.0' }}"
                         style="width:90px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;"
-                        placeholder="Rate">
-                    <button type="submit" style="padding:4px 10px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Set Currency</button>
+                        placeholder="{% trans 'Rate' %}">
+                    <button type="submit" style="padding:4px 10px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">{% trans "Set Currency" %}</button>
                 </form>
             </div>
             {% endif %}
@@ -135,7 +136,7 @@
             <div class="so-status-actions">
                 {% for target, label in status_actions %}
                 <form method="post" action="/so/{{ so.id }}/status/"
-                      {% if target == 'cancelled' %}onsubmit="return confirm('Cancel this order?');"{% endif %}>
+                      {% if target == 'cancelled' %}onsubmit="return confirm('{% trans "Cancel this order?" %}');"{% endif %}>
                     {% csrf_token %}
                     <input type="hidden" name="status" value="{{ target }}">
                     <button type="submit"
@@ -148,23 +149,32 @@
             {% if atp_warning or capacity_warning %}
             <div class="atp-warning">
                 {% if atp_warning %}
-                <b>Insufficient stock to confirm this order:</b>
+                <b>{% trans "Insufficient stock to confirm this order:" %}</b>
                 <ul>
                     {% for s in atp_warning %}
-                    <li>{{ s.product_name }}: need {{ s.requested_qty }}, ATP {{ s.atp_qty|floatformat:0 }}
-                        (short {{ s.shortfall|floatformat:0 }}){% if s.earliest_available_date %},
-                        earliest available {{ s.earliest_available_date }}{% else %} — not available within 90 days{% endif %}</li>
+                    <li>
+                        {% if s.earliest_available_date %}
+                        {% blocktrans with name=s.product_name need=s.requested_qty atp=s.atp_qty|floatformat:0 short=s.shortfall|floatformat:0 date=s.earliest_available_date %}{{ name }}: need {{ need }}, ATP {{ atp }} (short {{ short }}), earliest available {{ date }}{% endblocktrans %}
+                        {% else %}
+                        {% blocktrans with name=s.product_name need=s.requested_qty atp=s.atp_qty|floatformat:0 short=s.shortfall|floatformat:0 %}{{ name }}: need {{ need }}, ATP {{ atp }} (short {{ short }}) — not available within 90 days{% endblocktrans %}
+                        {% endif %}
+                    </li>
                     {% endfor %}
                 </ul>
                 {% endif %}
                 {% if capacity_warning %}
-                <b>Insufficient workcenter capacity to confirm this order by the ship date:</b>
+                <b>{% trans "Insufficient workcenter capacity to confirm this order by the ship date:" %}</b>
                 <ul>
                     {% for s in capacity_warning %}
-                    <li>{{ s.product_name }}: needs
+                    <li>
+                        {% blocktrans with name=s.product_name %}{{ name }}: needs{% endblocktrans %}
                         {% for wc in s.capacity_workcenters %}{{ wc.workcenter_name }} ({{ wc.hours_required|floatformat:1 }}h){% if not forloop.last %}, {% endif %}{% endfor %}
-                        {% if s.earliest_capacity_date %},
-                        earliest capacity available {{ s.earliest_capacity_date }}{% else %} — not available within 90 days{% endif %}</li>
+                        {% if s.earliest_capacity_date %}
+                        {% blocktrans with date=s.earliest_capacity_date %}, earliest capacity available {{ date }}{% endblocktrans %}
+                        {% else %}
+                        {% trans "— not available within 90 days" %}
+                        {% endif %}
+                    </li>
                     {% endfor %}
                 </ul>
                 {% endif %}
@@ -172,7 +182,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="status" value="{{ pending_status }}">
                     <input type="hidden" name="override" value="1">
-                    <button type="submit" class="btn btn-sm btn-danger">Confirm Anyway</button>
+                    <button type="submit" class="btn btn-sm btn-danger">{% trans "Confirm Anyway" %}</button>
                 </form>
             </div>
             {% endif %}
@@ -182,11 +192,11 @@
         <table class="so-table">
             <thead>
                 <tr>
-                    <th>Description</th>
-                    <th>Product</th>
-                    <th class="num">Qty</th>
-                    <th class="num">Unit Price</th>
-                    <th class="num">Line Total</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th class="num">{% trans "Qty" %}</th>
+                    <th class="num">{% trans "Unit Price" %}</th>
+                    <th class="num">{% trans "Line Total" %}</th>
                     {% if can_edit %}<th></th>{% endif %}
                 </tr>
             </thead>
@@ -201,13 +211,13 @@
                     {% if can_edit %}
                     <td class="num">
                         {% if it.product_id %}
-                        <a href="/cto/configure/{{ it.id }}/" class="btn btn-sm">Configure</a>
+                        <a href="/cto/configure/{{ it.id }}/" class="btn btn-sm">{% trans "Configure" %}</a>
                         {% endif %}
                         <form method="post" action="/so/{{ so.id }}/items/remove/"
-                              onsubmit="return confirm('Remove this line item?');" style="display:inline;">
+                              onsubmit="return confirm('{% trans "Remove this line item?" %}');" style="display:inline;">
                             {% csrf_token %}
                             <input type="hidden" name="item_id" value="{{ it.id }}">
-                            <button type="submit" class="btn btn-sm">Remove</button>
+                            <button type="submit" class="btn btn-sm">{% trans "Remove" %}</button>
                         </form>
                     </td>
                     {% endif %}
@@ -216,48 +226,48 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="4" class="num">Total</td>
+                    <td colspan="4" class="num">{% trans "Total" %}</td>
                     <td class="num">${{ so.total|floatformat:2 }}</td>
                     {% if can_edit %}<td></td>{% endif %}
                 </tr>
             </tfoot>
         </table>
         {% else %}
-        <div class="so-card so-empty">This sales order has no line items.</div>
+        <div class="so-card so-empty">{% trans "This sales order has no line items." %}</div>
         {% endif %}
 
         {% if can_edit %}
         <div class="add-item">
-            <h3>Add Line Item</h3>
+            <h3>{% trans "Add Line Item" %}</h3>
             <form method="post" action="/so/{{ so.id }}/items/add/">
                 {% csrf_token %}
                 <div class="grid">
                     <div>
-                        <label>Product (optional)</label>
+                        <label>{% trans "Product (optional)" %}</label>
                         <select name="product_id" id="so-add-product">
-                            <option value="">(none)</option>
+                            <option value="">{% trans "(none)" %}</option>
                             {% for p in products %}
                             <option value="{{ p.id }}">{{ p.product_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div>
-                        <label>Description</label>
+                        <label>{% trans "Description" %}</label>
                         <input type="text" name="description" required>
                     </div>
                     <div>
-                        <label>Qty</label>
+                        <label>{% trans "Qty" %}</label>
                         <input type="number" name="qty" min="1" value="1" id="so-add-qty">
                         <span id="so-add-atp" style="font-size:11px;"></span>
                     </div>
                     <div>
-                        <label>Unit Price</label>
+                        <label>{% trans "Unit Price" %}</label>
                         <input type="number" name="unit_price" min="0"
                                step="0.01" value="0.00" id="so-add-unit-price">
                         <span id="so-add-promo" style="font-size:11px;color:#1a7f37;"></span>
                     </div>
                     <div>
-                        <button type="submit" class="btn">Add</button>
+                        <button type="submit" class="btn">{% trans "Add" %}</button>
                     </div>
                 </div>
             </form>
@@ -302,7 +312,7 @@
                 var promo = applyDiscount(basePrice, qty);
                 priceInput.value = (promo ? promo.price : basePrice).toFixed(2);
                 if (promoSpan) {
-                    promoSpan.textContent = promo ? ('Promo applied: ' + promo.name) : '';
+                    promoSpan.textContent = promo ? ('{% trans "Promo applied:" %} ' + promo.name) : '';
                 }
             }
 
@@ -313,8 +323,8 @@
                 var qty = parseFloat(qtyInput.value) || 0;
                 var ok = info.atp_qty >= qty;
                 atpSpan.style.color = ok ? '#1a7f37' : '#c33';
-                atpSpan.textContent = 'ATP: ' + info.atp_qty +
-                    (ok ? '' : ' (short ' + (qty - info.atp_qty) + ')');
+                atpSpan.textContent = '{% trans "ATP:" %} ' + info.atp_qty +
+                    (ok ? '' : ' ({% trans "short" %} ' + (qty - info.atp_qty) + ')');
             }
 
             productSel.addEventListener('change', function () { applyPrice(); showAtp(); });

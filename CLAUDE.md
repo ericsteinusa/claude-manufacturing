@@ -1366,6 +1366,63 @@ department-specific content templates never marked for es/fr/de remain
 untranslated in pt/nl too** — this pass only extended existing coverage
 to two new languages, it didn't mark any new template.
 
+Also translated: the **web-native Work Order / Sales Order pages**
+(`so_list.html`, `so_detail.html`, `so_form.html`, `wo_list.html`,
+`wo_detail.html`, `wo_form.html`, `wo_carbon_detail.html`,
+`wo_cost_detail.html` — 8 templates). Note these are distinct from
+`sales_orders.html`/`sales_order_detail.html`, the older reporting-style
+pages already translated in the Sales department pass — `so_*`/`wo_*`
+are the actual `views.so_detail`/`views.wo_detail` CRUD pages (routed at
+`/so/`, `/wo/`) and were missed by every department-scoped pass so far
+since they don't carry a department-name prefix. 90 unique strings across
+5 languages (450 translations), all simple except 3 multi-line
+`{% blocktrans %}` paragraphs (the WO Carbon/Cost compute-hint text and
+the WO Gantt forward/backward-scheduling hint, all wrapping across
+template lines the same way as the Maintenance labor report's footnote).
+Also wrapped `SO_STATUS_ACTION_LABELS`/`WO_STATUS_ACTION_LABELS` (in
+`sales_orders_core.py`/`work_orders_core.py`) in `gettext_lazy` — these
+are plain dicts rendered directly as status-transition button text
+(`{{ label }}`) in `so_detail.html`/`wo_detail.html`, the same
+non-template-rendered-string situation `menus.py`'s
+`DASHBOARD_DEPARTMENTS` hit, and unlike `PO_STATUS_ACTION_LABELS` (left
+untranslated — out of scope, `po_detail.html` is a different page) these
+two are used nowhere else (no mobile/API JSON serialization), so wrapping
+was safe. Caught and fixed a bare `{{ wo.assigned_to|default:"— Unassigned
+—" }}` fallback (the same bug class first found on IT's Network Device
+page) sitting right next to an already-correct `{% if %}/{% else %}`
+version of the identical fallback three lines up — copy-paste had
+preserved the bug in one branch while fixing it in the other.
+
+**New gotcha, distinct from every prior escaping pitfall in this file**:
+a fill script that pre-embeds a literal `\n` (backslash+n, written as
+`"\\n"` in the Python source) into a translation string, then also runs
+a generic `.replace("\\", "\\\\")` escaping pass over that same string
+before writing it to the `.po` file, double-escapes the backslash —
+the file ends up with `\\n` (two backslashes) instead of `\n`, which
+`msgfmt --check` accepts without complaint (it's still a syntactically
+valid escape sequence, just the wrong one) and which every blank/fuzzy/
+duplication audit in this file's history would also pass clean, since
+none of them decode escape sequences. The only thing that catches it is
+calling `django.utils.translation.gettext()` at runtime and checking
+`"\n" in result` — `msgfmt --check` and a raw `.po` diff both look
+identical whether the newline decoded correctly or not. Found by doing
+exactly that (`translation.activate('es'); gettext(...)`) before trusting
+the multi-line strings, rather than stopping at `msgfmt --check` passing.
+Fixed by re-deriving the 3 affected entries (5 languages) with a targeted
+substring fix rather than re-running the whole fill script. Full suite
+3475 passed (unchanged), `manage.py check` and `ruff check .` clean,
+`msgfmt --check` clean on all 5 files, zero fuzzy/blank entries.
+Verified end-to-end against the real dev server: SO list + a draft SO's
+detail page (confirmed "Fecha de Envío:", "Descargar 855 (EDI)"), a WO's
+detail page including its Operations card (confirmed the
+"Progreso: 2 / 2 pasos completados" and "Total hrs. est.: ... | Hrs.
+real: ... | Costo de mano de obra: ..." blocktrans fragments, the
+"— Sin asignar —" fallback fix, and the forward/backward-scheduling
+hint paragraph rendering as real line breaks, not literal `\n`), the WO
+Cost and WO Carbon detail pages (confirmed both remaining multi-line
+paragraphs), and the SO/WO "New" forms, in Spanish, French, German,
+Portuguese, and Dutch with real sample data, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
