@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Compliance Audits{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Compliance Audits" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/risk/" class="btn">Risk Dashboard</a>
-<a href="/risk/register/" class="btn">Risk Register</a>
-<a href="/risk/assessments/" class="btn">Assessments</a>
-<a href="/risk/insurance/" class="btn">Insurance</a>
-<a href="/risk/continuity/" class="btn">Continuity</a>
-<a href="/risk/audits/" class="btn">Audits</a>
-<a href="/risk/kri/" class="btn">KRIs</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/risk/" class="btn">{% trans "Risk Dashboard" %}</a>
+<a href="/risk/register/" class="btn">{% trans "Risk Register" %}</a>
+<a href="/risk/assessments/" class="btn">{% trans "Assessments" %}</a>
+<a href="/risk/insurance/" class="btn">{% trans "Insurance" %}</a>
+<a href="/risk/continuity/" class="btn">{% trans "Continuity" %}</a>
+<a href="/risk/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/risk/kri/" class="btn">{% trans "KRIs" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,28 +50,28 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Compliance Audits</h2>
+    <h2>{% trans "Compliance Audits" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search audit / framework / auditor…">
-        <button type="submit">Filter</button>
-        <a href="/risk/audits/" style="font-size:13px;color:var(--accent);margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans "Search audit / framework / auditor…" %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/risk/audits/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Audit</th><th>Framework</th><th>Auditor</th><th>Scheduled</th>
-                    <th>Completed</th><th>Finding</th><th>Status</th>
+                    <th>{% trans "Audit" %}</th><th>{% trans "Framework" %}</th><th>{% trans "Auditor" %}</th><th>{% trans "Scheduled" %}</th>
+                    <th>{% trans "Completed" %}</th><th>{% trans "Finding" %}</th><th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -85,7 +86,7 @@
                 <td><span class="badge s-{{ r.status|lower|cut:" " }}">{{ r.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:var(--text-muted);text-align:center;">No audits found.</td></tr>
+            <tr><td colspan="7" style="color:var(--text-muted);text-align:center;">{% trans "No audits found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -93,32 +94,32 @@
 
     {% if user_role != 'viewer' and user_role != 'read_only' %}
     <div class="card">
-        <h3>New Audit</h3>
+        <h3>{% trans "New Audit" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Audit *</label>
+                    <label>{% trans "Audit *" %}</label>
                     <input type="text" name="audit" required>
                 </div>
                 <div class="form-group">
-                    <label>Framework</label>
-                    <input type="text" name="framework" placeholder="ISO 27001 / SOC 2 / …">
+                    <label>{% trans "Framework" %}</label>
+                    <input type="text" name="framework" placeholder="{% trans "ISO 27001 / SOC 2 / …" %}">
                 </div>
                 <div class="form-group">
-                    <label>Auditor</label>
+                    <label>{% trans "Auditor" %}</label>
                     <input type="text" name="auditor">
                 </div>
                 <div class="form-group">
-                    <label>Scheduled Date</label>
+                    <label>{% trans "Scheduled Date" %}</label>
                     <input type="date" name="scheduled_date">
                 </div>
                 <div class="form-group">
-                    <label>Completed Date</label>
+                    <label>{% trans "Completed Date" %}</label>
                     <input type="date" name="completed_date">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in statuses %}
                         <option value="{{ s }}"{% if s == 'Scheduled' %} selected{% endif %}>{{ s }}</option>
@@ -126,15 +127,15 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Finding</label>
+                    <label>{% trans "Finding" %}</label>
                     <input type="text" name="finding">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Audit</button>
+            <button type="submit" class="btn-submit">{% trans "Create Audit" %}</button>
         </form>
     </div>
     {% endif %}
