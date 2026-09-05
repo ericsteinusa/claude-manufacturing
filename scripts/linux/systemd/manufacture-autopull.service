@@ -1,0 +1,7 @@
+[Unit]
+Description=Check for new commits and redeploy the Manufacturing ERP web server
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/eric/tester/manufacture-autopull.sh

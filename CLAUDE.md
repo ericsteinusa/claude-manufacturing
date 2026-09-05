@@ -2032,6 +2032,34 @@ to two new languages, it didn't mark any new template.
   Fixed in PR #94/#95 — when adding or touching a query that joins for a
   `_name`/`_number` display field, check its sibling `_id` is selected too.
 
+## Linux deployment (`scripts/linux/`)
+`manufacture-autopull.sh` (polls `origin/main`, gates on `manage.py check`
+plus the full pytest suite, restarts `manufacture.service`) plus the three
+systemd units it needs; the timer fires every 2 minutes. `install.sh` sets
+it up — counterpart to `scripts/windows/register-scheduled-tasks.ps1`.
+
+These lived untracked at `~/tester/` until the bug below made the cost
+obvious: the Windows half was version-controlled and reviewed while its
+Linux twin had no history, no review and no CI. `install.sh` symlinks
+`~/tester/manufacture-autopull.sh` at the repo copy, so a pull updates the
+deploy tooling itself — which is how the Windows box already works.
+
+**Never `git pull origin main --ff-only` in a deploy script that shares a
+checkout with interactive work.** It decides from the `main` ref but pulls
+into `HEAD`, so whenever a session has a feature branch checked out the
+pull targets *that* branch: `main` never advances, the next cycle sees the
+identical delta, and the deploy stalls silently while the log keeps
+announcing `New commits detected` — five consecutive cycles with the same
+source SHA, observed live. Worse, on a freshly-created branch with no
+commits of its own the `--ff-only` pull *succeeds* and fast-forwards that
+branch onto `origin/main`, moving someone's work with no warning. The two
+cases need different mechanisms and neither is `pull`: on `main` use
+`git merge --ff-only` (advances the working tree); anywhere else use
+`git fetch origin main:main` (moves the ref only) — git **refuses** that
+form when `main` is checked out, so one cannot serve both. The script also
+declines to restart the service when the tree is not on `main`, rather
+than deploying whatever branch happens to be there.
+
 ## Windows deployment (`scripts/windows/`)
 `manufacture-autopull.ps1` (polls `origin/main` and redeploys) and
 `manufacture-run.ps1` (start/restart the dev server, tracked by port

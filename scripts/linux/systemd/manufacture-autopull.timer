@@ -1,0 +1,10 @@
+[Unit]
+Description=Poll for new commits every 2 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=2min
+Unit=manufacture-autopull.service
+
+[Install]
+WantedBy=timers.target
