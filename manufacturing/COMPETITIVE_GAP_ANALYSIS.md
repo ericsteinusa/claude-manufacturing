@@ -5037,3 +5037,108 @@ languages). See CLAUDE.md's htmx section for full detail.
 
 **§6.1/§9.2 status:** still 🟡 Partial — 24 of ~450 templates now. No further "manager watches a
 live queue" candidate has been explicitly scoped yet.
+
+---
+
+## Section 10: 2026-09-05 Re-Assessment — Correcting a Scorecard That Under-Rated the App
+
+Section 9's scorecard was written 2026-08-28 and has drifted. Every dimension it scored 🟡 Partial
+has since moved, several to closed, and the table had also fallen **internally inconsistent** with
+the rest of this document — §9.2 records CI-gated load testing as a manual `workflow_dispatch` job
+while §6.13 already describes it running on every PR. A reader landing on §9 today would materially
+under-rate the product.
+
+This pass re-measures every claim against the codebase rather than against this document's own
+prior text. Commands used are given so the numbers can be re-derived rather than trusted.
+
+### 10.1 Top-line stats (measured 2026-09-05)
+
+| Metric | §9.1 (2026-08-28) | Now | How measured |
+|---|---|---|---|
+| Qt-free `*_core.py` modules | 92 | **93** | `ls manufacturing/*_core.py \| wc -l` |
+| Django web templates | 454 | **474** | `ls manufacturing/templates/*.html \| wc -l` |
+| View submodules | 67 | 67 | `ls manufacturing/views/*.py \| wc -l` |
+| Automated test files | 104 | **108** | `ls tests/*.py \| wc -l` |
+| Automated tests passing | 3,412 | **3,475** | `pytest tests/ -q` |
+
+### 10.2 Corrections to the §9.2 platform-maturity scorecard
+
+Five rows were wrong. Each correction is a measurement, not a re-judgement:
+
+| Dimension | §9.2 said | Measured now | Corrected score |
+|---|---|---|---|
+| CI-gated load testing | 🟡 manual `workflow_dispatch`, not per-PR | `loadtest.yml` triggers on `pull_request` **and** `push` to main | ✅ **Full** |
+| Modern reactive frontend | 🟡 htmx on **5** of ~450 templates | **24** templates poll a fragment | 🟡 Partial (5× wider) |
+| Mobile app department coverage | 🟡 **11 of 17** departments | **22** tab screens; all 17 departments have one | ✅ **Full** |
+| Mobile offline support | 🟡 **2 of 10** screens | **21** screens use the offline cache/queue helpers | ✅ **Full** (read-cache; write-queue still Time Clock only, by design) |
+| Localization / i18n | 🟡 **4** languages, core shell + login + main dashboard | **6** languages (en/es/fr/de/pt/nl); **259 of 474** templates marked; **2,438** translated messages per language, **zero** fuzzy or untranslated in all five | 🟡 Partial (far wider) |
+
+The localization row is the largest correction. "Four languages, three templates" and "six languages
+at 2,438 fully-translated messages across 55% of templates" are not the same product. `msgfmt
+--statistics` on each of `locale/{es,fr,de,pt,nl}/LC_MESSAGES/django.po` reports 2,438 translated,
+0 fuzzy, 0 untranslated.
+
+### 10.3 CI surface (not previously scored as a dimension)
+
+Six workflows now gate every pull request and every push to `main`:
+
+| Workflow | Gates |
+|---|---|
+| `tests` | full pytest suite (3,475) |
+| `ruff` | lint |
+| `docker-build` | image builds |
+| `loadtest` | Locust run against a fresh CI database |
+| `mobile` | `tsc --noEmit`, `expo-doctor`, `expo export --platform web` |
+| `powershell-encoding` | Windows deploy scripts stay ASCII in executable lines |
+
+The last is new this session and worth noting as a *class* of protection rather than a feature: it
+exists because a non-ASCII character inside a PowerShell string, mis-decoded by Windows PowerShell
+5.1's ANSI fallback, had silently swallowed 30 lines of the Windows deploy script — including its
+`git pull` — for weeks, while the log reported success every two minutes. A parser-based check
+would not have caught it: the corrupted file parses **clean**. See CLAUDE.md's Windows deployment
+section.
+
+### 10.4 Document-and-export completeness (new, closes a real correctness gap)
+
+Every enterprise vendor ships print-to-PDF and grid export as table stakes. This pass audited the
+whole app rather than adding buttons ad hoc:
+
+| Surface | Coverage |
+|---|---|
+| Detail pages with **Print / Save PDF** | 29 |
+| Pages with **CSV / Excel export** | 67 |
+
+The audit found a genuine **data-correctness defect**, not merely missing buttons. Export links
+interpolated filter values into the query string without Django's `|urlencode`, so a filter
+containing `&` or a space broke the link apart and the export silently returned a **different,
+larger** result set than the screen displayed — no error shown. Reproduced live on the CS ticket
+list: searching `bolt & nut` produced `?export=1&search=bolt & nut`, which the browser parsed as
+`search=bolt ` plus a junk parameter. **51 templates** were affected, 40 of them reachable via a
+free-text `search` filter. All are now fixed; `0` unencoded export links remain app-wide.
+
+This matters competitively in a way a missing button does not: a user filtering a grid, exporting,
+and reporting on the wrong rows is a silent-wrong-data bug of exactly the kind an ERP evaluation
+weights heavily. It had been present since the feature was written, and two earlier PRs (#201/#202)
+had fixed two pages in isolation without anyone sweeping the rest.
+
+### 10.5 Revised remaining gaps
+
+With the corrections above, **frontend modernity and localization breadth remain the only two
+genuinely open dimensions** — the same two §9.4 named, but both materially narrower:
+
+- **Localization.** 6 languages against MRPeasy's 13+, and 259 of 474 templates marked. The gap is
+  now *breadth of language count* and *the untranslated 45% of templates*, not "this app has one
+  language." Every marked string is fully translated in all five non-English languages with zero
+  fuzzy entries — so the remaining work is extending coverage, not repairing quality.
+- **Frontend modernity.** 24 of 474 templates live-refresh. A full SPA rewrite remains
+  disproportionate for this codebase, as previously judged; the honest framing is that the app is
+  server-rendered with targeted live regions, not that it is mid-migration to a reactive frontend.
+
+Everything else §9.2 scored 🟡 is now closed or effectively so.
+
+### 10.6 What this pass did not do
+
+It did not re-verify the ten vendors' current public positioning — §9.4's competitive claims are
+carried forward unchanged and are now a week old. If any vendor verdict is load-bearing for a
+decision, re-check it rather than relying on this section. This pass corrected *this app's* side of
+the comparison only, which is the side that had demonstrably drifted.
