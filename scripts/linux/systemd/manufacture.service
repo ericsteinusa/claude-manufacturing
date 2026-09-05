@@ -1,0 +1,15 @@
+[Unit]
+Description=Manufacturing ERP Django web server
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=eric
+Group=eric
+WorkingDirectory=/home/eric/tester/manufacture
+ExecStart=/home/eric/tester/virt/bin/python manage.py runserver 0.0.0.0:8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
