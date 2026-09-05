@@ -2083,6 +2083,30 @@ and the manual elevated restart used to recover changed process ownership
 before the fix landed — so treat the above as two real defects closed,
 not one confirmed root cause.
 
+**Four `python.exe` processes on that box is normal, not a leak.** A bare
+process count is meaningless here: the venv's `Scripts\python.exe` is a
+255 KB *redirector*, not an interpreter — `pyvenv.cfg` points it at a
+separate `pythoncore-3.14-64` install — so every logical Python process
+appears twice, as a ~3 MB shim plus the real interpreter it launches.
+Django's `runserver` autoreloader is its usual parent/child pair, so a
+single healthy server is 2 logical and 4 OS processes, in one chain:
+
+```
+ 9060   3MB  virt\Scripts\python.exe        <- venv shim
+  16688  64MB  pythoncore-3.14-64\python.exe  <- reloader parent
+   23420   3MB  virt\Scripts\python.exe       <- venv shim
+    11268  81MB  pythoncore-3.14-64\python.exe <- server child, owns :8000
+```
+
+Distinguish a real leak from this by **memory and executable path**, not
+count: only the large `pythoncore-*` entries are loaded Django apps, and
+exactly one should own port 8000
+(`(Get-NetTCPConnection -LocalPort 8000 -State Listen).OwningProcess`).
+The Linux box shows the plain 2-process pair for the same server, which
+is the useful control. Counts that stay at 4 across restarts are healthy;
+growth beyond that is the accumulation `manufacture-run.ps1`'s docstring
+describes.
+
 **A DHCP IP change on the Windows box breaks three unrelated things at
 once**, seen in practice when its address moved from `192.168.4.46` to
 `192.168.0.188`: (1) Windows Firewall silently drops inbound connections
