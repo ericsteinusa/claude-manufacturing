@@ -1,28 +1,29 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Sales Orders{% endblock %}
+{% block page_title %}{% trans "Sales Orders" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">← Back</a>
-{% if can_edit %}<a href="/so/new/" class="btn btn-primary">+ New SO</a>{% endif %}
-<a href="/price-lists/" class="btn">Price Lists</a>
-<a href="/promotions/" class="btn">Discounts &amp; Promotions</a>
-<a href="/atp/" class="btn">ATP Inquiry</a>
-<a href="/ctp/" class="btn">CTP Inquiry</a>
-<a href="/edi/partners/" class="btn">EDI</a>
-<a href="/ecommerce/connections/" class="btn">e-Commerce</a>
-<a href="/so/export/?status={{ status|urlencode }}" class="btn">⬇ Export CSV</a>
-<a href="/so/export/?status={{ status|urlencode }}&format=xlsx" class="btn">⬇ Export Excel</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← {% trans "Back" %}</a>
+{% if can_edit %}<a href="/so/new/" class="btn btn-primary">+ {% trans "New SO" %}</a>{% endif %}
+<a href="/price-lists/" class="btn">{% trans "Price Lists" %}</a>
+<a href="/promotions/" class="btn">{% trans "Discounts &amp; Promotions" %}</a>
+<a href="/atp/" class="btn">{% trans "ATP Inquiry" %}</a>
+<a href="/ctp/" class="btn">{% trans "CTP Inquiry" %}</a>
+<a href="/edi/partners/" class="btn">{% trans "EDI" %}</a>
+<a href="/ecommerce/connections/" class="btn">{% trans "e-Commerce" %}</a>
+<a href="/so/export/?status={{ status|urlencode }}" class="btn">⬇ {% trans "Export CSV" %}</a>
+<a href="/so/export/?status={{ status|urlencode }}&format=xlsx" class="btn">⬇ {% trans "Export Excel" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Sales Orders</div>
+    <div class="menu-title">{% trans "Sales Orders" %}</div>
 
     <div class="filter-bar">
-        <label>Status:</label>
-        <a href="/so/" class="{% if not status %}active{% endif %}">All</a>
+        <label>{% trans "Status:" %}</label>
+        <a href="/so/" class="{% if not status %}active{% endif %}">{% trans "All" %}</a>
         {% for s in statuses %}
         <a href="/so/?status={{ s }}"
            class="{% if status == s %}active{% endif %}">{{ s|capfirst }}</a>
@@ -34,13 +35,13 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>SO #</th>
-                    <th>Customer</th>
-                    <th>Order Date</th>
-                    <th>Ship Date</th>
-                    <th class="num">Items</th>
-                    <th class="num">Total</th>
-                    <th>Status</th>
+                    <th>{% trans "SO #" %}</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th>{% trans "Order Date" %}</th>
+                    <th>{% trans "Ship Date" %}</th>
+                    <th class="num">{% trans "Items" %}</th>
+                    <th class="num">{% trans "Total" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,7 +64,13 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No sales orders{% if status %} with status "{{ status|capfirst }}"{% endif %}.</div>
+    <div class="empty-state">
+        {% if status %}
+        {% blocktrans with s=status|capfirst %}No sales orders with status "{{ s }}".{% endblocktrans %}
+        {% else %}
+        {% trans "No sales orders." %}
+        {% endif %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}

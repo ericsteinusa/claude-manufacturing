@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}WO Carbon — {{ wo.wo_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=wo.wo_number %}WO Carbon — {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wo/{{ wo.id }}/" class="btn">← Work Order</a>
-<a href="/esg/" class="btn">ESG Dashboard</a>
+<a href="/wo/{{ wo.id }}/" class="btn">← {% trans "Work Order" %}</a>
+<a href="/esg/" class="btn">{% trans "ESG Dashboard" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -27,7 +28,7 @@
 {% block body %}
 <div class="content">
 <div class="cost-wrap">
-    <h2>WO Carbon — {{ wo.wo_number }}</h2>
+    <h2>{% blocktrans with num=wo.wo_number %}WO Carbon — {{ num }}{% endblocktrans %}</h2>
     <div class="cost-meta">{{ wo.description|default:'' }}</div>
 
     {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
@@ -35,41 +36,41 @@
 
     {% if carbon %}
     <div class="card">
-        <h3>Carbon for This Production Run</h3>
+        <h3>{% trans "Carbon for This Production Run" %}</h3>
         <div class="info-grid">
-            <span class="info-label">Quantity Produced</span>
+            <span class="info-label">{% trans "Quantity Produced" %}</span>
             <span>{{ carbon.quantity|floatformat:0 }}</span>
-            <span class="info-label">Material (Scope 3)</span>
+            <span class="info-label">{% trans "Material (Scope 3)" %}</span>
             <span>{{ carbon.material_carbon_kg|floatformat:3 }} kg CO2e</span>
-            <span class="info-label">Process (Scope 1)</span>
+            <span class="info-label">{% trans "Process (Scope 1)" %}</span>
             <span>{{ carbon.process_carbon_kg|floatformat:3 }} kg CO2e</span>
-            <span class="info-label">Total for Run</span>
+            <span class="info-label">{% trans "Total for Run" %}</span>
             <span><strong>{{ carbon.total_carbon_kg|floatformat:3 }} kg CO2e</strong></span>
-            <span class="info-label">Carbon Intensity</span>
+            <span class="info-label">{% trans "Carbon Intensity" %}</span>
             <span><strong>{{ carbon.carbon_per_unit_kg|floatformat:3 }} kg CO2e / unit</strong></span>
         </div>
         <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">
-            Computed by {{ carbon.created_by|default:'-' }}
+            {% blocktrans with by=carbon.created_by|default:'-' %}Computed by {{ by }}{% endblocktrans %}
         </div>
     </div>
     {% else %}
     <div class="card">
-        <p style="color:var(--text-muted);text-align:center;padding:20px;">No carbon record computed yet.</p>
+        <p style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No carbon record computed yet." %}</p>
     </div>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Compute Carbon Actual</h3>
+        <h3>{% trans "Compute Carbon Actual" %}</h3>
         <p style="font-size:13px;color:#555;margin-bottom:14px;">
-            Multiplies this product's latest rolled carbon footprint (per unit) by this
+            {% blocktrans %}Multiplies this product's latest rolled carbon footprint (per unit) by this
             work order's actual quantity produced. Roll the product's carbon footprint
-            first if it hasn't been rolled yet.
+            first if it hasn't been rolled yet.{% endblocktrans %}
         </p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="compute">
-            <button type="submit" class="btn-compute">Compute Carbon</button>
+            <button type="submit" class="btn-compute">{% trans "Compute Carbon" %}</button>
         </form>
     </div>
     {% endif %}

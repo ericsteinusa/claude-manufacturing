@@ -7,6 +7,7 @@ and lifetime (pass a db_pg.get_db_connection() connection, %s placeholders).
 from datetime import date
 
 import psycopg2
+from django.utils.translation import gettext_lazy as _
 
 from .mrp_core import next_sequence_number
 from .notify_core import create_notification, ensure_notification_table
@@ -30,10 +31,10 @@ WO_STATUS_TRANSITIONS = {
 }
 
 WO_STATUS_ACTION_LABELS = {
-    "open":        "Open",
-    "in_progress": "Start",
-    "completed":   "Complete",
-    "cancelled":   "Cancel WO",
+    "open":        _("Open"),
+    "in_progress": _("Start"),
+    "completed":   _("Complete"),
+    "cancelled":   _("Cancel WO"),
 }
 
 

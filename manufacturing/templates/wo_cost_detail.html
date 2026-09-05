@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}WO Cost — {{ wo.wo_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=wo.wo_number %}WO Cost — {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wo/{{ wo.id }}/" class="btn">← Work Order</a>
-<a href="/carbon/wo/{{ wo.id }}/" class="btn">Carbon</a>
+<a href="/wo/{{ wo.id }}/" class="btn">← {% trans "Work Order" %}</a>
+<a href="/carbon/wo/{{ wo.id }}/" class="btn">{% trans "Carbon" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -34,7 +35,7 @@
 {% block body %}
 <div class="content">
 <div class="cost-wrap">
-    <h2>WO Cost — {{ wo.wo_number }}</h2>
+    <h2>{% blocktrans with num=wo.wo_number %}WO Cost — {{ num }}{% endblocktrans %}</h2>
     <div class="cost-meta">{{ wo.description|default:'' }}</div>
 
     {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
@@ -42,26 +43,26 @@
 
     {% if cost %}
     <div class="card">
-        <h3>Actual vs Standard</h3>
+        <h3>{% trans "Actual vs Standard" %}</h3>
         <div class="info-grid">
-            <span class="info-label">Actual Material</span>
+            <span class="info-label">{% trans "Actual Material" %}</span>
             <span>${{ cost.actual_material_cost|floatformat:2 }}</span>
-            <span class="info-label">Std Material</span>
+            <span class="info-label">{% trans "Std Material" %}</span>
             <span>${{ cost.std_material_cost|floatformat:2 }}</span>
-            <span class="info-label">Actual Labor</span>
+            <span class="info-label">{% trans "Actual Labor" %}</span>
             <span>${{ cost.actual_labor_cost|floatformat:2 }}</span>
-            <span class="info-label">Std Labor</span>
+            <span class="info-label">{% trans "Std Labor" %}</span>
             <span>${{ cost.std_labor_cost|floatformat:2 }}</span>
-            <span class="info-label">Actual Total</span>
+            <span class="info-label">{% trans "Actual Total" %}</span>
             <span><strong>${{ cost.actual_total_cost|floatformat:2 }}</strong></span>
-            <span class="info-label">Std Total</span>
+            <span class="info-label">{% trans "Std Total" %}</span>
             <span><strong>${{ cost.std_total_cost|floatformat:2 }}</strong></span>
         </div>
 
         <div class="var-grid">
             {% with mv=cost.material_variance %}
             <div class="var-box {% if mv <= 0 %}var-fav{% elif mv > 0 %}var-unfav{% else %}var-neut{% endif %}">
-                <div class="label">Material Variance</div>
+                <div class="label">{% trans "Material Variance" %}</div>
                 <div class="value">
                     {% if mv < 0 %}−${{ mv|floatformat:2|slice:"1:" }}{% else %}+${{ mv|floatformat:2 }}{% endif %}
                 </div>
@@ -69,7 +70,7 @@
             {% endwith %}
             {% with lv=cost.labor_variance %}
             <div class="var-box {% if lv <= 0 %}var-fav{% elif lv > 0 %}var-unfav{% else %}var-neut{% endif %}">
-                <div class="label">Labor Variance</div>
+                <div class="label">{% trans "Labor Variance" %}</div>
                 <div class="value">
                     {% if lv < 0 %}−${{ lv|floatformat:2|slice:"1:" }}{% else %}+${{ lv|floatformat:2 }}{% endif %}
                 </div>
@@ -78,26 +79,26 @@
         </div>
 
         <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">
-            Computed {{ cost.computed_at|default:'' }} by {{ cost.created_by|default:'-' }}
+            {% blocktrans with computed=cost.computed_at|default:'' by=cost.created_by|default:'-' %}Computed {{ computed }} by {{ by }}{% endblocktrans %}
         </div>
     </div>
     {% else %}
     <div class="card">
-        <p style="color:var(--text-muted);text-align:center;padding:20px;">No cost record computed yet.</p>
+        <p style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No cost record computed yet." %}</p>
     </div>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Compute Actual Cost</h3>
+        <h3>{% trans "Compute Actual Cost" %}</h3>
         <p style="font-size:13px;color:#555;margin-bottom:14px;">
-            Sums WO material issues and labor from completed operations, then compares to
-            the product's standard cost to compute variances.
+            {% blocktrans %}Sums WO material issues and labor from completed operations, then compares to
+            the product's standard cost to compute variances.{% endblocktrans %}
         </p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="compute">
-            <button type="submit" class="btn-compute">Compute Cost</button>
+            <button type="submit" class="btn-compute">{% trans "Compute Cost" %}</button>
         </form>
     </div>
     {% endif %}

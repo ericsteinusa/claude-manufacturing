@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}{% if mode == 'edit' %}Edit {{ form.wo_number }}{% else %}New Work Order{% endif %}{% endblock %}
+{% block page_title %}{% if mode == 'edit' %}{% blocktrans with num=form.wo_number %}Edit {{ num }}{% endblocktrans %}{% else %}{% trans "New Work Order" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">← Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← {% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
     <div class="menu-title">
-        {% if mode == 'edit' %}Edit {{ form.wo_number }}{% else %}New Work Order{% endif %}
+        {% if mode == 'edit' %}{% blocktrans with num=form.wo_number %}Edit {{ num }}{% endblocktrans %}{% else %}{% trans "New Work Order" %}{% endif %}
     </div>
 
     <div class="card" style="max-width:520px;">
@@ -21,7 +22,7 @@
             {% csrf_token %}
 
             <div class="form-row">
-                <label>WO Number</label>
+                <label>{% trans "WO Number" %}</label>
                 {% if mode == 'edit' %}
                 <input type="text" value="{{ form.wo_number }}" readonly>
                 {% else %}
@@ -30,9 +31,9 @@
             </div>
 
             <div class="form-row">
-                <label>Product (optional)</label>
+                <label>{% trans "Product (optional)" %}</label>
                 <select name="product_id">
-                    <option value="">(none)</option>
+                    <option value="">{% trans "(none)" %}</option>
                     {% for p in products %}
                     <option value="{{ p.id }}"
                         {% if p.id == form.product_id %}selected{% endif %}>
@@ -42,33 +43,33 @@
             </div>
 
             <div class="form-row">
-                <label>Description</label>
+                <label>{% trans "Description" %}</label>
                 <input type="text" name="description" value="{{ form.description }}">
             </div>
 
             <div class="form-row">
-                <label>Quantity</label>
+                <label>{% trans "Quantity" %}</label>
                 <input type="number" name="quantity" min="1" value="{{ form.quantity }}">
             </div>
 
             <div class="form-row">
-                <label>Start Date</label>
+                <label>{% trans "Start Date" %}</label>
                 <input type="date" name="start_date" value="{{ form.start_date }}">
             </div>
 
             <div class="form-row">
-                <label>Due Date</label>
+                <label>{% trans "Due Date" %}</label>
                 <input type="date" name="due_date" value="{{ form.due_date }}">
             </div>
 
             {% if mode == 'edit' %}
             <div class="form-row">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <input type="text" value="{{ form.status|capfirst }}" readonly>
             </div>
             {% else %}
             <div class="form-row">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <select name="status">
                     {% for s in statuses %}
                     <option value="{{ s }}"
@@ -80,15 +81,15 @@
             {% endif %}
 
             <div class="form-row">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <input type="text" name="notes" value="{{ form.notes }}">
             </div>
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
-                    {% if mode == 'edit' %}Save{% else %}Create WO{% endif %}
+                    {% if mode == 'edit' %}{% trans "Save" %}{% else %}{% trans "Create WO" %}{% endif %}
                 </button>
-                <a href="{{ back_url }}" class="btn">Cancel</a>
+                <a href="{{ back_url }}" class="btn">{% trans "Cancel" %}</a>
             </div>
         </form>
     </div>

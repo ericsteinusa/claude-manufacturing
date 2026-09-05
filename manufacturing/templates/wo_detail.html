@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page_title %}{{ wo.wo_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-{% if can_edit %}<a href="/wo/{{ wo.id }}/edit/" class="btn">Edit</a>{% endif %}
+<a href="{{ back_url }}" class="btn">{% trans "Back" %}</a>
+{% if can_edit %}<a href="/wo/{{ wo.id }}/edit/" class="btn">{% trans "Edit" %}</a>{% endif %}
 {% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
-<a href="{% url 'audit_record' 'work_order' wo.id %}" class="btn">History</a>
+<a href="{% url 'audit_record' 'work_order' wo.id %}" class="btn">{% trans "History" %}</a>
 {% endif %}
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-<a href="/label/wo/{{ wo.id }}/" target="_blank" class="btn">Print Label</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
+<a href="/label/wo/{{ wo.id }}/" target="_blank" class="btn">{% trans "Print Label" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -86,7 +87,7 @@
 
 {% block body %}
 <div class="content">
-    <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+    <button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
     <div class="wo-wrap">
         {% if schedule_error %}<div class="alert alert-danger">{{ schedule_error }}</div>{% endif %}
         {% if schedule_success %}<div class="alert alert-success">{{ schedule_success }}</div>{% endif %}
@@ -102,22 +103,22 @@
                 </span>
             </div>
             <div class="wo-meta">
-                <div><b>Product:</b> {{ wo.product_name|default:"—" }}</div>
-                <div><b>Quantity:</b> {{ wo.quantity }}</div>
-                <div><b>Start Date:</b> {{ wo.start_date|default:"—" }}</div>
-                <div><b>Due Date:</b> {{ wo.due_date|default:"—" }}</div>
+                <div><b>{% trans "Product:" %}</b> {{ wo.product_name|default:"—" }}</div>
+                <div><b>{% trans "Quantity:" %}</b> {{ wo.quantity }}</div>
+                <div><b>{% trans "Start Date:" %}</b> {{ wo.start_date|default:"—" }}</div>
+                <div><b>{% trans "Due Date:" %}</b> {{ wo.due_date|default:"—" }}</div>
                 <div style="grid-column: 1 / -1;">
-                    <b>Description:</b> {{ wo.description|default:"—" }}</div>
+                    <b>{% trans "Description:" %}</b> {{ wo.description|default:"—" }}</div>
                 <div style="grid-column: 1 / -1;">
-                    <b>Notes:</b> {{ wo.notes|default:"—" }}</div>
+                    <b>{% trans "Notes:" %}</b> {{ wo.notes|default:"—" }}</div>
                 <div style="grid-column: 1 / -1;">
-                    <b>Assigned To:</b>
+                    <b>{% trans "Assigned To:" %}</b>
                     {% if can_assign %}
                     <form method="post" class="wo-assign-form">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="assign">
                         <select name="assigned_to">
-                            <option value="">— Unassigned —</option>
+                            <option value="">{% trans "— Unassigned —" %}</option>
                             {% for a in assignees %}
                             <option {% if wo.assigned_to == a.name %}selected{% endif %}>{{ a.name }}</option>
                             {% endfor %}
@@ -125,10 +126,10 @@
                             <option selected>{{ wo.assigned_to }}</option>
                             {% endif %}
                         </select>
-                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                        <button type="submit" class="btn btn-primary btn-sm">{% trans "Assign" %}</button>
                     </form>
                     {% else %}
-                    {{ wo.assigned_to|default:"— Unassigned —" }}
+                    {% if wo.assigned_to %}{{ wo.assigned_to }}{% else %}{% trans "— Unassigned —" %}{% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -136,7 +137,7 @@
             <div class="wo-status-actions">
                 {% for target, label in status_actions %}
                 <form method="post" action="/wo/{{ wo.id }}/status/"
-                      {% if target == 'cancelled' %}onsubmit="return confirm('Cancel this work order?');"{% endif %}>
+                      {% if target == 'cancelled' %}onsubmit="return confirm('{% trans "Cancel this work order?" %}');"{% endif %}>
                     {% csrf_token %}
                     <input type="hidden" name="status" value="{{ target }}">
                     <button type="submit"
@@ -152,10 +153,10 @@
         <table class="wo-table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th class="num">Qty Required</th>
-                    <th class="num">Qty Issued</th>
-                    <th>Notes</th>
+                    <th>{% trans "Product" %}</th>
+                    <th class="num">{% trans "Qty Required" %}</th>
+                    <th class="num">{% trans "Qty Issued" %}</th>
+                    <th>{% trans "Notes" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -170,34 +171,34 @@
             </tbody>
         </table>
         {% else %}
-        <div class="wo-card wo-empty">No materials assigned to this work order.</div>
+        <div class="wo-card wo-empty">{% trans "No materials assigned to this work order." %}</div>
         {% endif %}
 
         {% if can_edit %}
         <div class="add-mat">
-            <h3>Add Material</h3>
+            <h3>{% trans "Add Material" %}</h3>
             <form method="post" action="/wo/{{ wo.id }}/materials/add/">
                 {% csrf_token %}
                 <div class="grid">
                     <div>
-                        <label>Product</label>
+                        <label>{% trans "Product" %}</label>
                         <select name="product_id" required>
-                            <option value="">(select product)</option>
+                            <option value="">{% trans "(select product)" %}</option>
                             {% for p in products %}
                             <option value="{{ p.id }}">{{ p.product_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div>
-                        <label>Qty Required</label>
+                        <label>{% trans "Qty Required" %}</label>
                         <input type="number" name="qty_required" min="1" value="1">
                     </div>
                     <div>
-                        <label>Notes (optional)</label>
+                        <label>{% trans "Notes (optional)" %}</label>
                         <input type="text" name="notes">
                     </div>
                     <div>
-                        <button type="submit" class="btn btn-primary">Add</button>
+                        <button type="submit" class="btn btn-primary">{% trans "Add" %}</button>
                     </div>
                 </div>
             </form>
@@ -207,11 +208,11 @@
         {# Operations #}
         {% if operations %}
         <div class="wo-card" style="margin-top:18px;">
-            <h3 style="font-size:14px;color:var(--accent-hover);margin:0 0 10px;">Operations</h3>
+            <h3 style="font-size:14px;color:var(--accent-hover);margin:0 0 10px;">{% trans "Operations" %}</h3>
             {% if op_total %}
             <div style="margin-bottom:12px;">
                 <div style="font-size:12px;color:#555;">
-                    Progress: {{ op_done }} / {{ op_total }} steps complete
+                    {% blocktrans with done=op_done total=op_total %}Progress: {{ done }} / {{ total }} steps complete{% endblocktrans %}
                 </div>
                 <div class="wo-progress-bar">
                     <div class="wo-progress-bar-fill" style="width:{% widthratio op_done op_total 100 %}%;"></div>
@@ -221,13 +222,13 @@
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
                 <thead>
                     <tr style="background:var(--accent);color:white;">
-                        <th style="padding:6px 10px;text-align:left;width:36px;">Seq</th>
-                        <th style="padding:6px 10px;text-align:left;">Operation</th>
-                        <th style="padding:6px 10px;text-align:left;">Work Center</th>
-                        <th style="padding:6px 10px;text-align:right;">Std hrs</th>
-                        <th style="padding:6px 10px;text-align:right;">Actual hrs</th>
-                        <th style="padding:6px 10px;text-align:left;">Status</th>
-                        <th style="padding:6px 10px;text-align:left;">Scheduled</th>
+                        <th style="padding:6px 10px;text-align:left;width:36px;">{% trans "Seq" %}</th>
+                        <th style="padding:6px 10px;text-align:left;">{% trans "Operation" %}</th>
+                        <th style="padding:6px 10px;text-align:left;">{% trans "Work Center" %}</th>
+                        <th style="padding:6px 10px;text-align:right;">{% trans "Std hrs" %}</th>
+                        <th style="padding:6px 10px;text-align:right;">{% trans "Actual hrs" %}</th>
+                        <th style="padding:6px 10px;text-align:left;">{% trans "Status" %}</th>
+                        <th style="padding:6px 10px;text-align:left;">{% trans "Scheduled" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -256,9 +257,9 @@
             </table>
             {% if wo_labor_cost %}
             <div style="margin-top:10px;font-size:12px;color:#555;text-align:right;">
-                Total std hrs: {{ wo_labor_cost.total_std_hours|floatformat:2 }}
-                &nbsp;|&nbsp; Actual hrs: {{ wo_labor_cost.total_actual_hours|floatformat:2 }}
-                &nbsp;|&nbsp; Labor cost: ${{ wo_labor_cost.labor_cost|floatformat:2 }}
+                {% blocktrans with hrs=wo_labor_cost.total_std_hours|floatformat:2 %}Total std hrs: {{ hrs }}{% endblocktrans %}
+                &nbsp;|&nbsp; {% blocktrans with hrs=wo_labor_cost.total_actual_hours|floatformat:2 %}Actual hrs: {{ hrs }}{% endblocktrans %}
+                &nbsp;|&nbsp; {% blocktrans with cost=wo_labor_cost.labor_cost|floatformat:2 %}Labor cost: ${{ cost }}{% endblocktrans %}
             </div>
             {% endif %}
             {% if can_edit %}
@@ -266,19 +267,19 @@
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="forward_schedule">
-                    <button type="submit" class="btn btn-primary btn-sm">Auto-Schedule Forward</button>
+                    <button type="submit" class="btn btn-primary btn-sm">{% trans "Auto-Schedule Forward" %}</button>
                 </form>
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="backward_schedule">
-                    <button type="submit" class="btn btn-primary btn-sm">Schedule to Due Date</button>
+                    <button type="submit" class="btn btn-primary btn-sm">{% trans "Schedule to Due Date" %}</button>
                 </form>
-                <a href="/prod/schedule/gantt/" class="btn btn-primary btn-sm">View on Gantt</a>
+                <a href="/prod/schedule/gantt/" class="btn btn-primary btn-sm">{% trans "View on Gantt" %}</a>
             </div>
             <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">
-                Forward: packs operations from today, in sequence, into each work center's
+                {% blocktrans %}Forward: packs operations from today, in sequence, into each work center's
                 available hours per day. Backward: packs from the due date above, in reverse
-                sequence, and flags whether the due date is at risk.
+                sequence, and flags whether the due date is at risk.{% endblocktrans %}
             </p>
             {% endif %}
         </div>
@@ -287,7 +288,7 @@
         {# Cost summary #}
         <div style="margin-top:14px;font-size:13px;">
             <a href="/wo/{{ wo.id }}/cost/" style="color:var(--accent);font-weight:bold;">
-                📊 View WO Cost Detail{% if wo_cost %} — Actual ${{ wo_cost.actual_total_cost|floatformat:2 }} vs Std ${{ wo_cost.std_total_cost|floatformat:2 }}{% endif %}
+                📊 {% trans "View WO Cost Detail" %}{% if wo_cost %} — {% blocktrans with actual=wo_cost.actual_total_cost|floatformat:2 std=wo_cost.std_total_cost|floatformat:2 %}Actual ${{ actual }} vs Std ${{ std }}{% endblocktrans %}{% endif %}
             </a>
         </div>
 
