@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 19:40+0000\n"
+"POT-Creation-Date: 2026-09-05 20:02+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -215,6 +215,7 @@ msgid "Reports"
 msgstr "Berichte"
 
 #: manufacturing/sales_orders_core.py:33
+#: manufacturing/templates/register.html:91
 msgid "Confirm"
 msgstr "Bestätigen"
 
@@ -2657,7 +2658,8 @@ msgstr "Aktivieren"
 
 #: manufacturing/templates/approval_rule_edit.html:93
 msgid "Delete this rule permanently? This cannot be undone."
-msgstr "Diese Regel dauerhaft löschen? Dies kann nicht rückgängig gemacht werden."
+msgstr ""
+"Diese Regel dauerhaft löschen? Dies kann nicht rückgängig gemacht werden."
 
 #: manufacturing/templates/approval_rule_edit.html:96
 #: manufacturing/templates/report_builder_list.html:41
@@ -2672,7 +2674,11 @@ msgid ""
 "Deleting fails if approval steps have already been created against this rule "
 "—\n"
 "            deactivate it instead to stop it from applying to new entities."
-msgstr "Das Löschen schlägt fehl, wenn für diese Regel bereits Genehmigungsschritte erstellt wurden —\n            deaktivieren Sie sie stattdessen, damit sie nicht mehr auf neue Entitäten angewendet wird."
+msgstr ""
+"Das Löschen schlägt fehl, wenn für diese Regel bereits Genehmigungsschritte "
+"erstellt wurden —\n"
+"            deaktivieren Sie sie stattdessen, damit sie nicht mehr auf neue "
+"Entitäten angewendet wird."
 
 #: manufacturing/templates/approval_rule_list.html:7
 msgid "New Rule"
@@ -2686,7 +2692,12 @@ msgid ""
 "the entity's\n"
 "        amount meets its threshold; leave department blank to apply it to "
 "every department."
-msgstr "Regeln legen fest, wer Bestellungen, Anforderungen, GL-Buchungen,\n        Zykluszählungen und Dokumente freigeben muss — und in welcher Reihenfolge. Eine Regel gilt, sobald der Betrag\n        der Entität ihren Schwellenwert erreicht; lassen Sie die Abteilung leer, um sie auf alle Abteilungen anzuwenden."
+msgstr ""
+"Regeln legen fest, wer Bestellungen, Anforderungen, GL-Buchungen,\n"
+"        Zykluszählungen und Dokumente freigeben muss — und in welcher "
+"Reihenfolge. Eine Regel gilt, sobald der Betrag\n"
+"        der Entität ihren Schwellenwert erreicht; lassen Sie die Abteilung "
+"leer, um sie auf alle Abteilungen anzuwenden."
 
 #: manufacturing/templates/approval_rule_list.html:25
 msgid "Filter by type:"
@@ -2765,11 +2776,15 @@ msgstr "Neue Genehmigungsregel"
 #: manufacturing/templates/approval_rule_new.html:45
 msgid ""
 "Leave as \"All departments\" unless this rule should only fire for one dept."
-msgstr "Belassen Sie es bei \"Alle Abteilungen\", es sei denn, diese Regel soll nur für eine Abteilung gelten."
+msgstr ""
+"Belassen Sie es bei \"Alle Abteilungen\", es sei denn, diese Regel soll nur "
+"für eine Abteilung gelten."
 
 #: manufacturing/templates/approval_rule_new.html:50
 msgid "Rule applies once the entity's amount is greater than or equal to this."
-msgstr "Die Regel gilt, sobald der Betrag der Entität diesen Wert erreicht oder übersteigt."
+msgstr ""
+"Die Regel gilt, sobald der Betrag der Entität diesen Wert erreicht oder "
+"übersteigt."
 
 #: manufacturing/templates/approval_rule_new.html:64
 msgid "Lower sequence numbers must be decided first."
@@ -3097,6 +3112,7 @@ msgstr "Name"
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/portal_login.html:18
 #: manufacturing/templates/portal_register.html:15
+#: manufacturing/templates/register.html:79
 #: manufacturing/templates/supplier_portal_login.html:18
 #: manufacturing/templates/supplier_portal_register.html:15
 #: manufacturing/templates/user_roles.html:21
@@ -3554,6 +3570,7 @@ msgstr "Wird geladen…"
 
 #: manufacturing/templates/base.html:482 manufacturing/templates/home.html:24
 #: manufacturing/templates/portal_login.html:24
+#: manufacturing/templates/register.html:85
 #: manufacturing/templates/supplier_portal_login.html:24
 msgid "Password"
 msgstr "Passwort"
@@ -3825,6 +3842,26 @@ msgstr "Datenverwaltung"
 #: manufacturing/templates/dashboard.html:12
 msgid "Periods"
 msgstr "Perioden"
+
+#: manufacturing/templates/base_card.html:7
+#: manufacturing/templates/base_card.html:285
+#: manufacturing/templates/dashboard.html:4 manufacturing/templates/home.html:4
+#: manufacturing/templates/home_mfa.html:4
+#: manufacturing/templates/portal_login.html:4
+#: manufacturing/templates/portal_register.html:4
+#: manufacturing/templates/supplier_portal_login.html:4
+#: manufacturing/templates/supplier_portal_register.html:4
+msgid "Manufacturing ERP"
+msgstr "Fertigungs-ERP"
+
+#: manufacturing/templates/base_card.html:286
+msgid "Enterprise Resource Planning"
+msgstr "Unternehmensressourcenplanung"
+
+#: manufacturing/templates/base_card.html:291
+#, python-format
+msgid "© %(cur_year)s Manufacturing ERP"
+msgstr "© %(cur_year)s Manufacturing ERP"
 
 #: manufacturing/templates/base_portal.html:7
 #: manufacturing/templates/base_portal.html:152
@@ -4560,7 +4597,10 @@ msgstr "Rahmenbestellung Erstellen"
 #: manufacturing/templates/blanket_po_new.html:55
 #: manufacturing/templates/blanket_po_release_new.html:49
 #: manufacturing/templates/bom_detail.html:191
+#: manufacturing/templates/change_password.html:42
 #: manufacturing/templates/eng_project_detail.html:175
+#: manufacturing/templates/forgot_password.html:37
+#: manufacturing/templates/forgot_password_reset.html:40
 #: manufacturing/templates/gl_accounts.html:115
 #: manufacturing/templates/it_incident_detail.html:82
 #: manufacturing/templates/it_task_detail.html:98
@@ -4572,6 +4612,7 @@ msgstr "Rahmenbestellung Erstellen"
 #: manufacturing/templates/maint_part_detail.html:144
 #: manufacturing/templates/maint_schedule_detail.html:161
 #: manufacturing/templates/maint_wo_detail.html:207
+#: manufacturing/templates/mfa_enroll.html:41
 #: manufacturing/templates/mrp_safety_stock.html:98
 #: manufacturing/templates/payroll_pay_rates.html:131
 #: manufacturing/templates/people_form.html:123
@@ -4582,6 +4623,7 @@ msgstr "Rahmenbestellung Erstellen"
 #: manufacturing/templates/qa_capa_detail.html:154
 #: manufacturing/templates/qa_ncr_detail.html:177
 #: manufacturing/templates/qa_supplier_detail.html:130
+#: manufacturing/templates/register.html:99
 #: manufacturing/templates/sales_commission_plans.html:128
 #: manufacturing/templates/sales_commissions.html:193
 #: manufacturing/templates/sales_quotes.html:128
@@ -4975,6 +5017,50 @@ msgstr "Keine Produkte gefunden"
 #, python-format
 msgid " with type \"%(t)s\""
 msgstr " mit Typ \"%(t)s\""
+
+#: manufacturing/templates/change_password.html:4
+#: manufacturing/templates/change_password.html:7
+#: manufacturing/templates/change_password.html:40
+msgid "Change Password"
+msgstr "Passwort Ändern"
+
+#: manufacturing/templates/change_password.html:19
+#: manufacturing/templates/forgot_password.html:29
+#: manufacturing/templates/people_detail.html:59
+msgid "Email:"
+msgstr "E-Mail:"
+
+#: manufacturing/templates/change_password.html:21
+#: manufacturing/templates/forgot_password.html:31
+msgid "Your registered email"
+msgstr "Ihre registrierte E-Mail-Adresse"
+
+#: manufacturing/templates/change_password.html:25
+msgid "Current Password:"
+msgstr "Aktuelles Passwort:"
+
+#: manufacturing/templates/change_password.html:27
+msgid "Current password"
+msgstr "Aktuelles Passwort"
+
+#: manufacturing/templates/change_password.html:30
+#: manufacturing/templates/forgot_password_reset.html:28
+msgid "New Password:"
+msgstr "Neues Passwort:"
+
+#: manufacturing/templates/change_password.html:32
+msgid "8+ chars, upper, lower, digit"
+msgstr "8+ Zeichen, Groß-, Kleinbuchstabe, Ziffer"
+
+#: manufacturing/templates/change_password.html:35
+#: manufacturing/templates/forgot_password_reset.html:33
+msgid "Confirm:"
+msgstr "Bestätigen:"
+
+#: manufacturing/templates/change_password.html:37
+#: manufacturing/templates/forgot_password_reset.html:35
+msgid "Re-enter new password"
+msgstr "Neues Passwort erneut eingeben"
 
 #: manufacturing/templates/coa_detail.html:6
 #: manufacturing/templates/coa_list.html:3
@@ -6948,14 +7034,6 @@ msgstr "Währung speichern"
 msgid "Quick-add:"
 msgstr "Schnellhinzufügen:"
 
-#: manufacturing/templates/dashboard.html:4 manufacturing/templates/home.html:4
-#: manufacturing/templates/portal_login.html:4
-#: manufacturing/templates/portal_register.html:4
-#: manufacturing/templates/supplier_portal_login.html:4
-#: manufacturing/templates/supplier_portal_register.html:4
-msgid "Manufacturing ERP"
-msgstr "Fertigungs-ERP"
-
 #: manufacturing/templates/dashboard.html:14
 msgid "PO Approvals"
 msgstr "Bestellgenehmigungen"
@@ -7041,7 +7119,14 @@ msgid ""
 "        payroll, or review history, which this app must keep for financial/"
 "operational\n"
 "        recordkeeping."
-msgstr "Recht auf Löschung (Anonymisierung), Auskunftsexport und automatische Aufbewahrungsrichtlinien\n        für Mitarbeiter-PII. Die Löschung überschreibt Name, Adresse,\n        Kontaktdaten und E-Mail einer Person durch Platzhalter\n        und entzieht den Zugang — die Zeiterfassungs-, Lohn- oder\n        Beurteilungshistorie wird nicht gelöscht, da diese App sie aus finanziellen/betrieblichen Gründen aufbewahren muss."
+msgstr ""
+"Recht auf Löschung (Anonymisierung), Auskunftsexport und automatische "
+"Aufbewahrungsrichtlinien\n"
+"        für Mitarbeiter-PII. Die Löschung überschreibt Name, Adresse,\n"
+"        Kontaktdaten und E-Mail einer Person durch Platzhalter\n"
+"        und entzieht den Zugang — die Zeiterfassungs-, Lohn- oder\n"
+"        Beurteilungshistorie wird nicht gelöscht, da diese App sie aus "
+"finanziellen/betrieblichen Gründen aufbewahren muss."
 
 #: manufacturing/templates/data_governance_dashboard.html:38
 msgid "Find a Person"
@@ -7060,7 +7145,10 @@ msgstr "Daten exportieren"
 msgid ""
 "Anonymize %(first)s %(last)s? This overwrites their name/address/email/phone "
 "with placeholders and revokes login access. This cannot be undone."
-msgstr "%(first)s %(last)s anonymisieren? Dies überschreibt Name/Adresse/E-Mail/Telefon der Person durch Platzhalter und entzieht den Zugang. Dies kann nicht rückgängig gemacht werden."
+msgstr ""
+"%(first)s %(last)s anonymisieren? Dies überschreibt Name/Adresse/E-Mail/"
+"Telefon der Person durch Platzhalter und entzieht den Zugang. Dies kann "
+"nicht rückgängig gemacht werden."
 
 #: manufacturing/templates/data_governance_dashboard.html:64
 msgid "Erase"
@@ -7081,7 +7169,11 @@ msgid ""
 "older\n"
 "            than the policy's cutoff. Run via <code>python manage.py "
 "run_data_retention</code>."
-msgstr "Anonymisiert automatisch ausgeschiedene Mitarbeiter, sobald deren Austrittsdatum\n            älter als der Stichtag der Richtlinie ist. Ausführen mit <code>python manage.py run_data_retention</code>."
+msgstr ""
+"Anonymisiert automatisch ausgeschiedene Mitarbeiter, sobald deren "
+"Austrittsdatum\n"
+"            älter als der Stichtag der Richtlinie ist. Ausführen mit "
+"<code>python manage.py run_data_retention</code>."
 
 #: manufacturing/templates/data_governance_dashboard.html:88
 msgid "Months After Termination"
@@ -8147,6 +8239,7 @@ msgstr ""
 
 #: manufacturing/templates/ess_profile.html:42
 #: manufacturing/templates/people_form.html:100
+#: manufacturing/templates/register.html:58
 msgid "Address"
 msgstr "Adresse"
 
@@ -8157,11 +8250,14 @@ msgstr "Straße und Hausnummer"
 
 #: manufacturing/templates/ess_profile.html:48
 #: manufacturing/templates/people_form.html:107
+#: manufacturing/templates/register.html:65
+#: manufacturing/templates/register.html:66
 msgid "City"
 msgstr "Stadt"
 
 #: manufacturing/templates/ess_profile.html:52
 #: manufacturing/templates/people_form.html:111
+#: manufacturing/templates/register.html:69
 msgid "State"
 msgstr "Bundesland"
 
@@ -9404,6 +9500,38 @@ msgstr "Optionale Notizen..."
 msgid "Create Asset"
 msgstr "Anlage Erstellen"
 
+#: manufacturing/templates/forgot_password.html:4
+#: manufacturing/templates/forgot_password_reset.html:38
+msgid "Reset Password"
+msgstr "Passwort Zurücksetzen"
+
+#: manufacturing/templates/forgot_password.html:19
+msgid "Reset Your Password"
+msgstr "Setzen Sie Ihr Passwort Zurück"
+
+#: manufacturing/templates/forgot_password.html:20
+msgid "Enter your email to verify your account,<br>then choose a new password."
+msgstr "Geben Sie Ihre E-Mail-Adresse ein, um Ihr Konto zu verifizieren,<br>und wählen Sie dann ein neues Passwort."
+
+#: manufacturing/templates/forgot_password.html:35
+msgid "Verify Email"
+msgstr "E-Mail Verifizieren"
+
+#: manufacturing/templates/forgot_password_reset.html:4
+#: manufacturing/templates/forgot_password_reset.html:18
+msgid "Choose New Password"
+msgstr "Neues Passwort Wählen"
+
+#: manufacturing/templates/forgot_password_reset.html:19
+#, python-format
+msgid "Setting new password for %(email)s"
+msgstr "Neues Passwort wird festgelegt für %(email)s"
+
+#: manufacturing/templates/forgot_password_reset.html:30
+#: manufacturing/templates/register.html:87
+msgid "Minimum 8 characters"
+msgstr "Mindestens 8 Zeichen"
+
 #: manufacturing/templates/gl_accounts.html:6
 #: manufacturing/templates/gl_balance_sheet.html:6
 #: manufacturing/templates/gl_cash_flow_statement.html:6
@@ -9870,6 +9998,32 @@ msgstr "Sind Sie Kunde? Melden Sie sich im Kundenportal an"
 #: manufacturing/templates/home.html:51
 msgid "Are you a supplier? Log in to the Supplier Portal"
 msgstr "Sind Sie Lieferant? Melden Sie sich im Lieferantenportal an"
+
+#: manufacturing/templates/home_mfa.html:4
+msgid "Verify Code"
+msgstr "Code Verifizieren"
+
+#: manufacturing/templates/home_mfa.html:7
+msgid "Enter your 6-digit code"
+msgstr "Geben Sie Ihren 6-stelligen Code ein"
+
+#: manufacturing/templates/home_mfa.html:9
+msgid ""
+"Open your authenticator app and enter the current code for this account."
+msgstr "Öffnen Sie Ihre Authentifizierungs-App und geben Sie den aktuellen Code für dieses Konto ein."
+
+#: manufacturing/templates/home_mfa.html:19
+#: manufacturing/templates/mfa_enroll.html:32
+msgid "Authentication Code"
+msgstr "Authentifizierungscode"
+
+#: manufacturing/templates/home_mfa.html:24
+msgid "Verify"
+msgstr "Verifizieren"
+
+#: manufacturing/templates/home_mfa.html:28
+msgid "Cancel and sign in again"
+msgstr "Abbrechen und erneut anmelden"
 
 #: manufacturing/templates/inventory_dashboard.html:3
 #: manufacturing/templates/inventory_dashboard.html:33
@@ -12622,6 +12776,69 @@ msgstr "Ziel"
 msgid "No campaigns found."
 msgstr "Keine Kampagnen gefunden."
 
+#: manufacturing/templates/mfa_enroll.html:4
+#: manufacturing/templates/mfa_enroll.html:7
+#: manufacturing/templates/mfa_settings.html:37
+msgid "Set Up Two-Factor Authentication"
+msgstr "Zwei-Faktor-Authentifizierung Einrichten"
+
+#: manufacturing/templates/mfa_enroll.html:14
+msgid ""
+"1. Open your authenticator app (Google Authenticator, Authy, 1Password, "
+"etc.)\n"
+"    and add a new account using this key:"
+msgstr "1. Öffnen Sie Ihre Authentifizierungs-App (Google Authenticator, Authy, 1Password usw.)\n    und fügen Sie mit diesem Schlüssel ein neues Konto hinzu:"
+
+#: manufacturing/templates/mfa_enroll.html:22
+msgid "Open directly in an authenticator app on this device"
+msgstr "Direkt in einer Authentifizierungs-App auf diesem Gerät öffnen"
+
+#: manufacturing/templates/mfa_enroll.html:26
+msgid ""
+"2. Enter the 6-digit code your app shows for this account to confirm setup:"
+msgstr "2. Geben Sie den 6-stelligen Code ein, den Ihre App für dieses Konto anzeigt, um die Einrichtung zu bestätigen:"
+
+#: manufacturing/templates/mfa_enroll.html:37
+msgid "Confirm and Enable"
+msgstr "Bestätigen und Aktivieren"
+
+#: manufacturing/templates/mfa_settings.html:4
+#: manufacturing/templates/mfa_settings.html:7
+msgid "Two-Factor Authentication"
+msgstr "Zwei-Faktor-Authentifizierung"
+
+#: manufacturing/templates/mfa_settings.html:18
+msgid ""
+"Two-factor authentication is <strong>enabled</strong> on your account.\n"
+"    You'll be asked for a code from your authenticator app each time you "
+"sign in."
+msgstr "Die Zwei-Faktor-Authentifizierung ist für Ihr Konto <strong>aktiviert</strong>.\n    Sie werden bei jeder Anmeldung nach einem Code aus Ihrer Authentifizierungs-App gefragt."
+
+#: manufacturing/templates/mfa_settings.html:24
+msgid "Current Password"
+msgstr "Aktuelles Passwort"
+
+#: manufacturing/templates/mfa_settings.html:26
+msgid "Confirm your password to disable"
+msgstr "Bestätigen Sie Ihr Passwort, um zu deaktivieren"
+
+#: manufacturing/templates/mfa_settings.html:28
+msgid "Disable Two-Factor Authentication"
+msgstr "Zwei-Faktor-Authentifizierung Deaktivieren"
+
+#: manufacturing/templates/mfa_settings.html:32
+msgid ""
+"Two-factor authentication is <strong>not enabled</strong> on your account.\n"
+"    Turning it on requires a code from an authenticator app (Google "
+"Authenticator,\n"
+"    Authy, 1Password, etc.) every time you sign in."
+msgstr "Die Zwei-Faktor-Authentifizierung ist für Ihr Konto <strong>nicht aktiviert</strong>.\n    Zum Aktivieren ist bei jeder Anmeldung ein Code aus einer Authentifizierungs-App (Google Authenticator,\n    Authy, 1Password usw.) erforderlich."
+
+#: manufacturing/templates/mfa_settings.html:42
+#: manufacturing/templates/user_roles.html:7
+msgid "Back to Dashboard"
+msgstr "Zurück zum Dashboard"
+
 #: manufacturing/templates/mkt_ad_detail.html:3
 #, python-format
 msgid "Ad #%(id)s"
@@ -13750,10 +13967,6 @@ msgstr "Abteilung:"
 msgid "Sub-Dept:"
 msgstr "Unterabteilung:"
 
-#: manufacturing/templates/people_detail.html:59
-msgid "Email:"
-msgstr "E-Mail:"
-
 #: manufacturing/templates/people_detail.html:61
 msgid "Address:"
 msgstr "Adresse:"
@@ -13832,7 +14045,11 @@ msgid ""
 "Close a period to prevent any new or edited records from being dated\n"
 "        within it. Only President and Vice President may close or reopen "
 "periods."
-msgstr "Schließen Sie eine Periode, um zu verhindern, dass neue oder bearbeitete Datensätze\n        innerhalb dieser Periode datiert werden. Nur Präsident und Vizepräsident dürfen Perioden schließen oder wieder öffnen."
+msgstr ""
+"Schließen Sie eine Periode, um zu verhindern, dass neue oder bearbeitete "
+"Datensätze\n"
+"        innerhalb dieser Periode datiert werden. Nur Präsident und "
+"Vizepräsident dürfen Perioden schließen oder wieder öffnen."
 
 #: manufacturing/templates/periods.html:22
 msgid "Close a Period"
@@ -13892,7 +14109,9 @@ msgstr "z. B. Jahresabschluss"
 
 #: manufacturing/templates/periods.html:53
 msgid "Close this period? Writes dated in this period will be blocked."
-msgstr "Diese Periode schließen? Buchungen mit Datum in dieser Periode werden blockiert."
+msgstr ""
+"Diese Periode schließen? Buchungen mit Datum in dieser Periode werden "
+"blockiert."
 
 #: manufacturing/templates/periods.html:54
 msgid "Close Period"
@@ -15962,6 +16181,59 @@ msgstr "Datum des Letzten Audits"
 msgid "Add Record"
 msgstr "Datensatz Hinzufügen"
 
+#: manufacturing/templates/register.html:4
+msgid "Register New User"
+msgstr "Neuen Benutzer Registrieren"
+
+#: manufacturing/templates/register.html:29
+msgid "Register New Employee"
+msgstr "Neuen Mitarbeiter Registrieren"
+
+#: manufacturing/templates/register.html:40
+msgid "First Name"
+msgstr "Vorname"
+
+#: manufacturing/templates/register.html:42
+msgid "First name"
+msgstr "Vorname"
+
+#: manufacturing/templates/register.html:45
+msgid "Last Name"
+msgstr "Nachname"
+
+#: manufacturing/templates/register.html:47
+msgid "Last name"
+msgstr "Nachname"
+
+#: manufacturing/templates/register.html:52
+msgid "Employee ID"
+msgstr "Mitarbeiter-ID"
+
+#: manufacturing/templates/register.html:54
+msgid "Numbers only (optional)"
+msgstr "Nur Zahlen (optional)"
+
+#: manufacturing/templates/register.html:60
+msgid "Street address"
+msgstr "Straße und Hausnummer"
+
+#: manufacturing/templates/register.html:73
+#: manufacturing/templates/register.html:74
+msgid "Zip"
+msgstr "PLZ"
+
+#: manufacturing/templates/register.html:81
+msgid "Email address"
+msgstr "E-Mail-Adresse"
+
+#: manufacturing/templates/register.html:93
+msgid "Re-enter password"
+msgstr "Passwort erneut eingeben"
+
+#: manufacturing/templates/register.html:97
+msgid "Register"
+msgstr "Registrieren"
+
 #: manufacturing/templates/report_builder_detail.html:9
 msgid "Export PDF"
 msgstr "PDF exportieren"
@@ -16315,7 +16587,9 @@ msgstr "Aufbewahrungsrichtlinie Bearbeiten"
 msgid ""
 "Terminated employees are anonymized once this many months have passed since "
 "their termination date."
-msgstr "Ausgeschiedene Mitarbeiter werden anonymisiert, sobald diese Anzahl von Monaten seit ihrem Austrittsdatum vergangen ist."
+msgstr ""
+"Ausgeschiedene Mitarbeiter werden anonymisiert, sobald diese Anzahl von "
+"Monaten seit ihrem Austrittsdatum vergangen ist."
 
 #: manufacturing/templates/retention_policy_edit.html:50
 msgid "Deactivate this policy?"
@@ -18365,10 +18639,6 @@ msgstr "Keine Abwesenheitsanträge gefunden."
 msgid "User Role Management"
 msgstr "Benutzerrollenverwaltung"
 
-#: manufacturing/templates/user_roles.html:7
-msgid "Back to Dashboard"
-msgstr "Zurück zum Dashboard"
-
 #: manufacturing/templates/user_roles.html:23
 msgid "Current Role"
 msgstr "Aktuelle Rolle"
@@ -18431,7 +18701,9 @@ msgstr "Dieses Abonnement aktivieren?"
 
 #: manufacturing/templates/webhook_edit.html:89
 msgid "Delete this subscription permanently? This cannot be undone."
-msgstr "Dieses Abonnement dauerhaft löschen? Dies kann nicht rückgängig gemacht werden."
+msgstr ""
+"Dieses Abonnement dauerhaft löschen? Dies kann nicht rückgängig gemacht "
+"werden."
 
 #: manufacturing/templates/webhook_list.html:3
 #: manufacturing/templates/webhook_list.html:17
@@ -18451,7 +18723,14 @@ msgid ""
 "        ships, or an NCR opens. Each subscription is delivered as a signed "
 "JSON POST to your\n"
 "        target URL."
-msgstr "Benachrichtigen Sie ein externes System (Zapier, das eigene ERP eines Kunden, einen Slack-Kanal), wenn ein\n        Geschäftsereignis eintritt — der Status einer Bestellung ändert sich, ein Fertigungsauftrag wird abgeschlossen, ein Kundenauftrag\n        wird versandt, oder eine NCR wird eröffnet. Jedes Abonnement wird als signierter JSON-POST an Ihre\n        Ziel-URL zugestellt."
+msgstr ""
+"Benachrichtigen Sie ein externes System (Zapier, das eigene ERP eines "
+"Kunden, einen Slack-Kanal), wenn ein\n"
+"        Geschäftsereignis eintritt — der Status einer Bestellung ändert "
+"sich, ein Fertigungsauftrag wird abgeschlossen, ein Kundenauftrag\n"
+"        wird versandt, oder eine NCR wird eröffnet. Jedes Abonnement wird "
+"als signierter JSON-POST an Ihre\n"
+"        Ziel-URL zugestellt."
 
 #: manufacturing/templates/webhook_list.html:26
 msgid "Filter by event:"
@@ -18489,7 +18768,9 @@ msgstr "Neues Webhook-Abonnement"
 
 #: manufacturing/templates/webhook_new.html:40
 msgid "Where we'll POST a JSON payload when this event fires."
-msgstr "Wohin wir eine JSON-Nutzlast per POST senden, wenn dieses Ereignis ausgelöst wird."
+msgstr ""
+"Wohin wir eine JSON-Nutzlast per POST senden, wenn dieses Ereignis ausgelöst "
+"wird."
 
 #: manufacturing/templates/webhook_new.html:44
 msgid "Optional — leave blank for an unsigned payload"
@@ -18501,7 +18782,13 @@ msgid ""
 "                    base64(HMAC-SHA256(secret, raw body)) — the same scheme "
 "this app's own\n"
 "                    inbound Shopify/WooCommerce webhook verification uses."
-msgstr "Falls gesetzt, enthält jede Anfrage einen <code>X-Webhook-Signature</code>-Header:\n                    base64(HMAC-SHA256(secret, raw body)) — dasselbe Schema, das die eigene\n                    eingehende Shopify/WooCommerce-Webhook-Verifizierung dieser Anwendung verwendet."
+msgstr ""
+"Falls gesetzt, enthält jede Anfrage einen <code>X-Webhook-Signature</code>-"
+"Header:\n"
+"                    base64(HMAC-SHA256(secret, raw body)) — dasselbe Schema, "
+"das die eigene\n"
+"                    eingehende Shopify/WooCommerce-Webhook-Verifizierung "
+"dieser Anwendung verwendet."
 
 #: manufacturing/templates/webhook_new.html:51
 msgid "Create Subscription"

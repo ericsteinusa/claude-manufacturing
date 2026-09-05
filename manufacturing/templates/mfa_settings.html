@@ -1,9 +1,10 @@
 {% extends "base_card.html" %}
+{% load i18n %}
 
-{% block page_title %}Two-Factor Authentication{% endblock %}
+{% block page_title %}{% trans "Two-Factor Authentication" %}{% endblock %}
 
 {% block card_content %}
-<h1>Two-Factor Authentication</h1>
+<h1>{% trans "Two-Factor Authentication" %}</h1>
 
 {% if success %}
 <div class="success-msg">{{ success }}</div>
@@ -14,30 +15,30 @@
 
 {% if enrolled %}
 <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">
-    Two-factor authentication is <strong>enabled</strong> on your account.
-    You'll be asked for a code from your authenticator app each time you sign in.
+    {% blocktrans %}Two-factor authentication is <strong>enabled</strong> on your account.
+    You'll be asked for a code from your authenticator app each time you sign in.{% endblocktrans %}
 </p>
 <form method="post" action="{% url 'mfa_disable' %}">
     {% csrf_token %}
     <div class="form-row">
-        <label for="current_password">Current Password</label>
+        <label for="current_password">{% trans "Current Password" %}</label>
         <input type="password" id="current_password" name="current_password"
-               placeholder="Confirm your password to disable" required>
+               placeholder="{% trans 'Confirm your password to disable' %}" required>
     </div>
-    <button type="submit" class="btn-submit" style="background:#a33;">Disable Two-Factor Authentication</button>
+    <button type="submit" class="btn-submit" style="background:#a33;">{% trans "Disable Two-Factor Authentication" %}</button>
 </form>
 {% else %}
 <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">
-    Two-factor authentication is <strong>not enabled</strong> on your account.
+    {% blocktrans %}Two-factor authentication is <strong>not enabled</strong> on your account.
     Turning it on requires a code from an authenticator app (Google Authenticator,
-    Authy, 1Password, etc.) every time you sign in.
+    Authy, 1Password, etc.) every time you sign in.{% endblocktrans %}
 </p>
 <a href="{% url 'mfa_enroll' %}" class="btn-submit" style="display:block;text-align:center;text-decoration:none;">
-    Set Up Two-Factor Authentication
+    {% trans "Set Up Two-Factor Authentication" %}
 </a>
 {% endif %}
 
 <div class="links">
-    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    <a href="{% url 'dashboard' %}">{% trans "Back to Dashboard" %}</a>
 </div>
 {% endblock %}
