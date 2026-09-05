@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Skill{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Skill" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/skills/" class="btn">Skills</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/skills/" class="btn">{% trans "Skills" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="skill-wrap">
-    <div class="menu-title">New Skill</div>
+    <div class="menu-title">{% trans "New Skill" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,18 +26,18 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Name *</label>
-                <input type="text" name="name" required placeholder="e.g. TIG Welding">
+                <label>{% trans "Name *" %}</label>
+                <input type="text" name="name" required placeholder="{% trans 'e.g. TIG Welding' %}">
             </div>
             <div class="form-row">
-                <label>Category</label>
-                <input type="text" name="category" placeholder="e.g. Fabrication">
+                <label>{% trans "Category" %}</label>
+                <input type="text" name="category" placeholder="{% trans 'e.g. Fabrication' %}">
             </div>
             <div class="form-row">
-                <label>Description</label>
-                <input type="text" name="description" placeholder="Optional description">
+                <label>{% trans "Description" %}</label>
+                <input type="text" name="description" placeholder="{% trans 'Optional description' %}">
             </div>
-            <button type="submit" class="btn btn-primary">Create Skill</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Skill" %}</button>
         </form>
     </div>
 </div>

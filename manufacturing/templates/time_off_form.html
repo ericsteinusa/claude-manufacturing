@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Request Time Off{% endblock %}
+{% block page_title %}{% trans "Request Time Off" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">{% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -31,7 +32,7 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Request Time Off</div>
+    <div class="menu-title">{% trans "Request Time Off" %}</div>
     <div class="tof-wrap">
         {% if error %}<div class="tof-error">{{ error }}</div>{% endif %}
 
@@ -39,16 +40,16 @@
             {% csrf_token %}
             <div class="row2">
                 <div>
-                    <label>Start Date *</label>
+                    <label>{% trans "Start Date *" %}</label>
                     <input type="date" name="start_date" value="{{ form.start_date }}" required>
                 </div>
                 <div>
-                    <label>End Date *</label>
+                    <label>{% trans "End Date *" %}</label>
                     <input type="date" name="end_date" value="{{ form.end_date }}" required>
                 </div>
             </div>
             <div class="row">
-                <label>Request Type</label>
+                <label>{% trans "Request Type" %}</label>
                 <select name="request_type">
                     {% for t in types %}
                     <option value="{{ t }}"
@@ -57,12 +58,12 @@
                 </select>
             </div>
             <div class="row">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <textarea name="notes">{{ form.notes }}</textarea>
             </div>
             <div class="tof-actions">
-                <button type="submit" class="btn">Submit Request</button>
-                <a href="{{ back_url }}" class="btn">Cancel</a>
+                <button type="submit" class="btn">{% trans "Submit Request" %}</button>
+                <a href="{{ back_url }}" class="btn">{% trans "Cancel" %}</a>
             </div>
         </form>
     </div>

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Workforce Analytics{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Workforce Analytics" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/workforce/headcount-plans/new/" class="btn btn-primary">+ New Headcount Plan</a>
-<a href="/pers/" class="btn">Personnel Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/workforce/headcount-plans/new/" class="btn btn-primary">+ {% trans "New Headcount Plan" %}</a>
+<a href="/pers/" class="btn">{% trans "Personnel Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -23,37 +24,37 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <div class="menu-title">Workforce Analytics</div>
+    <div class="menu-title">{% trans "Workforce Analytics" %}</div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Tenure and headcount trend are computed only from employees with a hire date on file —
-        set an employee's hire date from their profile to include them.
+        {% blocktrans %}Tenure and headcount trend are computed only from employees with a hire date on file —
+        set an employee's hire date from their profile to include them.{% endblocktrans %}
     </p>
 
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Active Headcount</div>
+            <div class="lbl">{% trans "Active Headcount" %}</div>
             <div class="val">{{ summary.total_active|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Terminated (All-Time)</div>
+            <div class="lbl">{% trans "Terminated (All-Time)" %}</div>
             <div class="val">{{ summary.total_terminated|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Avg Tenure (Years)</div>
+            <div class="lbl">{% trans "Avg Tenure (Years)" %}</div>
             <div class="val">{% if summary.avg_tenure_years != None %}{{ summary.avg_tenure_years }}{% else %}—{% endif %}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Turnover Rate (TTM)</div>
+            <div class="lbl">{% trans "Turnover Rate (TTM)" %}</div>
             <div class="val">{% if summary.turnover_rate_ttm != None %}{% widthratio summary.turnover_rate_ttm 1 100 %}%{% else %}—{% endif %}</div>
         </div>
     </div>
 
     <div class="two-col">
         <div class="card">
-            <h3>Headcount by Department</h3>
+            <h3>{% trans "Headcount by Department" %}</h3>
             {% if summary.by_dept %}
             <table class="erp-table">
-                <thead><tr><th>Department</th><th class="num">Active</th></tr></thead>
+                <thead><tr><th>{% trans "Department" %}</th><th class="num">{% trans "Active" %}</th></tr></thead>
                 <tbody>
                 {% for d in summary.by_dept %}
                 <tr><td>{{ d.dept_name }}</td><td class="num">{{ d.count }}</td></tr>
@@ -61,15 +62,15 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="empty-state">No active employees.</div>
+            <div class="empty-state">{% trans "No active employees." %}</div>
             {% endif %}
         </div>
 
         <div class="card">
-            <h3>12-Month Headcount Trend</h3>
+            <h3>{% trans "12-Month Headcount Trend" %}</h3>
             {% if trend %}
             <table class="erp-table">
-                <thead><tr><th>Month</th><th class="num">Headcount</th></tr></thead>
+                <thead><tr><th>{% trans "Month" %}</th><th class="num">{% trans "Headcount" %}</th></tr></thead>
                 <tbody>
                 {% for point in trend %}
                 <tr><td>{{ point.month }}</td><td class="num">{{ point.headcount }}</td></tr>
@@ -77,17 +78,17 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="empty-state">No hire-date data available.</div>
+            <div class="empty-state">{% trans "No hire-date data available." %}</div>
             {% endif %}
         </div>
     </div>
 
     <div class="card">
-        <h3>Headcount Plan vs. Actual</h3>
+        <h3>{% trans "Headcount Plan vs. Actual" %}</h3>
         {% if plan_vs_actual %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Department</th><th>Target Date</th><th class="num">Target</th><th class="num">Actual</th><th class="num">Gap</th></tr></thead>
+                <thead><tr><th>{% trans "Department" %}</th><th>{% trans "Target Date" %}</th><th class="num">{% trans "Target" %}</th><th class="num">{% trans "Actual" %}</th><th class="num">{% trans "Gap" %}</th></tr></thead>
                 <tbody>
                 {% for row in plan_vs_actual %}
                 <tr>
@@ -104,7 +105,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No headcount plans yet.</div>
+        <div class="empty-state">{% trans "No headcount plans yet." %}</div>
         {% endif %}
     </div>
 </div>
