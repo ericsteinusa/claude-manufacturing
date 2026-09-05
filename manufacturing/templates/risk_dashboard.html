@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block page_title %}Risk Management Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Risk Management Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/risk/" class="btn">Risk Dashboard</a>
-<a href="/risk/register/" class="btn">Risk Register</a>
-<a href="/risk/assessments/" class="btn">Assessments</a>
-<a href="/risk/insurance/" class="btn">Insurance</a>
-<a href="/risk/continuity/" class="btn">Continuity</a>
-<a href="/risk/audits/" class="btn">Audits</a>
-<a href="/risk/kri/" class="btn">KRIs</a>
-<a href="/legal/" class="btn">Legal</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/risk/" class="btn">{% trans "Risk Dashboard" %}</a>
+<a href="/risk/register/" class="btn">{% trans "Risk Register" %}</a>
+<a href="/risk/assessments/" class="btn">{% trans "Assessments" %}</a>
+<a href="/risk/insurance/" class="btn">{% trans "Insurance" %}</a>
+<a href="/risk/continuity/" class="btn">{% trans "Continuity" %}</a>
+<a href="/risk/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/risk/kri/" class="btn">{% trans "KRIs" %}</a>
+<a href="/legal/" class="btn">{% trans "Legal" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -36,82 +37,82 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Risk Management Dashboard</h2>
+    <h2>{% trans "Risk Management Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/legal/" class="dept-btn">Legal Dashboard</a>
-        <a href="/legal/compliance/" class="dept-btn">Compliance</a>
-        <a href="/legal/litigation/" class="dept-btn">Litigation</a>
-        <a href="/qa/fmea/risk-register/" class="dept-btn">FMEA Risk Register</a>
-        <a href="/reports/" class="dept-btn">Reports</a>
-        <a href="/dashboard/" class="dept-btn">Home</a>
+        <a href="/legal/" class="dept-btn">{% trans "Legal Dashboard" %}</a>
+        <a href="/legal/compliance/" class="dept-btn">{% trans "Compliance" %}</a>
+        <a href="/legal/litigation/" class="dept-btn">{% trans "Litigation" %}</a>
+        <a href="/qa/fmea/risk-register/" class="dept-btn">{% trans "FMEA Risk Register" %}</a>
+        <a href="/reports/" class="dept-btn">{% trans "Reports" %}</a>
+        <a href="/dashboard/" class="dept-btn">{% trans "Home" %}</a>
     </div>
 
     <div class="kpi-row">
         <div class="kpi{% if kpis.open_risks %} warn{% endif %}">
-            <div class="lbl">Open Risks</div>
+            <div class="lbl">{% trans "Open Risks" %}</div>
             <div class="val">{{ kpis.open_risks|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Total Risks</div>
+            <div class="lbl">{% trans "Total Risks" %}</div>
             <div class="val">{{ kpis.total_risks|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Assessments</div>
+            <div class="lbl">{% trans "Assessments" %}</div>
             <div class="val">{{ kpis.total_assessments|default:0 }}</div>
         </div>
         <div class="kpi{% if kpis.open_audits %} warn{% endif %}">
-            <div class="lbl">Open Audits</div>
+            <div class="lbl">{% trans "Open Audits" %}</div>
             <div class="val">{{ kpis.open_audits|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Active Policies</div>
+            <div class="lbl">{% trans "Active Policies" %}</div>
             <div class="val">{{ kpis.active_policies|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Continuity Plans</div>
+            <div class="lbl">{% trans "Continuity Plans" %}</div>
             <div class="val">{{ kpis.continuity_plans|default:0 }}</div>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Risk Register — by Severity</h3>
+            <h3>{% trans "Risk Register — by Severity" %}</h3>
             <canvas id="chart-severity" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Risk Register — by Status</h3>
+            <h3>{% trans "Risk Register — by Status" %}</h3>
             <canvas id="chart-reg-status" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Risk Assessments — by Level</h3>
+            <h3>{% trans "Risk Assessments — by Level" %}</h3>
             <canvas id="chart-risk-level" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Risk Register — by Category</h3>
+            <h3>{% trans "Risk Register — by Category" %}</h3>
             <canvas id="chart-category" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>KRI Status</h3>
+            <h3>{% trans "KRI Status" %}</h3>
             <canvas id="chart-kri" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Audit Status</h3>
+            <h3>{% trans "Audit Status" %}</h3>
             <canvas id="chart-audit" height="220"></canvas>
         </div>
     </div>
 
     <div class="card">
-        <h3>Risk Register</h3>
+        <h3>{% trans "Risk Register" %}</h3>
         <table class="list-table">
             <thead>
-                <tr><th>Risk</th><th>Category</th><th>Severity</th><th>Status</th><th>Owner</th></tr>
+                <tr><th>{% trans "Risk" %}</th><th>{% trans "Category" %}</th><th>{% trans "Severity" %}</th><th>{% trans "Status" %}</th><th>{% trans "Owner" %}</th></tr>
             </thead>
             <tbody>
             {% for r in recent_risks %}
@@ -123,17 +124,17 @@
                 <td>{{ r.owner|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);">No risks recorded yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);">{% trans "No risks recorded yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
     <div class="card">
-        <h3>Recent Risk Assessments</h3>
+        <h3>{% trans "Recent Risk Assessments" %}</h3>
         <table class="list-table">
             <thead>
-                <tr><th>Title</th><th>Category</th><th>Risk Level</th><th>Status</th><th>Owner</th></tr>
+                <tr><th>{% trans "Title" %}</th><th>{% trans "Category" %}</th><th>{% trans "Risk Level" %}</th><th>{% trans "Status" %}</th><th>{% trans "Owner" %}</th></tr>
             </thead>
             <tbody>
             {% for a in recent_assessments %}
@@ -145,7 +146,7 @@
                 <td>{{ a.owner|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);">No assessments recorded yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);">{% trans "No assessments recorded yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -183,7 +184,7 @@
                 plugins: {
                     legend: { position: 'right' },
                     title: { display: data.length === 0,
-                             text: 'No data yet', color: '#aaa' }
+                             text: '{% trans "No data yet" %}', color: '#aaa' }
                 } },
         });
     }

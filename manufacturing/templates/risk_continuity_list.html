@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Business Continuity{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Business Continuity" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/risk/" class="btn">Risk Dashboard</a>
-<a href="/risk/register/" class="btn">Risk Register</a>
-<a href="/risk/assessments/" class="btn">Assessments</a>
-<a href="/risk/insurance/" class="btn">Insurance</a>
-<a href="/risk/continuity/" class="btn">Continuity</a>
-<a href="/risk/audits/" class="btn">Audits</a>
-<a href="/risk/kri/" class="btn">KRIs</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/risk/" class="btn">{% trans "Risk Dashboard" %}</a>
+<a href="/risk/register/" class="btn">{% trans "Risk Register" %}</a>
+<a href="/risk/assessments/" class="btn">{% trans "Assessments" %}</a>
+<a href="/risk/insurance/" class="btn">{% trans "Insurance" %}</a>
+<a href="/risk/continuity/" class="btn">{% trans "Continuity" %}</a>
+<a href="/risk/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/risk/kri/" class="btn">{% trans "KRIs" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,28 +50,28 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Business Continuity Plans</h2>
+    <h2>{% trans "Business Continuity Plans" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search plan / scope / owner…">
-        <button type="submit">Filter</button>
-        <a href="/risk/continuity/" style="font-size:13px;color:var(--accent);margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans "Search plan / scope / owner…" %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/risk/continuity/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Plan</th><th>Scope</th><th>Criticality</th><th>Owner</th>
-                    <th>Last Tested</th><th>Next Test</th><th>Status</th>
+                    <th>{% trans "Plan" %}</th><th>{% trans "Scope" %}</th><th>{% trans "Criticality" %}</th><th>{% trans "Owner" %}</th>
+                    <th>{% trans "Last Tested" %}</th><th>{% trans "Next Test" %}</th><th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -85,7 +86,7 @@
                 <td><span class="badge s-{{ r.status|lower|cut:" " }}">{{ r.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:var(--text-muted);text-align:center;">No continuity plans found.</td></tr>
+            <tr><td colspan="7" style="color:var(--text-muted);text-align:center;">{% trans "No continuity plans found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -93,36 +94,36 @@
 
     {% if user_role != 'viewer' and user_role != 'read_only' %}
     <div class="card">
-        <h3>New Continuity Plan</h3>
+        <h3>{% trans "New Continuity Plan" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Plan *</label>
+                    <label>{% trans "Plan *" %}</label>
                     <input type="text" name="plan" required>
                 </div>
                 <div class="form-group">
-                    <label>Scope</label>
+                    <label>{% trans "Scope" %}</label>
                     <input type="text" name="scope">
                 </div>
                 <div class="form-group">
-                    <label>Criticality</label>
-                    <input type="text" name="criticality" placeholder="Low / Medium / High">
+                    <label>{% trans "Criticality" %}</label>
+                    <input type="text" name="criticality" placeholder="{% trans "Low / Medium / High" %}">
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     <input type="text" name="owner">
                 </div>
                 <div class="form-group">
-                    <label>Last Tested</label>
+                    <label>{% trans "Last Tested" %}</label>
                     <input type="date" name="last_tested">
                 </div>
                 <div class="form-group">
-                    <label>Next Test</label>
+                    <label>{% trans "Next Test" %}</label>
                     <input type="date" name="next_test">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in statuses %}
                         <option value="{{ s }}"{% if s == 'Draft' %} selected{% endif %}>{{ s }}</option>
@@ -130,11 +131,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Plan</button>
+            <button type="submit" class="btn-submit">{% trans "Create Plan" %}</button>
         </form>
     </div>
     {% endif %}

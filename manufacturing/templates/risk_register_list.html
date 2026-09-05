@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Risk Register{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Risk Register" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/risk/" class="btn">Risk Dashboard</a>
-<a href="/risk/register/" class="btn">Risk Register</a>
-<a href="/risk/assessments/" class="btn">Assessments</a>
-<a href="/risk/insurance/" class="btn">Insurance</a>
-<a href="/risk/continuity/" class="btn">Continuity</a>
-<a href="/risk/audits/" class="btn">Audits</a>
-<a href="/risk/kri/" class="btn">KRIs</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/risk/" class="btn">{% trans "Risk Dashboard" %}</a>
+<a href="/risk/register/" class="btn">{% trans "Risk Register" %}</a>
+<a href="/risk/assessments/" class="btn">{% trans "Assessments" %}</a>
+<a href="/risk/insurance/" class="btn">{% trans "Insurance" %}</a>
+<a href="/risk/continuity/" class="btn">{% trans "Continuity" %}</a>
+<a href="/risk/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/risk/kri/" class="btn">{% trans "KRIs" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,28 +50,28 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Risk Register</h2>
+    <h2>{% trans "Risk Register" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search risk / category / owner…">
-        <button type="submit">Filter</button>
-        <a href="/risk/register/" style="font-size:13px;color:var(--accent);margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans "Search risk / category / owner…" %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/risk/register/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Risk</th><th>Category</th><th>Severity</th><th>Response</th>
-                    <th>Owner</th><th>Target Date</th><th>Status</th>
+                    <th>{% trans "Risk" %}</th><th>{% trans "Category" %}</th><th>{% trans "Severity" %}</th><th>{% trans "Response" %}</th>
+                    <th>{% trans "Owner" %}</th><th>{% trans "Target Date" %}</th><th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -85,7 +86,7 @@
                 <td><span class="badge s-{{ r.status|lower }}">{{ r.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:var(--text-muted);text-align:center;">No risks found.</td></tr>
+            <tr><td colspan="7" style="color:var(--text-muted);text-align:center;">{% trans "No risks found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -93,24 +94,24 @@
 
     {% if user_role != 'viewer' and user_role != 'read_only' %}
     <div class="card">
-        <h3>New Risk</h3>
+        <h3>{% trans "New Risk" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Risk *</label>
+                    <label>{% trans "Risk *" %}</label>
                     <input type="text" name="risk" required>
                 </div>
                 <div class="form-group">
-                    <label>Category</label>
+                    <label>{% trans "Category" %}</label>
                     <input type="text" name="category">
                 </div>
                 <div class="form-group">
-                    <label>Severity</label>
-                    <input type="text" name="severity" placeholder="Low / Medium / High">
+                    <label>{% trans "Severity" %}</label>
+                    <input type="text" name="severity" placeholder="{% trans "Low / Medium / High" %}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in statuses %}
                         <option value="{{ s }}"{% if s == 'Open' %} selected{% endif %}>{{ s }}</option>
@@ -118,23 +119,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Response</label>
+                    <label>{% trans "Response" %}</label>
                     <input type="text" name="response">
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     <input type="text" name="owner">
                 </div>
                 <div class="form-group">
-                    <label>Target Date</label>
+                    <label>{% trans "Target Date" %}</label>
                     <input type="date" name="target_date">
                 </div>
                 <div class="form-group full-span">
-                    <label>Mitigation</label>
+                    <label>{% trans "Mitigation" %}</label>
                     <textarea name="mitigation"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Risk</button>
+            <button type="submit" class="btn-submit">{% trans "Create Risk" %}</button>
         </form>
     </div>
     {% endif %}

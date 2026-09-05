@@ -1983,6 +1983,61 @@ untranslated), plus direct `gettext()` calls confirming both
 correctly with real line breaks and intact tags in all 5 locales. No
 console or server errors.
 
+Also fully translated: the entire **Risk Management** feature
+(`risk_dashboard.html`, `risk_register_list.html`,
+`risk_assessment_list.html`, `risk_audit_list.html`,
+`risk_continuity_list.html`, `risk_insurance_list.html`,
+`risk_kri_list.html` — 7 templates, the twenty-first "whole feature"
+pass, and another instance of the "translate the link, not yet the
+target" gap: `/risk/` is linked from the already-translated Legal
+Dashboard but had never itself been touched). Marked up by two
+parallel subagents (dashboard+register+assessments+audits vs.
+continuity+insurance+KRI), translated by hand afterward — small enough
+(79 strings, all simple, no plurals) to skip delegating the
+translation step, matching ABC Costing/Auth. Both subagents' diffs
+checked out clean on review — no bugs, no bare `default:"literal"`
+fallbacks, no dotted-blocktrans-variable mistakes.
+
+One correctly-applied precedent worth reconfirming rather than a new
+finding: several placeholders needed `{% trans "..." %}` nested
+directly inside a double-quoted HTML `placeholder="..."` attribute
+(e.g. `placeholder="{% trans "Search risk / category / owner…" %}"`).
+Verified against two pre-existing files that already do this
+(`it_ticket_list.html`, `wms_putaway_rule_list.html`) before trusting
+it, rather than taking the subagents' self-reported precedent claim at
+face value — both files genuinely exist and genuinely use this
+pattern, confirming Django's tag tokenizer really does resolve `{% %}`
+boundaries before the surrounding HTML's own quoting matters (the same
+finding the IT department pass made for a single embedded apostrophe,
+now reconfirmed for a full nested double-quoted string). Also
+translated the Chart.js "No data yet" empty-chart title text inside
+`risk_dashboard.html`'s `<script>` block as `'{% trans "No data yet"
+%}'`, the same proven-safe pattern used for `confirm()` dialogs
+elsewhere (Django renders the tag server-side before the JS ever
+reaches the browser) — the first time this series has translated
+chart-internal text rather than just chart labels/titles outside the
+`<script>` tag.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check`
+clean on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically. Grepped the generic single-word labels reused via
+exact-msgid auto-merge (Threshold, Scope, Framework, Finding, Response,
+Coverage, Premium, Assessed) for the "Make"-style cross-context
+mistranslation risk — "Threshold" merged with `approval_rule_list
+.html`'s monetary approval threshold, both senses ("a numeric limit")
+compatible in every language, no bug. Verified end-to-end against the
+real dev server, in French with real sample data: the Risk Dashboard
+(confirmed all 6 KPI cards, both dept-grid rows, and no console errors
+after a mid-verification dev-server crash from an unrelated transient
+Postgres `tuple concurrently updated` error during autoreload — restarted
+cleanly, unrelated to this batch's changes), Risk Register (confirmed
+the full New Risk form's labels and the "Faible / Moyen / Élevé"
+severity-hint placeholder), Risk Assessments, Compliance Audits,
+Business Continuity, Insurance Policies, and Key Risk Indicators — all
+7 pages return 200 with correctly translated titles, headings, table
+headers, and toolbar navigation.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
