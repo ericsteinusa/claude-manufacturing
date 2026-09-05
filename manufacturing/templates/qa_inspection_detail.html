@@ -36,7 +36,7 @@
 .res-passed { background:#e8f5e9; color:#1a6b1a; }
 .res-failed { background:#ffebee; color:#c62828; }
 .res-pending { background:#e8eaf6; color:#3949ab; }
-.res-on_hold { background:#fff3e0; color:#e65100; }
+.res-on_hold { background:#fff3e0; color:#c34500; }
 .result-btns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
 .rbtn { padding:6px 16px; border:2px solid #aaa; border-radius:5px;
     font-size:13px; font-weight:bold; cursor:pointer; background:white; }
@@ -44,14 +44,14 @@
 .rbtn.active-passed { background:#e8f5e9; border-color:#1a6b1a; color:#1a6b1a; }
 .rbtn.active-failed { background:#ffebee; border-color:#c62828; color:#c62828; }
 .rbtn.active-pending { background:#e8eaf6; border-color:#3949ab; color:#3949ab; }
-.rbtn.active-on_hold { background:#fff3e0; border-color:#e65100; color:#e65100; }
+.rbtn.active-on_hold { background:#fff3e0; border-color:#c34500; color:#c34500; }
 .defect-table { width:100%; border-collapse:collapse; font-size:13px; }
 .defect-table th,.defect-table td { padding:8px 12px; text-align:left;
     border-bottom:1px solid #eee; }
 .defect-table th { background:#f0f4ff; color:#333; }
 .defect-table tr:last-child td { border-bottom:none; }
 .sev-minor { color:#1a6b1a; font-weight:bold; }
-.sev-major { color:#e65100; font-weight:bold; }
+.sev-major { color:#c34500; font-weight:bold; }
 .sev-critical { color:#c62828; font-weight:bold; }
 .form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
 .form-row label { font-size:12px; color:#555; font-weight:bold; }
@@ -62,9 +62,9 @@
 .save-btn { padding:7px 20px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
 .save-btn:hover { background:var(--accent-hover); }
-.resolve-btn { padding:4px 12px; background:#fff3e0; border:1px solid #e65100;
-    border-radius:4px; font-size:12px; cursor:pointer; color:#e65100; }
-.resolve-btn:hover { background:#e65100; color:white; }
+.resolve-btn { padding:4px 12px; background:#fff3e0; border:1px solid #c34500;
+    border-radius:4px; font-size:12px; cursor:pointer; color:#c34500; }
+.resolve-btn:hover { background:#c34500; color:white; }
 .msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
     padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
@@ -154,7 +154,7 @@
                     {% if inspection.accept_number is not None %}
                         Ac {{ inspection.accept_number }} / Re {{ inspection.reject_number }}
                     {% else %}
-                        <span style="color:#e65100;">{% trans "no accept/reject data for this plan/lot size — see Sampling Plans" %}</span>
+                        <span style="color:#c34500;">{% trans "no accept/reject data for this plan/lot size — see Sampling Plans" %}</span>
                     {% endif %}
                 </div>
             </div>
