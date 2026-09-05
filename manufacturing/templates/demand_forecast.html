@@ -79,7 +79,7 @@
             <tbody>
             {% for row in series %}
             <tr>
-                <td>{{ row.month }}{% if row.is_forecast %} <em style="color:#f5a623;">(forecast)</em>{% endif %}</td>
+                <td>{{ row.month }}{% if row.is_forecast %} <em style="color:#a36907;">(forecast)</em>{% endif %}</td>
                 <td class="num">
                     {% if row.is_forecast %}{{ row.forecast_qty|floatformat:0 }}
                     {% else %}{{ row.actual_qty|floatformat:0 }}{% endif %}

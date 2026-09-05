@@ -22,7 +22,7 @@
 .oee-kpi .lbl { font-size:12px; color:var(--text-muted); margin-top:6px; }
 .oee-kpi .sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
 .oee-kpi.green .num { color:#2e7d32; }
-.oee-kpi.amber .num { color:#e65100; }
+.oee-kpi.amber .num { color:#c34500; }
 .oee-kpi.red .num { color:#c62828; }
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
 .card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
@@ -86,7 +86,7 @@
             <div class="sub">{% trans "Std vs actual run hours" %}</div>
         </div>
         <div class="oee-kpi">
-            <div class="num" style="color:#059669;">{{ overall.quality_pct }}%</div>
+            <div class="num" style="color:#04865e;">{{ overall.quality_pct }}%</div>
             <div class="lbl">{% trans "Quality" %}</div>
             <div class="sub">{% blocktrans with scrap=overall.total_scrap total=overall.total_qty %}{{ scrap }} scrap / {{ total }} total units{% endblocktrans %}</div>
         </div>
@@ -163,7 +163,7 @@
                 <span style="color:var(--text-muted);font-size:12px;">{% trans "From completed work order routing operations at each workcenter. Standard hours are set in the routing; actual hours are recorded at completion." %}</span>
             </div>
             <div>
-                <strong style="color:#059669;">{% trans "Quality" %}</strong><br>
+                <strong style="color:#04865e;">{% trans "Quality" %}</strong><br>
                 {% trans "(Total Qty − Scrap) ÷ Total Qty" %}<br>
                 <span style="color:var(--text-muted);font-size:12px;">{% trans "Total quantity from work orders routed through this workcenter; scrap quantity recorded per routing step at completion." %}</span>
             </div>

@@ -1804,12 +1804,33 @@ to two new languages, it didn't mark any new template.
 
   Current state on `main`: across 299 pages — zero elements below 2.0
   contrast, zero muted-grey text below AA, and zero sub-AA brand-colour
-  text. **~53 sub-AA items remain and are deliberate**: semantic status
-  colours (the amber/orange `In Progress`, `Under Review` pills — muting
-  them to hit a ratio would lose the signal) and Swagger UI's own CSS on
-  `/api/docs/`. Measure with a size-aware threshold (AA allows 3:1 for
-  text ≥24px, or ≥18.66px bold) — otherwise you over-report large KPI
-  numbers by ~36 items.
+  text. *Semantic status colours are AA too* — the badge palette was
+  darkened in place (`#e65100`→`#c34500`, `#827717`→`#7c7216`,
+  `#bf360c`→`#ba350c`, `#f5a623`→`#a36907`, `#059669`→`#04865e`) plus the
+  green action-button background `#28a745`→`#1e8035`, which also lifts the
+  white text on it from 3.13 to 5.01. **Hue and saturation were preserved
+  and only lightness reduced**, so `In Progress` is still orange and
+  `Quality` still green — the signal survives, it is just legible. Do the
+  same for a new status colour rather than reaching for a generic grey.
+  `#e65100` had to serve two jobs (badge text on `#fff3e0`, and a button
+  background under white text); `#c34500` clears AA both ways (4.59/5.03).
+
+  **The only sub-AA text left is Swagger UI's own error banner** on
+  `/api/docs/` (4 elements, `errors__title` and friends). That CSS ships
+  from `cdn.jsdelivr.net/npm/swagger-ui-dist@5` — a floating major — so
+  overriding its internal class names to restyle a failure-only banner is
+  fragile for no real gain. Left on purpose; not an oversight.
+
+  Two colours were deliberately NOT darkened where they act as **chart
+  fills** rather than text (`#f5a623`'s forecast bar and legend swatch,
+  `#059669`'s OEE series): AA does not apply to fills, and darkening them
+  visibly muddies the chart for no benefit. Only their `color:` uses
+  changed — the same call made for the Chart.js palettes in the accent
+  pass.
+
+  Measure with a size-aware threshold (AA allows 3:1 for text ≥24px, or
+  ≥18.66px bold) — otherwise you over-report large KPI numbers by ~36
+  items.
 
   **When converting greys, check the *ancestor's* background, not just the
   element's own.** A rule like `.scope-total .label { color:#ccc }` is
