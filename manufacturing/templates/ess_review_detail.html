@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Review Detail{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Review Detail" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ess/reviews/" class="btn">My Reviews</a>
-<a href="/ess/" class="btn">My Info</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ess/reviews/" class="btn">{% trans "My Reviews" %}</a>
+<a href="/ess/" class="btn">{% trans "My Info" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -25,19 +26,19 @@
 {% block body %}
 <div class="content">
 <div class="ess-wrap">
-    <h2>{{ review.review_type }} Review
+    <h2>{% blocktrans with type=review.review_type %}{{ type }} Review{% endblocktrans %}
         <span class="badge s-{{ review.status|cut:' ' }}" style="font-size:14px;">{{ review.status }}</span>
     </h2>
     <div class="card">
         <table class="ro-table">
-            <tr><th>Review Type</th><td>{{ review.review_type|default:"—" }}</td></tr>
-            <tr><th>Review Date</th><td>{{ review.review_date|default:"—" }}</td></tr>
-            <tr><th>Reviewer</th><td>{{ review.reviewer|default:"—" }}</td></tr>
-            <tr><th>Rating</th><td>{{ review.rating|default:"—" }}</td></tr>
-            <tr><th>Status</th><td><span class="badge s-{{ review.status|cut:' ' }}">{{ review.status }}</span></td></tr>
+            <tr><th>{% trans "Review Type" %}</th><td>{{ review.review_type|default:"—" }}</td></tr>
+            <tr><th>{% trans "Review Date" %}</th><td>{{ review.review_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Reviewer" %}</th><td>{{ review.reviewer|default:"—" }}</td></tr>
+            <tr><th>{% trans "Rating" %}</th><td>{{ review.rating|default:"—" }}</td></tr>
+            <tr><th>{% trans "Status" %}</th><td><span class="badge s-{{ review.status|cut:' ' }}">{{ review.status }}</span></td></tr>
         </table>
         {% if review.notes %}
-        <div style="margin-top:12px;"><strong>Notes:</strong>
+        <div style="margin-top:12px;"><strong>{% trans "Notes:" %}</strong>
             <pre style="white-space:pre-wrap;font-size:13px;margin:6px 0 0;">{{ review.notes }}</pre>
         </div>
         {% endif %}

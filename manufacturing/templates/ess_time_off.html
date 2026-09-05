@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}My Time Off{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "My Time Off" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/time-off/new/" class="btn btn-primary">Request Time Off</a>
-<a href="/ess/" class="btn">My Info</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/time-off/new/" class="btn btn-primary">{% trans "Request Time Off" %}</a>
+<a href="/ess/" class="btn">{% trans "My Info" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -30,27 +31,27 @@
 {% block body %}
 <div class="content">
 <div class="ess-wrap">
-    <h2>My Time Off</h2>
+    <h2>{% trans "My Time Off" %}</h2>
 
     <div class="tile-grid">
         <div class="tile">
-            <label>Allotted ({{ balance.year }})</label>
-            <div class="big">{{ balance.allotted_days|floatformat:1 }} days</div>
+            <label>{% blocktrans with year=balance.year %}Allotted ({{ year }}){% endblocktrans %}</label>
+            <div class="big">{% blocktrans with days=balance.allotted_days|floatformat:1 %}{{ days }} days{% endblocktrans %}</div>
         </div>
         <div class="tile">
-            <label>Used</label>
-            <div class="big">{{ balance.used_days|floatformat:1 }} days</div>
+            <label>{% trans "Used" %}</label>
+            <div class="big">{% blocktrans with days=balance.used_days|floatformat:1 %}{{ days }} days{% endblocktrans %}</div>
         </div>
         <div class="tile">
-            <label>Remaining</label>
-            <div class="big">{{ balance.remaining_days|floatformat:1 }} days</div>
+            <label>{% trans "Remaining" %}</label>
+            <div class="big">{% blocktrans with days=balance.remaining_days|floatformat:1 %}{{ days }} days{% endblocktrans %}</div>
         </div>
     </div>
 
     <div class="card">
         <table class="list-table">
             <thead>
-                <tr><th>Type</th><th>Start</th><th>End</th><th>Status</th><th></th></tr>
+                <tr><th>{% trans "Type" %}</th><th>{% trans "Start" %}</th><th>{% trans "End" %}</th><th>{% trans "Status" %}</th><th></th></tr>
             </thead>
             <tbody>
             {% for r in requests %}
@@ -59,10 +60,10 @@
                 <td>{{ r.start_date }}</td>
                 <td>{{ r.end_date }}</td>
                 <td><span class="badge b-{{ r.status }}">{{ r.status|title }}</span></td>
-                <td><a href="/time-off/{{ r.id }}/">Detail</a></td>
+                <td><a href="/time-off/{{ r.id }}/">{% trans "Detail" %}</a></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No time-off requests yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">{% trans "No time-off requests yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

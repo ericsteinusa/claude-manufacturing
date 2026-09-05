@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}My Info{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "My Info" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ess/pay-stubs/" class="btn">Pay Stubs</a>
-<a href="/ess/time-off/" class="btn">Time Off</a>
-<a href="/ess/reviews/" class="btn">Reviews</a>
-<a href="/ess/training/" class="btn">Training</a>
-<a href="/ess/profile/" class="btn">My Profile</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ess/pay-stubs/" class="btn">{% trans "Pay Stubs" %}</a>
+<a href="/ess/time-off/" class="btn">{% trans "Time Off" %}</a>
+<a href="/ess/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/ess/training/" class="btn">{% trans "Training" %}</a>
+<a href="/ess/profile/" class="btn">{% trans "My Profile" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -28,57 +29,57 @@
 {% block body %}
 <div class="content">
 <div class="ess-wrap">
-    <h2>Welcome, {{ person.first_name }} {{ person.last_name }}</h2>
+    <h2>{% blocktrans with first=person.first_name last=person.last_name %}Welcome, {{ first }} {{ last }}{% endblocktrans %}</h2>
 
     <div class="tile-grid">
         <div class="tile">
-            <label>Vacation Balance ({{ balance.year }})</label>
-            <div class="big">{{ balance.remaining_days|floatformat:1 }} days left</div>
+            <label>{% blocktrans with year=balance.year %}Vacation Balance ({{ year }}){% endblocktrans %}</label>
+            <div class="big">{% blocktrans with remaining=balance.remaining_days|floatformat:1 %}{{ remaining }} days left{% endblocktrans %}</div>
             <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-                {{ balance.used_days|floatformat:1 }} of {{ balance.allotted_days|floatformat:1 }} used
+                {% blocktrans with used=balance.used_days|floatformat:1 allotted=balance.allotted_days|floatformat:1 %}{{ used }} of {{ allotted }} used{% endblocktrans %}
             </div>
-            <a href="/ess/time-off/">View / Request Time Off &rarr;</a>
+            <a href="/ess/time-off/">{% trans "View / Request Time Off →" %}</a>
         </div>
         <div class="tile">
-            <label>Latest Pay Stub</label>
+            <label>{% trans "Latest Pay Stub" %}</label>
             {% if latest_stub %}
             <div class="big">${{ latest_stub.net_pay|floatformat:2 }}</div>
             <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-                {{ latest_stub.pay_period_start }} to {{ latest_stub.pay_period_end }}
+                {% blocktrans with start=latest_stub.pay_period_start end=latest_stub.pay_period_end %}{{ start }} to {{ end }}{% endblocktrans %}
             </div>
             {% else %}
-            <div class="big" style="font-size:14px;color:var(--text-muted);">No pay stubs yet</div>
+            <div class="big" style="font-size:14px;color:var(--text-muted);">{% trans "No pay stubs yet" %}</div>
             {% endif %}
-            <a href="/ess/pay-stubs/">View Pay Stubs &rarr;</a>
+            <a href="/ess/pay-stubs/">{% trans "View Pay Stubs →" %}</a>
         </div>
         <div class="tile">
-            <label>Pending Reviews</label>
+            <label>{% trans "Pending Reviews" %}</label>
             <div class="big">{{ pending_reviews|length }}</div>
-            <a href="/ess/reviews/">View Reviews &rarr;</a>
+            <a href="/ess/reviews/">{% trans "View Reviews →" %}</a>
         </div>
         <div class="tile">
-            <label>Upcoming Training</label>
+            <label>{% trans "Upcoming Training" %}</label>
             <div class="big">{{ upcoming_trainings|length }}</div>
-            <a href="/ess/training/">View Training &rarr;</a>
+            <a href="/ess/training/">{% trans "View Training →" %}</a>
         </div>
     </div>
 
     <div class="card">
-        <h3>Quick Links</h3>
+        <h3>{% trans "Quick Links" %}</h3>
         <ul>
-            <li><a href="/time-clock/">Clock In / Out</a></li>
-            <li><a href="/time-clock/hours/">My Hours</a></li>
-            <li><a href="/ess/time-off/">Request Time Off</a></li>
-            <li><a href="/ess/profile/">Update My Contact Info</a></li>
+            <li><a href="/time-clock/">{% trans "Clock In / Out" %}</a></li>
+            <li><a href="/time-clock/hours/">{% trans "My Hours" %}</a></li>
+            <li><a href="/ess/time-off/">{% trans "Request Time Off" %}</a></li>
+            <li><a href="/ess/profile/">{% trans "Update My Contact Info" %}</a></li>
         </ul>
     </div>
 
     {% if open_time_off %}
     <div class="card">
-        <h3>Pending Time-Off Requests</h3>
+        <h3>{% trans "Pending Time-Off Requests" %}</h3>
         <ul>
             {% for r in open_time_off %}
-            <li><a href="/time-off/{{ r.id }}/">{{ r.request_type }}: {{ r.start_date }} to {{ r.end_date }}</a></li>
+            <li><a href="/time-off/{{ r.id }}/">{% blocktrans with type=r.request_type start=r.start_date end=r.end_date %}{{ type }}: {{ start }} to {{ end }}{% endblocktrans %}</a></li>
             {% endfor %}
         </ul>
     </div>
