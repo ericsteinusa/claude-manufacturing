@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Edit Webhook Subscription{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Edit Webhook Subscription" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/webhooks/" class="btn">Webhooks</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/webhooks/" class="btn">{% trans "Webhooks" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -25,8 +26,8 @@
 <div class="content">
 <div class="wh-wrap">
     <div class="menu-title">
-        Edit Webhook Subscription
-        {% if subscription.is_active %}<span class="pill pill-ok">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}
+        {% trans "Edit Webhook Subscription" %}
+        {% if subscription.is_active %}<span class="pill pill-ok">{% trans "Active" %}</span>{% else %}<span class="pill pill-cancelled">{% trans "Inactive" %}</span>{% endif %}
     </div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
@@ -37,7 +38,7 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-row">
-                <label>Event Type *</label>
+                <label>{% trans "Event Type *" %}</label>
                 <select name="event_type" required>
                     {% for et in event_types %}
                     <option value="{{ et }}"{% if et == subscription.event_type %} selected{% endif %}>{{ et }}</option>
@@ -45,50 +46,50 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Target URL *</label>
+                <label>{% trans "Target URL *" %}</label>
                 <input type="url" name="target_url" value="{{ subscription.target_url }}" required>
             </div>
             <div class="form-row">
-                <label>Signing Secret</label>
-                <input type="text" name="secret" value="{{ subscription.secret }}" placeholder="Optional">
+                <label>{% trans "Signing Secret" %}</label>
+                <input type="text" name="secret" value="{{ subscription.secret }}" placeholder="{% trans 'Optional' %}">
             </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
         </form>
     </div>
 
     <div class="card">
-        <h3 style="font-size:14px;margin-bottom:10px;">Recent Deliveries</h3>
+        <h3 style="font-size:14px;margin-bottom:10px;">{% trans "Recent Deliveries" %}</h3>
         {% if deliveries %}
         {% for d in deliveries %}
         <div class="deliv-item">
             {% if d.status == 'success' %}
-            <span class="pill pill-ok" style="font-size:10px;">Success</span>
+            <span class="pill pill-ok" style="font-size:10px;">{% trans "Success" %}</span>
             {% else %}
-            <span class="pill pill-danger" style="font-size:10px;">Failed</span>
+            <span class="pill pill-danger" style="font-size:10px;">{% trans "Failed" %}</span>
             {% endif %}
             {{ d.entity_type }} #{{ d.entity_id }} — {{ d.detail }}
             <div class="deliv-meta">{{ d.created_at }}</div>
         </div>
         {% endfor %}
         {% else %}
-        <div class="empty-state" style="padding:16px;">No deliveries yet.</div>
+        <div class="empty-state" style="padding:16px;">{% trans "No deliveries yet." %}</div>
         {% endif %}
     </div>
 
     <div class="card danger-zone">
-        <h3>Danger Zone</h3>
+        <h3>{% trans "Danger Zone" %}</h3>
         <div class="btn-row">
-            <form method="post" onsubmit="return confirm('{% if subscription.is_active %}Deactivate{% else %}Activate{% endif %} this subscription?');">
+            <form method="post" onsubmit="return confirm('{% if subscription.is_active %}{% trans "Deactivate this subscription?" %}{% else %}{% trans "Activate this subscription?" %}{% endif %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="toggle_active">
                 <button type="submit" class="btn">
-                    {% if subscription.is_active %}Deactivate{% else %}Activate{% endif %}
+                    {% if subscription.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}
                 </button>
             </form>
-            <form method="post" onsubmit="return confirm('Delete this subscription permanently? This cannot be undone.');">
+            <form method="post" onsubmit="return confirm('{% trans "Delete this subscription permanently? This cannot be undone." %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="delete">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">{% trans "Delete" %}</button>
             </form>
         </div>
     </div>

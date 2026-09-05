@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Edit Retention Policy{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Edit Retention Policy" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/data-governance/" class="btn">Data Governance</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/data-governance/" class="btn">{% trans "Data Governance" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -22,8 +23,8 @@
 <div class="content">
 <div class="rp-wrap">
     <div class="menu-title">
-        Edit Retention Policy
-        {% if policy.is_active %}<span class="pill pill-ok">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}
+        {% trans "Edit Retention Policy" %}
+        {% if policy.is_active %}<span class="pill pill-ok">{% trans "Active" %}</span>{% else %}<span class="pill pill-cancelled">{% trans "Inactive" %}</span>{% endif %}
     </div>
 
     <div class="card">
@@ -31,32 +32,32 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-row">
-                <label>Policy Name *</label>
+                <label>{% trans "Policy Name *" %}</label>
                 <input type="text" name="name" value="{{ policy.name }}" required>
             </div>
             <div class="form-row">
-                <label>Months After Termination *</label>
+                <label>{% trans "Months After Termination *" %}</label>
                 <input type="number" name="months_after_termination" value="{{ policy.months_after_termination }}" min="1" required>
-                <div class="form-hint">Terminated employees are anonymized once this many months have passed since their termination date.</div>
+                <div class="form-hint">{% blocktrans %}Terminated employees are anonymized once this many months have passed since their termination date.{% endblocktrans %}</div>
             </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
         </form>
     </div>
 
     <div class="card danger-zone">
-        <h3>Danger Zone</h3>
+        <h3>{% trans "Danger Zone" %}</h3>
         <div class="btn-row">
-            <form method="post" onsubmit="return confirm('{% if policy.is_active %}Deactivate{% else %}Activate{% endif %} this policy?');">
+            <form method="post" onsubmit="return confirm('{% if policy.is_active %}{% trans "Deactivate this policy?" %}{% else %}{% trans "Activate this policy?" %}{% endif %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="toggle_active">
                 <button type="submit" class="btn">
-                    {% if policy.is_active %}Deactivate{% else %}Activate{% endif %}
+                    {% if policy.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}
                 </button>
             </form>
-            <form method="post" onsubmit="return confirm('Delete this policy permanently?');">
+            <form method="post" onsubmit="return confirm('{% trans "Delete this policy permanently?" %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="delete">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">{% trans "Delete" %}</button>
             </form>
         </div>
     </div>

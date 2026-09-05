@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Webhook Subscription{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Webhook Subscription" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/webhooks/" class="btn">Webhooks</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/webhooks/" class="btn">{% trans "Webhooks" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -18,7 +19,7 @@
 {% block body %}
 <div class="content">
 <div class="wh-wrap">
-    <div class="menu-title">New Webhook Subscription</div>
+    <div class="menu-title">{% trans "New Webhook Subscription" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -26,7 +27,7 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Event Type *</label>
+                <label>{% trans "Event Type *" %}</label>
                 <select name="event_type" required>
                     {% for et in event_types %}
                     <option value="{{ et }}">{{ et }}</option>
@@ -34,20 +35,20 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Target URL *</label>
+                <label>{% trans "Target URL *" %}</label>
                 <input type="url" name="target_url" required placeholder="https://example.com/hooks/manufacturing">
-                <div class="form-hint">Where we'll POST a JSON payload when this event fires.</div>
+                <div class="form-hint">{% trans "Where we'll POST a JSON payload when this event fires." %}</div>
             </div>
             <div class="form-row">
-                <label>Signing Secret</label>
-                <input type="text" name="secret" placeholder="Optional — leave blank for an unsigned payload">
+                <label>{% trans "Signing Secret" %}</label>
+                <input type="text" name="secret" placeholder="{% trans 'Optional — leave blank for an unsigned payload' %}">
                 <div class="form-hint">
-                    If set, each request includes an <code>X-Webhook-Signature</code> header:
+                    {% blocktrans %}If set, each request includes an <code>X-Webhook-Signature</code> header:
                     base64(HMAC-SHA256(secret, raw body)) — the same scheme this app's own
-                    inbound Shopify/WooCommerce webhook verification uses.
+                    inbound Shopify/WooCommerce webhook verification uses.{% endblocktrans %}
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Create Subscription</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Subscription" %}</button>
         </form>
     </div>
 </div>

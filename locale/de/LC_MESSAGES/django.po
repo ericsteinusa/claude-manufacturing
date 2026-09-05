@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 19:19+0000\n"
+"POT-Creation-Date: 2026-09-05 19:40+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -84,6 +84,7 @@ msgstr "Informationstechnologie"
 #: manufacturing/menus.py:1693 manufacturing/templates/base.html:579
 #: manufacturing/templates/base.html:581
 #: manufacturing/templates/dashboard_kpis.html:29
+#: manufacturing/templates/fixed_asset_detail.html:203
 msgid "Maintenance"
 msgstr "Instandhaltung"
 
@@ -249,6 +250,9 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/ai_insights_dashboard.html:7
 #: manufacturing/templates/ap_invoice_detail.html:9
 #: manufacturing/templates/ap_list.html:10
+#: manufacturing/templates/approval_rule_edit.html:7
+#: manufacturing/templates/approval_rule_list.html:6
+#: manufacturing/templates/approval_rule_new.html:7
 #: manufacturing/templates/ar_invoice_detail.html:10
 #: manufacturing/templates/ar_list.html:10
 #: manufacturing/templates/ats_application_detail.html:9
@@ -300,6 +304,8 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/cs_returns_list.html:11
 #: manufacturing/templates/cs_surveys_detail.html:11
 #: manufacturing/templates/cs_surveys_list.html:11
+#: manufacturing/templates/currency_list.html:6
+#: manufacturing/templates/data_governance_dashboard.html:6
 #: manufacturing/templates/employee_benefits.html:7
 #: manufacturing/templates/employee_employment_dates.html:8
 #: manufacturing/templates/employee_gap_detail.html:7
@@ -334,6 +340,8 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/finance_dashboard.html:16
 #: manufacturing/templates/finance_tax_detail.html:11
 #: manufacturing/templates/finance_tax_list.html:13
+#: manufacturing/templates/fixed_asset_detail.html:6
+#: manufacturing/templates/fixed_asset_list.html:6
 #: manufacturing/templates/gl_accounts.html:9
 #: manufacturing/templates/gl_balance_sheet.html:9
 #: manufacturing/templates/gl_cash_flow_statement.html:10
@@ -424,6 +432,7 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/people_detail.html:14
 #: manufacturing/templates/people_form.html:8
 #: manufacturing/templates/people_list.html:9
+#: manufacturing/templates/periods.html:6
 #: manufacturing/templates/pers_depts.html:11
 #: manufacturing/templates/pers_review_detail.html:10
 #: manufacturing/templates/pers_reviews_list.html:12
@@ -471,6 +480,7 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/reports_dashboard.html:11
 #: manufacturing/templates/req_detail.html:8
 #: manufacturing/templates/req_list.html:14
+#: manufacturing/templates/retention_policy_edit.html:7
 #: manufacturing/templates/rfq_detail.html:7
 #: manufacturing/templates/rfq_list.html:7
 #: manufacturing/templates/rfq_new.html:7
@@ -514,6 +524,9 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/time_off_detail.html:11
 #: manufacturing/templates/time_off_form.html:8
 #: manufacturing/templates/time_off_list.html:9
+#: manufacturing/templates/webhook_edit.html:7
+#: manufacturing/templates/webhook_list.html:6
+#: manufacturing/templates/webhook_new.html:7
 #: manufacturing/templates/wo_detail.html:12
 #: manufacturing/templates/wo_form.html:8
 #: manufacturing/templates/wo_list.html:11
@@ -638,6 +651,7 @@ msgstr "Nach Namen suchen..."
 #: manufacturing/templates/ats_requisition_list.html:27
 #: manufacturing/templates/coa_list.html:20
 #: manufacturing/templates/cs_list.html:44
+#: manufacturing/templates/data_governance_dashboard.html:41
 #: manufacturing/templates/people_list.html:31
 #: manufacturing/templates/skill_list.html:21
 msgid "Search"
@@ -723,6 +737,8 @@ msgstr "z. B. pro Rüstvorgang, pro Maschinenstunde"
 #: manufacturing/templates/abc_product_output.html:67
 #: manufacturing/templates/ap_invoice_detail.html:196
 #: manufacturing/templates/ap_invoice_payments_kpis.html:6
+#: manufacturing/templates/approval_rule_edit.html:76
+#: manufacturing/templates/approval_rule_new.html:71
 #: manufacturing/templates/ar_invoice_detail.html:196
 #: manufacturing/templates/ar_invoice_payments_kpis.html:6
 #: manufacturing/templates/ats_application_detail.html:46
@@ -783,6 +799,9 @@ msgstr "z. B. pro Rüstvorgang, pro Maschinenstunde"
 #: manufacturing/templates/finance_tax_detail.html:136
 #: manufacturing/templates/finance_tax_detail.html:149
 #: manufacturing/templates/finance_tax_list.html:157
+#: manufacturing/templates/fixed_asset_detail.html:132
+#: manufacturing/templates/fixed_asset_detail.html:285
+#: manufacturing/templates/fixed_asset_list.html:203
 #: manufacturing/templates/gl_accounts.html:109
 #: manufacturing/templates/gl_accounts.html:136
 #: manufacturing/templates/headcount_plan_new.html:45
@@ -859,6 +878,7 @@ msgstr "z. B. pro Rüstvorgang, pro Maschinenstunde"
 #: manufacturing/templates/mkt_research_list.html:165
 #: manufacturing/templates/offboarding_list.html:143
 #: manufacturing/templates/payroll_deductions.html:192
+#: manufacturing/templates/periods.html:70
 #: manufacturing/templates/pers_review_detail.html:94
 #: manufacturing/templates/pers_reviews_list.html:153
 #: manufacturing/templates/pers_training_detail.html:92
@@ -923,6 +943,7 @@ msgstr "Notizen"
 #: manufacturing/templates/qa_ncr_list.html:131
 #: manufacturing/templates/req_detail.html:166
 #: manufacturing/templates/skill_requirements.html:102
+#: manufacturing/templates/webhook_edit.html:54
 msgid "Optional"
 msgstr "Optional"
 
@@ -1316,6 +1337,7 @@ msgstr "Letzte Buchungen"
 #: manufacturing/templates/cs_surveys_detail.html:127
 #: manufacturing/templates/ess_reviews.html:34
 #: manufacturing/templates/finance_dashboard_kpis.html:55
+#: manufacturing/templates/fixed_asset_detail.html:169
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:56
 #: manufacturing/templates/gl_journals.html:59
@@ -1450,6 +1472,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/ap_invoice_detail.html:107
 #: manufacturing/templates/ap_invoice_detail.html:151
 #: manufacturing/templates/ap_list.html:65
+#: manufacturing/templates/approval_rule_list.html:45
 #: manufacturing/templates/ar_invoice_detail.html:107
 #: manufacturing/templates/ar_invoice_detail.html:151
 #: manufacturing/templates/ar_list.html:65
@@ -1491,6 +1514,8 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/cs_surveys_detail.html:97
 #: manufacturing/templates/cs_surveys_list.html:87
 #: manufacturing/templates/cs_surveys_list.html:127
+#: manufacturing/templates/currency_list.html:74
+#: manufacturing/templates/data_governance_dashboard.html:88
 #: manufacturing/templates/employee_gap_detail.html:39
 #: manufacturing/templates/eng_dashboard_kpis.html:15
 #: manufacturing/templates/eng_dashboard_kpis.html:32
@@ -1531,6 +1556,9 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/finance_tax_detail.html:116
 #: manufacturing/templates/finance_tax_list.html:92
 #: manufacturing/templates/finance_tax_list.html:145
+#: manufacturing/templates/fixed_asset_detail.html:120
+#: manufacturing/templates/fixed_asset_detail.html:233
+#: manufacturing/templates/fixed_asset_list.html:113
 #: manufacturing/templates/gl_accounts.html:63
 #: manufacturing/templates/gl_journal_detail.html:60
 #: manufacturing/templates/inventory_list.html:72
@@ -1626,6 +1654,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/payroll_dashboard.html:88
 #: manufacturing/templates/payroll_history.html:39
 #: manufacturing/templates/payroll_run_detail.html:41
+#: manufacturing/templates/periods.html:67
 #: manufacturing/templates/pers_review_detail.html:86
 #: manufacturing/templates/pers_review_detail.html:108
 #: manufacturing/templates/pers_reviews_list.html:84
@@ -1722,6 +1751,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/termination_list.html:133
 #: manufacturing/templates/time_clock_attendance.html:89
 #: manufacturing/templates/time_off_list.html:38
+#: manufacturing/templates/webhook_list.html:43
 #: manufacturing/templates/wms_bin_detail.html:19
 #: manufacturing/templates/wms_bin_list.html:47
 #: manufacturing/templates/wms_pack_station.html:22
@@ -1888,6 +1918,8 @@ msgstr "Rechnungsdetails"
 #: manufacturing/templates/ap_invoice_detail.html:149
 #: manufacturing/templates/ap_list.html:64
 #: manufacturing/templates/ap_list.html:101
+#: manufacturing/templates/fixed_asset_detail.html:261
+#: manufacturing/templates/fixed_asset_list.html:108
 #: manufacturing/templates/it_license_detail.html:64
 #: manufacturing/templates/it_license_detail.html:127
 #: manufacturing/templates/it_license_list.html:62
@@ -1911,6 +1943,7 @@ msgstr "Lieferant"
 #: manufacturing/templates/rfq_detail.html:93
 #: manufacturing/templates/so_detail.html:248
 #: manufacturing/templates/so_form.html:36
+#: manufacturing/templates/user_roles.html:33
 #: manufacturing/templates/wo_form.html:36
 msgid "(none)"
 msgstr "(keine)"
@@ -1973,6 +2006,7 @@ msgid "Exchange Rate"
 msgstr "Wechselkurs"
 
 #: manufacturing/templates/ap_invoice_detail.html:145
+#: manufacturing/templates/approval_rule_edit.html:79
 #: manufacturing/templates/ar_invoice_detail.html:145
 #: manufacturing/templates/credit_account_detail.html:125
 #: manufacturing/templates/credit_collections_detail.html:133
@@ -1989,6 +2023,7 @@ msgstr "Wechselkurs"
 #: manufacturing/templates/finance_bank_rec_detail.html:85
 #: manufacturing/templates/finance_budget_detail.html:85
 #: manufacturing/templates/finance_tax_detail.html:140
+#: manufacturing/templates/fixed_asset_detail.html:289
 #: manufacturing/templates/inventory_detail.html:198
 #: manufacturing/templates/it_asset_detail.html:214
 #: manufacturing/templates/it_incident_detail.html:81
@@ -2022,11 +2057,14 @@ msgstr "Wechselkurs"
 #: manufacturing/templates/qa_capa_detail.html:153
 #: manufacturing/templates/qa_ncr_detail.html:176
 #: manufacturing/templates/qa_supplier_detail.html:129
+#: manufacturing/templates/retention_policy_edit.html:43
 #: manufacturing/templates/sales_contracts_detail.html:134
 #: manufacturing/templates/sales_forecast_detail.html:176
 #: manufacturing/templates/sales_leads_detail.html:107
 #: manufacturing/templates/sales_territories.html:140
 #: manufacturing/templates/tc_device_form.html:192
+#: manufacturing/templates/user_roles.html:55
+#: manufacturing/templates/webhook_edit.html:56
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -2250,6 +2288,7 @@ msgstr "Bis:"
 
 #: manufacturing/templates/ap_list.html:54
 #: manufacturing/templates/ar_list.html:54
+#: manufacturing/templates/audit_log.html:20
 #: manufacturing/templates/credit_account_list.html:68
 #: manufacturing/templates/credit_application_list.html:67
 #: manufacturing/templates/credit_collections_list.html:68
@@ -2265,6 +2304,7 @@ msgstr "Bis:"
 #: manufacturing/templates/finance_bank_rec_list.html:60
 #: manufacturing/templates/finance_budget_list.html:71
 #: manufacturing/templates/finance_tax_list.html:77
+#: manufacturing/templates/fixed_asset_list.html:98
 #: manufacturing/templates/gl_journals.html:50
 #: manufacturing/templates/it_asset_list.html:54
 #: manufacturing/templates/it_incident_list.html:54
@@ -2314,6 +2354,7 @@ msgstr "Filtern"
 
 #: manufacturing/templates/ap_list.html:56
 #: manufacturing/templates/ar_list.html:56
+#: manufacturing/templates/audit_log.html:22
 #: manufacturing/templates/credit_account_list.html:69
 #: manufacturing/templates/credit_application_list.html:68
 #: manufacturing/templates/credit_collections_list.html:69
@@ -2330,6 +2371,7 @@ msgstr "Filtern"
 #: manufacturing/templates/finance_bank_rec_list.html:61
 #: manufacturing/templates/finance_budget_list.html:72
 #: manufacturing/templates/finance_tax_list.html:78
+#: manufacturing/templates/fixed_asset_list.html:99
 #: manufacturing/templates/gl_balance_sheet.html:47
 #: manufacturing/templates/gl_journals.html:52
 #: manufacturing/templates/gl_trial_balance.html:41
@@ -2424,6 +2466,318 @@ msgstr "Gesamt Fakturiert"
 #: manufacturing/templates/ar_list_kpis.html:20
 msgid "Total Invoices"
 msgstr "Rechnungen Gesamt"
+
+#: manufacturing/templates/approval_rule_edit.html:3
+#: manufacturing/templates/approval_rule_edit.html:26
+msgid "Edit Approval Rule"
+msgstr "Genehmigungsregel bearbeiten"
+
+#: manufacturing/templates/approval_rule_edit.html:6
+#: manufacturing/templates/approval_rule_list.html:3
+#: manufacturing/templates/approval_rule_list.html:17
+#: manufacturing/templates/approval_rule_new.html:6
+#: manufacturing/templates/base.html:610
+msgid "Approval Rules"
+msgstr "Genehmigungsregeln"
+
+#: manufacturing/templates/approval_rule_edit.html:27
+#: manufacturing/templates/approval_rule_list.html:60
+#: manufacturing/templates/benefit_plan_detail.html:25
+#: manufacturing/templates/benefits_dashboard.html:85
+#: manufacturing/templates/control_plan_detail.html:30
+#: manufacturing/templates/control_plan_list.html:38
+#: manufacturing/templates/data_governance_dashboard.html:97
+#: manufacturing/templates/finance_bank_rec_detail.html:74
+#: manufacturing/templates/finance_bank_rec_detail.html:94
+#: manufacturing/templates/finance_bank_rec_list.html:71
+#: manufacturing/templates/finance_bank_rec_list.html:83
+#: manufacturing/templates/gl_accounts.html:75
+#: manufacturing/templates/gl_accounts.html:108
+#: manufacturing/templates/it_dashboard.html:37
+#: manufacturing/templates/legal_dashboard.html:63
+#: manufacturing/templates/marketing_dashboard_kpis.html:9
+#: manufacturing/templates/mkt_analytics.html:142
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:66
+#: manufacturing/templates/payroll_deductions.html:121
+#: manufacturing/templates/payroll_deductions.html:189
+#: manufacturing/templates/retention_policy_edit.html:27
+#: manufacturing/templates/sales_commission_plans.html:63
+#: manufacturing/templates/sales_commission_plans.html:76
+#: manufacturing/templates/sales_commission_plans.html:118
+#: manufacturing/templates/webhook_edit.html:30
+#: manufacturing/templates/webhook_list.html:56
+#: manufacturing/templates/wms_bin_detail.html:19
+#: manufacturing/templates/wms_bin_list.html:59
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+#: manufacturing/templates/wms_rfid_reader_list.html:47
+#: manufacturing/templates/wms_warehouse_list.html:36
+#: manufacturing/templates/workforce_analytics.html:57
+msgid "Active"
+msgstr "Aktiv"
+
+#: manufacturing/templates/approval_rule_edit.html:27
+#: manufacturing/templates/approval_rule_list.html:62
+#: manufacturing/templates/benefit_plan_detail.html:27
+#: manufacturing/templates/benefits_dashboard.html:87
+#: manufacturing/templates/currency_list.html:90
+#: manufacturing/templates/data_governance_dashboard.html:97
+#: manufacturing/templates/finance_bank_rec_list.html:85
+#: manufacturing/templates/gl_accounts.html:75
+#: manufacturing/templates/payroll_deductions.html:66
+#: manufacturing/templates/retention_policy_edit.html:27
+#: manufacturing/templates/sales_commission_plans.html:76
+#: manufacturing/templates/webhook_edit.html:30
+#: manufacturing/templates/webhook_list.html:58
+#: manufacturing/templates/wms_bin_detail.html:19
+#: manufacturing/templates/wms_bin_list.html:59
+#: manufacturing/templates/wms_rfid_reader_list.html:47
+#: manufacturing/templates/wms_warehouse_list.html:36
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: manufacturing/templates/approval_rule_edit.html:38
+#: manufacturing/templates/approval_rule_new.html:30
+msgid "Entity Type *"
+msgstr "Entitätstyp *"
+
+#: manufacturing/templates/approval_rule_edit.html:46
+#: manufacturing/templates/approval_rule_list.html:40
+#: manufacturing/templates/approval_rule_new.html:38
+#: manufacturing/templates/ats_application_detail.html:100
+#: manufacturing/templates/ats_dashboard.html:80
+#: manufacturing/templates/ats_requisition_list.html:33
+#: manufacturing/templates/ats_requisition_new.html:33
+#: manufacturing/templates/data_governance_dashboard.html:49
+#: manufacturing/templates/finance_audit_detail.html:74
+#: manufacturing/templates/finance_audit_detail.html:109
+#: manufacturing/templates/finance_audit_detail.html:126
+#: manufacturing/templates/finance_audit_detail.html:167
+#: manufacturing/templates/finance_audit_list.html:86
+#: manufacturing/templates/finance_audit_list.html:130
+#: manufacturing/templates/it_asset_detail.html:99
+#: manufacturing/templates/it_asset_detail.html:162
+#: manufacturing/templates/it_asset_list.html:141
+#: manufacturing/templates/it_dashboard_kpis.html:30
+#: manufacturing/templates/it_task_detail.html:76
+#: manufacturing/templates/it_task_detail.html:110
+#: manufacturing/templates/it_task_list.html:135
+#: manufacturing/templates/it_ticket_detail.html:79
+#: manufacturing/templates/it_ticket_detail.html:145
+#: manufacturing/templates/it_ticket_list.html:113
+#: manufacturing/templates/people_form.html:77
+#: manufacturing/templates/people_list.html:20
+#: manufacturing/templates/people_list.html:49
+#: manufacturing/templates/pers_depts.html:54
+#: manufacturing/templates/pers_depts.html:95
+#: manufacturing/templates/personnel_dashboard.html:122
+#: manufacturing/templates/req_detail.html:70
+#: manufacturing/templates/req_list.html:81
+#: manufacturing/templates/skills_matrix_summary.html:25
+#: manufacturing/templates/tc_ot_report.html:113
+#: manufacturing/templates/termination_detail.html:40
+#: manufacturing/templates/termination_list.html:71
+#: manufacturing/templates/time_clock_attendance.html:85
+#: manufacturing/templates/user_roles.html:22
+#: manufacturing/templates/workforce_analytics.html:57
+#: manufacturing/templates/workforce_analytics.html:91
+msgid "Department"
+msgstr "Abteilung"
+
+#: manufacturing/templates/approval_rule_edit.html:48
+#: manufacturing/templates/approval_rule_new.html:40
+msgid "— All departments —"
+msgstr "— Alle Abteilungen —"
+
+#: manufacturing/templates/approval_rule_edit.html:55
+#: manufacturing/templates/approval_rule_new.html:48
+msgid "Threshold Amount *"
+msgstr "Schwellenbetrag *"
+
+#: manufacturing/templates/approval_rule_edit.html:59
+#: manufacturing/templates/approval_rule_new.html:53
+msgid "Approver Role *"
+msgstr "Genehmigerrolle *"
+
+#: manufacturing/templates/approval_rule_edit.html:61
+#: manufacturing/templates/approval_rule_new.html:55
+msgid "— Select role —"
+msgstr "— Rolle auswählen —"
+
+#: manufacturing/templates/approval_rule_edit.html:68
+#: manufacturing/templates/approval_rule_new.html:62
+msgid "Sequence *"
+msgstr "Reihenfolge *"
+
+#: manufacturing/templates/approval_rule_edit.html:72
+#: manufacturing/templates/approval_rule_new.html:67
+msgid "Escalate After (hours) *"
+msgstr "Eskalieren Nach (Stunden) *"
+
+#: manufacturing/templates/approval_rule_edit.html:77
+#: manufacturing/templates/approval_rule_new.html:72
+#: manufacturing/templates/coa_new.html:48
+#: manufacturing/templates/it_license_list.html:161
+#: manufacturing/templates/it_network_list.html:155
+#: manufacturing/templates/it_repairs_list.html:142
+#: manufacturing/templates/it_software_list.html:130
+#: manufacturing/templates/mkt_ad_list.html:181
+#: manufacturing/templates/mkt_research_list.html:166
+#: manufacturing/templates/sales_commissions.html:238
+msgid "Optional notes"
+msgstr "Optionale Notizen"
+
+#: manufacturing/templates/approval_rule_edit.html:84
+#: manufacturing/templates/retention_policy_edit.html:48
+#: manufacturing/templates/webhook_edit.html:80
+msgid "Danger Zone"
+msgstr "Gefahrenzone"
+
+#: manufacturing/templates/approval_rule_edit.html:86
+msgid "Deactivate this rule?"
+msgstr "Diese Regel deaktivieren?"
+
+#: manufacturing/templates/approval_rule_edit.html:86
+msgid "Activate this rule?"
+msgstr "Diese Regel aktivieren?"
+
+#: manufacturing/templates/approval_rule_edit.html:90
+#: manufacturing/templates/currency_list.html:105
+#: manufacturing/templates/retention_policy_edit.html:54
+#: manufacturing/templates/webhook_edit.html:86
+msgid "Deactivate"
+msgstr "Deaktivieren"
+
+#: manufacturing/templates/approval_rule_edit.html:90
+#: manufacturing/templates/currency_list.html:105
+#: manufacturing/templates/retention_policy_edit.html:54
+#: manufacturing/templates/webhook_edit.html:86
+msgid "Activate"
+msgstr "Aktivieren"
+
+#: manufacturing/templates/approval_rule_edit.html:93
+msgid "Delete this rule permanently? This cannot be undone."
+msgstr "Diese Regel dauerhaft löschen? Dies kann nicht rückgängig gemacht werden."
+
+#: manufacturing/templates/approval_rule_edit.html:96
+#: manufacturing/templates/report_builder_list.html:41
+#: manufacturing/templates/retention_policy_edit.html:60
+#: manufacturing/templates/webhook_edit.html:92
+#: manufacturing/templates/wms_putaway_rule_list.html:60
+msgid "Delete"
+msgstr "Löschen"
+
+#: manufacturing/templates/approval_rule_edit.html:100
+msgid ""
+"Deleting fails if approval steps have already been created against this rule "
+"—\n"
+"            deactivate it instead to stop it from applying to new entities."
+msgstr "Das Löschen schlägt fehl, wenn für diese Regel bereits Genehmigungsschritte erstellt wurden —\n            deaktivieren Sie sie stattdessen, damit sie nicht mehr auf neue Entitäten angewendet wird."
+
+#: manufacturing/templates/approval_rule_list.html:7
+msgid "New Rule"
+msgstr "Neue Regel"
+
+#: manufacturing/templates/approval_rule_list.html:19
+msgid ""
+"Rules determine who must sign off on purchase orders, requisitions, GL "
+"journals,\n"
+"        cycle counts, and documents — and in what order. A rule applies once "
+"the entity's\n"
+"        amount meets its threshold; leave department blank to apply it to "
+"every department."
+msgstr "Regeln legen fest, wer Bestellungen, Anforderungen, GL-Buchungen,\n        Zykluszählungen und Dokumente freigeben muss — und in welcher Reihenfolge. Eine Regel gilt, sobald der Betrag\n        der Entität ihren Schwellenwert erreicht; lassen Sie die Abteilung leer, um sie auf alle Abteilungen anzuwenden."
+
+#: manufacturing/templates/approval_rule_list.html:25
+msgid "Filter by type:"
+msgstr "Nach Typ filtern:"
+
+#: manufacturing/templates/approval_rule_list.html:27
+msgid "All types"
+msgstr "Alle Typen"
+
+#: manufacturing/templates/approval_rule_list.html:39
+msgid "Entity Type"
+msgstr "Entitätstyp"
+
+#: manufacturing/templates/approval_rule_list.html:41
+msgid "Threshold"
+msgstr "Schwellenwert"
+
+#: manufacturing/templates/approval_rule_list.html:42
+msgid "Approver Role"
+msgstr "Genehmigerrolle"
+
+#: manufacturing/templates/approval_rule_list.html:43
+#: manufacturing/templates/control_plan_detail.html:64
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wo_detail.html:225
+msgid "Seq"
+msgstr "Nr."
+
+#: manufacturing/templates/approval_rule_list.html:44
+msgid "Escalate After"
+msgstr "Eskalieren Nach"
+
+#: manufacturing/templates/approval_rule_list.html:53
+msgid "— All —"
+msgstr "— Alle —"
+
+#: manufacturing/templates/approval_rule_list.html:65
+#: manufacturing/templates/bom_detail.html:177
+#: manufacturing/templates/data_governance_dashboard.html:99
+#: manufacturing/templates/eng_project_detail.html:142
+#: manufacturing/templates/gl_accounts.html:64
+#: manufacturing/templates/gl_accounts.html:79
+#: manufacturing/templates/it_software_detail.html:94
+#: manufacturing/templates/payroll_pay_rates.html:65
+#: manufacturing/templates/payroll_pay_rates.html:87
+#: manufacturing/templates/people_detail.html:8
+#: manufacturing/templates/po_detail.html:8
+#: manufacturing/templates/report_builder_detail.html:7
+#: manufacturing/templates/report_builder_list.html:37
+#: manufacturing/templates/sales_commission_plans.html:82
+#: manufacturing/templates/sales_commissions.html:134
+#: manufacturing/templates/sales_quotes.html:84
+#: manufacturing/templates/sales_targets.html:106
+#: manufacturing/templates/sales_territories.html:96
+#: manufacturing/templates/so_detail.html:8
+#: manufacturing/templates/tc_device_list.html:72
+#: manufacturing/templates/webhook_list.html:62
+#: manufacturing/templates/wo_detail.html:8
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: manufacturing/templates/approval_rule_list.html:74
+#, python-format
+msgid "No approval rules configured for %(entity_type)s."
+msgstr "Keine Genehmigungsregeln für %(entity_type)s konfiguriert."
+
+#: manufacturing/templates/approval_rule_list.html:76
+msgid "No approval rules configured."
+msgstr "Keine Genehmigungsregeln konfiguriert."
+
+#: manufacturing/templates/approval_rule_new.html:3
+#: manufacturing/templates/approval_rule_new.html:22
+msgid "New Approval Rule"
+msgstr "Neue Genehmigungsregel"
+
+#: manufacturing/templates/approval_rule_new.html:45
+msgid ""
+"Leave as \"All departments\" unless this rule should only fire for one dept."
+msgstr "Belassen Sie es bei \"Alle Abteilungen\", es sei denn, diese Regel soll nur für eine Abteilung gelten."
+
+#: manufacturing/templates/approval_rule_new.html:50
+msgid "Rule applies once the entity's amount is greater than or equal to this."
+msgstr "Die Regel gilt, sobald der Betrag der Entität diesen Wert erreicht oder übersteigt."
+
+#: manufacturing/templates/approval_rule_new.html:64
+msgid "Lower sequence numbers must be decided first."
+msgstr "Niedrigere Reihenfolgenummern müssen zuerst entschieden werden."
+
+#: manufacturing/templates/approval_rule_new.html:74
+msgid "Create Rule"
+msgstr "Regel erstellen"
 
 #: manufacturing/templates/ar_invoice_detail.html:3
 #, python-format
@@ -2601,44 +2955,6 @@ msgstr ""
 msgid "Hire Date *"
 msgstr "Einstellungsdatum *"
 
-#: manufacturing/templates/ats_application_detail.html:100
-#: manufacturing/templates/ats_dashboard.html:80
-#: manufacturing/templates/ats_requisition_list.html:33
-#: manufacturing/templates/ats_requisition_new.html:33
-#: manufacturing/templates/finance_audit_detail.html:74
-#: manufacturing/templates/finance_audit_detail.html:109
-#: manufacturing/templates/finance_audit_detail.html:126
-#: manufacturing/templates/finance_audit_detail.html:167
-#: manufacturing/templates/finance_audit_list.html:86
-#: manufacturing/templates/finance_audit_list.html:130
-#: manufacturing/templates/it_asset_detail.html:99
-#: manufacturing/templates/it_asset_detail.html:162
-#: manufacturing/templates/it_asset_list.html:141
-#: manufacturing/templates/it_dashboard_kpis.html:30
-#: manufacturing/templates/it_task_detail.html:76
-#: manufacturing/templates/it_task_detail.html:110
-#: manufacturing/templates/it_task_list.html:135
-#: manufacturing/templates/it_ticket_detail.html:79
-#: manufacturing/templates/it_ticket_detail.html:145
-#: manufacturing/templates/it_ticket_list.html:113
-#: manufacturing/templates/people_form.html:77
-#: manufacturing/templates/people_list.html:20
-#: manufacturing/templates/people_list.html:49
-#: manufacturing/templates/pers_depts.html:54
-#: manufacturing/templates/pers_depts.html:95
-#: manufacturing/templates/personnel_dashboard.html:122
-#: manufacturing/templates/req_detail.html:70
-#: manufacturing/templates/req_list.html:81
-#: manufacturing/templates/skills_matrix_summary.html:25
-#: manufacturing/templates/tc_ot_report.html:113
-#: manufacturing/templates/termination_detail.html:40
-#: manufacturing/templates/termination_list.html:71
-#: manufacturing/templates/time_clock_attendance.html:85
-#: manufacturing/templates/workforce_analytics.html:57
-#: manufacturing/templates/workforce_analytics.html:91
-msgid "Department"
-msgstr "Abteilung"
-
 #: manufacturing/templates/ats_application_detail.html:109
 #: manufacturing/templates/people_form.html:72
 #: manufacturing/templates/people_list.html:51
@@ -2733,7 +3049,14 @@ msgstr "Name oder E-Mail suchen..."
 #: manufacturing/templates/compliance_checklist_list.html:27
 #: manufacturing/templates/compliance_template_list.html:27
 #: manufacturing/templates/control_plan_list.html:23
+#: manufacturing/templates/currency_list.html:71
+#: manufacturing/templates/currency_list.html:129
+#: manufacturing/templates/data_governance_dashboard.html:49
+#: manufacturing/templates/data_governance_dashboard.html:88
 #: manufacturing/templates/ess_profile.html:66
+#: manufacturing/templates/fixed_asset_detail.html:118
+#: manufacturing/templates/fixed_asset_detail.html:221
+#: manufacturing/templates/fixed_asset_list.html:106
 #: manufacturing/templates/inventory_detail.html:152
 #: manufacturing/templates/it_task_detail.html:106
 #: manufacturing/templates/maint_equipment_list.html:78
@@ -2753,6 +3076,7 @@ msgstr "Name oder E-Mail suchen..."
 #: manufacturing/templates/report_builder_list.html:20
 #: manufacturing/templates/skill_list.html:29
 #: manufacturing/templates/tc_device_list.html:40
+#: manufacturing/templates/user_roles.html:20
 #: manufacturing/templates/wms_bin_new.html:27
 #: manufacturing/templates/wms_warehouse_list.html:21
 #: manufacturing/templates/wms_warehouse_list.html:29
@@ -2762,6 +3086,7 @@ msgstr "Name"
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/ats_candidate_new.html:37
 #: manufacturing/templates/credit_account_detail.html:78
+#: manufacturing/templates/data_governance_dashboard.html:49
 #: manufacturing/templates/home.html:18
 #: manufacturing/templates/mkt_lead_detail.html:68
 #: manufacturing/templates/mkt_lead_detail.html:103
@@ -2774,6 +3099,7 @@ msgstr "Name"
 #: manufacturing/templates/portal_register.html:15
 #: manufacturing/templates/supplier_portal_login.html:18
 #: manufacturing/templates/supplier_portal_register.html:15
+#: manufacturing/templates/user_roles.html:21
 msgid "Email"
 msgstr "E-Mail"
 
@@ -2973,6 +3299,7 @@ msgstr "Nicht Zugewiesen"
 #: manufacturing/templates/it_dashboard_kpis.html:5
 #: manufacturing/templates/it_incident_list.html:85
 #: manufacturing/templates/legal_dashboard.html:95
+#: manufacturing/templates/periods.html:82
 #: manufacturing/templates/qa_inspection_detail.html:202
 #: manufacturing/templates/reports_dashboard.html:233
 #: manufacturing/templates/rfq_detail.html:38
@@ -3029,6 +3356,7 @@ msgstr "Titel suchen..."
 #: manufacturing/templates/finance_audit_list.html:64
 #: manufacturing/templates/finance_budget_list.html:64
 #: manufacturing/templates/finance_tax_list.html:65
+#: manufacturing/templates/fixed_asset_list.html:93
 #: manufacturing/templates/it_asset_list.html:41
 #: manufacturing/templates/it_incident_list.html:41
 #: manufacturing/templates/it_license_list.html:45
@@ -3101,6 +3429,112 @@ msgstr "z. B. Schweißer II"
 #: manufacturing/templates/req_list.html:123
 msgid "Create Requisition"
 msgstr "Anforderung Erstellen"
+
+#: manufacturing/templates/audit_log.html:3
+msgid "Audit Log — Manufacturing System"
+msgstr "Audit-Protokoll — Fertigungssystem"
+
+#: manufacturing/templates/audit_log.html:7
+#: manufacturing/templates/base.html:601
+#: manufacturing/templates/dashboard.html:9
+#: manufacturing/templates/periods.html:7
+msgid "Audit Log"
+msgstr "Prüfprotokoll"
+
+#: manufacturing/templates/audit_log.html:10
+msgid "Table:"
+msgstr "Tabelle:"
+
+#: manufacturing/templates/audit_log.html:12
+msgid "All tables"
+msgstr "Alle Tabellen"
+
+#: manufacturing/templates/audit_log.html:17
+msgid "User:"
+msgstr "Benutzer:"
+
+#: manufacturing/templates/audit_log.html:18
+msgid "email fragment"
+msgstr "E-Mail-Fragment"
+
+#: manufacturing/templates/audit_log.html:30
+#: manufacturing/templates/data_governance_dashboard.html:130
+#: manufacturing/templates/tc_device_form.html:221
+msgid "When"
+msgstr "Wann"
+
+#: manufacturing/templates/audit_log.html:31
+#: manufacturing/templates/report_builder_detail.html:32
+#: manufacturing/templates/report_builder_form.html:41
+#: manufacturing/templates/report_builder_list.html:21
+msgid "Table"
+msgstr "Tabelle"
+
+#: manufacturing/templates/audit_log.html:32
+#: manufacturing/templates/inventory_detail.html:130
+msgid "Record"
+msgstr "Erfassen"
+
+#: manufacturing/templates/audit_log.html:33
+#: manufacturing/templates/mrp_plan.html:79
+msgid "Action"
+msgstr "Aktion"
+
+#: manufacturing/templates/audit_log.html:34
+msgid "Changed by"
+msgstr "Geändert von"
+
+#: manufacturing/templates/audit_log.html:57
+#: manufacturing/templates/payroll_dashboard.html:8
+#: manufacturing/templates/payroll_deductions.html:8
+#: manufacturing/templates/payroll_pay_rates.html:8
+#: manufacturing/templates/payroll_ytd.html:7
+#: manufacturing/templates/people_detail.html:12
+#: manufacturing/templates/po_detail.html:10
+#: manufacturing/templates/so_detail.html:10
+#: manufacturing/templates/time_off_detail.html:9
+#: manufacturing/templates/wo_detail.html:10
+msgid "History"
+msgstr "Historie"
+
+#: manufacturing/templates/audit_log.html:61
+msgid "No audit entries found."
+msgstr "Keine Audit-Einträge gefunden."
+
+#: manufacturing/templates/audit_record.html:3
+#, python-format
+msgid "%(table_name)s #%(record_id)s History — Manufacturing System"
+msgstr "%(table_name)s #%(record_id)s Verlauf — Fertigungssystem"
+
+#: manufacturing/templates/audit_record.html:63
+#, python-format
+msgid "%(table_name)s #%(record_id)s — Change History"
+msgstr "%(table_name)s #%(record_id)s — Änderungsverlauf"
+
+#: manufacturing/templates/audit_record.html:66
+msgid "Back to audit log"
+msgstr "Zurück zum Audit-Protokoll"
+
+#: manufacturing/templates/audit_record.html:77
+#, python-format
+msgid "by %(by)s"
+msgstr "von %(by)s"
+
+#: manufacturing/templates/audit_record.html:79
+msgid "by unknown"
+msgstr "von unbekannt"
+
+#: manufacturing/templates/audit_record.html:85
+msgid "Before"
+msgstr "Vorher"
+
+#: manufacturing/templates/audit_record.html:93
+msgid "After"
+msgstr "Nachher"
+
+#: manufacturing/templates/audit_record.html:103
+msgid "No history found for this record."
+msgstr "Kein Verlauf für diesen Datensatz gefunden."
 
 #: manufacturing/templates/base.html:439
 msgid "Toggle menu"
@@ -3361,28 +3795,29 @@ msgstr "Verwaltung"
 msgid "User Roles"
 msgstr "Benutzerrollen"
 
-#: manufacturing/templates/base.html:601
-#: manufacturing/templates/dashboard.html:9
-msgid "Audit Log"
-msgstr "Prüfprotokoll"
-
 #: manufacturing/templates/base.html:604
+#: manufacturing/templates/fixed_asset_detail.html:7
+#: manufacturing/templates/fixed_asset_list.html:3
+#: manufacturing/templates/fixed_asset_list.html:7
+#: manufacturing/templates/fixed_asset_list.html:53
 msgid "Fixed Assets"
 msgstr "Anlagevermögen"
 
 #: manufacturing/templates/base.html:607
+#: manufacturing/templates/currency_list.html:7
 msgid "Currencies"
 msgstr "Währungen"
 
-#: manufacturing/templates/base.html:610
-msgid "Approval Rules"
-msgstr "Genehmigungsregeln"
-
 #: manufacturing/templates/base.html:613
+#: manufacturing/templates/webhook_edit.html:6
+#: manufacturing/templates/webhook_new.html:6
 msgid "Webhooks"
 msgstr "Webhooks"
 
 #: manufacturing/templates/base.html:616
+#: manufacturing/templates/data_governance_dashboard.html:3
+#: manufacturing/templates/data_governance_dashboard.html:25
+#: manufacturing/templates/retention_policy_edit.html:6
 msgid "Data Governance"
 msgstr "Datenverwaltung"
 
@@ -3472,49 +3907,6 @@ msgstr "Angebotsanfragen"
 #: manufacturing/templates/personnel_dashboard.html:57
 msgid "Benefits"
 msgstr "Sozialleistungen"
-
-#: manufacturing/templates/benefit_plan_detail.html:25
-#: manufacturing/templates/benefits_dashboard.html:85
-#: manufacturing/templates/control_plan_detail.html:30
-#: manufacturing/templates/control_plan_list.html:38
-#: manufacturing/templates/finance_bank_rec_detail.html:74
-#: manufacturing/templates/finance_bank_rec_detail.html:94
-#: manufacturing/templates/finance_bank_rec_list.html:71
-#: manufacturing/templates/finance_bank_rec_list.html:83
-#: manufacturing/templates/gl_accounts.html:75
-#: manufacturing/templates/gl_accounts.html:108
-#: manufacturing/templates/it_dashboard.html:37
-#: manufacturing/templates/legal_dashboard.html:63
-#: manufacturing/templates/marketing_dashboard_kpis.html:9
-#: manufacturing/templates/mkt_analytics.html:142
-#: manufacturing/templates/payroll_deductions.html:56
-#: manufacturing/templates/payroll_deductions.html:66
-#: manufacturing/templates/payroll_deductions.html:121
-#: manufacturing/templates/payroll_deductions.html:189
-#: manufacturing/templates/sales_commission_plans.html:63
-#: manufacturing/templates/sales_commission_plans.html:76
-#: manufacturing/templates/sales_commission_plans.html:118
-#: manufacturing/templates/wms_bin_detail.html:19
-#: manufacturing/templates/wms_bin_list.html:59
-#: manufacturing/templates/wms_putaway_rule_list.html:44
-#: manufacturing/templates/wms_rfid_reader_list.html:47
-#: manufacturing/templates/wms_warehouse_list.html:36
-#: manufacturing/templates/workforce_analytics.html:57
-msgid "Active"
-msgstr "Aktiv"
-
-#: manufacturing/templates/benefit_plan_detail.html:27
-#: manufacturing/templates/benefits_dashboard.html:87
-#: manufacturing/templates/finance_bank_rec_list.html:85
-#: manufacturing/templates/gl_accounts.html:75
-#: manufacturing/templates/payroll_deductions.html:66
-#: manufacturing/templates/sales_commission_plans.html:76
-#: manufacturing/templates/wms_bin_detail.html:19
-#: manufacturing/templates/wms_bin_list.html:59
-#: manufacturing/templates/wms_rfid_reader_list.html:47
-#: manufacturing/templates/wms_warehouse_list.html:36
-msgid "Inactive"
-msgstr "Inaktiv"
 
 #: manufacturing/templates/benefit_plan_detail.html:35
 msgid "Plan Details"
@@ -3704,6 +4096,8 @@ msgstr "Pläne"
 #: manufacturing/templates/ess_trainings.html:33
 #: manufacturing/templates/finance_audit_detail.html:108
 #: manufacturing/templates/finance_audit_list.html:85
+#: manufacturing/templates/fixed_asset_detail.html:119
+#: manufacturing/templates/fixed_asset_list.html:107
 #: manufacturing/templates/gl_accounts.html:62
 #: manufacturing/templates/gl_accounts.html:102
 #: manufacturing/templates/gl_accounts.html:130
@@ -4417,28 +4811,6 @@ msgstr "Menge / Einheit"
 msgid "Scrap %%"
 msgstr "Ausschuss %%"
 
-#: manufacturing/templates/bom_detail.html:177
-#: manufacturing/templates/eng_project_detail.html:142
-#: manufacturing/templates/gl_accounts.html:64
-#: manufacturing/templates/gl_accounts.html:79
-#: manufacturing/templates/it_software_detail.html:94
-#: manufacturing/templates/payroll_pay_rates.html:65
-#: manufacturing/templates/payroll_pay_rates.html:87
-#: manufacturing/templates/people_detail.html:8
-#: manufacturing/templates/po_detail.html:8
-#: manufacturing/templates/report_builder_detail.html:7
-#: manufacturing/templates/report_builder_list.html:37
-#: manufacturing/templates/sales_commission_plans.html:82
-#: manufacturing/templates/sales_commissions.html:134
-#: manufacturing/templates/sales_quotes.html:84
-#: manufacturing/templates/sales_targets.html:106
-#: manufacturing/templates/sales_territories.html:96
-#: manufacturing/templates/so_detail.html:8
-#: manufacturing/templates/tc_device_list.html:72
-#: manufacturing/templates/wo_detail.html:8
-msgid "Edit"
-msgstr "Bearbeiten"
-
 #: manufacturing/templates/bom_detail.html:196
 #, python-format
 msgid "Remove %(name)s from this BOM?"
@@ -4508,7 +4880,11 @@ msgid ""
 "All components needed at every level to build\n"
 "        <strong style=\"color:var(--text);\">%(q)s %(uom)s</strong>\n"
 "        of <strong style=\"color:var(--text);\">%(name)s</strong>."
-msgstr "Alle Komponenten, die auf jeder Ebene benötigt werden, um\n        <strong style=\"color:var(--text);\">%(q)s %(uom)s</strong>\n        von <strong style=\"color:var(--text);\">%(name)s</strong> zu fertigen."
+msgstr ""
+"Alle Komponenten, die auf jeder Ebene benötigt werden, um\n"
+"        <strong style=\"color:var(--text);\">%(q)s %(uom)s</strong>\n"
+"        von <strong style=\"color:var(--text);\">%(name)s</strong> zu "
+"fertigen."
 
 #: manufacturing/templates/bom_explode.html:46
 msgid "Build quantity:"
@@ -4762,17 +5138,6 @@ msgstr "— Los Auswählen —"
 #: manufacturing/templates/coa_new.html:44
 msgid "Inspector / QA signatory"
 msgstr "Prüfer / QS-Unterzeichner"
-
-#: manufacturing/templates/coa_new.html:48
-#: manufacturing/templates/it_license_list.html:161
-#: manufacturing/templates/it_network_list.html:155
-#: manufacturing/templates/it_repairs_list.html:142
-#: manufacturing/templates/it_software_list.html:130
-#: manufacturing/templates/mkt_ad_list.html:181
-#: manufacturing/templates/mkt_research_list.html:166
-#: manufacturing/templates/sales_commissions.html:238
-msgid "Optional notes"
-msgstr "Optionale Notizen"
 
 #: manufacturing/templates/coa_new.html:50
 msgid "Generate Certificate"
@@ -5077,12 +5442,6 @@ msgstr "Ersetzt"
 msgid "Characteristics &amp; FMEA"
 msgstr "Merkmale und FMEA"
 
-#: manufacturing/templates/control_plan_detail.html:64
-#: manufacturing/templates/wms_pick_list_detail.html:37
-#: manufacturing/templates/wo_detail.html:225
-msgid "Seq"
-msgstr "Nr."
-
 #: manufacturing/templates/control_plan_detail.html:66
 msgid "Spec"
 msgstr "Spez."
@@ -5270,6 +5629,7 @@ msgstr "Limit"
 #: manufacturing/templates/cs_returns_detail.html:121
 #: manufacturing/templates/cs_returns_list.html:80
 #: manufacturing/templates/cs_returns_list.html:113
+#: manufacturing/templates/data_governance_dashboard.html:130
 #: manufacturing/templates/maint_downtime_detail.html:118
 #: manufacturing/templates/maint_downtime_list.html:78
 #: manufacturing/templates/maint_downtime_list.html:129
@@ -5734,6 +6094,7 @@ msgstr "Problem"
 #: manufacturing/templates/cs_list.html:81
 #: manufacturing/templates/legal_dashboard.html:99
 #: manufacturing/templates/legal_employment_list.html:76
+#: manufacturing/templates/periods.html:80
 #: manufacturing/templates/reports_dashboard.html:237
 #: manufacturing/templates/rfq_detail.html:36
 #: manufacturing/templates/rfq_list.html:23
@@ -6338,6 +6699,7 @@ msgstr "Erstattungsbetrag"
 #: manufacturing/templates/purch_contract_detail.html:130
 #: manufacturing/templates/rfq_list.html:34
 #: manufacturing/templates/sales_order_detail.html:68
+#: manufacturing/templates/webhook_list.html:44
 msgid "Created By"
 msgstr "Erstellt von"
 
@@ -6389,6 +6751,8 @@ msgstr "Ø Bewertung"
 #: manufacturing/templates/finance_tax_list.html:133
 #: manufacturing/templates/payroll_dashboard.html:87
 #: manufacturing/templates/payroll_history.html:37
+#: manufacturing/templates/periods.html:28
+#: manufacturing/templates/periods.html:66
 #: manufacturing/templates/sales_commission_history.html:57
 #: manufacturing/templates/sales_commissions.html:111
 #: manufacturing/templates/sales_commissions.html:158
@@ -6453,6 +6817,7 @@ msgstr "Umfragen & Feedback"
 #: manufacturing/templates/cs_surveys_list.html:67
 #: manufacturing/templates/finance_audit_list.html:70
 #: manufacturing/templates/finance_tax_list.html:71
+#: manufacturing/templates/fixed_asset_list.html:87
 #: manufacturing/templates/it_asset_list.html:47
 #: manufacturing/templates/it_network_list.html:52
 #: manufacturing/templates/legal_contract_list.html:74
@@ -6486,6 +6851,102 @@ msgstr "Umfragebeschreibung…"
 #: manufacturing/templates/cs_surveys_list.html:147
 msgid "Create Survey"
 msgstr "Umfrage erstellen"
+
+#: manufacturing/templates/currency_list.html:3
+#: manufacturing/templates/currency_list.html:45
+msgid "Currency Management"
+msgstr "Währungsverwaltung"
+
+#: manufacturing/templates/currency_list.html:52
+msgid "Base Currency"
+msgstr "Basiswährung"
+
+#: manufacturing/templates/currency_list.html:56
+#: manufacturing/templates/currency_list.html:66
+msgid "Active Currencies"
+msgstr "Aktive Währungen"
+
+#: manufacturing/templates/currency_list.html:60
+msgid "Usage"
+msgstr "Verwendung"
+
+#: manufacturing/templates/currency_list.html:70
+#: manufacturing/templates/wms_bin_new.html:26
+#: manufacturing/templates/wms_warehouse_list.html:20
+#: manufacturing/templates/wms_warehouse_list.html:29
+msgid "Code"
+msgstr "Code"
+
+#: manufacturing/templates/currency_list.html:72
+#: manufacturing/templates/currency_list.html:133
+msgid "Symbol"
+msgstr "Symbol"
+
+#: manufacturing/templates/currency_list.html:73
+#: manufacturing/templates/currency_list.html:137
+msgid "Rate to Base"
+msgstr "Kurs zur Basiswährung"
+
+#: manufacturing/templates/currency_list.html:75
+msgid "Updated"
+msgstr "Aktualisiert"
+
+#: manufacturing/templates/currency_list.html:89
+msgid "Base"
+msgstr "Basis"
+
+#: manufacturing/templates/currency_list.html:112
+msgid "No currencies configured."
+msgstr "Keine Währungen konfiguriert."
+
+#: manufacturing/templates/currency_list.html:120
+msgid "Add / Update Currency"
+msgstr "Währung hinzufügen / aktualisieren"
+
+#: manufacturing/templates/currency_list.html:125
+msgid "Code (e.g. EUR)"
+msgstr "Code (z. B. EUR)"
+
+#: manufacturing/templates/currency_list.html:141
+msgid "Set as Base?"
+msgstr "Als Basis festlegen?"
+
+#: manufacturing/templates/currency_list.html:143
+#: manufacturing/templates/currency_list.html:151
+#: manufacturing/templates/finance_bank_rec_detail.html:77
+#: manufacturing/templates/finance_bank_rec_detail.html:94
+#: manufacturing/templates/gl_dashboard_kpis.html:58
+#: manufacturing/templates/payroll_deductions.html:64
+#: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/wms_putaway_rule_list.html:53
+msgid "No"
+msgstr "Nein"
+
+#: manufacturing/templates/currency_list.html:144
+msgid "Yes (make base)"
+msgstr "Ja (als Basis festlegen)"
+
+#: manufacturing/templates/currency_list.html:148
+msgid "Active?"
+msgstr "Aktiv?"
+
+#: manufacturing/templates/currency_list.html:150
+#: manufacturing/templates/finance_bank_rec_detail.html:76
+#: manufacturing/templates/finance_bank_rec_detail.html:94
+#: manufacturing/templates/gl_dashboard_kpis.html:58
+#: manufacturing/templates/payroll_deductions.html:64
+#: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/wms_putaway_rule_list.html:53
+msgid "Yes"
+msgstr "Ja"
+
+#: manufacturing/templates/currency_list.html:155
+msgid "Save Currency"
+msgstr "Währung speichern"
+
+#: manufacturing/templates/currency_list.html:160
+msgid "Quick-add:"
+msgstr "Schnellhinzufügen:"
 
 #: manufacturing/templates/dashboard.html:4 manufacturing/templates/home.html:4
 #: manufacturing/templates/portal_login.html:4
@@ -6568,6 +7029,111 @@ msgstr "%(zero)s bei null"
 #: manufacturing/templates/finance_dashboard_kpis.html:37
 msgid "Cash Position"
 msgstr "Liquiditätsposition"
+
+#: manufacturing/templates/data_governance_dashboard.html:27
+msgid ""
+"Right-to-erasure (anonymization), subject-access export, and automatic "
+"retention\n"
+"        policies for employee PII. Erasure overwrites a person's name/"
+"address/contact/email\n"
+"        with placeholders and revokes their login — it does not delete their "
+"time clock,\n"
+"        payroll, or review history, which this app must keep for financial/"
+"operational\n"
+"        recordkeeping."
+msgstr "Recht auf Löschung (Anonymisierung), Auskunftsexport und automatische Aufbewahrungsrichtlinien\n        für Mitarbeiter-PII. Die Löschung überschreibt Name, Adresse,\n        Kontaktdaten und E-Mail einer Person durch Platzhalter\n        und entzieht den Zugang — die Zeiterfassungs-, Lohn- oder\n        Beurteilungshistorie wird nicht gelöscht, da diese App sie aus finanziellen/betrieblichen Gründen aufbewahren muss."
+
+#: manufacturing/templates/data_governance_dashboard.html:38
+msgid "Find a Person"
+msgstr "Person suchen"
+
+#: manufacturing/templates/data_governance_dashboard.html:40
+msgid "Search by name or email…"
+msgstr "Suche nach Name oder E-Mail…"
+
+#: manufacturing/templates/data_governance_dashboard.html:58
+msgid "Export Data"
+msgstr "Daten exportieren"
+
+#: manufacturing/templates/data_governance_dashboard.html:59
+#, python-format
+msgid ""
+"Anonymize %(first)s %(last)s? This overwrites their name/address/email/phone "
+"with placeholders and revokes login access. This cannot be undone."
+msgstr "%(first)s %(last)s anonymisieren? Dies überschreibt Name/Adresse/E-Mail/Telefon der Person durch Platzhalter und entzieht den Zugang. Dies kann nicht rückgängig gemacht werden."
+
+#: manufacturing/templates/data_governance_dashboard.html:64
+msgid "Erase"
+msgstr "Löschen"
+
+#: manufacturing/templates/data_governance_dashboard.html:73
+#, python-format
+msgid "No matches for \"%(search)s\"."
+msgstr "Keine Treffer für \"%(search)s\"."
+
+#: manufacturing/templates/data_governance_dashboard.html:79
+msgid "Retention Policies"
+msgstr "Aufbewahrungsrichtlinien"
+
+#: manufacturing/templates/data_governance_dashboard.html:81
+msgid ""
+"Automatically anonymizes terminated employees once their termination date is "
+"older\n"
+"            than the policy's cutoff. Run via <code>python manage.py "
+"run_data_retention</code>."
+msgstr "Anonymisiert automatisch ausgeschiedene Mitarbeiter, sobald deren Austrittsdatum\n            älter als der Stichtag der Richtlinie ist. Ausführen mit <code>python manage.py run_data_retention</code>."
+
+#: manufacturing/templates/data_governance_dashboard.html:88
+msgid "Months After Termination"
+msgstr "Monate nach Austritt"
+
+#: manufacturing/templates/data_governance_dashboard.html:88
+msgid "Candidates Now"
+msgstr "Aktuelle Kandidaten"
+
+#: manufacturing/templates/data_governance_dashboard.html:106
+msgid "No retention policies configured."
+msgstr "Keine Aufbewahrungsrichtlinien konfiguriert."
+
+#: manufacturing/templates/data_governance_dashboard.html:113
+#: manufacturing/templates/retention_policy_edit.html:35
+msgid "Policy Name *"
+msgstr "Richtlinienname *"
+
+#: manufacturing/templates/data_governance_dashboard.html:114
+msgid "e.g. Terminated employees, 7 years"
+msgstr "z. B. Ausgeschiedene Mitarbeiter, 7 Jahre"
+
+#: manufacturing/templates/data_governance_dashboard.html:117
+#: manufacturing/templates/retention_policy_edit.html:39
+msgid "Months After Termination *"
+msgstr "Monate nach Austritt *"
+
+#: manufacturing/templates/data_governance_dashboard.html:120
+msgid "Add Policy"
+msgstr "Richtlinie hinzufügen"
+
+#: manufacturing/templates/data_governance_dashboard.html:125
+msgid "Erasure Log"
+msgstr "Löschprotokoll"
+
+#: manufacturing/templates/data_governance_dashboard.html:130
+#: manufacturing/templates/prod_labor_report.html:125
+msgid "Person"
+msgstr "Person"
+
+#: manufacturing/templates/data_governance_dashboard.html:130
+msgid "Performed By"
+msgstr "Durchgeführt von"
+
+#: manufacturing/templates/data_governance_dashboard.html:135
+#, python-format
+msgid "%(name)s (id %(pid)s)"
+msgstr "%(name)s (ID %(pid)s)"
+
+#: manufacturing/templates/data_governance_dashboard.html:145
+msgid "No erasures recorded yet."
+msgstr "Noch keine Löschungen erfasst."
 
 #: manufacturing/templates/employee_benefits.html:3
 #: manufacturing/templates/employee_benefits.html:19
@@ -7017,6 +7583,9 @@ msgstr "Aufgabe"
 #: manufacturing/templates/eng_task_detail.html:117
 #: manufacturing/templates/eng_tasks_list.html:91
 #: manufacturing/templates/eng_tasks_list.html:134
+#: manufacturing/templates/fixed_asset_detail.html:124
+#: manufacturing/templates/fixed_asset_detail.html:277
+#: manufacturing/templates/fixed_asset_list.html:199
 #: manufacturing/templates/it_asset_detail.html:95
 #: manufacturing/templates/it_asset_detail.html:158
 #: manufacturing/templates/it_asset_list.html:67
@@ -8118,24 +8687,6 @@ msgstr "Kontonummer"
 msgid "Routing Number"
 msgstr "Bankleitzahl"
 
-#: manufacturing/templates/finance_bank_rec_detail.html:76
-#: manufacturing/templates/finance_bank_rec_detail.html:94
-#: manufacturing/templates/gl_dashboard_kpis.html:58
-#: manufacturing/templates/payroll_deductions.html:64
-#: manufacturing/templates/payroll_deductions.html:132
-#: manufacturing/templates/wms_putaway_rule_list.html:53
-msgid "Yes"
-msgstr "Ja"
-
-#: manufacturing/templates/finance_bank_rec_detail.html:77
-#: manufacturing/templates/finance_bank_rec_detail.html:94
-#: manufacturing/templates/gl_dashboard_kpis.html:58
-#: manufacturing/templates/payroll_deductions.html:64
-#: manufacturing/templates/payroll_deductions.html:132
-#: manufacturing/templates/wms_putaway_rule_list.html:53
-msgid "No"
-msgstr "Nein"
-
 #: manufacturing/templates/finance_bank_rec_detail.html:91
 #: manufacturing/templates/finance_bank_rec_list.html:69
 msgid "Bank"
@@ -8472,6 +9023,387 @@ msgstr "z. B. Q1 2026, GJ2025"
 msgid "Create Filing"
 msgstr "Erklärung Erstellen"
 
+#: manufacturing/templates/fixed_asset_detail.html:3
+#: manufacturing/templates/fixed_asset_detail.html:68
+#, python-format
+msgid "%(num)s — %(name)s"
+msgstr "%(num)s — %(name)s"
+
+#: manufacturing/templates/fixed_asset_detail.html:78
+#: manufacturing/templates/it_asset_detail.html:224
+msgid "Purchase Cost"
+msgstr "Anschaffungskosten"
+
+#: manufacturing/templates/fixed_asset_detail.html:80
+msgid "No date"
+msgstr "Kein Datum"
+
+#: manufacturing/templates/fixed_asset_detail.html:83
+msgid "Accumulated Dep."
+msgstr "Kumulierte Abschr."
+
+#: manufacturing/templates/fixed_asset_detail.html:85
+#: manufacturing/templates/fixed_asset_detail.html:109
+#, python-format
+msgid "%(pct)s%% depreciated"
+msgstr "%(pct)s%% abgeschrieben"
+
+#: manufacturing/templates/fixed_asset_detail.html:88
+#: manufacturing/templates/fixed_asset_detail.html:146
+#: manufacturing/templates/fixed_asset_list.html:70
+#: manufacturing/templates/fixed_asset_list.html:111
+#: manufacturing/templates/it_asset_detail.html:236
+msgid "Book Value"
+msgstr "Buchwert"
+
+#: manufacturing/templates/fixed_asset_detail.html:90
+msgid "Net carrying value"
+msgstr "Nettobuchwert"
+
+#: manufacturing/templates/fixed_asset_detail.html:93
+#: manufacturing/templates/fixed_asset_detail.html:144
+#: manufacturing/templates/it_asset_detail.html:228
+msgid "Annual Dep."
+msgstr "Jährl. Abschr."
+
+#: manufacturing/templates/fixed_asset_detail.html:95
+#: manufacturing/templates/fixed_asset_detail.html:130
+#: manufacturing/templates/fixed_asset_list.html:127
+#: manufacturing/templates/mrp_plan.html:68
+msgid "None"
+msgstr "Keine"
+
+#: manufacturing/templates/fixed_asset_detail.html:102
+msgid "Depreciation Progress"
+msgstr "Abschreibungsfortschritt"
+
+#: manufacturing/templates/fixed_asset_detail.html:103
+#, python-format
+msgid "<strong>$%(book)s</strong> remaining of $%(purchase)s"
+msgstr "<strong>$%(book)s</strong> verbleibend von $%(purchase)s"
+
+#: manufacturing/templates/fixed_asset_detail.html:115
+msgid "Asset Details"
+msgstr "Anlagendetails"
+
+#: manufacturing/templates/fixed_asset_detail.html:117
+msgid "Asset Number"
+msgstr "Anlagennummer"
+
+#: manufacturing/templates/fixed_asset_detail.html:121
+#: manufacturing/templates/fixed_asset_list.html:179
+#: manufacturing/templates/it_asset_detail.html:202
+msgid "Vendor / Supplier"
+msgstr "Lieferant"
+
+#: manufacturing/templates/fixed_asset_detail.html:122
+#: manufacturing/templates/fixed_asset_detail.html:265
+#: manufacturing/templates/fixed_asset_list.html:109
+#: manufacturing/templates/fixed_asset_list.html:183
+#: manufacturing/templates/it_asset_detail.html:206
+#: manufacturing/templates/it_network_detail.html:89
+#: manufacturing/templates/it_network_detail.html:145
+#: manufacturing/templates/it_network_list.html:73
+#: manufacturing/templates/it_network_list.html:138
+#: manufacturing/templates/maint_equipment_detail.html:90
+#: manufacturing/templates/maint_equipment_list.html:78
+#: manufacturing/templates/maint_equipment_list.html:113
+#: manufacturing/templates/maint_part_detail.html:75
+#: manufacturing/templates/maint_parts_list.html:78
+#: manufacturing/templates/maint_parts_list.html:120
+#: manufacturing/templates/tc_device_form.html:97
+#: manufacturing/templates/tc_device_list.html:41
+msgid "Location"
+msgstr "Standort"
+
+#: manufacturing/templates/fixed_asset_detail.html:123
+#: manufacturing/templates/fixed_asset_detail.html:269
+#: manufacturing/templates/fixed_asset_list.html:187
+#: manufacturing/templates/it_asset_detail.html:210
+msgid "Cost Center"
+msgstr "Kostenstelle"
+
+#: manufacturing/templates/fixed_asset_detail.html:125
+#: manufacturing/templates/fixed_asset_detail.html:273
+#: manufacturing/templates/fixed_asset_list.html:195
+msgid "Serial Number"
+msgstr "Seriennummer"
+
+#: manufacturing/templates/fixed_asset_detail.html:126
+#: manufacturing/templates/fixed_asset_detail.html:281
+#: manufacturing/templates/fixed_asset_list.html:191
+msgid "In-Service Date"
+msgstr "Inbetriebnahmedatum"
+
+#: manufacturing/templates/fixed_asset_detail.html:127
+msgid "Purchase Price"
+msgstr "Kaufpreis"
+
+#: manufacturing/templates/fixed_asset_detail.html:128
+msgid "Salvage Value"
+msgstr "Restwert"
+
+#: manufacturing/templates/fixed_asset_detail.html:129
+msgid "Useful Life"
+msgstr "Nutzungsdauer"
+
+#: manufacturing/templates/fixed_asset_detail.html:129
+#, python-format
+msgid "%(counter)s year"
+msgid_plural "%(counter)s years"
+msgstr[0] "%(counter)s Jahr"
+msgstr[1] "%(counter)s Jahre"
+
+#: manufacturing/templates/fixed_asset_detail.html:130
+#: manufacturing/templates/fixed_asset_detail.html:253
+#: manufacturing/templates/fixed_asset_list.html:171
+#: manufacturing/templates/it_asset_detail.html:194
+msgid "Depreciation Method"
+msgstr "Abschreibungsmethode"
+
+#: manufacturing/templates/fixed_asset_detail.html:139
+msgid "Depreciation Schedule"
+msgstr "Abschreibungsplan"
+
+#: manufacturing/templates/fixed_asset_detail.html:143
+#: manufacturing/templates/periods.html:39
+msgid "Year"
+msgstr "Jahr"
+
+#: manufacturing/templates/fixed_asset_detail.html:145
+#: manufacturing/templates/it_asset_detail.html:232
+msgid "Accumulated"
+msgstr "Kumuliert"
+
+#: manufacturing/templates/fixed_asset_detail.html:152
+msgid "current"
+msgstr "aktuell"
+
+#: manufacturing/templates/fixed_asset_detail.html:164
+msgid "Event History"
+msgstr "Ereignisverlauf"
+
+#: manufacturing/templates/fixed_asset_detail.html:170
+#: manufacturing/templates/it_asset_detail.html:254
+msgid "Event"
+msgstr "Ereignis"
+
+#: manufacturing/templates/fixed_asset_detail.html:171
+#: manufacturing/templates/it_asset_detail.html:255
+#: manufacturing/templates/it_repairs_detail.html:61
+#: manufacturing/templates/it_software_detail.html:53
+msgid "Details"
+msgstr "Details"
+
+#: manufacturing/templates/fixed_asset_detail.html:172
+#: manufacturing/templates/gl_dashboard_kpis.html:47
+#: manufacturing/templates/inventory_detail.html:232
+#: manufacturing/templates/it_asset_detail.html:256
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:101
+msgid "By"
+msgstr "Von"
+
+#: manufacturing/templates/fixed_asset_detail.html:187
+msgid "No events logged."
+msgstr "Keine Ereignisse protokolliert."
+
+#: manufacturing/templates/fixed_asset_detail.html:195
+msgid "Purchased"
+msgstr "Gekauft"
+
+#: manufacturing/templates/fixed_asset_detail.html:196
+msgid "Deployed"
+msgstr "Bereitgestellt"
+
+#: manufacturing/templates/fixed_asset_detail.html:197
+msgid "Assigned"
+msgstr "Zugewiesen"
+
+#: manufacturing/templates/fixed_asset_detail.html:198
+msgid "Reassigned"
+msgstr "Neu zugewiesen"
+
+#: manufacturing/templates/fixed_asset_detail.html:199
+msgid "Relocated"
+msgstr "Verlagert"
+
+#: manufacturing/templates/fixed_asset_detail.html:200
+msgid "Repaired"
+msgstr "Repariert"
+
+#: manufacturing/templates/fixed_asset_detail.html:201
+msgid "Disposed"
+msgstr "Ausgesondert"
+
+#: manufacturing/templates/fixed_asset_detail.html:202
+msgid "Sold"
+msgstr "Verkauft"
+
+#: manufacturing/templates/fixed_asset_detail.html:204
+msgid "Inspection"
+msgstr "Inspektion"
+
+#: manufacturing/templates/fixed_asset_detail.html:205
+#: manufacturing/templates/sales_coaching.html:77
+#: manufacturing/templates/sales_coaching.html:125
+msgid "Note"
+msgstr "Notiz"
+
+#: manufacturing/templates/fixed_asset_detail.html:207
+msgid "Details..."
+msgstr "Details..."
+
+#: manufacturing/templates/fixed_asset_detail.html:209
+#: manufacturing/templates/maint_downtime_list.html:137
+msgid "Log Event"
+msgstr "Ereignis Erfassen"
+
+#: manufacturing/templates/fixed_asset_detail.html:215
+#: manufacturing/templates/it_asset_detail.html:121
+msgid "Edit Asset"
+msgstr "Anlagegut Bearbeiten"
+
+#: manufacturing/templates/fixed_asset_detail.html:225
+msgid "Asset Type"
+msgstr "Anlagentyp"
+
+#: manufacturing/templates/fixed_asset_detail.html:241
+#: manufacturing/templates/fixed_asset_list.html:159
+#: manufacturing/templates/it_asset_detail.html:182
+msgid "Purchase Price ($)"
+msgstr "Kaufpreis ($)"
+
+#: manufacturing/templates/fixed_asset_detail.html:245
+#: manufacturing/templates/fixed_asset_list.html:163
+#: manufacturing/templates/it_asset_detail.html:186
+msgid "Salvage Value ($)"
+msgstr "Restwert ($)"
+
+#: manufacturing/templates/fixed_asset_detail.html:249
+#: manufacturing/templates/fixed_asset_list.html:167
+#: manufacturing/templates/it_asset_detail.html:190
+msgid "Useful Life (years)"
+msgstr "Nutzungsdauer (Jahre)"
+
+#: manufacturing/templates/fixed_asset_list.html:60
+#: manufacturing/templates/gl_balance_sheet.html:66
+#: manufacturing/templates/gl_balance_sheet.html:103
+#: manufacturing/templates/it_dashboard.html:33
+msgid "Total Assets"
+msgstr "Aktiva Gesamt"
+
+#: manufacturing/templates/fixed_asset_list.html:62
+#: manufacturing/templates/mkt_analytics.html:54
+#, python-format
+msgid "%(counter)s active"
+msgid_plural "%(counter)s active"
+msgstr[0] "%(counter)s aktiv"
+msgstr[1] "%(counter)s aktiv"
+
+#: manufacturing/templates/fixed_asset_list.html:65
+#: manufacturing/templates/maint_labor_report.html:129
+#: manufacturing/templates/prod_labor_report.html:128
+msgid "Total Cost"
+msgstr "Gesamtkosten"
+
+#: manufacturing/templates/fixed_asset_list.html:67
+msgid "Purchase price"
+msgstr "Kaufpreis"
+
+#: manufacturing/templates/fixed_asset_list.html:72
+msgid "Net of depreciation"
+msgstr "Netto nach Abschreibung"
+
+#: manufacturing/templates/fixed_asset_list.html:75
+msgid "Annual Depreciation"
+msgstr "Jährliche Abschreibung"
+
+#: manufacturing/templates/fixed_asset_list.html:77
+msgid "Straight-line estimate"
+msgstr "Lineare Schätzung"
+
+#: manufacturing/templates/fixed_asset_list.html:82
+msgid "Asset List"
+msgstr "Anlagenliste"
+
+#: manufacturing/templates/fixed_asset_list.html:85
+msgid "Search name, number, vendor, location..."
+msgstr "Name, Nummer, Lieferant, Standort suchen..."
+
+#: manufacturing/templates/fixed_asset_list.html:105
+msgid "Asset #"
+msgstr "Anlagen-Nr."
+
+#: manufacturing/templates/fixed_asset_list.html:110
+#: manufacturing/templates/it_license_detail.html:86
+#: manufacturing/templates/it_license_list.html:67
+#: manufacturing/templates/maint_downtime_list.html:79
+#: manufacturing/templates/maint_labor_report.html:140
+#: manufacturing/templates/prod_labor_report.html:139
+msgid "Cost"
+msgstr "Kosten"
+
+#: manufacturing/templates/fixed_asset_list.html:112
+msgid "Dep. Method"
+msgstr "Abschr.-Methode"
+
+#: manufacturing/templates/fixed_asset_list.html:114
+msgid "In Service"
+msgstr "In Betrieb"
+
+#: manufacturing/templates/fixed_asset_list.html:134
+msgid "No fixed assets found."
+msgstr "Keine Anlagegüter gefunden."
+
+#: manufacturing/templates/fixed_asset_list.html:141
+msgid "Add New Fixed Asset"
+msgstr "Neues Anlagegut hinzufügen"
+
+#: manufacturing/templates/fixed_asset_list.html:146
+msgid "Asset Name *"
+msgstr "Name der Anlage *"
+
+#: manufacturing/templates/fixed_asset_list.html:147
+msgid "e.g. CNC Lathe #3"
+msgstr "z. B. CNC-Drehmaschine Nr. 3"
+
+#: manufacturing/templates/fixed_asset_list.html:150
+msgid "Asset Type *"
+msgstr "Anlagentyp *"
+
+#: manufacturing/templates/fixed_asset_list.html:152
+msgid "Select type..."
+msgstr "Typ auswählen..."
+
+#: manufacturing/templates/fixed_asset_list.html:180
+msgid "Supplier name"
+msgstr "Lieferantenname"
+
+#: manufacturing/templates/fixed_asset_list.html:184
+msgid "Building / Room / Site"
+msgstr "Gebäude / Raum / Standort"
+
+#: manufacturing/templates/fixed_asset_list.html:188
+msgid "e.g. Manufacturing"
+msgstr "z. B. Fertigung"
+
+#: manufacturing/templates/fixed_asset_list.html:196
+msgid "Manufacturer serial"
+msgstr "Herstellerseriennummer"
+
+#: manufacturing/templates/fixed_asset_list.html:200
+msgid "Person or department"
+msgstr "Person oder Abteilung"
+
+#: manufacturing/templates/fixed_asset_list.html:204
+msgid "Optional notes..."
+msgstr "Optionale Notizen..."
+
+#: manufacturing/templates/fixed_asset_list.html:207
+msgid "Create Asset"
+msgstr "Anlage Erstellen"
+
 #: manufacturing/templates/gl_accounts.html:6
 #: manufacturing/templates/gl_balance_sheet.html:6
 #: manufacturing/templates/gl_cash_flow_statement.html:6
@@ -8553,12 +9485,6 @@ msgstr "Bilanz zum %(as_of)s"
 #: manufacturing/templates/it_ticket_list.html:8
 msgid "Assets"
 msgstr "Aktiva"
-
-#: manufacturing/templates/gl_balance_sheet.html:66
-#: manufacturing/templates/gl_balance_sheet.html:103
-#: manufacturing/templates/it_dashboard.html:33
-msgid "Total Assets"
-msgstr "Aktiva Gesamt"
 
 #: manufacturing/templates/gl_balance_sheet.html:73
 msgid "Liabilities"
@@ -8714,14 +9640,6 @@ msgstr "Neue Buchung"
 #: manufacturing/templates/gl_journals.html:60
 msgid "Total Dr"
 msgstr "Gesamt Soll"
-
-#: manufacturing/templates/gl_dashboard_kpis.html:47
-#: manufacturing/templates/inventory_detail.html:232
-#: manufacturing/templates/it_asset_detail.html:256
-#: manufacturing/templates/spc_list.html:117
-#: manufacturing/templates/spc_log.html:101
-msgid "By"
-msgstr "Von"
 
 #: manufacturing/templates/gl_income_statement.html:57
 #: manufacturing/templates/sales_performance_kpis.html:56
@@ -9075,10 +9993,6 @@ msgstr "Bestandsbewegung Erfassen"
 msgid "Reference (PO#, WO#…)"
 msgstr "Referenz (Bestell-Nr., FA-Nr.…)"
 
-#: manufacturing/templates/inventory_detail.html:130
-msgid "Record"
-msgstr "Erfassen"
-
 #: manufacturing/templates/inventory_detail.html:133
 msgid ""
 "\n"
@@ -9086,7 +10000,12 @@ msgid ""
 "                Issue: subtracts from stock &nbsp;|&nbsp;\n"
 "                Adjust: enter a positive or negative signed quantity\n"
 "                "
-msgstr "\n                Empfangen / Rückgabe: erhöht den Bestand &nbsp;|&nbsp;\n                Ausgabe: verringert den Bestand &nbsp;|&nbsp;\n                Anpassen: geben Sie eine positive oder negative Menge ein\n                "
+msgstr ""
+"\n"
+"                Empfangen / Rückgabe: erhöht den Bestand &nbsp;|&nbsp;\n"
+"                Ausgabe: verringert den Bestand &nbsp;|&nbsp;\n"
+"                Anpassen: geben Sie eine positive oder negative Menge ein\n"
+"                "
 
 #: manufacturing/templates/inventory_detail.html:146
 #: manufacturing/templates/inventory_detail.html:206
@@ -9412,10 +10331,6 @@ msgstr "Kaufdatum"
 msgid "Warranty Exp"
 msgstr "Garantieablauf"
 
-#: manufacturing/templates/it_asset_detail.html:121
-msgid "Edit Asset"
-msgstr "Anlagegut Bearbeiten"
-
 #: manufacturing/templates/it_asset_detail.html:126
 #: manufacturing/templates/it_asset_list.html:105
 msgid "Asset Tag *"
@@ -9425,53 +10340,13 @@ msgstr "Anlagenkennung *"
 msgid "Financial &amp; Depreciation"
 msgstr "Finanzen und Abschreibung"
 
-#: manufacturing/templates/it_asset_detail.html:182
-msgid "Purchase Price ($)"
-msgstr "Kaufpreis ($)"
-
-#: manufacturing/templates/it_asset_detail.html:186
-msgid "Salvage Value ($)"
-msgstr "Restwert ($)"
-
-#: manufacturing/templates/it_asset_detail.html:190
-msgid "Useful Life (years)"
-msgstr "Nutzungsdauer (Jahre)"
-
-#: manufacturing/templates/it_asset_detail.html:194
-msgid "Depreciation Method"
-msgstr "Abschreibungsmethode"
-
-#: manufacturing/templates/it_asset_detail.html:202
-msgid "Vendor / Supplier"
-msgstr "Lieferant"
-
 #: manufacturing/templates/it_asset_detail.html:203
 msgid "Vendor name"
 msgstr "Name des Lieferanten"
 
-#: manufacturing/templates/it_asset_detail.html:206
-#: manufacturing/templates/it_network_detail.html:89
-#: manufacturing/templates/it_network_detail.html:145
-#: manufacturing/templates/it_network_list.html:73
-#: manufacturing/templates/it_network_list.html:138
-#: manufacturing/templates/maint_equipment_detail.html:90
-#: manufacturing/templates/maint_equipment_list.html:78
-#: manufacturing/templates/maint_equipment_list.html:113
-#: manufacturing/templates/maint_part_detail.html:75
-#: manufacturing/templates/maint_parts_list.html:78
-#: manufacturing/templates/maint_parts_list.html:120
-#: manufacturing/templates/tc_device_form.html:97
-#: manufacturing/templates/tc_device_list.html:41
-msgid "Location"
-msgstr "Standort"
-
 #: manufacturing/templates/it_asset_detail.html:207
 msgid "Room / Building"
 msgstr "Raum / Gebäude"
-
-#: manufacturing/templates/it_asset_detail.html:210
-msgid "Cost Center"
-msgstr "Kostenstelle"
 
 #: manufacturing/templates/it_asset_detail.html:211
 msgid "e.g. IT"
@@ -9480,22 +10355,6 @@ msgstr "z. B. IT"
 #: manufacturing/templates/it_asset_detail.html:221
 msgid "Depreciation Summary"
 msgstr "Abschreibungsübersicht"
-
-#: manufacturing/templates/it_asset_detail.html:224
-msgid "Purchase Cost"
-msgstr "Anschaffungskosten"
-
-#: manufacturing/templates/it_asset_detail.html:228
-msgid "Annual Dep."
-msgstr "Jährl. Abschr."
-
-#: manufacturing/templates/it_asset_detail.html:232
-msgid "Accumulated"
-msgstr "Kumuliert"
-
-#: manufacturing/templates/it_asset_detail.html:236
-msgid "Book Value"
-msgstr "Buchwert"
 
 #: manufacturing/templates/it_asset_detail.html:240
 #, python-format
@@ -9515,16 +10374,6 @@ msgstr "Standort: %(loc)s"
 #: manufacturing/templates/it_asset_detail.html:249
 msgid "Assignment History"
 msgstr "Zuweisungsverlauf"
-
-#: manufacturing/templates/it_asset_detail.html:254
-msgid "Event"
-msgstr "Ereignis"
-
-#: manufacturing/templates/it_asset_detail.html:255
-#: manufacturing/templates/it_repairs_detail.html:61
-#: manufacturing/templates/it_software_detail.html:53
-msgid "Details"
-msgstr "Details"
 
 #: manufacturing/templates/it_asset_list.html:3
 msgid "IT Assets"
@@ -9780,14 +10629,6 @@ msgstr "Lizenztyp"
 #: manufacturing/templates/it_license_list.html:64
 msgid "Seats Used / Total"
 msgstr "Genutzte Plätze / Gesamt"
-
-#: manufacturing/templates/it_license_detail.html:86
-#: manufacturing/templates/it_license_list.html:67
-#: manufacturing/templates/maint_downtime_list.html:79
-#: manufacturing/templates/maint_labor_report.html:140
-#: manufacturing/templates/prod_labor_report.html:139
-msgid "Cost"
-msgstr "Kosten"
 
 #: manufacturing/templates/it_license_detail.html:98
 #: manufacturing/templates/it_license_detail.html:155
@@ -10652,6 +11493,7 @@ msgid "Created by"
 msgstr "Erstellt von"
 
 #: manufacturing/templates/lot_detail.html:94
+#: manufacturing/templates/periods.html:48
 #: manufacturing/templates/rfq_new.html:29
 #: manufacturing/templates/supplier_portal_po_detail.html:39
 #: manufacturing/templates/wo_detail.html:197
@@ -10940,10 +11782,6 @@ msgstr "Keine Ausfallzeit-Datensätze gefunden."
 msgid "Log Downtime Event"
 msgstr "Ausfallereignis Erfassen"
 
-#: manufacturing/templates/maint_downtime_list.html:137
-msgid "Log Event"
-msgstr "Ereignis Erfassen"
-
 #: manufacturing/templates/maint_equipment_detail.html:6
 msgid "All Equipment"
 msgstr "Alle Ausrüstung"
@@ -11214,11 +12052,6 @@ msgstr "Anzahl FA"
 #: manufacturing/templates/maint_mechanics_list.html:127
 msgid "Hourly Rate"
 msgstr "Stundensatz"
-
-#: manufacturing/templates/maint_labor_report.html:129
-#: manufacturing/templates/prod_labor_report.html:128
-msgid "Total Cost"
-msgstr "Gesamtkosten"
 
 #: manufacturing/templates/maint_labor_report.html:138
 #: manufacturing/templates/prod_labor_report.html:137
@@ -11911,13 +12744,6 @@ msgstr "Anzeige hinzufügen"
 msgid "Marketing Analytics"
 msgstr "Marketing-Analyse"
 
-#: manufacturing/templates/mkt_analytics.html:54
-#, python-format
-msgid "%(counter)s active"
-msgid_plural "%(counter)s active"
-msgstr[0] "%(counter)s aktiv"
-msgstr[1] "%(counter)s aktiv"
-
 #: manufacturing/templates/mkt_analytics.html:59
 #, python-format
 msgid "%(counter)s converted"
@@ -12181,7 +13007,9 @@ msgstr "Materialbedarfsplanung"
 msgid ""
 "Net requirements based on confirmed Sales Orders vs on-hand stock and open "
 "Work Orders."
-msgstr "Nettobedarf basierend auf bestätigten Kundenaufträgen im Vergleich zum verfügbaren Bestand und offenen Fertigungsaufträgen."
+msgstr ""
+"Nettobedarf basierend auf bestätigten Kundenaufträgen im Vergleich zum "
+"verfügbaren Bestand und offenen Fertigungsaufträgen."
 
 #: manufacturing/templates/mrp_home.html:48
 msgid "Demand source:"
@@ -12249,7 +13077,14 @@ msgid ""
 "        Checking \"Include forecasted demand\" also adds AI-generated "
 "future\n"
 "        demand from the Demand Forecast page."
-msgstr "Das Ausführen des Plans löst den gesamten bestätigten Bedarf aus Kundenaufträgen über die Stückliste (BOM) auf,\n        gleicht ihn mit dem verfügbaren Bestand und offenen Fertigungsaufträgen ab und berechnet geplante Aufträge.\n        Durch Aktivieren von „Prognostizierte Nachfrage einbeziehen“ wird außerdem die von KI generierte zukünftige\n        Nachfrage von der Seite Bedarfsprognose hinzugefügt."
+msgstr ""
+"Das Ausführen des Plans löst den gesamten bestätigten Bedarf aus "
+"Kundenaufträgen über die Stückliste (BOM) auf,\n"
+"        gleicht ihn mit dem verfügbaren Bestand und offenen "
+"Fertigungsaufträgen ab und berechnet geplante Aufträge.\n"
+"        Durch Aktivieren von „Prognostizierte Nachfrage einbeziehen“ wird "
+"außerdem die von KI generierte zukünftige\n"
+"        Nachfrage von der Seite Bedarfsprognose hinzugefügt."
 
 #: manufacturing/templates/mrp_home.html:112
 msgid "No confirmed Sales Orders with product lines found."
@@ -12286,7 +13121,12 @@ msgid ""
 "        Make orders create Work Orders; Buy orders create draft Purchase "
 "Orders,\n"
 "        pre-assigned to the product's preferred supplier when one is on file."
-msgstr "Wählen Sie die geplanten Aufträge aus, die Sie freigeben möchten.\n        Fertigen-Aufträge erstellen Fertigungsaufträge; Kaufen-Aufträge erstellen Bestellungen im Entwurfsstatus,\n        die dem bevorzugten Lieferanten des Produkts vorab zugewiesen werden, sofern einer hinterlegt ist."
+msgstr ""
+"Wählen Sie die geplanten Aufträge aus, die Sie freigeben möchten.\n"
+"        Fertigen-Aufträge erstellen Fertigungsaufträge; Kaufen-Aufträge "
+"erstellen Bestellungen im Entwurfsstatus,\n"
+"        die dem bevorzugten Lieferanten des Produkts vorab zugewiesen "
+"werden, sofern einer hinterlegt ist."
 
 #: manufacturing/templates/mrp_plan.html:56
 #, python-format
@@ -12313,10 +13153,6 @@ msgstr[1] "<strong>%(counter)s</strong> Gesamt"
 msgid "Select:"
 msgstr "Auswählen:"
 
-#: manufacturing/templates/mrp_plan.html:68
-msgid "None"
-msgstr "Keine"
-
 #: manufacturing/templates/mrp_plan.html:69
 msgid "All Make"
 msgstr "Alle Fertigen"
@@ -12324,10 +13160,6 @@ msgstr "Alle Fertigen"
 #: manufacturing/templates/mrp_plan.html:70
 msgid "All Buy"
 msgstr "Alle Kaufen"
-
-#: manufacturing/templates/mrp_plan.html:79
-msgid "Action"
-msgstr "Aktion"
 
 #: manufacturing/templates/mrp_plan.html:102
 #: manufacturing/templates/qa_inspection_list.html:123
@@ -12359,7 +13191,8 @@ msgstr "Nur-Lese-Rolle — Aufträge können nicht freigegeben werden."
 
 #: manufacturing/templates/mrp_plan.html:141
 msgid "No planned orders. The MRP run found no net requirements."
-msgstr "Keine geplanten Aufträge. Der MRP-Lauf hat keinen Nettobedarf ermittelt."
+msgstr ""
+"Keine geplanten Aufträge. Der MRP-Lauf hat keinen Nettobedarf ermittelt."
 
 #: manufacturing/templates/mrp_release.html:3
 msgid "MRP Release Results"
@@ -12377,7 +13210,10 @@ msgstr "MRP-Plan Freigegeben"
 msgid ""
 "The following orders were created. Edit each one to set\n"
 "        dates, assign suppliers, and confirm before production begins."
-msgstr "Die folgenden Aufträge wurden erstellt. Bearbeiten Sie jeden, um\n        Termine festzulegen, Lieferanten zuzuweisen und vor Produktionsbeginn zu bestätigen."
+msgstr ""
+"Die folgenden Aufträge wurden erstellt. Bearbeiten Sie jeden, um\n"
+"        Termine festzulegen, Lieferanten zuzuweisen und vor "
+"Produktionsbeginn zu bestätigen."
 
 #: manufacturing/templates/mrp_release.html:39
 #, python-format
@@ -12422,8 +13258,12 @@ msgid ""
 msgid_plural ""
 "%(counter)s POs below have no preferred supplier on file — open and assign "
 "one before sending."
-msgstr[0] "%(counter)s Bestellung unten hat keinen bevorzugten Lieferanten hinterlegt — öffnen und einen zuweisen, bevor sie gesendet wird."
-msgstr[1] "%(counter)s Bestellungen unten haben keinen bevorzugten Lieferanten hinterlegt — öffnen und einen zuweisen, bevor sie gesendet werden."
+msgstr[0] ""
+"%(counter)s Bestellung unten hat keinen bevorzugten Lieferanten hinterlegt — "
+"öffnen und einen zuweisen, bevor sie gesendet wird."
+msgstr[1] ""
+"%(counter)s Bestellungen unten haben keinen bevorzugten Lieferanten "
+"hinterlegt — öffnen und einen zuweisen, bevor sie gesendet werden."
 
 #: manufacturing/templates/mrp_release.html:82
 #: manufacturing/templates/po_approvals.html:35
@@ -12452,7 +13292,10 @@ msgstr "MRP-Startseite"
 msgid ""
 "Set the minimum on-hand buffer MRP must maintain after fulfilling demand.\n"
 "        Uses each product's <strong>Reorder Point</strong> value."
-msgstr "Legt den minimalen Lagerpuffer fest, den MRP nach Erfüllung des Bedarfs aufrechterhalten muss.\n        Verwendet den Wert des <strong>Meldebestands</strong> jedes Produkts."
+msgstr ""
+"Legt den minimalen Lagerpuffer fest, den MRP nach Erfüllung des Bedarfs "
+"aufrechterhalten muss.\n"
+"        Verwendet den Wert des <strong>Meldebestands</strong> jedes Produkts."
 
 #: manufacturing/templates/mrp_safety_stock.html:41
 msgid "Safety stock values saved successfully."
@@ -12503,18 +13346,6 @@ msgstr "Gehaltssätze"
 #: manufacturing/templates/payroll_pay_rates.html:7
 msgid "Deductions"
 msgstr "Abzüge"
-
-#: manufacturing/templates/payroll_dashboard.html:8
-#: manufacturing/templates/payroll_deductions.html:8
-#: manufacturing/templates/payroll_pay_rates.html:8
-#: manufacturing/templates/payroll_ytd.html:7
-#: manufacturing/templates/people_detail.html:12
-#: manufacturing/templates/po_detail.html:10
-#: manufacturing/templates/so_detail.html:10
-#: manufacturing/templates/time_off_detail.html:9
-#: manufacturing/templates/wo_detail.html:10
-msgid "History"
-msgstr "Historie"
 
 #: manufacturing/templates/payroll_dashboard.html:9
 #: manufacturing/templates/payroll_dashboard.html:68
@@ -12990,6 +13821,99 @@ msgstr "Keine Mitarbeiter gefunden"
 #: manufacturing/templates/people_list.html:72
 msgid " in the selected department"
 msgstr " in der ausgewählten Abteilung"
+
+#: manufacturing/templates/periods.html:3
+#: manufacturing/templates/periods.html:12
+msgid "Period Management"
+msgstr "Periodenverwaltung"
+
+#: manufacturing/templates/periods.html:14
+msgid ""
+"Close a period to prevent any new or edited records from being dated\n"
+"        within it. Only President and Vice President may close or reopen "
+"periods."
+msgstr "Schließen Sie eine Periode, um zu verhindern, dass neue oder bearbeitete Datensätze\n        innerhalb dieser Periode datiert werden. Nur Präsident und Vizepräsident dürfen Perioden schließen oder wieder öffnen."
+
+#: manufacturing/templates/periods.html:22
+msgid "Close a Period"
+msgstr "Eine Periode Schließen"
+
+#: manufacturing/templates/periods.html:30
+msgid "January"
+msgstr "Januar"
+
+#: manufacturing/templates/periods.html:30
+msgid "February"
+msgstr "Februar"
+
+#: manufacturing/templates/periods.html:31
+msgid "March"
+msgstr "März"
+
+#: manufacturing/templates/periods.html:31
+msgid "April"
+msgstr "April"
+
+#: manufacturing/templates/periods.html:32
+msgid "May"
+msgstr "Mai"
+
+#: manufacturing/templates/periods.html:32
+msgid "June"
+msgstr "Juni"
+
+#: manufacturing/templates/periods.html:33
+msgid "July"
+msgstr "Juli"
+
+#: manufacturing/templates/periods.html:33
+msgid "August"
+msgstr "August"
+
+#: manufacturing/templates/periods.html:34
+msgid "September"
+msgstr "September"
+
+#: manufacturing/templates/periods.html:34
+msgid "October"
+msgstr "Oktober"
+
+#: manufacturing/templates/periods.html:35
+msgid "November"
+msgstr "November"
+
+#: manufacturing/templates/periods.html:35
+msgid "December"
+msgstr "Dezember"
+
+#: manufacturing/templates/periods.html:49
+msgid "e.g. Year-end close"
+msgstr "z. B. Jahresabschluss"
+
+#: manufacturing/templates/periods.html:53
+msgid "Close this period? Writes dated in this period will be blocked."
+msgstr "Diese Periode schließen? Buchungen mit Datum in dieser Periode werden blockiert."
+
+#: manufacturing/templates/periods.html:54
+msgid "Close Period"
+msgstr "Periode Schließen"
+
+#: manufacturing/templates/periods.html:68
+msgid "Closed By"
+msgstr "Geschlossen Von"
+
+#: manufacturing/templates/periods.html:69
+msgid "Closed At"
+msgstr "Geschlossen Am"
+
+#: manufacturing/templates/periods.html:92
+#, python-format
+msgid "Reopen %(label)s? Writes will be allowed again."
+msgstr "%(label)s wieder öffnen? Buchungen werden wieder zugelassen."
+
+#: manufacturing/templates/periods.html:96
+msgid "Reopen"
+msgstr "Wieder Öffnen"
 
 #: manufacturing/templates/pers_depts.html:43
 msgid "Departments &amp; Sub-Departments"
@@ -14014,10 +14938,6 @@ msgstr "Keine Fertigungsaufträge mit Arbeitsplänen in diesem Zeitraum."
 #: manufacturing/templates/prod_labor_report.html:121
 msgid "Labor by Person"
 msgstr "Arbeitszeit nach Person"
-
-#: manufacturing/templates/prod_labor_report.html:125
-msgid "Person"
-msgstr "Person"
 
 #: manufacturing/templates/prod_labor_report.html:161
 msgid "No attributable labor in this range."
@@ -15047,12 +15967,6 @@ msgid "Export PDF"
 msgstr "PDF exportieren"
 
 #: manufacturing/templates/report_builder_detail.html:32
-#: manufacturing/templates/report_builder_form.html:41
-#: manufacturing/templates/report_builder_list.html:21
-msgid "Table"
-msgstr "Tabelle"
-
-#: manufacturing/templates/report_builder_detail.html:32
 msgid "Access"
 msgstr "Zugriff"
 
@@ -15248,11 +16162,6 @@ msgstr "Bericht speichern"
 msgid "Custom Reports"
 msgstr "Benutzerdefinierte Berichte"
 
-#: manufacturing/templates/report_builder_list.html:41
-#: manufacturing/templates/wms_putaway_rule_list.html:60
-msgid "Delete"
-msgstr "Löschen"
-
 #: manufacturing/templates/report_builder_list.html:50
 msgid "No custom reports yet."
 msgstr "Noch keine benutzerdefinierten Berichte."
@@ -15396,6 +16305,29 @@ msgid ""
 msgstr ""
 "Sie fügen Positionen hinzu und reichen sie von der Detailseite der "
 "Anforderung aus zur Genehmigung ein."
+
+#: manufacturing/templates/retention_policy_edit.html:3
+#: manufacturing/templates/retention_policy_edit.html:26
+msgid "Edit Retention Policy"
+msgstr "Aufbewahrungsrichtlinie Bearbeiten"
+
+#: manufacturing/templates/retention_policy_edit.html:41
+msgid ""
+"Terminated employees are anonymized once this many months have passed since "
+"their termination date."
+msgstr "Ausgeschiedene Mitarbeiter werden anonymisiert, sobald diese Anzahl von Monaten seit ihrem Austrittsdatum vergangen ist."
+
+#: manufacturing/templates/retention_policy_edit.html:50
+msgid "Deactivate this policy?"
+msgstr "Diese Richtlinie deaktivieren?"
+
+#: manufacturing/templates/retention_policy_edit.html:50
+msgid "Activate this policy?"
+msgstr "Diese Richtlinie aktivieren?"
+
+#: manufacturing/templates/retention_policy_edit.html:57
+msgid "Delete this policy permanently?"
+msgstr "Diese Richtlinie dauerhaft löschen?"
 
 #: manufacturing/templates/rfq_detail.html:34
 #: manufacturing/templates/rfq_list.html:22
@@ -15560,11 +16492,6 @@ msgstr "Thema"
 #: manufacturing/templates/sales_coaching.html:113
 msgid "Coach"
 msgstr "Coach"
-
-#: manufacturing/templates/sales_coaching.html:77
-#: manufacturing/templates/sales_coaching.html:125
-msgid "Note"
-msgstr "Notiz"
 
 #: manufacturing/templates/sales_coaching.html:92
 msgid "No coaching notes found."
@@ -17124,10 +18051,6 @@ msgid "Poll Now"
 msgstr "Jetzt abfragen"
 
 #: manufacturing/templates/tc_device_form.html:221
-msgid "When"
-msgstr "Wann"
-
-#: manufacturing/templates/tc_device_form.html:221
 msgid "Records"
 msgstr "Datensätze"
 
@@ -17437,6 +18360,153 @@ msgstr "Neuer Antrag"
 msgid "No time-off requests found."
 msgstr "Keine Abwesenheitsanträge gefunden."
 
+#: manufacturing/templates/user_roles.html:4
+#: manufacturing/templates/user_roles.html:12
+msgid "User Role Management"
+msgstr "Benutzerrollenverwaltung"
+
+#: manufacturing/templates/user_roles.html:7
+msgid "Back to Dashboard"
+msgstr "Zurück zum Dashboard"
+
+#: manufacturing/templates/user_roles.html:23
+msgid "Current Role"
+msgstr "Aktuelle Rolle"
+
+#: manufacturing/templates/user_roles.html:24
+msgid "Assign Role"
+msgstr "Rolle Zuweisen"
+
+#: manufacturing/templates/user_roles.html:36
+msgid "-- none --"
+msgstr "-- keine --"
+
+#: manufacturing/templates/user_roles.html:48
+msgid "No users found."
+msgstr "Keine Benutzer gefunden."
+
+#: manufacturing/templates/webhook_edit.html:3
+#: manufacturing/templates/webhook_edit.html:29
+msgid "Edit Webhook Subscription"
+msgstr "Webhook-Abonnement Bearbeiten"
+
+#: manufacturing/templates/webhook_edit.html:41
+#: manufacturing/templates/webhook_new.html:30
+msgid "Event Type *"
+msgstr "Ereignistyp *"
+
+#: manufacturing/templates/webhook_edit.html:49
+#: manufacturing/templates/webhook_new.html:38
+msgid "Target URL *"
+msgstr "Ziel-URL *"
+
+#: manufacturing/templates/webhook_edit.html:53
+#: manufacturing/templates/webhook_new.html:43
+msgid "Signing Secret"
+msgstr "Signaturschlüssel"
+
+#: manufacturing/templates/webhook_edit.html:61
+msgid "Recent Deliveries"
+msgstr "Letzte Zustellungen"
+
+#: manufacturing/templates/webhook_edit.html:66
+msgid "Success"
+msgstr "Erfolg"
+
+#: manufacturing/templates/webhook_edit.html:68
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+#: manufacturing/templates/webhook_edit.html:75
+msgid "No deliveries yet."
+msgstr "Noch keine Zustellungen."
+
+#: manufacturing/templates/webhook_edit.html:82
+msgid "Deactivate this subscription?"
+msgstr "Dieses Abonnement deaktivieren?"
+
+#: manufacturing/templates/webhook_edit.html:82
+msgid "Activate this subscription?"
+msgstr "Dieses Abonnement aktivieren?"
+
+#: manufacturing/templates/webhook_edit.html:89
+msgid "Delete this subscription permanently? This cannot be undone."
+msgstr "Dieses Abonnement dauerhaft löschen? Dies kann nicht rückgängig gemacht werden."
+
+#: manufacturing/templates/webhook_list.html:3
+#: manufacturing/templates/webhook_list.html:17
+msgid "Webhook Subscriptions"
+msgstr "Webhook-Abonnements"
+
+#: manufacturing/templates/webhook_list.html:7
+msgid "New Subscription"
+msgstr "Neues Abonnement"
+
+#: manufacturing/templates/webhook_list.html:19
+msgid ""
+"Notify an external system (Zapier, a customer's own ERP, a Slack channel) "
+"when a business\n"
+"        event happens — a purchase order status changes, a work order "
+"completes, a sales order\n"
+"        ships, or an NCR opens. Each subscription is delivered as a signed "
+"JSON POST to your\n"
+"        target URL."
+msgstr "Benachrichtigen Sie ein externes System (Zapier, das eigene ERP eines Kunden, einen Slack-Kanal), wenn ein\n        Geschäftsereignis eintritt — der Status einer Bestellung ändert sich, ein Fertigungsauftrag wird abgeschlossen, ein Kundenauftrag\n        wird versandt, oder eine NCR wird eröffnet. Jedes Abonnement wird als signierter JSON-POST an Ihre\n        Ziel-URL zugestellt."
+
+#: manufacturing/templates/webhook_list.html:26
+msgid "Filter by event:"
+msgstr "Nach Ereignis filtern:"
+
+#: manufacturing/templates/webhook_list.html:28
+msgid "All events"
+msgstr "Alle Ereignisse"
+
+#: manufacturing/templates/webhook_list.html:40
+msgid "Event Type"
+msgstr "Ereignistyp"
+
+#: manufacturing/templates/webhook_list.html:41
+msgid "Target URL"
+msgstr "Ziel-URL"
+
+#: manufacturing/templates/webhook_list.html:42
+msgid "Signed"
+msgstr "Signiert"
+
+#: manufacturing/templates/webhook_list.html:71
+#, python-format
+msgid "No webhook subscriptions configured for %(event_type)s."
+msgstr "Keine Webhook-Abonnements für %(event_type)s konfiguriert."
+
+#: manufacturing/templates/webhook_list.html:73
+msgid "No webhook subscriptions configured."
+msgstr "Keine Webhook-Abonnements konfiguriert."
+
+#: manufacturing/templates/webhook_new.html:3
+#: manufacturing/templates/webhook_new.html:22
+msgid "New Webhook Subscription"
+msgstr "Neues Webhook-Abonnement"
+
+#: manufacturing/templates/webhook_new.html:40
+msgid "Where we'll POST a JSON payload when this event fires."
+msgstr "Wohin wir eine JSON-Nutzlast per POST senden, wenn dieses Ereignis ausgelöst wird."
+
+#: manufacturing/templates/webhook_new.html:44
+msgid "Optional — leave blank for an unsigned payload"
+msgstr "Optional — leer lassen für eine unsignierte Nutzlast"
+
+#: manufacturing/templates/webhook_new.html:46
+msgid ""
+"If set, each request includes an <code>X-Webhook-Signature</code> header:\n"
+"                    base64(HMAC-SHA256(secret, raw body)) — the same scheme "
+"this app's own\n"
+"                    inbound Shopify/WooCommerce webhook verification uses."
+msgstr "Falls gesetzt, enthält jede Anfrage einen <code>X-Webhook-Signature</code>-Header:\n                    base64(HMAC-SHA256(secret, raw body)) — dasselbe Schema, das die eigene\n                    eingehende Shopify/WooCommerce-Webhook-Verifizierung dieser Anwendung verwendet."
+
+#: manufacturing/templates/webhook_new.html:51
+msgid "Create Subscription"
+msgstr "Abonnement Erstellen"
+
 #: manufacturing/templates/wms_bin_detail.html:3
 #, python-format
 msgid "Bin %(num)s"
@@ -17574,12 +18644,6 @@ msgstr "Neue Zone"
 #: manufacturing/templates/wms_bin_new.html:19
 msgid "Warehouse"
 msgstr "Lager"
-
-#: manufacturing/templates/wms_bin_new.html:26
-#: manufacturing/templates/wms_warehouse_list.html:20
-#: manufacturing/templates/wms_warehouse_list.html:29
-msgid "Code"
-msgstr "Code"
 
 #: manufacturing/templates/wms_bin_new.html:28
 msgid "Pick Sequence"
@@ -17813,8 +18877,10 @@ msgstr "Cross-Docking-Möglichkeit"
 msgid "%(counter)s order line waiting on this product with nothing in stock:"
 msgid_plural ""
 "%(counter)s order lines waiting on this product with nothing in stock:"
-msgstr[0] "%(counter)s Auftragsposition wartet auf dieses Produkt ohne Bestand:"
-msgstr[1] "%(counter)s Auftragspositionen warten auf dieses Produkt ohne Bestand:"
+msgstr[0] ""
+"%(counter)s Auftragsposition wartet auf dieses Produkt ohne Bestand:"
+msgstr[1] ""
+"%(counter)s Auftragspositionen warten auf dieses Produkt ohne Bestand:"
 
 #: manufacturing/templates/wms_receive.html:77
 #, python-format

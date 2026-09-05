@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block page_title %}{{ table_name }} #{{ record_id }} History — Manufacturing System{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans %}{{ table_name }} #{{ record_id }} History — Manufacturing System{% endblocktrans %}{% endblock %}
 
 {% block extra_styles %}
 .audit-wrap {
@@ -59,10 +60,10 @@
 {% block body %}
 <div class="content">
 <div class="audit-wrap">
-    <h2>{{ table_name }} #{{ record_id }} — Change History</h2>
+    <h2>{% blocktrans %}{{ table_name }} #{{ record_id }} — Change History{% endblocktrans %}</h2>
     <p class="subtitle">
         <a href="{% url 'audit_log' %}?table={{ table_name }}" style="color:#cde">
-            &larr; Back to audit log
+            &larr; {% trans "Back to audit log" %}
         </a>
     </p>
 
@@ -71,11 +72,17 @@
         <div class="history-header">
             <span class="badge badge-{{ entry.action }}">{{ entry.action }}</span>
             <span>{{ entry.changed_at }}</span>
-            <span>by {{ entry.changed_by|default:"unknown" }}</span>
+            <span>
+                {% if entry.changed_by %}
+                {% blocktrans with by=entry.changed_by %}by {{ by }}{% endblocktrans %}
+                {% else %}
+                {% trans "by unknown" %}
+                {% endif %}
+            </span>
         </div>
         <div class="diff-grid">
             <div class="diff-col">
-                <h4>Before</h4>
+                <h4>{% trans "Before" %}</h4>
                 {% if entry.old_values %}
                 <pre>{{ entry.old_values }}</pre>
                 {% else %}
@@ -83,7 +90,7 @@
                 {% endif %}
             </div>
             <div class="diff-col diff-col-right">
-                <h4>After</h4>
+                <h4>{% trans "After" %}</h4>
                 {% if entry.new_values %}
                 <pre>{{ entry.new_values }}</pre>
                 {% else %}
@@ -93,7 +100,7 @@
         </div>
     </div>
     {% empty %}
-    <p style="color:var(--text-muted)">No history found for this record.</p>
+    <p style="color:var(--text-muted)">{% trans "No history found for this record." %}</p>
     {% endfor %}
 </div>
 </div>

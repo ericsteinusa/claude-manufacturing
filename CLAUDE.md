@@ -1778,6 +1778,134 @@ literal `\n` escapes, continuing the runtime-verification habit
 established after the WO/SO pass's double-escape bug. No console or
 server errors.
 
+Also fully translated: the entire **Administration** section
+(`approval_rule_list.html`/`_new.html`/`_edit.html`, `webhook_list.html`/
+`_new.html`/`_edit.html`, `currency_list.html`, `audit_log.html`,
+`audit_record.html`, `user_roles.html`, `data_governance_dashboard.html`,
+`retention_policy_edit.html`, `periods.html`, `fixed_asset_list.html`,
+`fixed_asset_detail.html` — 15 templates, the nineteenth "whole
+section" pass, matching the by-now-standard "translate the link, not
+yet the target" gap: the sidebar's ADMINISTRATION section header and
+all 7 of its nav labels (Rôles utilisateurs, Journal d'audit,
+Immobilisations, Devises, Règles d'approbation, Webhooks, Gouvernance
+des données) were already translated from `base.html`'s original core
+pass, but every page they link to was still English-only). Marked up
+by two parallel subagents (Approval Rules/Webhooks/Currency vs.
+Audit/Roles/Governance/Periods/Fixed-Assets), then translated by two
+further parallel agents split by string count. 194 unique strings
+across 5 languages (193 simple + 1 plural), the 12 calendar month
+names among them (no prior translation existed for any of them
+anywhere in the app, confirmed via grep before assuming so).
+
+**Two confirm-dialog fragment-concatenation bugs caught in review and
+fixed before translating**, the same quality issue the Personnel-core
+pass first flagged for a static paragraph (a translator working from
+two disconnected fragments can't produce correct grammar) but which
+had not previously been checked for JS `confirm()` strings built from
+an `{% if %}/{% else %}` verb plus a shared suffix:
+`approval_rule_edit.html` and `webhook_edit.html` had each built their
+Deactivate/Activate confirm as `{% if x %}{% trans "Deactivate" %}
+{% else %}{% trans "Activate" %}{% endif %} {% trans "this rule?" %}`
+— concatenating a bare verb with a shared tail rather than translating
+one complete question per branch. Fixed to two full independent
+`{% trans %}` calls each (`"Deactivate this rule?"` /
+`"Activate this rule?"`), matching the pattern the other subagent's
+files (`retention_policy_edit.html`, `currency_list.html`) already got
+right on the first pass — worth a standing checklist item alongside
+the dotted-blocktrans-variable and bare-`default:"literal"` checks:
+grep any new `confirm()` string for an `{% if %}...{% endif %}`
+sitting *next to* (not fully wrapping) a `{% trans %}`, since that
+shape is exactly this fragment-gluing anti-pattern.
+
+**A real, independently-caught bug in `fixed_asset_detail.html`'s Log
+Event form**: its 11 `<option>` tags had no `value=` attribute, so the
+browser submits whatever text is *displayed* as the field's value —
+translating the display text without also pinning an explicit
+`value="purchased"` etc. would have silently changed what gets POSTed
+once a non-English locale was active (a French user's "Acheté" would
+have been stored as the event type instead of "purchased"). Fixed by
+adding explicit lowercase `value` attributes matching the original
+English text, translating only the display labels — the same
+data-integrity class of gotcha as the Engineering pass's dotted-lookup
+`blocktrans` bug (a translation-marking change silently breaking a
+data path is worse than one breaking a translation catalog, since
+nothing red-flags it: `manage.py check`, `msgfmt --check`, and the
+test suite all stay green).
+
+**Two real, pre-existing (non-i18n) bugs found while browser-verifying
+this batch, both fixed in this same PR since they directly blocked
+verifying the very pages being translated** — a departure from this
+series' usual "flag but don't fix" precedent for unrelated bugs
+(Purchasing's `/purch/reports/` table-name bug, Sales' `get_item`
+filter bug), justified here because both fixes were small, low-risk,
+and left the page silently broken/wrong rather than merely undiscovered:
+1. `fixed_asset_list.html`'s KPI row read `summary.total_count` /
+   `summary.active_count` / `summary.total_annual_dep`, but
+   `fixed_asset_core.get_fixed_asset_summary()` actually returns
+   `count` / `active` / (no `total_annual_dep` key at all) — a
+   longstanding key-name mismatch that Django's template engine
+   silently renders as blank rather than erroring, so the "Total
+   Assets" and "N active" KPIs have always shown blank, and "Annual
+   Depreciation" was blank because the underlying total was never
+   even computed. This i18n pass's `{% blocktrans count %}` conversion
+   of the "N active" sub-label is what surfaced it as a hard
+   `TemplateSyntaxError: 'counter' argument to 'blocktrans' tag must
+   be a number` 500 instead of silent wrongness, since blocktrans
+   validates its counter is numeric — unlike a bare `{{ }}` var, it
+   can't silently swallow a missing key. Fixed by correcting the two
+   template variable names to match the real dict keys, and adding
+   `total_annual_dep` to `get_fixed_asset_summary()`'s return value
+   (summing the module's own already-tested `calc_annual_depreciation()`
+   per asset — the same aggregation pattern that function already uses
+   for `total_book_value`/`total_accumulated_depreciation`, not new
+   business logic), plus one new assertion in the existing
+   `test_get_fixed_asset_summary_aggregates_across_assets` test.
+2. **The sidebar's "Currencies" link has been completely unreachable
+   since it was built** — `{% url 'currency_list' %}` resolved to
+   `/admin/currencies/`, which `manufacture/urls.py`'s
+   `path('admin/', admin.site.urls)` (registered first, ahead of
+   `include('manufacturing.urls')`) swallows before Django ever tries
+   the app's own URLconf, silently redirecting every visitor to the
+   Django admin login screen instead. This was already known and
+   explicitly documented as deferred in `COMPETITIVE_GAP_ANALYSIS.md`'s
+   2026-07-17 Approval Rules entry ("verified this is pre-existing and
+   not new... left that as a separate, already-there issue") — the
+   Approval Rules pages were deliberately routed at `/approval-rules/`
+   (no `/admin/` prefix) specifically to avoid the same trap. Fixed
+   here, with the user's explicit go-ahead, by moving `currency_list`
+   to `/currencies/`, matching that same no-`/admin/`-prefix
+   convention (`/approval-rules/`, `/price-lists/`, `/sampling-plans/`,
+   `/rfq/`) — updated the URL pattern, `base.html`'s active-link check,
+   `currency_list.html`'s own toolbar self-link (now `{% url %}`
+   instead of a hardcoded path), and the `/currencies/` reference in
+   `docs/user-guide/00-getting-started.md`.
+
+Full suite 3475 passed (+0 net — one new assertion added to an
+existing test, no new test functions), `manage.py check` and
+`ruff check .` both clean, `msgfmt --check` clean on all 5 `.po`
+files, zero fuzzy/blank entries confirmed programmatically. Grepped
+every generic single-word label reused via exact-msgid auto-merge
+(Base, Success, Failed, Assigned, Sold, Note, Details, Year, By,
+Signed, Maintenance, Purchased, Deployed, Repaired, Relocated,
+Disposed) for the "Make"-style cross-context mistranslation risk the
+Inventory/BOM/MRP pass's fix established as a standing checklist item
+— all merges checked out semantically correct, no new instance of that
+bug class this pass. Verified end-to-end against the real dev server,
+in French with real sample data: Approval Rules list + a rule's edit
+page (confirmed the fixed Deactivate/Activate confirm dialogs render
+as complete sentences), Webhook Subscriptions list + an edit page
+(same fix), **Currency Management at its corrected `/currencies/` URL**
+(confirmed the sidebar link now navigates there instead of the Django
+admin login, real data — base currency, 12 active currencies, full
+table), Audit Log + a record's history page, User Role Management,
+Data Governance, Period Management (confirmed all 12 translated month
+names in the dropdown), and **Fixed Assets** (confirmed the KPI-row
+crash is fixed and all four KPI cards — including the two previously
+always-blank ones — now show correct real numbers), plus direct
+`gettext()` calls confirming all 7 multi-line `{% blocktrans %}`
+strings in this batch render with real line breaks in all 5 locales.
+No console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
