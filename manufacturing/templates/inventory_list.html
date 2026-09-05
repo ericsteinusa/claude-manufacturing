@@ -1,58 +1,59 @@
 {% extends "base.html" %}
-{% block page_title %}Inventory{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Inventory" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/dashboard/" class="btn">Home</a>
-<a href="/inventory/cycle-counts/" class="btn">Cycle Counts</a>
-<a href="/inventory/export/?search={{ search|urlencode }}&filter={{ filter_status|urlencode }}&item_type={{ item_type|urlencode }}" class="btn">⬇ Export CSV</a>
-<a href="/inventory/export/?search={{ search|urlencode }}&filter={{ filter_status|urlencode }}&item_type={{ item_type|urlencode }}&format=xlsx" class="btn">⬇ Export Excel</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="/inventory/cycle-counts/" class="btn">{% trans "Cycle Counts" %}</a>
+<a href="/inventory/export/?search={{ search|urlencode }}&filter={{ filter_status|urlencode }}&item_type={{ item_type|urlencode }}" class="btn">⬇ {% trans "Export CSV" %}</a>
+<a href="/inventory/export/?search={{ search|urlencode }}&filter={{ filter_status|urlencode }}&item_type={{ item_type|urlencode }}&format=xlsx" class="btn">⬇ {% trans "Export Excel" %}</a>
 {% if can_edit %}
-<a href="/inventory/new/" class="btn btn-primary">+ New Product</a>
+<a href="/inventory/new/" class="btn btn-primary">+ {% trans "New Product" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Inventory</div>
+    <div class="menu-title">{% trans "Inventory" %}</div>
 
     {% if alert_zero or alert_low %}
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
         {% if alert_zero %}
         <a href="/inventory/?filter=zero" class="pill pill-danger" style="font-size:13px;padding:5px 14px;">
-            {{ alert_zero }} at zero stock
+            {% blocktrans with n=alert_zero %}{{ n }} at zero stock{% endblocktrans %}
         </a>
         {% endif %}
         {% if alert_low %}
         <a href="/inventory/?filter=low" class="pill pill-warn" style="font-size:13px;padding:5px 14px;">
-            {{ alert_low }} below reorder point
+            {% blocktrans with n=alert_low %}{{ n }} below reorder point{% endblocktrans %}
         </a>
         {% endif %}
     </div>
     {% endif %}
 
     <div class="filter-bar">
-        <label>Status:</label>
+        <label>{% trans "Status:" %}</label>
         <a href="/inventory/{% if item_type %}?item_type={{ item_type }}{% endif %}"
-           class="{% if not filter_status %}active{% endif %}">All</a>
+           class="{% if not filter_status %}active{% endif %}">{% trans "All" %}</a>
         <a href="/inventory/?filter=low{% if item_type %}&item_type={{ item_type }}{% endif %}"
-           class="{% if filter_status == 'low' %}active{% endif %}">Low / Zero</a>
+           class="{% if filter_status == 'low' %}active{% endif %}">{% trans "Low / Zero" %}</a>
         <a href="/inventory/?filter=zero{% if item_type %}&item_type={{ item_type }}{% endif %}"
-           class="{% if filter_status == 'zero' %}active{% endif %}">Zero Only</a>
+           class="{% if filter_status == 'zero' %}active{% endif %}">{% trans "Zero Only" %}</a>
 
-        <label style="margin-left:12px;">Type:</label>
+        <label style="margin-left:12px;">{% trans "Type:" %}</label>
         <a href="/inventory/{% if filter_status %}?filter={{ filter_status }}{% endif %}"
-           class="{% if not item_type %}active{% endif %}">All</a>
+           class="{% if not item_type %}active{% endif %}">{% trans "All" %}</a>
         <a href="/inventory/?item_type=buy{% if filter_status %}&filter={{ filter_status }}{% endif %}"
-           class="{% if item_type == 'buy' %}active{% endif %}">Buy</a>
+           class="{% if item_type == 'buy' %}active{% endif %}">{% trans "Buy" %}</a>
         <a href="/inventory/?item_type=make{% if filter_status %}&filter={{ filter_status }}{% endif %}"
-           class="{% if item_type == 'make' %}active{% endif %}">Make</a>
+           class="{% if item_type == 'make' %}active{% endif %}">{% trans "Make" context "item_type" %}</a>
 
         <form method="get" action="/inventory/" style="display:flex;gap:6px;align-items:center;margin-left:auto;">
             {% if filter_status %}<input type="hidden" name="filter" value="{{ filter_status }}">{% endif %}
             {% if item_type %}<input type="hidden" name="item_type" value="{{ item_type }}">{% endif %}
-            <input type="text" name="search" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:200px;" placeholder="Search products…" value="{{ search }}">
-            <button type="submit" class="btn btn-primary" style="padding:5px 12px;font-size:12px;">Go</button>
-            {% if search %}<a href="/inventory/" style="font-size:12px;color:var(--text-muted);">Clear</a>{% endif %}
+            <input type="text" name="search" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:200px;" placeholder="{% trans 'Search products…' %}" value="{{ search }}">
+            <button type="submit" class="btn btn-primary" style="padding:5px 12px;font-size:12px;">{% trans "Go" %}</button>
+            {% if search %}<a href="/inventory/" style="font-size:12px;color:var(--text-muted);">{% trans "Clear" %}</a>{% endif %}
         </form>
     </div>
 
@@ -61,15 +62,15 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Type</th>
-                    <th>UOM</th>
-                    <th>Bin</th>
-                    <th class="num">On Hand</th>
-                    <th class="num">Reorder Pt</th>
-                    <th class="num">Unit Cost</th>
-                    <th>Status</th>
-                    <th>Supplier</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "UOM" %}</th>
+                    <th>{% trans "Bin" %}</th>
+                    <th class="num">{% trans "On Hand" %}</th>
+                    <th class="num">{% trans "Reorder Pt" %}</th>
+                    <th class="num">{% trans "Unit Cost" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Supplier" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -90,24 +91,26 @@
                     </td>
                     <td>
                         {% if p.status == 'zero' %}
-                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Zero</span>
+                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{% trans "Zero" %}</span>
                         {% elif p.status == 'low' %}
-                        <span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">Low</span>
+                        <span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{% trans "Low" %}</span>
                         {% else %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">OK</span>
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "OK" %}</span>
                         {% endif %}
                     </td>
                     <td>{{ p.supplier_name|default:"—" }}</td>
-                    <td><a href="/inventory/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/inventory/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">{{ products|length }} product{{ products|length|pluralize }}</p>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">{% blocktrans count counter=products|length %}{{ counter }} product{% plural %}{{ counter }} products{% endblocktrans %}</p>
     {% else %}
     <div class="empty-state">
-        No products found{% if search %} matching "{{ search }}"{% endif %}{% if filter_status %} with status "{{ filter_status }}"{% endif %}.
+        {% trans "No products found" %}
+        {% if search %}{% blocktrans with s=search %} matching "{{ s }}"{% endblocktrans %}{% endif %}
+        {% if filter_status %}{% blocktrans with s=filter_status %} with status "{{ s }}"{% endblocktrans %}{% endif %}.
     </div>
     {% endif %}
 </div>

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Safety Stock Settings{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Safety Stock Settings" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mrp/" class="btn">MRP Home</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mrp/" class="btn">{% trans "MRP Home" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -30,14 +31,14 @@
 {% block body %}
 <div class="content">
 <div class="ss-wrap">
-    <div class="menu-title">Safety Stock Settings</div>
+    <div class="menu-title">{% trans "Safety Stock Settings" %}</div>
     <p class="page-subtitle">
-        Set the minimum on-hand buffer MRP must maintain after fulfilling demand.
-        Uses each product's <strong>Reorder Point</strong> value.
+        {% blocktrans %}Set the minimum on-hand buffer MRP must maintain after fulfilling demand.
+        Uses each product's <strong>Reorder Point</strong> value.{% endblocktrans %}
     </p>
 
     {% if saved %}
-    <div class="alert alert-success" style="max-width:860px;">Safety stock values saved successfully.</div>
+    <div class="alert alert-success" style="max-width:860px;">{% trans "Safety stock values saved successfully." %}</div>
     {% endif %}
     {% if error %}
     <div class="alert alert-danger" style="max-width:860px;">{{ error }}</div>
@@ -52,11 +53,11 @@
             <table class="erp-table">
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th>Type</th>
-                        <th class="num">Lead Time</th>
-                        <th class="num">On Hand</th>
-                        <th class="num">Safety Stock</th>
+                        <th>{% trans "Product" %}</th>
+                        <th>{% trans "Type" %}</th>
+                        <th class="num">{% trans "Lead Time" %}</th>
+                        <th class="num">{% trans "On Hand" %}</th>
+                        <th class="num">{% trans "Safety Stock" %}</th>
                         {% if can_edit %}<th></th>{% endif %}
                     </tr>
                 </thead>
@@ -67,7 +68,7 @@
                     <td><span class="pill pill-info" style="font-size:11px;">{{ p.item_type|capfirst }}</span></td>
                     <td class="num">
                         {% if p.lead_time_days %}
-                        <span class="lt-badge">{{ p.lead_time_days }} d</span>
+                        <span class="lt-badge">{% blocktrans with d=p.lead_time_days %}{{ d }} d{% endblocktrans %}</span>
                         {% else %}—{% endif %}
                     </td>
                     <td class="num">{{ p.on_hand|floatformat:0 }}</td>
@@ -83,7 +84,7 @@
                     {% if can_edit %}<td></td>{% endif %}
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="empty-state">No products found.</td></tr>
+                <tr><td colspan="6" class="empty-state">{% trans "No products found." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -92,9 +93,9 @@
     {% if can_edit %}
         <div class="form-actions" style="max-width:860px;margin-top:16px;">
             <button type="submit" class="btn btn-primary" style="padding:8px 24px;font-size:13px;">
-                Save All
+                {% trans "Save All" %}
             </button>
-            <a href="/mrp/" class="btn btn-cancel">Cancel</a>
+            <a href="/mrp/" class="btn btn-cancel">{% trans "Cancel" %}</a>
         </div>
     </form>
     {% endif %}

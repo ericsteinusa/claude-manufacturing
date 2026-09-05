@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}MRP Planning{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "MRP Planning" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/dashboard/" class="btn">Home</a>
-<a href="/mrp/safety-stock/" class="btn">Safety Stock</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="/mrp/safety-stock/" class="btn">{% trans "Safety Stock" %}</a>
 {% if has_plan %}
-<a href="/mrp/plan/" class="btn">View Current Plan</a>
+<a href="/mrp/plan/" class="btn">{% trans "View Current Plan" %}</a>
 {% endif %}
 {% endblock %}
 
@@ -40,15 +41,15 @@
 {% block body %}
 <div class="content">
 <div class="mrp-wrap">
-    <h2>Material Requirements Planning</h2>
-    <p class="sub">Net requirements based on confirmed Sales Orders vs on-hand stock and open Work Orders.</p>
+    <h2>{% trans "Material Requirements Planning" %}</h2>
+    <p class="sub">{% trans "Net requirements based on confirmed Sales Orders vs on-hand stock and open Work Orders." %}</p>
 
     <div class="info-card">
-        <strong>Demand source:</strong> Confirmed Sales Orders &nbsp;|&nbsp;
-        <strong>Scheduled receipts:</strong> Open / In-Progress Work Orders &nbsp;|&nbsp;
-        <strong>Safety stock:</strong> Reorder Point per product
+        <strong>{% trans "Demand source:" %}</strong> {% trans "Confirmed Sales Orders" %} &nbsp;|&nbsp;
+        <strong>{% trans "Scheduled receipts:" %}</strong> {% trans "Open / In-Progress Work Orders" %} &nbsp;|&nbsp;
+        <strong>{% trans "Safety stock:" %}</strong> {% trans "Reorder Point per product" %}
         <span style="color:var(--text-muted);font-size:11px;margin-left:8px;">
-            (set on each product's inventory record)
+            ({% trans "set on each product's inventory record" %})
         </span>
     </div>
 
@@ -56,14 +57,14 @@
     <table class="mrp-table">
         <thead>
             <tr>
-                <th>Product</th>
-                <th>Type</th>
-                <th class="num">Demand (SOs)</th>
-                <th class="num">Safety Stock</th>
-                <th class="num">On Hand</th>
-                <th class="num">Open WOs</th>
-                <th class="num">Net Need</th>
-                <th>Contributing SOs</th>
+                <th>{% trans "Product" %}</th>
+                <th>{% trans "Type" %}</th>
+                <th class="num">{% trans "Demand (SOs)" %}</th>
+                <th class="num">{% trans "Safety Stock" %}</th>
+                <th class="num">{% trans "On Hand" %}</th>
+                <th class="num">{% trans "Open WOs" %}</th>
+                <th class="num">{% trans "Net Need" %}</th>
+                <th>{% trans "Contributing SOs" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -94,30 +95,30 @@
         {% csrf_token %}
         <label style="font-size:13px;display:block;margin-bottom:8px;">
             <input type="checkbox" name="include_forecast">
-            Include forecasted demand
-            (<a href="/demand-forecast/" style="color:var(--accent);">AI Demand Forecast</a>)
+            {% trans "Include forecasted demand" %}
+            (<a href="/demand-forecast/" style="color:var(--accent);">{% trans "AI Demand Forecast" %}</a>)
         </label>
-        <button type="submit" class="run-btn">Run MRP Plan &rarr;</button>
+        <button type="submit" class="run-btn">{% trans "Run MRP Plan" %} &rarr;</button>
     </form>
     <p style="color: var(--text-muted);font-size:12px;margin-top:8px;">
-        Running the plan explodes all confirmed SO demand through the BOM,
+        {% blocktrans %}Running the plan explodes all confirmed SO demand through the BOM,
         nets against on-hand stock and open WOs, and computes planned orders.
         Checking "Include forecasted demand" also adds AI-generated future
-        demand from the Demand Forecast page.
+        demand from the Demand Forecast page.{% endblocktrans %}
     </p>
     {% endif %}
 
     {% else %}
-    <p class="empty-note">No confirmed Sales Orders with product lines found.
-        <a href="/so/" style="color:#99f;">Go to Sales Orders &rarr;</a>
+    <p class="empty-note">{% trans "No confirmed Sales Orders with product lines found." %}
+        <a href="/so/" style="color:#99f;">{% trans "Go to Sales Orders" %} &rarr;</a>
     </p>
     {% endif %}
 
     {% if has_plan %}
     <div style="margin-top:24px; padding:14px 18px; background:rgba(0,80,0,0.25);
                 border:1px solid #4a4; border-radius:6px; color:#cfc; font-size:13px;">
-        A plan was run recently.
-        <a href="/mrp/plan/" style="color:#9f9;font-weight:bold;">Review and release it &rarr;</a>
+        {% trans "A plan was run recently." %}
+        <a href="/mrp/plan/" style="color:#9f9;font-weight:bold;">{% trans "Review and release it" %} &rarr;</a>
     </div>
     {% endif %}
 </div>

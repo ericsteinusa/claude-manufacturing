@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Lot {{ lot.lot_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=lot.lot_number %}Lot {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/lots/" class="btn">← Lots</a>
-<a href="/qa/coa/new/?lot_id={{ lot.id }}" class="btn">Generate CoA</a>
+<a href="/lots/" class="btn">← {% trans "Lots" %}</a>
+<a href="/qa/coa/new/?lot_id={{ lot.id }}" class="btn">{% trans "Generate CoA" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -57,30 +58,30 @@
         <img src="/barcode/img/LOT-{{ lot.lot_number }}/" alt="Barcode LOT-{{ lot.lot_number }}">
         <small>LOT-{{ lot.lot_number }}</small>
     </div>
-    <h2>Lot {{ lot.lot_number }}</h2>
+    <h2>{% blocktrans with num=lot.lot_number %}Lot {{ num }}{% endblocktrans %}</h2>
     <div class="lot-meta">
         <span class="badge badge-{{ lot.status }}">{{ lot.status }}</span>
-        &nbsp;·&nbsp; Product: {{ lot.product_name|default:lot.product_id }}
+        &nbsp;·&nbsp; {% trans "Product:" %} {{ lot.product_name|default:lot.product_id }}
     </div>
 
     {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
 
     <div class="card">
-        <h3>Lot Details</h3>
+        <h3>{% trans "Lot Details" %}</h3>
         <div class="info-grid">
-            <span class="info-label">Lot Number</span><span>{{ lot.lot_number }}</span>
-            <span class="info-label">Quantity</span><span>{{ lot.qty }}</span>
-            <span class="info-label">Received</span><span>{{ lot.received_date|default:'-' }}</span>
-            <span class="info-label">Expires</span><span>{{ lot.expiry_date|default:'-' }}</span>
-            <span class="info-label">Notes</span><span>{{ lot.notes|default:'-' }}</span>
-            <span class="info-label">Created by</span><span>{{ lot.created_by|default:'-' }}</span>
+            <span class="info-label">{% trans "Lot Number" %}</span><span>{{ lot.lot_number }}</span>
+            <span class="info-label">{% trans "Quantity" %}</span><span>{{ lot.qty }}</span>
+            <span class="info-label">{% trans "Received" %}</span><span>{{ lot.received_date|default:'-' }}</span>
+            <span class="info-label">{% trans "Expires" %}</span><span>{{ lot.expiry_date|default:'-' }}</span>
+            <span class="info-label">{% trans "Notes" %}</span><span>{{ lot.notes|default:'-' }}</span>
+            <span class="info-label">{% trans "Created by" %}</span><span>{{ lot.created_by|default:'-' }}</span>
         </div>
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Update Status</h3>
+        <h3>{% trans "Update Status" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="status">
@@ -90,8 +91,8 @@
                     <option value="{{ s }}" {% if lot.status == s %}selected{% endif %}>{{ s|title }}</option>
                     {% endfor %}
                 </select>
-                <input type="text" name="notes" placeholder="Notes (optional)">
-                <button type="submit" class="btn-sm">Update</button>
+                <input type="text" name="notes" placeholder="{% trans 'Notes (optional)' %}">
+                <button type="submit" class="btn-sm">{% trans "Update" %}</button>
             </div>
         </form>
     </div>
@@ -99,7 +100,7 @@
 
     {% if genealogy.input_lots %}
     <div class="card">
-        <h3>Genealogy — Input Lots</h3>
+        <h3>{% trans "Genealogy — Input Lots" %}</h3>
         <ul class="genealogy-list">
         {% for il in genealogy.input_lots %}
             <li>
@@ -112,11 +113,11 @@
     {% endif %}
 
     <div class="card">
-        <h3>Serial Numbers ({{ serials|length }})</h3>
+        <h3>{% blocktrans with n=serials|length %}Serial Numbers ({{ n }}){% endblocktrans %}</h3>
         {% if serials %}
         <table class="serial-table">
             <thead>
-                <tr><th>Serial #</th><th>Status</th><th>Notes</th></tr>
+                <tr><th>{% trans "Serial #" %}</th><th>{% trans "Status" %}</th><th>{% trans "Notes" %}</th></tr>
             </thead>
             <tbody>
             {% for s in serials %}
@@ -129,16 +130,16 @@
             </tbody>
         </table>
         {% else %}
-        <p style="color:var(--text-muted);font-size:13px;">No serial numbers recorded.</p>
+        <p style="color:var(--text-muted);font-size:13px;">{% trans "No serial numbers recorded." %}</p>
         {% endif %}
 
         {% if can_edit %}
         <form method="post" style="margin-top:14px; display:flex; gap:8px; align-items:center;">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_serial">
-            <input type="text" name="serial_number" placeholder="New serial number"
+            <input type="text" name="serial_number" placeholder="{% trans 'New serial number' %}"
                 style="padding:5px 8px; border:1px solid #aaa; border-radius:4px; font-size:13px; width:220px;">
-            <button type="submit" class="btn-sm">+ Add Serial</button>
+            <button type="submit" class="btn-sm">+ {% trans "Add Serial" %}</button>
         </form>
         {% endif %}
     </div>

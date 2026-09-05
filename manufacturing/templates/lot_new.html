@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block page_title %}New Lot{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Lot" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/lots/" class="btn">← Lots</a>
+<a href="/lots/" class="btn">← {% trans "Lots" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -27,7 +28,7 @@
 {% block body %}
 <div class="content">
 <div class="form-wrap">
-    <h2>New Lot</h2>
+    <h2>{% trans "New Lot" %}</h2>
 
     {% if error %}
     <div class="alert-err">{{ error }}</div>
@@ -37,9 +38,9 @@
         <form method="post">
             {% csrf_token %}
             <div class="field">
-                <label>Product *</label>
+                <label>{% trans "Product *" %}</label>
                 <select name="product_id" required>
-                    <option value="">-- select product --</option>
+                    <option value="">{% trans "-- select product --" %}</option>
                     {% for p in products %}
                     <option value="{{ p.id }}" {% if form.product_id == p.id|stringformat:"s" %}selected{% endif %}>
                         {{ p.name }}{% if p.sku %} ({{ p.sku }}){% endif %}
@@ -48,30 +49,30 @@
                 </select>
             </div>
             <div class="field">
-                <label>Lot Number (auto-generated if blank)</label>
+                <label>{% trans "Lot Number (auto-generated if blank)" %}</label>
                 <input type="text" name="lot_number" value="{{ form.lot_number|default:'' }}"
-                    placeholder="e.g. LOT-2026-001">
+                    placeholder="{% trans 'e.g. LOT-2026-001' %}">
             </div>
             <div class="field">
-                <label>Quantity *</label>
+                <label>{% trans "Quantity *" %}</label>
                 <input type="number" name="qty" value="{{ form.qty|default:'' }}"
                     step="0.001" min="0" required>
             </div>
             <div class="field">
-                <label>Received Date</label>
+                <label>{% trans "Received Date" %}</label>
                 <input type="date" name="received_date" value="{{ form.received_date|default:'' }}">
             </div>
             <div class="field">
-                <label>Expiry Date</label>
+                <label>{% trans "Expiry Date" %}</label>
                 <input type="date" name="expiry_date" value="{{ form.expiry_date|default:'' }}">
             </div>
             <div class="field">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <textarea name="notes">{{ form.notes|default:'' }}</textarea>
             </div>
             <div class="actions">
-                <button type="submit" class="btn-primary">Create Lot</button>
-                <a href="/lots/" class="btn">Cancel</a>
+                <button type="submit" class="btn-primary">{% trans "Create Lot" %}</button>
+                <a href="/lots/" class="btn">{% trans "Cancel" %}</a>
             </div>
         </form>
     </div>

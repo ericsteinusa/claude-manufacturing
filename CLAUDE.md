@@ -1690,6 +1690,94 @@ as one continuous sentence with a real line break, not two disconnected
 fragments), in Spanish, French, and German with real sample data, no
 console or server errors.
 
+Also fully translated: the entire **Inventory, Lots, BOM, and MRP**
+feature set (`inventory_dashboard.html`, `inventory_detail.html`,
+`inventory_list.html`, `inventory_new.html`, `lot_detail.html`,
+`lot_list.html`, `lot_new.html`, `bom_detail.html`, `bom_explode.html`,
+`bom_list.html`, `mrp_home.html`, `mrp_plan.html`, `mrp_release.html`,
+`mrp_safety_stock.html` — 14 templates, the eighteenth "whole feature
+set" pass and the first to span four related-but-distinct feature areas
+in one batch rather than one department, since Inventory/Lots/BOM/MRP
+share the same product-master data and are cross-linked constantly
+(a BOM's components link to Inventory detail pages, MRP plans link back
+to BOM). Marked up by two parallel subagents (Inventory+Lots vs.
+BOM+MRP), reviewed and translated centrally — same pipeline as every
+batch since Portals. 169 unique strings across 5 languages (163 simple
++ 6 plural), translated by two further parallel agents split by string
+count rather than by file, each producing all 5 languages together per
+string for terminology consistency.
+
+Introduced a new `{{ d }} d` / `{{ d }} days` lead-time abbreviation
+pattern (`{% blocktrans with d=... %}`), reused across `bom_detail.html`,
+`bom_explode.html`, `mrp_plan.html`, and `mrp_safety_stock.html`, so each
+language can supply its own short unit abbreviation rather than the
+literal English "d". Two `|pluralize` anti-patterns converted to proper
+`{% blocktrans count %}` blocks, continuing the class first found in the
+Production pass: `inventory_list.html`'s "N product(s)" footer and
+`lot_list.html`'s "N lot(s) expiring within 30 days" banner.
+`mrp_release.html` needed the trickiest pluralization handling in this
+series so far — two *independent* counts in one sentence ("Released N
+Work Order(s) and M Purchase Order(s)"), split into two separate
+`{% blocktrans count %}` blocks joined by a plain `{% trans "and" %}`
+rather than one combined block, since gettext plural forms only support
+a single counting variable per block.
+
+**A genuine cross-context mistranslation bug was found and fixed,
+the same class as the Portals pass's "RMA #" bug**: the bare English
+word "Make" is ambiguous between "manufacturer brand" (as in
+`it_asset_list.html`'s IT Asset "Make" column, already translated
+Marca/Marque/Marke/Marca/Merk from the IT department pass) and "produce
+in-house" (this batch's `item_type=make` filter/dropdown options in
+`inventory_list.html`, `inventory_detail.html`, `inventory_new.html`).
+Because gettext keys its catalog by exact source text with no notion of
+surrounding context, the new item_type usage silently inherited the
+IT Asset translation in all 5 languages — French rendered the "Make"
+inventory filter as "Marque" (brand), not "Fabriquer" (to produce).
+Caught by inspecting the rendered French filter bar directly rather
+than trusting a passing test suite (this class of bug produces no
+syntax error, no blank/fuzzy entry, and no test failure — the string
+*is* translated, just to the wrong word). Fixed with Django's
+`{% trans "Make" context "item_type" %}` tag, which creates a separate
+`msgctxt`-scoped catalog entry independent of the IT Asset one; verified
+the IT Asset page still renders "Marque"/"Marque"/"Marke"/"Marca"/"Merk"
+unaffected before translating the new context-scoped entry as a verb
+infinitive to match the existing "Buy" → Comprar/Acheter/Kaufen/
+Comprar/Kopen pattern (Fabricar/Fabriquer/Herstellen/Fabricar/Maken).
+Worth a standing checklist item alongside the dotted-blocktrans-variable
+and bare-`default:"literal"` checks from prior passes: before trusting
+an exact-msgid auto-merge, grep the new template's own words for
+generic single-word labels ("Make", "Type", "Status") and spot-check
+one non-English rendering of each, since ambiguous English homographs
+are exactly the case ordinary syntax/blank-entry checks can't catch.
+
+Full suite 3475 passed (unchanged), `manage.py check` and `ruff check .`
+clean, `msgfmt --check` clean on all 5 files, zero fuzzy/blank entries
+confirmed programmatically both before and after a same-session merge
+with the Personnel batch (PR #250, merged concurrently — both batches
+touched `locale/*/LC_MESSAGES/django.po`, requiring a conflict
+resolution: rather than a manual line-level `.po` merge, the cleaner
+fix was taking `main`'s post-merge catalog as the base, re-running
+`makemessages` to re-extract this batch's own new strings fresh against
+it, and re-applying the same saved translation dictionary — safer than
+resolving a multi-thousand-line textual diff by hand). Verified
+end-to-end against the real dev server, in French with real sample
+data: the Inventory Dashboard, Inventory list (confirmed the "N
+products" plural and the "Fabriquer"/"Acheter" filter fix, and that
+`it_asset_list.html`'s unrelated "Marque" column was unaffected), a
+real product's Inventory detail page (confirmed the item-type edit
+dropdown's context-scoped translation), Lot Tracking list, a BOM
+detail page (confirmed "Composants (2)" and the untranslated literal
+"BOM" in the page title, correct per the BOM/MRP-stay-literal
+convention), the MRP Home page (confirmed the full demand-source/
+scheduled-receipts/safety-stock info-card sentence), and — via direct
+`gettext()` calls activating all 5 locales — that all 6 multi-line
+`{% blocktrans %}` strings in this batch (the BOM explosion quantity
+line, the inventory transaction-type hint, the MRP run/release/
+safety-stock explanatory paragraphs) render with real line breaks, not
+literal `\n` escapes, continuing the runtime-verification habit
+established after the WO/SO pass's double-escape bug. No console or
+server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
