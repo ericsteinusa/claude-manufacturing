@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 19:40+0000\n"
+"POT-Creation-Date: 2026-09-05 20:02+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -213,6 +213,7 @@ msgid "Reports"
 msgstr "Rapporten"
 
 #: manufacturing/sales_orders_core.py:33
+#: manufacturing/templates/register.html:91
 msgid "Confirm"
 msgstr "Bevestigen"
 
@@ -2657,7 +2658,8 @@ msgstr "Activeren"
 
 #: manufacturing/templates/approval_rule_edit.html:93
 msgid "Delete this rule permanently? This cannot be undone."
-msgstr "Deze regel permanent verwijderen? Dit kan niet ongedaan worden gemaakt."
+msgstr ""
+"Deze regel permanent verwijderen? Dit kan niet ongedaan worden gemaakt."
 
 #: manufacturing/templates/approval_rule_edit.html:96
 #: manufacturing/templates/report_builder_list.html:41
@@ -2672,7 +2674,11 @@ msgid ""
 "Deleting fails if approval steps have already been created against this rule "
 "—\n"
 "            deactivate it instead to stop it from applying to new entities."
-msgstr "Verwijderen mislukt als er al goedkeuringsstappen voor deze regel zijn aangemaakt —\n            deactiveer de regel in plaats daarvan zodat deze niet meer op nieuwe entiteiten wordt toegepast."
+msgstr ""
+"Verwijderen mislukt als er al goedkeuringsstappen voor deze regel zijn "
+"aangemaakt —\n"
+"            deactiveer de regel in plaats daarvan zodat deze niet meer op "
+"nieuwe entiteiten wordt toegepast."
 
 #: manufacturing/templates/approval_rule_list.html:7
 msgid "New Rule"
@@ -2686,7 +2692,12 @@ msgid ""
 "the entity's\n"
 "        amount meets its threshold; leave department blank to apply it to "
 "every department."
-msgstr "Regels bepalen wie inkooporders, aanvragen, GL-boekingen,\n        cyclustellingen en documenten moet goedkeuren — en in welke volgorde. Een regel is van toepassing zodra het bedrag\n        van de entiteit de drempel bereikt; laat de afdeling leeg om de regel op alle afdelingen toe te passen."
+msgstr ""
+"Regels bepalen wie inkooporders, aanvragen, GL-boekingen,\n"
+"        cyclustellingen en documenten moet goedkeuren — en in welke "
+"volgorde. Een regel is van toepassing zodra het bedrag\n"
+"        van de entiteit de drempel bereikt; laat de afdeling leeg om de "
+"regel op alle afdelingen toe te passen."
 
 #: manufacturing/templates/approval_rule_list.html:25
 msgid "Filter by type:"
@@ -2765,11 +2776,15 @@ msgstr "Nieuwe Goedkeuringsregel"
 #: manufacturing/templates/approval_rule_new.html:45
 msgid ""
 "Leave as \"All departments\" unless this rule should only fire for one dept."
-msgstr "Laat dit op \"Alle afdelingen\" staan, tenzij deze regel alleen voor één afdeling moet gelden."
+msgstr ""
+"Laat dit op \"Alle afdelingen\" staan, tenzij deze regel alleen voor één "
+"afdeling moet gelden."
 
 #: manufacturing/templates/approval_rule_new.html:50
 msgid "Rule applies once the entity's amount is greater than or equal to this."
-msgstr "De regel is van toepassing zodra het bedrag van de entiteit gelijk is aan of groter is dan deze waarde."
+msgstr ""
+"De regel is van toepassing zodra het bedrag van de entiteit gelijk is aan of "
+"groter is dan deze waarde."
 
 #: manufacturing/templates/approval_rule_new.html:64
 msgid "Lower sequence numbers must be decided first."
@@ -3097,6 +3112,7 @@ msgstr "Naam"
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/portal_login.html:18
 #: manufacturing/templates/portal_register.html:15
+#: manufacturing/templates/register.html:79
 #: manufacturing/templates/supplier_portal_login.html:18
 #: manufacturing/templates/supplier_portal_register.html:15
 #: manufacturing/templates/user_roles.html:21
@@ -3554,6 +3570,7 @@ msgstr "Laden…"
 
 #: manufacturing/templates/base.html:482 manufacturing/templates/home.html:24
 #: manufacturing/templates/portal_login.html:24
+#: manufacturing/templates/register.html:85
 #: manufacturing/templates/supplier_portal_login.html:24
 msgid "Password"
 msgstr "Wachtwoord"
@@ -3825,6 +3842,26 @@ msgstr "Datagovernance"
 #: manufacturing/templates/dashboard.html:12
 msgid "Periods"
 msgstr "Periodes"
+
+#: manufacturing/templates/base_card.html:7
+#: manufacturing/templates/base_card.html:285
+#: manufacturing/templates/dashboard.html:4 manufacturing/templates/home.html:4
+#: manufacturing/templates/home_mfa.html:4
+#: manufacturing/templates/portal_login.html:4
+#: manufacturing/templates/portal_register.html:4
+#: manufacturing/templates/supplier_portal_login.html:4
+#: manufacturing/templates/supplier_portal_register.html:4
+msgid "Manufacturing ERP"
+msgstr "Productie-ERP"
+
+#: manufacturing/templates/base_card.html:286
+msgid "Enterprise Resource Planning"
+msgstr "Enterprise Resource Planning"
+
+#: manufacturing/templates/base_card.html:291
+#, python-format
+msgid "© %(cur_year)s Manufacturing ERP"
+msgstr "© %(cur_year)s Manufacturing ERP"
 
 #: manufacturing/templates/base_portal.html:7
 #: manufacturing/templates/base_portal.html:152
@@ -4562,7 +4599,10 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/blanket_po_new.html:55
 #: manufacturing/templates/blanket_po_release_new.html:49
 #: manufacturing/templates/bom_detail.html:191
+#: manufacturing/templates/change_password.html:42
 #: manufacturing/templates/eng_project_detail.html:175
+#: manufacturing/templates/forgot_password.html:37
+#: manufacturing/templates/forgot_password_reset.html:40
 #: manufacturing/templates/gl_accounts.html:115
 #: manufacturing/templates/it_incident_detail.html:82
 #: manufacturing/templates/it_task_detail.html:98
@@ -4574,6 +4614,7 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/maint_part_detail.html:144
 #: manufacturing/templates/maint_schedule_detail.html:161
 #: manufacturing/templates/maint_wo_detail.html:207
+#: manufacturing/templates/mfa_enroll.html:41
 #: manufacturing/templates/mrp_safety_stock.html:98
 #: manufacturing/templates/payroll_pay_rates.html:131
 #: manufacturing/templates/people_form.html:123
@@ -4584,6 +4625,7 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/qa_capa_detail.html:154
 #: manufacturing/templates/qa_ncr_detail.html:177
 #: manufacturing/templates/qa_supplier_detail.html:130
+#: manufacturing/templates/register.html:99
 #: manufacturing/templates/sales_commission_plans.html:128
 #: manufacturing/templates/sales_commissions.html:193
 #: manufacturing/templates/sales_quotes.html:128
@@ -4976,6 +5018,50 @@ msgstr "Geen producten gevonden"
 #, python-format
 msgid " with type \"%(t)s\""
 msgstr " met type \"%(t)s\""
+
+#: manufacturing/templates/change_password.html:4
+#: manufacturing/templates/change_password.html:7
+#: manufacturing/templates/change_password.html:40
+msgid "Change Password"
+msgstr "Wachtwoord Wijzigen"
+
+#: manufacturing/templates/change_password.html:19
+#: manufacturing/templates/forgot_password.html:29
+#: manufacturing/templates/people_detail.html:59
+msgid "Email:"
+msgstr "E-mail:"
+
+#: manufacturing/templates/change_password.html:21
+#: manufacturing/templates/forgot_password.html:31
+msgid "Your registered email"
+msgstr "Uw geregistreerde e-mailadres"
+
+#: manufacturing/templates/change_password.html:25
+msgid "Current Password:"
+msgstr "Huidig Wachtwoord:"
+
+#: manufacturing/templates/change_password.html:27
+msgid "Current password"
+msgstr "Huidig wachtwoord"
+
+#: manufacturing/templates/change_password.html:30
+#: manufacturing/templates/forgot_password_reset.html:28
+msgid "New Password:"
+msgstr "Nieuw Wachtwoord:"
+
+#: manufacturing/templates/change_password.html:32
+msgid "8+ chars, upper, lower, digit"
+msgstr "8+ tekens, hoofdletter, kleine letter, cijfer"
+
+#: manufacturing/templates/change_password.html:35
+#: manufacturing/templates/forgot_password_reset.html:33
+msgid "Confirm:"
+msgstr "Bevestigen:"
+
+#: manufacturing/templates/change_password.html:37
+#: manufacturing/templates/forgot_password_reset.html:35
+msgid "Re-enter new password"
+msgstr "Nieuw wachtwoord opnieuw invoeren"
 
 #: manufacturing/templates/coa_detail.html:6
 #: manufacturing/templates/coa_list.html:3
@@ -6949,14 +7035,6 @@ msgstr "Valuta Opslaan"
 msgid "Quick-add:"
 msgstr "Snel toevoegen:"
 
-#: manufacturing/templates/dashboard.html:4 manufacturing/templates/home.html:4
-#: manufacturing/templates/portal_login.html:4
-#: manufacturing/templates/portal_register.html:4
-#: manufacturing/templates/supplier_portal_login.html:4
-#: manufacturing/templates/supplier_portal_register.html:4
-msgid "Manufacturing ERP"
-msgstr "Productie-ERP"
-
 #: manufacturing/templates/dashboard.html:14
 msgid "PO Approvals"
 msgstr "PO-goedkeuringen"
@@ -7040,7 +7118,16 @@ msgid ""
 "        payroll, or review history, which this app must keep for financial/"
 "operational\n"
 "        recordkeeping."
-msgstr "Recht op vergetelheid (anonimisering), export van inzagegegevens en automatisch\n        bewaarbeleid voor PII van medewerkers. Anonimisering overschrijft iemands naam,\n        adres, contactgegevens en e-mail met plaatshouders\n        en trekt hun inlogtoegang in — het verwijdert niet hun tijdregistratie-, salaris-\n        of beoordelingsgeschiedenis, die deze applicatie moet bewaren voor financiële/operationele administratie."
+msgstr ""
+"Recht op vergetelheid (anonimisering), export van inzagegegevens en "
+"automatisch\n"
+"        bewaarbeleid voor PII van medewerkers. Anonimisering overschrijft "
+"iemands naam,\n"
+"        adres, contactgegevens en e-mail met plaatshouders\n"
+"        en trekt hun inlogtoegang in — het verwijdert niet hun "
+"tijdregistratie-, salaris-\n"
+"        of beoordelingsgeschiedenis, die deze applicatie moet bewaren voor "
+"financiële/operationele administratie."
 
 #: manufacturing/templates/data_governance_dashboard.html:38
 msgid "Find a Person"
@@ -7059,7 +7146,10 @@ msgstr "Gegevens Exporteren"
 msgid ""
 "Anonymize %(first)s %(last)s? This overwrites their name/address/email/phone "
 "with placeholders and revokes login access. This cannot be undone."
-msgstr "%(first)s %(last)s anonimiseren? Dit overschrijft naam/adres/e-mail/telefoon met plaatshouders en trekt de inlogtoegang in. Dit kan niet ongedaan worden gemaakt."
+msgstr ""
+"%(first)s %(last)s anonimiseren? Dit overschrijft naam/adres/e-mail/telefoon "
+"met plaatshouders en trekt de inlogtoegang in. Dit kan niet ongedaan worden "
+"gemaakt."
 
 #: manufacturing/templates/data_governance_dashboard.html:64
 msgid "Erase"
@@ -7080,7 +7170,11 @@ msgid ""
 "older\n"
 "            than the policy's cutoff. Run via <code>python manage.py "
 "run_data_retention</code>."
-msgstr "Anonimiseert automatisch uit dienst getreden medewerkers zodra hun einddatum ouder is\n            dan de afkapdatum van het beleid. Uitvoeren via <code>python manage.py run_data_retention</code>."
+msgstr ""
+"Anonimiseert automatisch uit dienst getreden medewerkers zodra hun einddatum "
+"ouder is\n"
+"            dan de afkapdatum van het beleid. Uitvoeren via <code>python "
+"manage.py run_data_retention</code>."
 
 #: manufacturing/templates/data_governance_dashboard.html:88
 msgid "Months After Termination"
@@ -8144,6 +8238,7 @@ msgstr ""
 
 #: manufacturing/templates/ess_profile.html:42
 #: manufacturing/templates/people_form.html:100
+#: manufacturing/templates/register.html:58
 msgid "Address"
 msgstr "Adres"
 
@@ -8154,11 +8249,14 @@ msgstr "Straatnaam en Huisnummer"
 
 #: manufacturing/templates/ess_profile.html:48
 #: manufacturing/templates/people_form.html:107
+#: manufacturing/templates/register.html:65
+#: manufacturing/templates/register.html:66
 msgid "City"
 msgstr "Plaats"
 
 #: manufacturing/templates/ess_profile.html:52
 #: manufacturing/templates/people_form.html:111
+#: manufacturing/templates/register.html:69
 msgid "State"
 msgstr "Provincie"
 
@@ -9402,6 +9500,38 @@ msgstr "Optionele notities..."
 msgid "Create Asset"
 msgstr "Actief Aanmaken"
 
+#: manufacturing/templates/forgot_password.html:4
+#: manufacturing/templates/forgot_password_reset.html:38
+msgid "Reset Password"
+msgstr "Wachtwoord Resetten"
+
+#: manufacturing/templates/forgot_password.html:19
+msgid "Reset Your Password"
+msgstr "Reset Uw Wachtwoord"
+
+#: manufacturing/templates/forgot_password.html:20
+msgid "Enter your email to verify your account,<br>then choose a new password."
+msgstr "Voer uw e-mailadres in om uw account te verifiëren,<br>kies dan een nieuw wachtwoord."
+
+#: manufacturing/templates/forgot_password.html:35
+msgid "Verify Email"
+msgstr "E-mail Verifiëren"
+
+#: manufacturing/templates/forgot_password_reset.html:4
+#: manufacturing/templates/forgot_password_reset.html:18
+msgid "Choose New Password"
+msgstr "Nieuw Wachtwoord Kiezen"
+
+#: manufacturing/templates/forgot_password_reset.html:19
+#, python-format
+msgid "Setting new password for %(email)s"
+msgstr "Nieuw wachtwoord instellen voor %(email)s"
+
+#: manufacturing/templates/forgot_password_reset.html:30
+#: manufacturing/templates/register.html:87
+msgid "Minimum 8 characters"
+msgstr "Minimaal 8 tekens"
+
 #: manufacturing/templates/gl_accounts.html:6
 #: manufacturing/templates/gl_balance_sheet.html:6
 #: manufacturing/templates/gl_cash_flow_statement.html:6
@@ -9868,6 +9998,32 @@ msgstr "Bent u klant? Log in op het klantenportaal"
 #: manufacturing/templates/home.html:51
 msgid "Are you a supplier? Log in to the Supplier Portal"
 msgstr "Bent u leverancier? Log in op het leveranciersportaal"
+
+#: manufacturing/templates/home_mfa.html:4
+msgid "Verify Code"
+msgstr "Code Verifiëren"
+
+#: manufacturing/templates/home_mfa.html:7
+msgid "Enter your 6-digit code"
+msgstr "Voer uw 6-cijferige code in"
+
+#: manufacturing/templates/home_mfa.html:9
+msgid ""
+"Open your authenticator app and enter the current code for this account."
+msgstr "Open uw authenticator-app en voer de huidige code voor dit account in."
+
+#: manufacturing/templates/home_mfa.html:19
+#: manufacturing/templates/mfa_enroll.html:32
+msgid "Authentication Code"
+msgstr "Authenticatiecode"
+
+#: manufacturing/templates/home_mfa.html:24
+msgid "Verify"
+msgstr "Verifiëren"
+
+#: manufacturing/templates/home_mfa.html:28
+msgid "Cancel and sign in again"
+msgstr "Annuleren en opnieuw inloggen"
 
 #: manufacturing/templates/inventory_dashboard.html:3
 #: manufacturing/templates/inventory_dashboard.html:33
@@ -12619,6 +12775,69 @@ msgstr "Doelstelling"
 msgid "No campaigns found."
 msgstr "Geen campagnes gevonden."
 
+#: manufacturing/templates/mfa_enroll.html:4
+#: manufacturing/templates/mfa_enroll.html:7
+#: manufacturing/templates/mfa_settings.html:37
+msgid "Set Up Two-Factor Authentication"
+msgstr "Tweefactorauthenticatie Instellen"
+
+#: manufacturing/templates/mfa_enroll.html:14
+msgid ""
+"1. Open your authenticator app (Google Authenticator, Authy, 1Password, "
+"etc.)\n"
+"    and add a new account using this key:"
+msgstr "1. Open uw authenticator-app (Google Authenticator, Authy, 1Password, enz.)\n    en voeg een nieuw account toe met deze sleutel:"
+
+#: manufacturing/templates/mfa_enroll.html:22
+msgid "Open directly in an authenticator app on this device"
+msgstr "Rechtstreeks openen in een authenticator-app op dit apparaat"
+
+#: manufacturing/templates/mfa_enroll.html:26
+msgid ""
+"2. Enter the 6-digit code your app shows for this account to confirm setup:"
+msgstr "2. Voer de 6-cijferige code in die uw app voor dit account toont om de installatie te bevestigen:"
+
+#: manufacturing/templates/mfa_enroll.html:37
+msgid "Confirm and Enable"
+msgstr "Bevestigen en Inschakelen"
+
+#: manufacturing/templates/mfa_settings.html:4
+#: manufacturing/templates/mfa_settings.html:7
+msgid "Two-Factor Authentication"
+msgstr "Tweefactorauthenticatie"
+
+#: manufacturing/templates/mfa_settings.html:18
+msgid ""
+"Two-factor authentication is <strong>enabled</strong> on your account.\n"
+"    You'll be asked for a code from your authenticator app each time you "
+"sign in."
+msgstr "Tweefactorauthenticatie is <strong>ingeschakeld</strong> voor uw account.\n    U wordt bij elke aanmelding om een code van uw authenticator-app gevraagd."
+
+#: manufacturing/templates/mfa_settings.html:24
+msgid "Current Password"
+msgstr "Huidig Wachtwoord"
+
+#: manufacturing/templates/mfa_settings.html:26
+msgid "Confirm your password to disable"
+msgstr "Bevestig uw wachtwoord om uit te schakelen"
+
+#: manufacturing/templates/mfa_settings.html:28
+msgid "Disable Two-Factor Authentication"
+msgstr "Tweefactorauthenticatie Uitschakelen"
+
+#: manufacturing/templates/mfa_settings.html:32
+msgid ""
+"Two-factor authentication is <strong>not enabled</strong> on your account.\n"
+"    Turning it on requires a code from an authenticator app (Google "
+"Authenticator,\n"
+"    Authy, 1Password, etc.) every time you sign in."
+msgstr "Tweefactorauthenticatie is <strong>niet ingeschakeld</strong> voor uw account.\n    Om het in te schakelen is bij elke aanmelding een code van een authenticator-app (Google Authenticator,\n    Authy, 1Password, enz.) vereist."
+
+#: manufacturing/templates/mfa_settings.html:42
+#: manufacturing/templates/user_roles.html:7
+msgid "Back to Dashboard"
+msgstr "Terug naar Dashboard"
+
 #: manufacturing/templates/mkt_ad_detail.html:3
 #, python-format
 msgid "Ad #%(id)s"
@@ -13744,10 +13963,6 @@ msgstr "Afdeling:"
 msgid "Sub-Dept:"
 msgstr "Subafdeling:"
 
-#: manufacturing/templates/people_detail.html:59
-msgid "Email:"
-msgstr "E-mail:"
-
 #: manufacturing/templates/people_detail.html:61
 msgid "Address:"
 msgstr "Adres:"
@@ -13826,7 +14041,11 @@ msgid ""
 "Close a period to prevent any new or edited records from being dated\n"
 "        within it. Only President and Vice President may close or reopen "
 "periods."
-msgstr "Sluit een periode om te voorkomen dat nieuwe of bewerkte records worden gedateerd\n        binnen deze periode. Alleen de voorzitter en de vicevoorzitter mogen periodes sluiten of heropenen."
+msgstr ""
+"Sluit een periode om te voorkomen dat nieuwe of bewerkte records worden "
+"gedateerd\n"
+"        binnen deze periode. Alleen de voorzitter en de vicevoorzitter mogen "
+"periodes sluiten of heropenen."
 
 #: manufacturing/templates/periods.html:22
 msgid "Close a Period"
@@ -13886,7 +14105,9 @@ msgstr "bijv. Jaareindafsluiting"
 
 #: manufacturing/templates/periods.html:53
 msgid "Close this period? Writes dated in this period will be blocked."
-msgstr "Deze periode sluiten? Boekingen die in deze periode zijn gedateerd, worden geblokkeerd."
+msgstr ""
+"Deze periode sluiten? Boekingen die in deze periode zijn gedateerd, worden "
+"geblokkeerd."
 
 #: manufacturing/templates/periods.html:54
 msgid "Close Period"
@@ -15957,6 +16178,59 @@ msgstr "Datum laatste audit"
 msgid "Add Record"
 msgstr "Record toevoegen"
 
+#: manufacturing/templates/register.html:4
+msgid "Register New User"
+msgstr "Nieuwe Gebruiker Registreren"
+
+#: manufacturing/templates/register.html:29
+msgid "Register New Employee"
+msgstr "Nieuwe Werknemer Registreren"
+
+#: manufacturing/templates/register.html:40
+msgid "First Name"
+msgstr "Voornaam"
+
+#: manufacturing/templates/register.html:42
+msgid "First name"
+msgstr "Voornaam"
+
+#: manufacturing/templates/register.html:45
+msgid "Last Name"
+msgstr "Achternaam"
+
+#: manufacturing/templates/register.html:47
+msgid "Last name"
+msgstr "Achternaam"
+
+#: manufacturing/templates/register.html:52
+msgid "Employee ID"
+msgstr "Werknemer-ID"
+
+#: manufacturing/templates/register.html:54
+msgid "Numbers only (optional)"
+msgstr "Alleen cijfers (optioneel)"
+
+#: manufacturing/templates/register.html:60
+msgid "Street address"
+msgstr "Straatadres"
+
+#: manufacturing/templates/register.html:73
+#: manufacturing/templates/register.html:74
+msgid "Zip"
+msgstr "Postcode"
+
+#: manufacturing/templates/register.html:81
+msgid "Email address"
+msgstr "E-mailadres"
+
+#: manufacturing/templates/register.html:93
+msgid "Re-enter password"
+msgstr "Wachtwoord opnieuw invoeren"
+
+#: manufacturing/templates/register.html:97
+msgid "Register"
+msgstr "Registreren"
+
 #: manufacturing/templates/report_builder_detail.html:9
 msgid "Export PDF"
 msgstr "PDF exporteren"
@@ -16312,7 +16586,9 @@ msgstr "Bewaarbeleid Bewerken"
 msgid ""
 "Terminated employees are anonymized once this many months have passed since "
 "their termination date."
-msgstr "Uitdiensttredende medewerkers worden geanonimiseerd zodra dit aantal maanden is verstreken sinds hun uitdiensttredingsdatum."
+msgstr ""
+"Uitdiensttredende medewerkers worden geanonimiseerd zodra dit aantal maanden "
+"is verstreken sinds hun uitdiensttredingsdatum."
 
 #: manufacturing/templates/retention_policy_edit.html:50
 msgid "Deactivate this policy?"
@@ -18361,10 +18637,6 @@ msgstr "Geen verlofaanvragen gevonden."
 msgid "User Role Management"
 msgstr "Gebruikersrolbeheer"
 
-#: manufacturing/templates/user_roles.html:7
-msgid "Back to Dashboard"
-msgstr "Terug naar Dashboard"
-
 #: manufacturing/templates/user_roles.html:23
 msgid "Current Role"
 msgstr "Huidige Rol"
@@ -18427,7 +18699,8 @@ msgstr "Dit abonnement activeren?"
 
 #: manufacturing/templates/webhook_edit.html:89
 msgid "Delete this subscription permanently? This cannot be undone."
-msgstr "Dit abonnement permanent verwijderen? Dit kan niet ongedaan worden gemaakt."
+msgstr ""
+"Dit abonnement permanent verwijderen? Dit kan niet ongedaan worden gemaakt."
 
 #: manufacturing/templates/webhook_list.html:3
 #: manufacturing/templates/webhook_list.html:17
@@ -18447,7 +18720,14 @@ msgid ""
 "        ships, or an NCR opens. Each subscription is delivered as a signed "
 "JSON POST to your\n"
 "        target URL."
-msgstr "Breng een extern systeem (Zapier, het eigen ERP van een klant, een Slack-kanaal) op de hoogte wanneer een\n        bedrijfsgebeurtenis plaatsvindt — de status van een inkooporder verandert, een productieorder wordt voltooid, een verkooporder\n        wordt verzonden, of een NCR wordt geopend. Elk abonnement wordt afgeleverd als een ondertekende JSON-POST naar uw\n        doel-URL."
+msgstr ""
+"Breng een extern systeem (Zapier, het eigen ERP van een klant, een Slack-"
+"kanaal) op de hoogte wanneer een\n"
+"        bedrijfsgebeurtenis plaatsvindt — de status van een inkooporder "
+"verandert, een productieorder wordt voltooid, een verkooporder\n"
+"        wordt verzonden, of een NCR wordt geopend. Elk abonnement wordt "
+"afgeleverd als een ondertekende JSON-POST naar uw\n"
+"        doel-URL."
 
 #: manufacturing/templates/webhook_list.html:26
 msgid "Filter by event:"
@@ -18485,7 +18765,8 @@ msgstr "Nieuw Webhookabonnement"
 
 #: manufacturing/templates/webhook_new.html:40
 msgid "Where we'll POST a JSON payload when this event fires."
-msgstr "Waar we een JSON-payload naartoe POSTen wanneer deze gebeurtenis plaatsvindt."
+msgstr ""
+"Waar we een JSON-payload naartoe POSTen wanneer deze gebeurtenis plaatsvindt."
 
 #: manufacturing/templates/webhook_new.html:44
 msgid "Optional — leave blank for an unsigned payload"
@@ -18497,7 +18778,13 @@ msgid ""
 "                    base64(HMAC-SHA256(secret, raw body)) — the same scheme "
 "this app's own\n"
 "                    inbound Shopify/WooCommerce webhook verification uses."
-msgstr "Indien ingesteld, bevat elk verzoek een <code>X-Webhook-Signature</code>-header:\n                    base64(HMAC-SHA256(secret, raw body)) — hetzelfde schema dat de eigen\n                    inkomende Shopify/WooCommerce-webhookverificatie van deze app gebruikt."
+msgstr ""
+"Indien ingesteld, bevat elk verzoek een <code>X-Webhook-Signature</code>-"
+"header:\n"
+"                    base64(HMAC-SHA256(secret, raw body)) — hetzelfde schema "
+"dat de eigen\n"
+"                    inkomende Shopify/WooCommerce-webhookverificatie van "
+"deze app gebruikt."
 
 #: manufacturing/templates/webhook_new.html:51
 msgid "Create Subscription"

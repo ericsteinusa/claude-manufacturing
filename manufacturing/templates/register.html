@@ -1,6 +1,7 @@
 {% extends "base_card.html" %}
+{% load i18n %}
 
-{% block page_title %}Register New User{% endblock %}
+{% block page_title %}{% trans "Register New User" %}{% endblock %}
 
 {% block extra_styles %}
 .card { width: min(540px, 100%); padding: 36px 48px; }
@@ -15,7 +16,7 @@
 .csz-row { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-end; }
 .csz-row .city  { flex: 1; }
 .csz-row .state { width: 56px; }
-.csz-row .zip   { width: 96px; }
+.csz-row .zip   { width: 132px; }
 .csz-label { font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: .4px; color: var(--text-muted); display: block; margin-bottom: 4px; }
 .csz-input { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border);
@@ -25,7 +26,7 @@
 {% endblock %}
 
 {% block card_content %}
-<h2 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:20px;">Register New Employee</h2>
+<h2 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:20px;">{% trans "Register New Employee" %}</h2>
 
 {% if error %}
 <div class="error-msg">{{ error }}</div>
@@ -36,66 +37,66 @@
 
     <div class="name-row">
         <div class="field">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);">First Name</label>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);">{% trans "First Name" %}</label>
             <input type="text" name="first_name" class="csz-input"
-                   placeholder="First name" value="{{ form.first_name }}" required autofocus>
+                   placeholder="{% trans 'First name' %}" value="{{ form.first_name }}" required autofocus>
         </div>
         <div class="field">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);">Last Name</label>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);">{% trans "Last Name" %}</label>
             <input type="text" name="last_name" class="csz-input"
-                   placeholder="Last name" value="{{ form.last_name }}" required>
+                   placeholder="{% trans 'Last name' %}" value="{{ form.last_name }}" required>
         </div>
     </div>
 
     <div class="form-row">
-        <label>Employee ID</label>
+        <label>{% trans "Employee ID" %}</label>
         <input type="text" name="employee_id"
-               placeholder="Numbers only (optional)" value="{{ form.employee_id }}">
+               placeholder="{% trans 'Numbers only (optional)' %}" value="{{ form.employee_id }}">
     </div>
 
     <div class="form-row">
-        <label>Address</label>
+        <label>{% trans "Address" %}</label>
         <input type="text" name="address"
-               placeholder="Street address" value="{{ form.address }}">
+               placeholder="{% trans 'Street address' %}" value="{{ form.address }}">
     </div>
 
     <div class="csz-row">
         <div class="city">
-            <span class="csz-label">City</span>
-            <input type="text" name="city" class="csz-input" placeholder="City" value="{{ form.city }}">
+            <span class="csz-label">{% trans "City" %}</span>
+            <input type="text" name="city" class="csz-input" placeholder="{% trans 'City' %}" value="{{ form.city }}">
         </div>
         <div class="state">
-            <span class="csz-label">State</span>
+            <span class="csz-label">{% trans "State" %}</span>
             <input type="text" name="state" class="csz-input" placeholder="ST" maxlength="2" value="{{ form.state }}">
         </div>
         <div class="zip">
-            <span class="csz-label">Zip</span>
-            <input type="text" name="zip_code" class="csz-input" placeholder="Zip" maxlength="10" value="{{ form.zip_code }}">
+            <span class="csz-label">{% trans "Zip" %}</span>
+            <input type="text" name="zip_code" class="csz-input" placeholder="{% trans 'Zip' %}" maxlength="10" value="{{ form.zip_code }}">
         </div>
     </div>
 
     <div class="form-row">
-        <label>Email</label>
+        <label>{% trans "Email" %}</label>
         <input type="email" name="email"
-               placeholder="Email address" value="{{ form.email }}" required>
+               placeholder="{% trans 'Email address' %}" value="{{ form.email }}" required>
     </div>
 
     <div class="form-row">
-        <label>Password</label>
+        <label>{% trans "Password" %}</label>
         <input type="password" name="password"
-               placeholder="Minimum 8 characters" required>
+               placeholder="{% trans 'Minimum 8 characters' %}" required>
     </div>
 
     <div class="form-row">
-        <label>Confirm</label>
+        <label>{% trans "Confirm" %}</label>
         <input type="password" name="confirm"
-               placeholder="Re-enter password" required>
+               placeholder="{% trans 'Re-enter password' %}" required>
     </div>
 
     <div class="btn-row">
-        <button type="submit" class="btn">Register</button>
+        <button type="submit" class="btn">{% trans "Register" %}</button>
         <a href="{% url 'home' %}" style="flex:1;text-decoration:none;">
-            <button type="button" class="btn btn-cancel" style="width:100%;">Cancel</button>
+            <button type="button" class="btn btn-cancel" style="width:100%;">{% trans "Cancel" %}</button>
         </a>
     </div>
 </form>

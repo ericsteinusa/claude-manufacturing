@@ -1906,6 +1906,83 @@ always-blank ones — now show correct real numbers), plus direct
 strings in this batch render with real line breaks in all 5 locales.
 No console or server errors.
 
+Also fully translated: the **Authentication / MFA** cluster
+(`register.html`, `change_password.html`, `forgot_password.html`,
+`forgot_password_reset.html`, `home_mfa.html`, `mfa_enroll.html`,
+`mfa_settings.html` — 7 pages, plus their shared base template — the
+twentieth "whole section" pass and, unusually for this series, the
+one with the smallest template count but arguably the highest reach:
+every single user hits at least the login page regardless of role or
+department, and a non-English-speaking new hire's very first
+interaction with the app is `register.html`). Small enough (47
+strings) to translate directly by hand rather than delegating, the
+first pass since ABC Costing to skip subagent delegation entirely.
+
+**Found `base_card.html` — the shared shell all 7 of these pages (plus
+the already-translated `home.html`, the login page) extend — had never
+itself been touched by any prior i18n pass**, the same "shared base
+template overlooked" gap the Portals batch closed for
+`base_portal.html`/`base_supplier_portal.html`: `home.html` loads
+`{% load i18n %}` and translates its own blocks independently, but the
+"Manufacturing ERP" / "Enterprise Resource Planning" logo text and the
+"© {year} Manufacturing ERP" footer live in the *parent* template and
+had been rendering in hardcoded English on every single one of these
+pages the entire time, undetected because nothing in this series'
+per-page verification ever looked above a child template's own
+`{% block %}` content. Fixed by adding `{% load i18n %}`, the standard
+`<html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}">`
+attribute, and wrapping the three strings — the year is bound via
+`{% now "Y" as cur_year %}` first since blocktrans can't call a
+template tag inline, then referenced as a bare context name inside
+`{% blocktrans %}` (same rule as `audit_record.html`'s `table_name`/
+`record_id`: only *dotted* lookups need explicit `with` binding).
+**Also added a language switcher to `base_card.html`** — this whole
+flow (login, register, forgot-password, MFA) previously had no way to
+pick a language before authenticating at all, unlike every other part
+of the app; copied `base.html`'s `{% url 'set_language' %}` form
+verbatim and restyled it to fit the centered-card layout (small
+top-right dropdown) rather than the app shell's dark toolbar.
+
+Caught and fixed one small layout regression this pass's own
+translations caused, before it shipped: `register.html`'s City/State/
+Zip row has fixed-width columns (`.csz-row .zip { width: 96px; }`,
+sized for the 3-character English word "Zip"), and French's natural
+translation "Code Postal" (11 characters) visually overflowed and
+truncated inside that field's placeholder text — confirmed via
+`preview_inspect`'s bounding-box measurement, not just eyeballing a
+screenshot. Fixed by widening that one column to 132px (the other 4
+languages' translations — Spanish "C.P.", German "PLZ", Portuguese
+"CEP" — all chose short, natural abbreviations and were never at risk;
+French has no equally-short idiomatic postal-code abbreviation). Worth
+a standing note distinct from every prior "check the rendered text"
+verification step in this file: a fixed-width form field sized for the
+*English* label is a latent trap for any language whose translation is
+longer, and catching it requires actually rendering the page and
+checking layout, not just confirming the string translated correctly.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check`
+clean on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically. Grepped the small set of generic single-word labels
+reused via exact-msgid auto-merge (Verify, Confirm, Register, Zip) for
+the "Make"-style cross-context mistranslation risk — "Confirm" merged
+with an existing Sales Order status-action label ("Confirmar"/
+"Confirmer"/"Bestätigen"), checked and confirmed both senses ("confirm
+this order" / "confirm this password") use the same natural verb in
+every language, no bug. Verified end-to-end against the real dev
+server, in French with real sample data: the Login page (confirmed
+the base-card shell's logo/subtitle/footer are now translated, and the
+language switcher works from an unauthenticated session), Register New
+Employee (confirmed the Zip-field width fix, screenshot-verified),
+Change Password, Forgot Password (confirmed the `<br>`-embedded
+two-line subtitle), Reset Password, MFA Settings, and MFA Enroll
+(confirmed the two-step numbered instructions and the authenticator-app
+proper nouns — Google Authenticator, Authy, 1Password — left
+untranslated), plus direct `gettext()` calls confirming both
+`<strong>`-embedded and `<br>`-embedded multi-line strings render
+correctly with real line breaks and intact tags in all 5 locales. No
+console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
