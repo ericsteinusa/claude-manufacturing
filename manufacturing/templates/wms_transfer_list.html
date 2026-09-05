@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Warehouse Transfers{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Warehouse Transfers" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/bins/" class="btn">Bin Master</a>
-<a href="/wms/warehouses/" class="btn">Warehouses</a>
-{% if can_edit %}<a href="/wms/transfers/new/" class="btn btn-primary">+ New Transfer</a>{% endif %}
+<a href="/wms/bins/" class="btn">{% trans "Bin Master" %}</a>
+<a href="/wms/warehouses/" class="btn">{% trans "Warehouses" %}</a>
+{% if can_edit %}<a href="/wms/transfers/new/" class="btn btn-primary">+ {% trans "New Transfer" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -16,10 +17,10 @@
 
 {% block body %}
 <div class="content">
-<div class="menu-title">Warehouse Transfers</div>
+<div class="menu-title">{% trans "Warehouse Transfers" %}</div>
 
 <div class="chip-row" style="margin-bottom:14px;">
-    <a href="/wms/transfers/" class="chip {% if not status %}active{% endif %}">All</a>
+    <a href="/wms/transfers/" class="chip {% if not status %}active{% endif %}">{% trans "All" %}</a>
     {% for s in transfer_statuses %}
     <a href="/wms/transfers/?status={{ s }}" class="chip {% if status == s %}active{% endif %}">{{ s|title }}</a>
     {% endfor %}
@@ -29,7 +30,7 @@
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Transfer #</th><th>From</th><th>To</th><th>Status</th><th>Created</th><th></th></tr>
+            <tr><th>{% trans "Transfer #" %}</th><th>{% trans "From" %}</th><th>{% trans "To" %}</th><th>{% trans "Status" %}</th><th>{% trans "Created" %}</th><th></th></tr>
         </thead>
         <tbody>
             {% for t in transfers %}
@@ -39,14 +40,20 @@
                 <td>{{ t.to_warehouse_code }}</td>
                 <td><span class="pill pill-{{ t.status }}">{{ t.status|title }}</span></td>
                 <td>{{ t.created_at }}</td>
-                <td><a href="/wms/transfers/{{ t.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                <td><a href="/wms/transfers/{{ t.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% else %}
-<div class="empty-state">No transfers{% if status %} with status "{{ status|title }}"{% endif %}.</div>
+<div class="empty-state">
+{% if status %}
+{% blocktrans with s=status|title %}No transfers with status "{{ s }}".{% endblocktrans %}
+{% else %}
+{% trans "No transfers." %}
+{% endif %}
+</div>
 {% endif %}
 </div>
 {% endblock %}

@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Pick List {{ pick_list.pick_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=pick_list.pick_number %}Pick List {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/picks/" class="btn">Back to Pick Lists</a>
+<a href="/wms/picks/" class="btn">{% trans "Back to Pick Lists" %}</a>
 {% if pick_list.status == 'picked' %}
-<a href="/wms/pack/{{ pick_list.id }}/" class="btn btn-primary">Pack Station</a>
+<a href="/wms/pack/{{ pick_list.id }}/" class="btn btn-primary">{% trans "Pack Station" %}</a>
 {% elif pick_list.status == 'packed' %}
-<a href="/wms/ship/{{ pick_list.id }}/" class="btn btn-primary">Confirm Shipment</a>
+<a href="/wms/ship/{{ pick_list.id }}/" class="btn btn-primary">{% trans "Confirm Shipment" %}</a>
 {% endif %}
 {% endblock %}
 
@@ -24,16 +25,16 @@
 
 {% block body %}
 <div class="content">
-<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="menu-title">{{ pick_list.pick_number }} — SO {{ pick_list.so_number }}</div>
-<p>Status: <span class="pill pill-{{ pick_list.status }}">{{ pick_list.status|title }}</span></p>
+<p>{% trans "Status:" %} <span class="pill pill-{{ pick_list.status }}">{{ pick_list.status|title }}</span></p>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Seq</th><th>Product</th><th>Bin</th><th>Ordered</th><th>Picked</th><th>Status</th>{% if can_edit %}<th class="no-print"></th>{% endif %}</tr>
+            <tr><th>{% trans "Seq" %}</th><th>{% trans "Product" %}</th><th>{% trans "Bin" %}</th><th>{% trans "Ordered" %}</th><th>{% trans "Picked" %}</th><th>{% trans "Status" %}</th>{% if can_edit %}<th class="no-print"></th>{% endif %}</tr>
         </thead>
         <tbody>
             {% for l in lines %}
@@ -52,7 +53,7 @@
                         <input type="hidden" name="action" value="record_pick">
                         <input type="hidden" name="line_id" value="{{ l.id }}">
                         <input type="number" step="any" name="qty_picked" value="{{ l.qty_ordered }}" style="width:80px;" required>
-                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Pick</button>
+                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">{% trans "Pick" %}</button>
                     </form>
                     {% endif %}
                 </td>

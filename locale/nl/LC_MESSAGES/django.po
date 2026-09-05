@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 16:21+0000\n"
+"POT-Creation-Date: 2026-09-05 16:56+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -27,6 +27,7 @@ msgstr ""
 #: manufacturing/templates/prod_shipping_list.html:81
 #: manufacturing/templates/prod_shipping_list.html:123
 #: manufacturing/templates/prod_tracking_dashboard.html:74
+#: manufacturing/templates/wms_ship_confirm.html:31
 msgid "Carrier"
 msgstr "Verzekeraar"
 
@@ -122,6 +123,7 @@ msgstr "Personeel"
 #: manufacturing/templates/prod_shipping_detail.html:6
 #: manufacturing/templates/prod_shipping_list.html:6
 #: manufacturing/templates/prod_tracking_dashboard.html:6
+#: manufacturing/templates/wms_bin_list.html:12
 msgid "Production"
 msgstr "Productie"
 
@@ -840,6 +842,8 @@ msgstr "Referentie"
 #: manufacturing/templates/supplier_portal_invoice_new.html:38
 #: manufacturing/templates/supplier_portal_po_detail.html:52
 #: manufacturing/templates/supplier_portal_rfq_detail.html:20
+#: manufacturing/templates/wms_rfid_reader_list.html:32
+#: manufacturing/templates/wms_rfid_reader_list.html:40
 #: manufacturing/templates/wo_form.html:46
 #: manufacturing/templates/wo_list.html:34
 msgid "Description"
@@ -1128,6 +1132,18 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/termination_list.html:72
 #: manufacturing/templates/termination_list.html:133
 #: manufacturing/templates/time_clock_attendance.html:89
+#: manufacturing/templates/wms_bin_detail.html:19
+#: manufacturing/templates/wms_bin_list.html:47
+#: manufacturing/templates/wms_pack_station.html:22
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_rfid_reader_list.html:40
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+#: manufacturing/templates/wms_transfer_detail.html:36
+#: manufacturing/templates/wms_transfer_list.html:33
+#: manufacturing/templates/wms_warehouse_list.html:29
+#: manufacturing/templates/wms_wave_detail.html:59
+#: manufacturing/templates/wms_wave_list.html:66
 #: manufacturing/templates/wo_detail.html:230
 #: manufacturing/templates/wo_form.html:67
 #: manufacturing/templates/wo_form.html:72
@@ -1242,6 +1258,8 @@ msgstr "G/L"
 #: manufacturing/templates/sales_contracts_detail.html:62
 #: manufacturing/templates/so_detail.html:91
 #: manufacturing/templates/supplier_portal_po_detail.html:21
+#: manufacturing/templates/wms_pick_list_detail.html:28
+#: manufacturing/templates/wms_transfer_detail.html:23
 #: manufacturing/templates/wo_detail.html:90
 msgid "Print / Save PDF"
 msgstr "Afdrukken / PDF Opslaan"
@@ -1703,6 +1721,7 @@ msgstr "Chequenr., enz."
 #: manufacturing/templates/supplier_portal_rfqs.html:11
 #: manufacturing/templates/termination_detail.html:46
 #: manufacturing/templates/termination_list.html:141
+#: manufacturing/templates/wms_transfer_new.html:30
 #: manufacturing/templates/wo_detail.html:159
 #: manufacturing/templates/wo_form.html:84
 msgid "Notes"
@@ -1773,6 +1792,11 @@ msgstr "Excel Exporteren"
 #: manufacturing/templates/supplier_portal_invoice_detail.html:9
 #: manufacturing/templates/supplier_portal_po_detail.html:25
 #: manufacturing/templates/supplier_portal_rfq_detail.html:11
+#: manufacturing/templates/wms_pack_station.html:15
+#: manufacturing/templates/wms_pick_list_detail.html:30
+#: manufacturing/templates/wms_rfid_tag_detail.html:15
+#: manufacturing/templates/wms_transfer_detail.html:27
+#: manufacturing/templates/wms_wave_detail.html:12
 #: manufacturing/templates/wo_list.html:19
 msgid "Status:"
 msgstr "Status:"
@@ -2063,6 +2087,7 @@ msgstr "Klant:"
 
 #: manufacturing/templates/ar_list.html:65
 #: manufacturing/templates/po_detail.html:168
+#: manufacturing/templates/wms_receive.html:33
 msgid "Received"
 msgstr "Ontvangen"
 
@@ -2249,6 +2274,12 @@ msgstr "Gesolliciteerd"
 #: manufacturing/templates/control_plan_list.html:45
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/rfq_list.html:55
+#: manufacturing/templates/wms_bin_list.html:60
+#: manufacturing/templates/wms_pick_list_list.html:71
+#: manufacturing/templates/wms_rfid_tag_list.html:68
+#: manufacturing/templates/wms_transfer_list.html:43
+#: manufacturing/templates/wms_wave_detail.html:66
+#: manufacturing/templates/wms_wave_list.html:73
 msgid "Detail"
 msgstr "Detail"
 
@@ -2322,6 +2353,9 @@ msgstr "Zoeken"
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/report_builder_list.html:20
 #: manufacturing/templates/tc_device_list.html:40
+#: manufacturing/templates/wms_bin_new.html:27
+#: manufacturing/templates/wms_warehouse_list.html:21
+#: manufacturing/templates/wms_warehouse_list.html:29
 msgid "Name"
 msgstr "Naam"
 
@@ -2970,6 +3004,7 @@ msgstr "Klantenportaal"
 #: manufacturing/templates/sales_reports.html:7
 #: manufacturing/templates/sales_reports_kpis.html:9
 #: manufacturing/templates/sales_targets.html:7
+#: manufacturing/templates/wms_wave_detail.html:26
 msgid "Orders"
 msgstr "Orders"
 
@@ -3046,6 +3081,11 @@ msgstr "Voordelen"
 #: manufacturing/templates/sales_commission_plans.html:63
 #: manufacturing/templates/sales_commission_plans.html:76
 #: manufacturing/templates/sales_commission_plans.html:118
+#: manufacturing/templates/wms_bin_detail.html:19
+#: manufacturing/templates/wms_bin_list.html:59
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+#: manufacturing/templates/wms_rfid_reader_list.html:47
+#: manufacturing/templates/wms_warehouse_list.html:36
 msgid "Active"
 msgstr "Actief"
 
@@ -3055,6 +3095,10 @@ msgstr "Actief"
 #: manufacturing/templates/gl_accounts.html:75
 #: manufacturing/templates/payroll_deductions.html:66
 #: manufacturing/templates/sales_commission_plans.html:76
+#: manufacturing/templates/wms_bin_detail.html:19
+#: manufacturing/templates/wms_bin_list.html:59
+#: manufacturing/templates/wms_rfid_reader_list.html:47
+#: manufacturing/templates/wms_warehouse_list.html:36
 msgid "Inactive"
 msgstr "Inactief"
 
@@ -3440,6 +3484,12 @@ msgstr "Afroepnr."
 #: manufacturing/templates/so_detail.html:197
 #: manufacturing/templates/so_detail.html:259
 #: manufacturing/templates/supplier_portal_rfq_detail.html:20
+#: manufacturing/templates/wms_bin_detail.html:26
+#: manufacturing/templates/wms_pack_station.html:54
+#: manufacturing/templates/wms_rfid_tag_list.html:41
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+#: manufacturing/templates/wms_transfer_detail.html:36
+#: manufacturing/templates/wms_transfer_detail.html:94
 #: manufacturing/templates/wo_list.html:35
 msgid "Qty"
 msgstr "Aantal"
@@ -3503,6 +3553,10 @@ msgstr "Nieuwe raam-PO"
 #: manufacturing/templates/sales_orders.html:57
 #: manufacturing/templates/sales_quotes.html:53
 #: manufacturing/templates/so_list.html:26
+#: manufacturing/templates/wms_pick_list_list.html:55
+#: manufacturing/templates/wms_rfid_tag_list.html:50
+#: manufacturing/templates/wms_transfer_list.html:23
+#: manufacturing/templates/wms_wave_list.html:58
 #: manufacturing/templates/wo_list.html:20
 msgid "All"
 msgstr "Alle"
@@ -3777,6 +3831,15 @@ msgstr "Certificaatkop"
 #: manufacturing/templates/spc_list.html:88
 #: manufacturing/templates/spc_list.html:117
 #: manufacturing/templates/spc_log.html:47
+#: manufacturing/templates/wms_bin_detail.html:26
+#: manufacturing/templates/wms_pack_station.html:22
+#: manufacturing/templates/wms_pack_station.html:54
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+#: manufacturing/templates/wms_ship_confirm.html:17
+#: manufacturing/templates/wms_transfer_detail.html:36
+#: manufacturing/templates/wms_wave_detail.html:26
 #: manufacturing/templates/wo_detail.html:156
 #: manufacturing/templates/wo_detail.html:184
 #: manufacturing/templates/wo_list.html:33
@@ -4215,6 +4278,7 @@ msgid "Characteristics &amp; FMEA"
 msgstr "Kenmerken &amp; FMEA"
 
 #: manufacturing/templates/control_plan_detail.html:64
+#: manufacturing/templates/wms_pick_list_detail.html:37
 #: manufacturing/templates/wo_detail.html:225
 msgid "Seq"
 msgstr "Volgnr."
@@ -4241,6 +4305,7 @@ msgstr "Herscoren"
 #: manufacturing/templates/po_detail.html:202
 #: manufacturing/templates/rfq_detail.html:57
 #: manufacturing/templates/so_detail.html:220
+#: manufacturing/templates/wms_transfer_detail.html:53
 msgid "Remove"
 msgstr "Verwijderen"
 
@@ -5037,6 +5102,8 @@ msgstr "Dagen open"
 #: manufacturing/templates/sales_leads_detail.html:116
 #: manufacturing/templates/sales_leads_list.html:89
 #: manufacturing/templates/sales_leads_list.html:140
+#: manufacturing/templates/wms_putaway_rule_list.html:35
+#: manufacturing/templates/wms_putaway_rule_list.html:44
 msgid "Priority"
 msgstr "Prioriteit"
 
@@ -5119,6 +5186,7 @@ msgstr "Publicatiedatum"
 #: manufacturing/templates/cs_kb_detail.html:107
 #: manufacturing/templates/cs_kb_list.html:86
 #: manufacturing/templates/cs_kb_list.html:143
+#: manufacturing/templates/wms_bin_list.html:11
 msgid "Tags"
 msgstr "Labels"
 
@@ -5388,6 +5456,9 @@ msgstr "Streefdatum"
 #: manufacturing/templates/sales_forecast_detail.html:184
 #: manufacturing/templates/sales_leads_detail.html:118
 #: manufacturing/templates/sales_leads_list.html:91
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_transfer_list.html:33
+#: manufacturing/templates/wms_wave_list.html:66
 msgid "Created"
 msgstr "Aangemaakt"
 
@@ -7233,6 +7304,7 @@ msgstr "Routingnummer"
 #: manufacturing/templates/gl_dashboard_kpis.html:58
 #: manufacturing/templates/payroll_deductions.html:64
 #: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/wms_putaway_rule_list.html:53
 msgid "Yes"
 msgstr "Ja"
 
@@ -7241,6 +7313,7 @@ msgstr "Ja"
 #: manufacturing/templates/gl_dashboard_kpis.html:58
 #: manufacturing/templates/payroll_deductions.html:64
 #: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/wms_putaway_rule_list.html:53
 msgid "No"
 msgstr "Nee"
 
@@ -7403,6 +7476,8 @@ msgstr "Begroot Bedrag ($)"
 
 #: manufacturing/templates/finance_budget_detail.html:168
 #: manufacturing/templates/gl_journal_detail.html:153
+#: manufacturing/templates/wms_transfer_detail.html:81
+#: manufacturing/templates/wms_transfer_detail.html:95
 msgid "Add Line"
 msgstr "Regel Toevoegen"
 
@@ -9169,6 +9244,7 @@ msgstr "bijv. OSHA 29 CFR 1910"
 #: manufacturing/templates/req_detail.html:117
 #: manufacturing/templates/rfq_detail.html:108
 #: manufacturing/templates/sales_order_detail.html:183
+#: manufacturing/templates/wms_pack_station.html:72
 msgid "Add Item"
 msgstr "Item toevoegen"
 
@@ -9631,6 +9707,7 @@ msgstr "Stilstand van apparatuur"
 #: manufacturing/templates/qa_ncr_list.html:78
 #: manufacturing/templates/qa_supplier_list.html:76
 #: manufacturing/templates/sales_reports.html:54
+#: manufacturing/templates/wms_bin_list.html:34
 msgid "Go"
 msgstr "Ga"
 
@@ -11642,6 +11719,8 @@ msgid "Unit Price"
 msgstr "Stukprijs"
 
 #: manufacturing/templates/po_detail.html:169
+#: manufacturing/templates/wms_receive.html:58
+#: manufacturing/templates/wms_transfer_detail.html:65
 msgid "Receive"
 msgstr "Ontvangen"
 
@@ -11733,6 +11812,8 @@ msgstr "Nieuwe Inkooporder"
 #: manufacturing/templates/so_list.html:40
 #: manufacturing/templates/supplier_portal_home.html:31
 #: manufacturing/templates/supplier_portal_pos.html:11
+#: manufacturing/templates/wms_pick_list_list.html:27
+#: manufacturing/templates/wms_wave_list.html:35
 msgid "Order Date"
 msgstr "Besteldatum"
 
@@ -11859,6 +11940,7 @@ msgstr "Consignatie"
 #: manufacturing/templates/purchasing_dashboard_kpis.html:34
 #: manufacturing/templates/supplier_portal_home.html:31
 #: manufacturing/templates/supplier_portal_pos.html:11
+#: manufacturing/templates/wms_receive.html:33
 msgid "PO #"
 msgstr "PO-nr."
 
@@ -12039,6 +12121,9 @@ msgstr "Zendingnr."
 #: manufacturing/templates/sales_orders.html:111
 #: manufacturing/templates/so_form.html:51
 #: manufacturing/templates/so_list.html:41
+#: manufacturing/templates/wms_pick_list_list.html:27
+#: manufacturing/templates/wms_ship_confirm.html:33
+#: manufacturing/templates/wms_wave_list.html:35
 msgid "Ship Date"
 msgstr "Zendingnr."
 
@@ -12355,6 +12440,10 @@ msgstr "Verzendnr."
 #: manufacturing/templates/sales_dashboard_kpis.html:15
 #: manufacturing/templates/sales_orders.html:74
 #: manufacturing/templates/so_list.html:38
+#: manufacturing/templates/wms_pick_list_list.html:27
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_wave_detail.html:59
+#: manufacturing/templates/wms_wave_list.html:35
 msgid "SO #"
 msgstr "SO-nr."
 
@@ -12662,6 +12751,7 @@ msgstr "Zending bewerken"
 
 #: manufacturing/templates/prod_shipping_detail.html:114
 #: manufacturing/templates/prod_shipping_list.html:127
+#: manufacturing/templates/wms_ship_confirm.html:32
 msgid "Tracking Number"
 msgstr "Trackingnummer"
 
@@ -13644,6 +13734,7 @@ msgid "Custom Reports"
 msgstr "Aangepaste rapporten"
 
 #: manufacturing/templates/report_builder_list.html:41
+#: manufacturing/templates/wms_putaway_rule_list.html:60
 msgid "Delete"
 msgstr "Verwijderen"
 
@@ -15293,7 +15384,9 @@ msgstr "Geen regelitems in deze offerteaanvraag."
 #: manufacturing/templates/supplier_portal_rfqs.html:24
 msgid ""
 "No RFQs yet — your buyer will invite you to quote when there's a request."
-msgstr "Nog geen offerteaanvragen — uw inkoper nodigt u uit om een offerte in te dienen zodra er een aanvraag is."
+msgstr ""
+"Nog geen offerteaanvragen — uw inkoper nodigt u uit om een offerte in te "
+"dienen zodra er een aanvraag is."
 
 #: manufacturing/templates/tc_device_form.html:3
 msgid "Add Time Clock"
@@ -15723,6 +15816,743 @@ msgstr "Logboek van Vandaag"
 #, python-format
 msgid "Total today: %(total)s"
 msgstr "Totaal vandaag: %(total)s"
+
+#: manufacturing/templates/wms_bin_detail.html:3
+#, python-format
+msgid "Bin %(num)s"
+msgstr "Locatie %(num)s"
+
+#: manufacturing/templates/wms_bin_detail.html:6
+#: manufacturing/templates/wms_bin_new.html:6
+msgid "Back to Bins"
+msgstr "Terug naar Locaties"
+
+#: manufacturing/templates/wms_bin_detail.html:15
+#: manufacturing/templates/wms_bin_list.html:43
+#: manufacturing/templates/wms_bin_new.html:36
+#: manufacturing/templates/wms_rfid_reader_list.html:24
+#: manufacturing/templates/wms_rfid_reader_list.html:40
+msgid "Zone"
+msgstr "Zone"
+
+#: manufacturing/templates/wms_bin_detail.html:16
+#: manufacturing/templates/wms_bin_list.html:44
+#: manufacturing/templates/wms_bin_new.html:43
+msgid "Aisle"
+msgstr "Gang"
+
+#: manufacturing/templates/wms_bin_detail.html:17
+#: manufacturing/templates/wms_bin_list.html:45
+#: manufacturing/templates/wms_bin_new.html:44
+msgid "Rack"
+msgstr "Stelling"
+
+#: manufacturing/templates/wms_bin_detail.html:18
+#: manufacturing/templates/wms_bin_list.html:46
+#: manufacturing/templates/wms_bin_new.html:45
+msgid "Shelf"
+msgstr "Plank"
+
+#: manufacturing/templates/wms_bin_detail.html:22
+msgid "Current Stock"
+msgstr "Huidige Voorraad"
+
+#: manufacturing/templates/wms_bin_detail.html:35
+msgid "No stock tracked in this bin."
+msgstr "Geen voorraad bijgehouden op deze locatie."
+
+#: manufacturing/templates/wms_bin_detail.html:42
+msgid "Deactivate Bin"
+msgstr "Locatie Deactiveren"
+
+#: manufacturing/templates/wms_bin_list.html:3
+#: manufacturing/templates/wms_bin_list.html:20
+#: manufacturing/templates/wms_pick_list_list.html:6
+#: manufacturing/templates/wms_putaway_rule_list.html:6
+#: manufacturing/templates/wms_receive.html:6
+#: manufacturing/templates/wms_rfid_reader_list.html:6
+#: manufacturing/templates/wms_rfid_tag_list.html:6
+#: manufacturing/templates/wms_transfer_list.html:6
+#: manufacturing/templates/wms_warehouse_list.html:6
+#: manufacturing/templates/wms_wave_list.html:7
+msgid "Bin Master"
+msgstr "Locatiebeheer"
+
+#: manufacturing/templates/wms_bin_list.html:6
+#: manufacturing/templates/wms_transfer_list.html:7
+#: manufacturing/templates/wms_warehouse_list.html:3
+#: manufacturing/templates/wms_warehouse_list.html:12
+msgid "Warehouses"
+msgstr "Magazijnen"
+
+#: manufacturing/templates/wms_bin_list.html:7
+#: manufacturing/templates/wms_pick_list_list.html:3
+#: manufacturing/templates/wms_pick_list_list.html:20
+#: manufacturing/templates/wms_pick_list_list.html:53
+#: manufacturing/templates/wms_wave_list.html:6
+msgid "Pick Lists"
+msgstr "Picklijsten"
+
+#: manufacturing/templates/wms_bin_list.html:8
+#: manufacturing/templates/wms_pick_list_list.html:8
+#: manufacturing/templates/wms_wave_list.html:3
+#: manufacturing/templates/wms_wave_list.html:19
+msgid "Wave Picking"
+msgstr "Golfpicking"
+
+#: manufacturing/templates/wms_bin_list.html:9
+#: manufacturing/templates/wms_putaway_rule_list.html:3
+#: manufacturing/templates/wms_putaway_rule_list.html:12
+#: manufacturing/templates/wms_receive.html:7
+msgid "Put-Away Rules"
+msgstr "Wegzetregels"
+
+#: manufacturing/templates/wms_bin_list.html:10
+#: manufacturing/templates/wms_warehouse_list.html:7
+msgid "Transfers"
+msgstr "Overplaatsingen"
+
+#: manufacturing/templates/wms_bin_list.html:14
+#: manufacturing/templates/wms_bin_new.html:3
+#: manufacturing/templates/wms_bin_new.html:35
+msgid "New Bin"
+msgstr "Nieuwe Locatie"
+
+#: manufacturing/templates/wms_bin_list.html:22
+msgid ""
+"Warehouse &rarr; zone &rarr; bin locations. Aisle/rack/shelf are recorded\n"
+"    on each bin rather than as their own hierarchy levels."
+msgstr "Magazijn &rarr; zone &rarr; locaties. Gang/stelling/plank worden\n    per locatie geregistreerd in plaats van als eigen hiërarchieniveaus."
+
+#: manufacturing/templates/wms_bin_list.html:28
+msgid "All Zones"
+msgstr "Alle Zones"
+
+#: manufacturing/templates/wms_bin_list.html:33
+msgid "Search bin code…"
+msgstr "Zoek locatiecode…"
+
+#: manufacturing/templates/wms_bin_list.html:42
+#: manufacturing/templates/wms_bin_new.html:46
+msgid "Bin Code"
+msgstr "Locatiecode"
+
+#: manufacturing/templates/wms_bin_list.html:67
+msgid "No bins found."
+msgstr "Geen locaties gevonden."
+
+#: manufacturing/templates/wms_bin_new.html:11
+msgid "New Zone / Bin"
+msgstr "Nieuwe Zone / Locatie"
+
+#: manufacturing/templates/wms_bin_new.html:18
+msgid "New Zone"
+msgstr "Nieuwe Zone"
+
+#: manufacturing/templates/wms_bin_new.html:19
+msgid "Warehouse"
+msgstr "Magazijn"
+
+#: manufacturing/templates/wms_bin_new.html:26
+#: manufacturing/templates/wms_warehouse_list.html:20
+#: manufacturing/templates/wms_warehouse_list.html:29
+msgid "Code"
+msgstr "Code"
+
+#: manufacturing/templates/wms_bin_new.html:28
+msgid "Pick Sequence"
+msgstr "Pickvolgorde"
+
+#: manufacturing/templates/wms_bin_new.html:29
+msgid "Create Zone"
+msgstr "Zone Aanmaken"
+
+#: manufacturing/templates/wms_bin_new.html:47
+msgid "Create Bin"
+msgstr "Locatie Aanmaken"
+
+#: manufacturing/templates/wms_pack_station.html:3
+#: manufacturing/templates/wms_pack_station.html:14
+#: manufacturing/templates/wms_pick_list_detail.html:8
+msgid "Pack Station"
+msgstr "Inpakstation"
+
+#: manufacturing/templates/wms_pack_station.html:6
+#: manufacturing/templates/wms_ship_confirm.html:6
+msgid "Back to Pick List"
+msgstr "Terug naar Picklijst"
+
+#: manufacturing/templates/wms_pack_station.html:8
+#: manufacturing/templates/wms_pick_list_detail.html:10
+#: manufacturing/templates/wms_ship_confirm.html:3
+#: manufacturing/templates/wms_ship_confirm.html:11
+#: manufacturing/templates/wms_ship_confirm.html:34
+msgid "Confirm Shipment"
+msgstr "Verzending Bevestigen"
+
+#: manufacturing/templates/wms_pack_station.html:19
+msgid "Picked Lines"
+msgstr "Gepickte Regels"
+
+#: manufacturing/templates/wms_pack_station.html:22
+msgid "Line"
+msgstr "Regel"
+
+#: manufacturing/templates/wms_pack_station.html:22
+msgid "Picked Qty"
+msgstr "Gepickte Hoeveelheid"
+
+#: manufacturing/templates/wms_pack_station.html:40
+msgid "New Carton"
+msgstr "Nieuwe Doos"
+
+#: manufacturing/templates/wms_pack_station.html:44
+msgid "Cartons"
+msgstr "Dozen"
+
+#: manufacturing/templates/wms_pack_station.html:49
+msgid "Weight:"
+msgstr "Gewicht:"
+
+#: manufacturing/templates/wms_pack_station.html:50
+msgid "Dims:"
+msgstr "Afmetingen:"
+
+#: manufacturing/templates/wms_pack_station.html:69
+#, python-format
+msgid "Line %(lid)s — %(lname)s"
+msgstr "Regel %(lid)s — %(lname)s"
+
+#: manufacturing/templates/wms_pack_station.html:79
+msgid "Weight"
+msgstr "Gewicht"
+
+#: manufacturing/templates/wms_pack_station.html:80
+msgid "L"
+msgstr "L"
+
+#: manufacturing/templates/wms_pack_station.html:81
+msgid "W"
+msgstr "W"
+
+#: manufacturing/templates/wms_pack_station.html:82
+msgid "H"
+msgstr "H"
+
+#: manufacturing/templates/wms_pack_station.html:83
+msgid "Set Dims"
+msgstr "Afmetingen Instellen"
+
+#: manufacturing/templates/wms_pack_station.html:90
+msgid "Close Carton"
+msgstr "Doos Sluiten"
+
+#: manufacturing/templates/wms_pack_station.html:96
+msgid "No cartons yet."
+msgstr "Nog geen dozen."
+
+#: manufacturing/templates/wms_pack_station.html:103
+msgid "Mark Pick List Packed"
+msgstr "Picklijst Markeren als Ingepakt"
+
+#: manufacturing/templates/wms_pick_list_detail.html:3
+#, python-format
+msgid "Pick List %(num)s"
+msgstr "Picklijst %(num)s"
+
+#: manufacturing/templates/wms_pick_list_detail.html:6
+msgid "Back to Pick Lists"
+msgstr "Terug naar Picklijsten"
+
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+#: manufacturing/templates/wms_wave_detail.html:26
+msgid "Bin"
+msgstr "Locatie"
+
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+msgid "Ordered"
+msgstr "Besteld"
+
+#: manufacturing/templates/wms_pick_list_detail.html:37
+msgid "Picked"
+msgstr "Gepickt"
+
+#: manufacturing/templates/wms_pick_list_detail.html:56
+#: manufacturing/templates/wms_wave_detail.html:43
+msgid "Pick"
+msgstr "Picken"
+
+#: manufacturing/templates/wms_pick_list_list.html:7
+#: manufacturing/templates/wms_putaway_rule_list.html:7
+#: manufacturing/templates/wms_receive.html:3
+#: manufacturing/templates/wms_receive.html:17
+msgid "Receive &amp; Put-Away"
+msgstr "Ontvangen en Wegzetten"
+
+#: manufacturing/templates/wms_pick_list_list.html:23
+#: manufacturing/templates/wms_wave_list.html:28
+msgid "Confirmed SOs Awaiting a Pick List"
+msgstr "Bevestigde Orders die Wachten op een Picklijst"
+
+#: manufacturing/templates/wms_pick_list_list.html:40
+msgid "Generate Pick List"
+msgstr "Picklijst Genereren"
+
+#: manufacturing/templates/wms_pick_list_list.html:50
+#: manufacturing/templates/wms_wave_list.html:53
+msgid "No confirmed SOs waiting on a pick list."
+msgstr "Geen bevestigde orders die wachten op een picklijst."
+
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_wave_detail.html:59
+msgid "Pick #"
+msgstr "Pickbon-nr."
+
+#: manufacturing/templates/wms_pick_list_list.html:78
+msgid "No pick lists yet."
+msgstr "Nog geen picklijsten."
+
+#: manufacturing/templates/wms_putaway_rule_list.html:14
+msgid ""
+"Match a product's category or ABC class to a target zone. Rules are\n"
+"    evaluated by priority (highest first); the first match wins. Products\n"
+"    matching no active rule fall back to the unassigned bin at receipt time."
+msgstr "Koppelt de categorie of ABC-klasse van een product aan een doelzone. Regels worden\n    op prioriteit geëvalueerd (hoogste eerst); de eerste match wint. Producten\n    die met geen enkele actieve regel overeenkomen, vallen bij ontvangst terug op de niet-toegewezen locatie."
+
+#: manufacturing/templates/wms_putaway_rule_list.html:29
+msgid "e.g. 'raw material' or 'A'"
+msgstr "bijv. 'grondstof' of 'A'"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:36
+msgid "Add Rule"
+msgstr "Regel Toevoegen"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+msgid "Match Type"
+msgstr "Overeenkomsttype"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+msgid "Match Value"
+msgstr "Overeenkomstwaarde"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:44
+msgid "Target Zone"
+msgstr "Doelzone"
+
+#: manufacturing/templates/wms_putaway_rule_list.html:70
+msgid ""
+"No put-away rules configured — everything receives into the unassigned bin."
+msgstr "Geen wegzetregels geconfigureerd — alles wordt ontvangen op de niet-toegewezen locatie."
+
+#: manufacturing/templates/wms_receive.html:19
+msgid ""
+"Open lines on sent/partial POs with a linked product. Receiving here\n"
+"    updates both the PO's received quantity and the bin's tracked stock in\n"
+"    one step. Free-text PO lines (no linked product) aren't shown — receive\n"
+"    those from the PO's own detail page. When an item has orders waiting on\n"
+"    it with nothing in stock, a cross-dock option appears below it to route\n"
+"    the receipt straight to that order instead of putting it away first."
+msgstr "Openstaande regels van verzonden/gedeeltelijke PO's met een gekoppeld product. Hier ontvangen\n    werkt zowel de ontvangen hoeveelheid van de PO als de bijgehouden voorraad van de locatie in\n    één stap bij. Vrije-tekst PO-regels (geen gekoppeld product) worden niet getoond — ontvang deze\n    vanaf de eigen detailpagina van de PO. Wanneer voor een item orders wachten\n    zonder dat er iets op voorraad is, verschijnt eronder een cross-dock-optie om\n    de ontvangst rechtstreeks naar die order te leiden in plaats van deze eerst weg te zetten."
+
+#: manufacturing/templates/wms_receive.html:33
+msgid "Owed"
+msgstr "Verschuldigd"
+
+#: manufacturing/templates/wms_receive.html:33
+msgid "Qty to Receive"
+msgstr "Te Ontvangen Hoeveelheid"
+
+#: manufacturing/templates/wms_receive.html:53
+msgid "Suggested:"
+msgstr "Voorgesteld:"
+
+#: manufacturing/templates/wms_receive.html:66
+msgid "Cross-dock opportunity"
+msgstr "Cross-dock-mogelijkheid"
+
+#: manufacturing/templates/wms_receive.html:67
+#, python-format
+msgid "%(counter)s order line waiting on this product with nothing in stock:"
+msgid_plural ""
+"%(counter)s order lines waiting on this product with nothing in stock:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: manufacturing/templates/wms_receive.html:77
+#, python-format
+msgid "needs %(n)s"
+msgstr "heeft %(n)s nodig"
+
+#: manufacturing/templates/wms_receive.html:80
+msgid "qty"
+msgstr "aantal"
+
+#: manufacturing/templates/wms_receive.html:81
+msgid "Cross-Dock Straight to Order"
+msgstr "Cross-Dock Direct naar Order"
+
+#: manufacturing/templates/wms_receive.html:83
+msgid ""
+"Routes received qty directly to the selected order instead of putting it "
+"away — skips storage entirely."
+msgstr "Leidt de ontvangen hoeveelheid rechtstreeks naar de geselecteerde order in plaats van deze weg te zetten — slaat opslag volledig over."
+
+#: manufacturing/templates/wms_receive.html:93
+msgid "No open PO lines awaiting receipt."
+msgstr "Geen openstaande PO-regels die wachten op ontvangst."
+
+#: manufacturing/templates/wms_rfid_reader_list.html:3
+#: manufacturing/templates/wms_rfid_reader_list.html:12
+#: manufacturing/templates/wms_rfid_tag_list.html:7
+msgid "RFID Readers"
+msgstr "RFID-lezers"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:7
+#: manufacturing/templates/wms_rfid_tag_list.html:3
+#: manufacturing/templates/wms_rfid_tag_list.html:19
+msgid "RFID Tags"
+msgstr "RFID-tags"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:14
+msgid ""
+"A reader is a virtual antenna tied to one zone — there is no real RFID\n"
+"    hardware in this environment, so \"reading\" a tag is a manual action\n"
+"    standing in for what a real antenna would capture automatically."
+msgstr "Een lezer is een virtuele antenne gekoppeld aan één zone — er is geen echte RFID-\n    hardware in deze omgeving, dus het \"lezen\" van een tag is een handmatige actie\n    die vervangt wat een echte antenne automatisch zou registreren."
+
+#: manufacturing/templates/wms_rfid_reader_list.html:23
+msgid "New Reader"
+msgstr "Nieuwe Lezer"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:31
+#: manufacturing/templates/wms_rfid_reader_list.html:40
+msgid "Reader Code"
+msgstr "Lezercode"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:33
+msgid "Create Reader"
+msgstr "Lezer Aanmaken"
+
+#: manufacturing/templates/wms_rfid_reader_list.html:54
+msgid "No readers yet."
+msgstr "Nog geen lezers."
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:3
+msgid "Tag"
+msgstr "Tag"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:6
+msgid "Back to Tags"
+msgstr "Terug naar Tags"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:7
+msgid "Readers"
+msgstr "Lezers"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:14
+msgid "Qty:"
+msgstr "Aantal:"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:17
+msgid "Current bin:"
+msgstr "Huidige locatie:"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:22
+msgid "Simulate a Read"
+msgstr "Een Uitlezing Simuleren"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:24
+msgid ""
+"Stands in for a real RFID antenna capturing this tag. Reading it at a\n"
+"    reader whose zone differs from the tag's current zone relocates the\n"
+"    tagged qty there automatically; reading the same zone again is just a\n"
+"    \"still here\" heartbeat."
+msgstr "Vervangt een echte RFID-antenne die deze tag registreert. Deze uitlezen bij een\n    lezer waarvan de zone verschilt van de huidige zone van de tag, verplaatst de\n    getagde hoeveelheid daar automatisch naartoe; dezelfde zone opnieuw uitlezen is slechts een\n    \"nog hier\"-signaal."
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:37
+msgid "Simulate Read"
+msgstr "Uitlezing Simuleren"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:40
+msgid "Retire this tag?"
+msgstr "Deze tag buiten gebruik stellen?"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:43
+msgid "Retire Tag"
+msgstr "Tag Buiten Gebruik Stellen"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:47
+msgid "Read History"
+msgstr "Uitleesgeschiedenis"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+msgid "Read At"
+msgstr "Uitgelezen op"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+msgid "Reader"
+msgstr "Lezer"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+#: manufacturing/templates/wms_transfer_detail.html:36
+msgid "From Bin"
+msgstr "Van Locatie"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+#: manufacturing/templates/wms_transfer_detail.html:36
+msgid "To Bin"
+msgstr "Naar Locatie"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:51
+msgid "Moved?"
+msgstr "Verplaatst?"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:59
+msgid "Moved"
+msgstr "Verplaatst"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:59
+msgid "Heartbeat"
+msgstr "Signaal"
+
+#: manufacturing/templates/wms_rfid_tag_detail.html:66
+msgid "No reads recorded yet."
+msgstr "Nog geen uitlezingen geregistreerd."
+
+#: manufacturing/templates/wms_rfid_tag_list.html:21
+msgid ""
+"A tag labels a qty of one product already tracked in a bin — it doesn't\n"
+"    create new stock. Simulate a read at a different zone's reader from the\n"
+"    tag's own detail page to see it relocate automatically."
+msgstr "Een tag labelt een hoeveelheid van een product dat al op een locatie wordt bijgehouden — het\n    creëert geen nieuwe voorraad. Simuleer een uitlezing bij de lezer van een andere zone vanaf\n    de eigen detailpagina van de tag om te zien hoe deze automatisch wordt verplaatst."
+
+#: manufacturing/templates/wms_rfid_tag_list.html:30
+msgid "New Tag"
+msgstr "Nieuwe Tag"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:32
+#: manufacturing/templates/wms_transfer_detail.html:86
+msgid "Product / Bin"
+msgstr "Product / Locatie"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:35
+#: manufacturing/templates/wms_transfer_detail.html:89
+#, python-format
+msgid "%(q)s available"
+msgstr "%(q)s beschikbaar"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:40
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+msgid "Tag Code"
+msgstr "Tagcode"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:42
+msgid "Create Tag"
+msgstr "Tag Aanmaken"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:44
+msgid "No tracked stock available anywhere to tag."
+msgstr "Nergens bijgehouden voorraad beschikbaar om te taggen."
+
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+msgid "Current Bin"
+msgstr "Huidige Locatie"
+
+#: manufacturing/templates/wms_rfid_tag_list.html:77
+#, python-format
+msgid "No tags with status \"%(s)s\"."
+msgstr "Geen tags met status „%(s)s”."
+
+#: manufacturing/templates/wms_rfid_tag_list.html:79
+msgid "No tags."
+msgstr "Geen tags."
+
+#: manufacturing/templates/wms_ship_confirm.html:14
+msgid "Lines to Ship"
+msgstr "Te Verzenden Regels"
+
+#: manufacturing/templates/wms_ship_confirm.html:17
+msgid "Qty Picked"
+msgstr "Gepickte Hoeveelheid"
+
+#: manufacturing/templates/wms_transfer_detail.html:3
+msgid "Transfer"
+msgstr "Overplaatsing"
+
+#: manufacturing/templates/wms_transfer_detail.html:6
+#: manufacturing/templates/wms_transfer_new.html:6
+msgid "Back to Transfers"
+msgstr "Terug naar Overplaatsingen"
+
+#: manufacturing/templates/wms_transfer_detail.html:73
+msgid "No lines yet."
+msgstr "Nog geen regels."
+
+#: manufacturing/templates/wms_transfer_detail.html:98
+#, python-format
+msgid "No tracked stock available in %(wh)s to transfer."
+msgstr "Geen bijgehouden voorraad beschikbaar in %(wh)s om over te plaatsen."
+
+#: manufacturing/templates/wms_transfer_detail.html:102
+msgid "Ship this transfer? Source bins will be decremented immediately."
+msgstr "Deze overplaatsing verzenden? Bronlocaties worden onmiddellijk verminderd."
+
+#: manufacturing/templates/wms_transfer_detail.html:105
+msgid "Ship Transfer"
+msgstr "Overplaatsing Verzenden"
+
+#: manufacturing/templates/wms_transfer_detail.html:107
+msgid "Cancel this transfer?"
+msgstr "Deze overplaatsing annuleren?"
+
+#: manufacturing/templates/wms_transfer_detail.html:110
+msgid "Cancel Transfer"
+msgstr "Overplaatsing Annuleren"
+
+#: manufacturing/templates/wms_transfer_list.html:3
+#: manufacturing/templates/wms_transfer_list.html:20
+msgid "Warehouse Transfers"
+msgstr "Magazijnoverplaatsingen"
+
+#: manufacturing/templates/wms_transfer_list.html:8
+#: manufacturing/templates/wms_transfer_new.html:3
+msgid "New Transfer"
+msgstr "Nieuwe Overplaatsing"
+
+#: manufacturing/templates/wms_transfer_list.html:33
+msgid "Transfer #"
+msgstr "Overplaatsingsnr."
+
+#: manufacturing/templates/wms_transfer_list.html:33
+msgid "From"
+msgstr "Van"
+
+#: manufacturing/templates/wms_transfer_list.html:33
+msgid "To"
+msgstr "Naar"
+
+#: manufacturing/templates/wms_transfer_list.html:52
+#, python-format
+msgid "No transfers with status \"%(s)s\"."
+msgstr "Geen overplaatsingen met status „%(s)s”."
+
+#: manufacturing/templates/wms_transfer_list.html:54
+msgid "No transfers."
+msgstr "Geen overplaatsingen."
+
+#: manufacturing/templates/wms_transfer_new.html:11
+msgid "New Warehouse Transfer"
+msgstr "Nieuwe Magazijnoverplaatsing"
+
+#: manufacturing/templates/wms_transfer_new.html:16
+msgid "From Warehouse"
+msgstr "Van Magazijn"
+
+#: manufacturing/templates/wms_transfer_new.html:23
+msgid "To Warehouse"
+msgstr "Naar Magazijn"
+
+#: manufacturing/templates/wms_transfer_new.html:31
+msgid "Create Draft Transfer"
+msgstr "Concept-overplaatsing Aanmaken"
+
+#: manufacturing/templates/wms_transfer_new.html:34
+msgid ""
+"Add line items on the next screen, then ship — this decrements the\n"
+"    source bins immediately. Stock is only credited to a destination bin\n"
+"    once each line is received there."
+msgstr "Voeg regels toe op het volgende scherm en verzend dan — dit vermindert\n    de bronlocaties onmiddellijk. Voorraad wordt pas aan een bestemmingslocatie\n    toegekend zodra elke regel daar is ontvangen."
+
+#: manufacturing/templates/wms_warehouse_list.html:19
+msgid "New Warehouse"
+msgstr "Nieuw Magazijn"
+
+#: manufacturing/templates/wms_warehouse_list.html:22
+msgid "Create Warehouse"
+msgstr "Magazijn Aanmaken"
+
+#: manufacturing/templates/wms_warehouse_list.html:29
+msgid "Zones"
+msgstr "Zones"
+
+#: manufacturing/templates/wms_warehouse_list.html:43
+msgid "No warehouses yet."
+msgstr "Nog geen magazijnen."
+
+#: manufacturing/templates/wms_wave_detail.html:3
+#, python-format
+msgid "Wave %(num)s"
+msgstr "Golf %(num)s"
+
+#: manufacturing/templates/wms_wave_detail.html:6
+msgid "Back to Waves"
+msgstr "Terug naar Golven"
+
+#: manufacturing/templates/wms_wave_detail.html:16
+msgid "Consolidated Pick Sheet"
+msgstr "Geconsolideerd Pickblad"
+
+#: manufacturing/templates/wms_wave_detail.html:18
+msgid ""
+"One row per product/bin combination still needed anywhere in this wave —\n"
+"    pick the full row quantity in one trip, then it's automatically "
+"allocated\n"
+"    back across every order line that needed it."
+msgstr "Eén regel per product/locatie-combinatie die nog ergens in deze golf nodig is —\n    pick de volledige regelhoeveelheid in één rit, waarna deze automatisch wordt\n    teruggealloceerd naar elke orderregel die het nodig had."
+
+#: manufacturing/templates/wms_wave_detail.html:26
+msgid "Qty Needed"
+msgstr "Benodigde Hoeveelheid"
+
+#: manufacturing/templates/wms_wave_detail.html:53
+msgid ""
+"Nothing left to pick — every consolidatable line in this wave is resolved."
+msgstr "Niets meer te picken — alle consolideerbare regels in deze golf zijn afgehandeld."
+
+#: manufacturing/templates/wms_wave_detail.html:56
+msgid "Orders in this Wave"
+msgstr "Orders in deze Golf"
+
+#: manufacturing/templates/wms_wave_detail.html:74
+msgid "Cancel this wave? Every order in it will need a new pick list."
+msgstr "Deze golf annuleren? Elke order erin heeft een nieuwe picklijst nodig."
+
+#: manufacturing/templates/wms_wave_detail.html:77
+msgid "Cancel Wave"
+msgstr "Golf Annuleren"
+
+#: manufacturing/templates/wms_wave_list.html:21
+msgid ""
+"Batch several confirmed SOs into one wave so a picker walks each product/"
+"bin\n"
+"    once per wave instead of once per order — pick lists are still "
+"generated\n"
+"    one per SO underneath, but the picker works from a single consolidated\n"
+"    sheet until every order in the wave is resolved."
+msgstr "Bundel meerdere bevestigde orders in één golf zodat een picker elk product/locatie\n    één keer per golf loopt in plaats van één keer per order — picklijsten worden nog steeds\n    per order gegenereerd, maar de picker werkt vanuit één geconsolideerd\n    blad totdat elke order in de golf is afgehandeld."
+
+#: manufacturing/templates/wms_wave_list.html:49
+msgid "Create Wave from Selected"
+msgstr "Golf Maken van Selectie"
+
+#: manufacturing/templates/wms_wave_list.html:56
+msgid "Waves"
+msgstr "Golven"
+
+#: manufacturing/templates/wms_wave_list.html:66
+msgid "Wave #"
+msgstr "Golfnr."
+
+#: manufacturing/templates/wms_wave_list.html:82
+#, python-format
+msgid "No waves with status \"%(s)s\"."
+msgstr "Geen golven met status „%(s)s”."
+
+#: manufacturing/templates/wms_wave_list.html:84
+msgid "No waves."
+msgstr "Geen golven."
 
 #: manufacturing/templates/wo_carbon_detail.html:3
 #: manufacturing/templates/wo_carbon_detail.html:31

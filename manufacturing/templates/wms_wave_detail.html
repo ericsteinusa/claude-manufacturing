@@ -1,28 +1,29 @@
 {% extends "base.html" %}
-{% block page_title %}Wave {{ wave.wave_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=wave.wave_number %}Wave {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wms/waves/" class="btn">Back to Waves</a>
+<a href="/wms/waves/" class="btn">{% trans "Back to Waves" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
 <div class="menu-title">{{ wave.wave_number }}</div>
-<p>Status: <span class="pill pill-{{ wave.status }}">{{ wave.status|title }}</span></p>
+<p>{% trans "Status:" %} <span class="pill pill-{{ wave.status }}">{{ wave.status|title }}</span></p>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
-<h3>Consolidated Pick Sheet</h3>
+<h3>{% trans "Consolidated Pick Sheet" %}</h3>
 <p style="font-size:12px;color:var(--text-muted);max-width:700px;">
-    One row per product/bin combination still needed anywhere in this wave —
+    {% blocktrans %}One row per product/bin combination still needed anywhere in this wave —
     pick the full row quantity in one trip, then it's automatically allocated
-    back across every order line that needed it.
+    back across every order line that needed it.{% endblocktrans %}
 </p>
 {% if consolidated %}
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Product</th><th>Bin</th><th class="num">Qty Needed</th><th class="num">Orders</th>{% if can_edit %}<th></th>{% endif %}</tr>
+            <tr><th>{% trans "Product" %}</th><th>{% trans "Bin" %}</th><th class="num">{% trans "Qty Needed" %}</th><th class="num">{% trans "Orders" %}</th>{% if can_edit %}<th></th>{% endif %}</tr>
         </thead>
         <tbody>
             {% for c in consolidated %}
@@ -39,7 +40,7 @@
                         <input type="hidden" name="product_id" value="{{ c.product_id }}">
                         <input type="hidden" name="bin_id" value="{{ c.bin_id }}">
                         <input type="number" step="any" name="qty_picked" value="{{ c.qty_needed }}" style="width:90px;" required>
-                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Pick</button>
+                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">{% trans "Pick" %}</button>
                     </form>
                 </td>
                 {% endif %}
@@ -49,20 +50,20 @@
     </table>
 </div>
 {% else %}
-<div class="empty-state">Nothing left to pick — every consolidatable line in this wave is resolved.</div>
+<div class="empty-state">{% trans "Nothing left to pick — every consolidatable line in this wave is resolved." %}</div>
 {% endif %}
 
-<h3 style="margin-top:28px;">Orders in this Wave</h3>
+<h3 style="margin-top:28px;">{% trans "Orders in this Wave" %}</h3>
 <div class="erp-table-wrap">
     <table class="erp-table">
-        <thead><tr><th>Pick #</th><th>SO #</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>{% trans "Pick #" %}</th><th>{% trans "SO #" %}</th><th>{% trans "Status" %}</th><th></th></tr></thead>
         <tbody>
             {% for p in member_pick_lists %}
             <tr>
                 <td>{{ p.pick_number }}</td>
                 <td>{{ p.so_number }}</td>
                 <td><span class="pill pill-{{ p.status }}">{{ p.status|title }}</span></td>
-                <td><a href="/wms/picks/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                <td><a href="/wms/picks/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -70,10 +71,10 @@
 </div>
 
 {% if can_edit and wave.status == 'open' %}
-<form method="post" style="margin-top:20px;" onsubmit="return confirm('Cancel this wave? Every order in it will need a new pick list.');">
+<form method="post" style="margin-top:20px;" onsubmit="return confirm('{% trans "Cancel this wave? Every order in it will need a new pick list." %}');">
     {% csrf_token %}
     <input type="hidden" name="action" value="cancel">
-    <button type="submit" class="btn">Cancel Wave</button>
+    <button type="submit" class="btn">{% trans "Cancel Wave" %}</button>
 </form>
 {% endif %}
 </div>

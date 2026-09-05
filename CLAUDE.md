@@ -1557,6 +1557,74 @@ item with an existing quote) in French and German — including confirming
 the newly-added language switcher itself lists and switches between all
 6 languages from within the portal header, not just the main app.
 
+Also translated: the entire **WMS (Warehouse Management)** feature
+(`wms_warehouse_list.html`, `wms_bin_list.html`, `wms_bin_detail.html`,
+`wms_bin_new.html`, `wms_putaway_rule_list.html`, `wms_pick_list_list.html`,
+`wms_pick_list_detail.html`, `wms_wave_list.html`, `wms_wave_detail.html`,
+`wms_pack_station.html`, `wms_ship_confirm.html`, `wms_receive.html`,
+`wms_transfer_list.html`, `wms_transfer_detail.html`, `wms_transfer_new.html`,
+`wms_rfid_reader_list.html`, `wms_rfid_tag_list.html`,
+`wms_rfid_tag_detail.html` — 18 templates, routed at `/wms/`, all extending
+`base.html` directly — no separate base template needed this time, unlike
+the Portals pass). Split across two parallel subagents (locations/picking
+vs. fulfillment/RFID, ~9 files each) working from the same conventions,
+then centrally reviewed, makemessages'd, fuzzy-stripped, translated, and
+verified — same pipeline as the Portals pass. 154 unique strings across 5
+languages. Both subagents' diffs checked out clean on review; one caught
+its own mistake mid-edit (`wms_wave_list.html`'s quoted-status empty-state
+split briefly dropped the `.empty-state` wrapper div, fixed before
+finishing) and one hand-rolled pluralization anti-pattern
+(`{{ x|length }} order line(s)`) was converted to a proper
+`{% blocktrans count %}` in `wms_receive.html`.
+
+**Found a genuine `makemessages` extraction bug, distinct from every
+prior escaping gotcha in this file** — and this one is NOT a mistake in
+how the translation pipeline was *used*, it's a real gap in what
+`makemessages` can correctly *parse*: `wms_putaway_rule_list.html`'s
+placeholder hint used backslash-escaped quotes matching the tag's own
+delimiter — `{% trans 'e.g. \'raw material\' or \'A\'' %}` — to embed
+literal apostrophes inside a single-quoted `{% trans %}` argument. This
+is **not** the already-documented "backslash doesn't work for a
+non-matching quote" gotcha (that one is about trying to escape a
+different quote character than the delimiter, and produces a leaked
+literal backslash); this is the delimiter's *own* quote character,
+correctly escaped, and it renders **perfectly correctly at runtime** —
+confirmed by rendering the template directly (`{{ ... }}` → `e.g. 'raw
+material' or 'A'`, exactly as intended, no stray backslash). The failure
+is specific to *extraction*: `makemessages` mis-tokenized the argument
+and silently produced a garbage 3-character msgid (`"e.g. \\"` — "e.g. "
+plus a bare escaped backslash) instead of raising an error, meaning the
+real string was **never added to the catalog at all** in any language —
+it would have shipped as permanently-untranslated English with no trace
+in any `.po` file, and no warning from `manage.py check`, `msgfmt
+--check`, or the test suite, since a missing catalog entry isn't a
+syntax error to any of those tools. The fix was to stop escaping
+entirely: since the argument only contains apostrophes and the tag
+itself is nested inside a *double*-quoted HTML attribute
+(`placeholder="..."`), switching the `{% trans %}` argument to
+double-quotes (`{% trans "e.g. 'raw material' or 'A'" %}`) needs no
+escaping at all — matching the IT department pass's established finding
+that Django's own tag/HTML-attribute quote nesting doesn't require
+escaping, and additionally confirming that finding extends to
+*extraction*, not just runtime rendering. Re-ran `makemessages` after
+the fix and confirmed the full, correct string (`"e.g. 'raw material' or
+'A'"`) was extracted this time. **Worth a standing checklist item**:
+after adding any escaped-quote `{% trans %}`/`{% blocktrans %}` argument,
+check the `.po` diff for a suspiciously short or truncated new msgid
+before translating it — `msgfmt`/`manage.py check`/pytest all stay green
+on a silently-dropped string, so eyeballing the extracted text is the
+only thing that catches it.
+
+Full suite 3475 passed (unchanged), `manage.py check` and `ruff check .`
+clean, `msgfmt --check` clean on all 5 files, zero fuzzy/blank entries.
+Verified end-to-end against the real dev server: Bin Master (confirmed
+the corrected placeholder text renders as real apostrophes, not a stray
+backslash), Put-Away Rules, Receive & Put-Away, Wave Picking, Warehouse
+Transfers + a completed transfer's detail page, RFID Readers, RFID Tags
++ a real tag's detail page (confirmed the embedded-quote "still here"
+heartbeat sentence), in Spanish, French, and German with real sample
+data, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
