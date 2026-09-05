@@ -2140,10 +2140,33 @@ whether or not anything was logged:
         -p ExecMainStartTimestamp --value
     systemctl list-timers manufacture-autopull.timer
 
-`journalctl -t manufacture-autopull` shows the script's `logger` lines;
-`journalctl -u manufacture-autopull.service` shows those *plus* the unit's
-stdout (the pytest run, git output) and systemd's own start/stop records,
-which is usually what you want when a deploy misbehaved.
+**Read the script's own lines with `journalctl -t manufacture-autopull`.
+`-u manufacture-autopull.service` silently drops most of them** — it is not
+a superset. Measured across three deploy cycles, `-t` returned every
+`logger` line (3, 3, 2) while `-u` returned 2, 1 and 1.
+
+The cause is cgroup attribution, verified from the journal's own fields:
+
+    "New commits detected ..."   _SYSTEMD_CGROUP=/system.slice/manufacture-autopull.service
+    "Checks passed, restarting"  _SYSTEMD_CGROUP=None
+    "Restart OK -- now serving"  _SYSTEMD_CGROUP=None
+
+The script does its work through `sudo -u eric`, which re-parents out of the
+unit's cgroup; every `logger` invocation after that point is recorded with
+no `_SYSTEMD_UNIT`, and `-u` filters on exactly that field. So the lines
+that matter most — the restart outcome — are the ones `-u` hides. `-t`
+filters on `SYSLOG_IDENTIFIER`, which survives.
+
+Use `-t` for the deploy narrative, `-u` for the unit's stdout (the pytest
+run) and systemd's start/stop records, and no filter at all when you want
+both interleaved.
+
+*This note was wrong twice before being measured.* The first version
+claimed `-t` was the lossy one; the correction claimed the two were
+equivalent, from a test that compared `grep 'New commits'` under `-t`
+against `grep -E 'New commits|passed in'` under `-u` — different patterns,
+so the matching counts meant nothing. Compare like with like, over a window
+that contains a real deploy, before believing either.
 
 ## Windows deployment (`scripts/windows/`)
 `manufacture-autopull.ps1` (polls `origin/main` and redeploys) and
