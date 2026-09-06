@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Routing — {{ product.name }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with name=product.name %}Routing — {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/inventory/{{ product.id }}/" class="btn">← Product</a>
-<a href="/workcenters/" class="btn">Work Centers</a>
+<a href="/inventory/{{ product.id }}/" class="btn">← {% trans "Product" %}</a>
+<a href="/workcenters/" class="btn">{% trans "Work Centers" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -41,11 +42,11 @@
 {% block body %}
 <div class="content">
 <div class="route-wrap">
-    <h2>Routing — {{ product.name }}</h2>
+    <h2>{% blocktrans with name=product.name %}Routing — {{ name }}{% endblocktrans %}</h2>
     <div class="route-meta">
-        {% if product.sku %}SKU: {{ product.sku }} &nbsp;·&nbsp;{% endif %}
-        {{ steps|length }} operation{{ steps|length|pluralize }}
-        &nbsp;·&nbsp; <a href="/costs/{{ product.id }}/" style="color: var(--text-muted);">View Cost Roll</a>
+        {% if product.sku %}{% blocktrans with sku=product.sku %}SKU: {{ sku }}{% endblocktrans %} &nbsp;·&nbsp;{% endif %}
+        {% blocktrans count counter=steps|length %}{{ counter }} operation{% plural %}{{ counter }} operations{% endblocktrans %}
+        &nbsp;·&nbsp; <a href="/costs/{{ product.id }}/" style="color: var(--text-muted);">{% trans "View Cost Roll" %}</a>
     </div>
 
     {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
@@ -55,11 +56,11 @@
         <table class="route-table">
             <thead>
                 <tr>
-                    <th style="width:44px">Seq</th>
-                    <th>Operation</th>
-                    <th>Work Center</th>
-                    <th class="num">Std Hours</th>
-                    <th>Notes</th>
+                    <th style="width:44px">{% trans "Seq" %}</th>
+                    <th>{% trans "Operation" %}</th>
+                    <th>{% trans "Work Center" %}</th>
+                    <th class="num">{% trans "Std Hours" %}</th>
+                    <th>{% trans "Notes" %}</th>
                     {% if can_edit %}<th></th>{% endif %}
                 </tr>
             </thead>
@@ -78,14 +79,14 @@
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="routing_id" value="{{ step.id }}">
                             <button type="submit" class="btn-del"
-                                onclick="return confirm('Remove this step?')">Remove</button>
+                                onclick="return confirm('{% trans "Remove this step?" %}')">{% trans "Remove" %}</button>
                         </form>
                     </td>
                     {% endif %}
                 </tr>
             {% empty %}
                 <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:20px;">
-                    No routing steps defined yet.
+                    {% trans "No routing steps defined yet." %}
                 </td></tr>
             {% endfor %}
             </tbody>
@@ -94,34 +95,34 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Operation</h3>
+        <h3>{% trans "Add Operation" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add">
             <div class="form-grid">
                 <div class="field">
-                    <label>Operation Name *</label>
-                    <input type="text" name="operation_name" required placeholder="e.g. Weld Frame">
+                    <label>{% trans "Operation Name *" %}</label>
+                    <input type="text" name="operation_name" required placeholder="{% trans "e.g. Weld Frame" %}">
                 </div>
                 <div class="field">
-                    <label>Work Center</label>
+                    <label>{% trans "Work Center" %}</label>
                     <select name="workcenter_id">
-                        <option value="">-- none --</option>
+                        <option value="">{% trans "-- none --" %}</option>
                         {% for wc in workcenters %}
                         <option value="{{ wc.id }}">{{ wc.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="field">
-                    <label>Std Hours</label>
+                    <label>{% trans "Std Hours" %}</label>
                     <input type="number" name="std_hours" step="0.01" value="0" min="0">
                 </div>
                 <div class="field">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans "Optional" %}">
                 </div>
             </div>
-            <button type="submit" class="btn-sm">+ Add Step</button>
+            <button type="submit" class="btn-sm">{% trans "+ Add Step" %}</button>
         </form>
     </div>
     {% endif %}
