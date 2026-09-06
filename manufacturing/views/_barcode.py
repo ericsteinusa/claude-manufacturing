@@ -172,6 +172,7 @@ def receive_scan(request):
                     qty_left = (item.get("qty_ordered") or 0) - (item.get("qty_received") or 0)
                     if qty_left > 0:
                         receive_po_item(conn, item["id"], qty_left, po_id=po_id)
+                        conn.commit()
                         items = get_po_items(conn, po_id)
                         ctx["success"] = f"Received {qty_left} × {item.get('description') or sku}"
                     else:

@@ -53,11 +53,15 @@ class _FakeConn:
 
     def __init__(self, responses):
         self.calls = []
+        self.committed = False
         self._responses = iter(responses)
 
     def execute(self, sql, params=None):
         self.calls.append((sql, list(params or [])))
         return _FakeCursor(next(self._responses))
+
+    def commit(self):
+        self.committed = True
 
 
 def _scan(conn_responses, q, session=None, get_po_ret=None, items_ret=None):
@@ -152,6 +156,41 @@ def test_scan_part_matches_by_product_id_when_no_sku():
     receive_item.assert_called_once_with(conn, 501, 10, po_id=5)
     assert "error" not in ctx
     assert "Bicycle Tire" in ctx["success"]
+
+
+def test_scan_part_receive_commits_the_transaction():
+    """Regression guard: receive_po_item's own docstring says "Does not
+    commit" — the caller must. Without an explicit conn.commit() after a
+    successful receive, the UPDATE is silently rolled back when the
+    connection is closed/garbage-collected, so the "Received N x item"
+    success message is a lie (confirmed live: qty_received stayed 0 in
+    the real dev DB after a "successful" scan, before this fix)."""
+    items = [{"id": 501, "product_id": 7, "sku": None,
+              "description": "Bicycle Tire", "qty_ordered": 10, "qty_received": 0}]
+    request, conn, ctx, receive_item = _scan(
+        conn_responses=[],
+        q="PART-7",
+        session={"receive_po_id": 5},
+        get_po_ret={"id": 5, "po_number": "PO-2026-0001"},
+        items_ret=items,
+    )
+    assert conn.committed is True
+
+
+def test_scan_part_already_fully_received_does_not_commit():
+    """No write happened, so there's nothing to commit — asserting this
+    pins the commit to the successful-receive branch specifically,
+    not a blanket "always commit at the end of the view" change."""
+    items = [{"id": 501, "product_id": 7, "sku": None,
+              "description": "Bicycle Tire", "qty_ordered": 10, "qty_received": 10}]
+    request, conn, ctx, receive_item = _scan(
+        conn_responses=[],
+        q="PART-7",
+        session={"receive_po_id": 5},
+        get_po_ret={"id": 5, "po_number": "PO-2026-0001"},
+        items_ret=items,
+    )
+    assert conn.committed is False
 
 
 def test_scan_part_still_matches_by_sku_when_present():
