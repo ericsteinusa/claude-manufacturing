@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ recipe.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/recipes/" class="btn">Recipes</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/recipes/" class="btn">{% trans "Recipes" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -19,28 +20,28 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">{{ recipe.name }} ({{ recipe.product_name }}, Rev {{ recipe.revision }})
+    <div class="menu-title">{% blocktrans with name=recipe.name product=recipe.product_name rev=recipe.revision %}{{ name }} ({{ product }}, Rev {{ rev }}){% endblocktrans %}
         {% if recipe.status == 'active' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
         {% elif recipe.status == 'superseded' %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Superseded</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Superseded" %}</span>
         {% else %}
-        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Draft</span>
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{% trans "Draft" %}</span>
         {% endif %}
     </div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Batch size: {{ recipe.batch_size }} {{ recipe.batch_uom }} · Yield: {{ recipe.yield_pct }}%
+        {% blocktrans with size=recipe.batch_size uom=recipe.batch_uom pct=recipe.yield_pct %}Batch size: {{ size }} {{ uom }} · Yield: {{ pct }}%{% endblocktrans %}
     </p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Ingredients</h3>
+        <h3>{% trans "Ingredients" %}</h3>
         {% if recipe.ingredients %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Component</th><th class="num">Qty / Batch</th><th>UOM</th></tr></thead>
+                <thead><tr><th>{% trans "Component" %}</th><th class="num">{% trans "Qty / Batch" %}</th><th>{% trans "UOM" %}</th></tr></thead>
                 <tbody>
                     {% for ing in recipe.ingredients %}
                     <tr>
@@ -53,7 +54,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No ingredients added yet.</div>
+        <div class="empty-state">{% trans "No ingredients added yet." %}</div>
         {% endif %}
 
         {% if can_edit and recipe.status == 'draft' %}
@@ -62,7 +63,7 @@
             <input type="hidden" name="action" value="add_ingredient">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Component *</label>
+                    <label>{% trans "Component *" %}</label>
                     <select name="component_id" required>
                         {% for p in products %}
                         <option value="{{ p.id }}">{{ p.name }}</option>
@@ -70,52 +71,52 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Qty / Batch *</label>
+                    <label>{% trans "Qty / Batch *" %}</label>
                     <input type="number" name="qty_per_batch" step="0.01" min="0.01" required>
                 </div>
                 <div class="form-row">
-                    <label>UOM</label>
+                    <label>{% trans "UOM" %}</label>
                     <input type="text" name="uom" value="kg">
                 </div>
                 <div class="form-row">
-                    <label>Sequence</label>
+                    <label>{% trans "Sequence" %}</label>
                     <input type="number" name="sequence" value="0">
                 </div>
             </div>
-            <button type="submit" class="btn">Add Ingredient</button>
+            <button type="submit" class="btn">{% trans "Add Ingredient" %}</button>
         </form>
         {% endif %}
     </div>
 
     {% if can_edit and recipe.status == 'draft' %}
     <div class="card">
-        <h3>Activate</h3>
-        <p style="font-size:12px;color:var(--text-muted);">Activating this recipe supersedes any other active recipe for this product.</p>
+        <h3>{% trans "Activate" %}</h3>
+        <p style="font-size:12px;color:var(--text-muted);">{% trans "Activating this recipe supersedes any other active recipe for this product." %}</p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="activate">
-            <button type="submit" class="btn">Activate Recipe</button>
+            <button type="submit" class="btn">{% trans "Activate Recipe" %}</button>
         </form>
     </div>
     {% endif %}
 
     {% if recipe.status == 'active' %}
     <div class="card">
-        <h3>Scale / Release a Batch</h3>
+        <h3>{% trans "Scale / Release a Batch" %}</h3>
         <form method="post" style="display:flex;gap:10px;align-items:end;margin-bottom:14px;">
             {% csrf_token %}
             <input type="hidden" name="action" value="scale">
             <div class="form-row">
-                <label>Target Qty</label>
+                <label>{% trans "Target Qty" %}</label>
                 <input type="number" name="target_qty" step="0.01" min="0.01" required>
             </div>
-            <button type="submit" class="btn">Preview Scaled Ingredients</button>
+            <button type="submit" class="btn">{% trans "Preview Scaled Ingredients" %}</button>
         </form>
 
         {% if scaled %}
         <div class="erp-table-wrap" style="margin-bottom:14px;">
             <table class="erp-table">
-                <thead><tr><th>Component</th><th class="num">Qty Needed</th><th>UOM</th></tr></thead>
+                <thead><tr><th>{% trans "Component" %}</th><th class="num">{% trans "Qty Needed" %}</th><th>{% trans "UOM" %}</th></tr></thead>
                 <tbody>
                     {% for s in scaled %}
                     <tr><td>{{ s.component_name }}</td><td class="num">{{ s.qty_needed }}</td><td>{{ s.uom }}</td></tr>
@@ -130,10 +131,10 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="release">
             <div class="form-row">
-                <label>Release Qty *</label>
+                <label>{% trans "Release Qty *" %}</label>
                 <input type="number" name="target_qty" step="0.01" min="0.01" required>
             </div>
-            <button type="submit" class="btn btn-primary">Release Batch Work Order</button>
+            <button type="submit" class="btn btn-primary">{% trans "Release Batch Work Order" %}</button>
         </form>
         {% endif %}
     </div>

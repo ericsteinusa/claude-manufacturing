@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Recipe{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Recipe" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/recipes/" class="btn">Recipes</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/recipes/" class="btn">{% trans "Recipes" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">New Recipe</div>
+    <div class="menu-title">{% trans "New Recipe" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,7 +26,7 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Product *</label>
+                <label>{% trans "Product *" %}</label>
                 <select name="product_id" required>
                     {% for p in products %}
                     <option value="{{ p.id }}">{{ p.name }}</option>
@@ -33,26 +34,26 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Recipe Name *</label>
-                <input type="text" name="name" required placeholder="e.g. Syrup Base">
+                <label>{% trans "Recipe Name *" %}</label>
+                <input type="text" name="name" required placeholder="{% trans 'e.g. Syrup Base' %}">
             </div>
             <div class="form-row">
-                <label>Revision</label>
+                <label>{% trans "Revision" %}</label>
                 <input type="text" name="revision" value="A">
             </div>
             <div class="form-row">
-                <label>Batch Size *</label>
+                <label>{% trans "Batch Size *" %}</label>
                 <input type="number" name="batch_size" step="0.01" min="0.01" required>
             </div>
             <div class="form-row">
-                <label>Batch UOM</label>
+                <label>{% trans "Batch UOM" %}</label>
                 <input type="text" name="batch_uom" value="kg">
             </div>
             <div class="form-row">
-                <label>Yield %</label>
+                <label>{% trans "Yield %" %}</label>
                 <input type="number" name="yield_pct" step="0.1" min="0.1" max="100" value="100">
             </div>
-            <button type="submit" class="btn btn-primary">Create Recipe</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Recipe" %}</button>
         </form>
     </div>
 </div>
