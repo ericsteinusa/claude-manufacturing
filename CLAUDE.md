@@ -2430,6 +2430,67 @@ header survives literally next to fully-translated sibling headers,
 with a real FIFO-method product row) — all pages return 200 with
 correctly translated titles and labels, no console or server errors.
 
+Also fully translated: the **Scan (barcode)** feature (`scan_home.html`,
+`scan_receive.html` — 2 templates, linked from `base.html`'s own global
+header — the "🔍 Scan barcode…" search box and "⬛ Scan" button that
+appear on every authenticated page in the app, not just one department's
+dashboard — making this a higher-visibility "translate the link, not
+yet the target" closure than most prior batches, even though it's the
+smallest batch by template count so far). 24 unique strings across 5
+languages, all simple (no plurals). Small enough to translate directly
+by hand rather than delegating, matching the ABC Costing/Auth/Risk
+Management precedent. Barcode prefixes (`WO-`, `PART-`, `PO-`, `RCV-`,
+`ASSET-`) and their example codes' numeric/alphanumeric portions stay
+untranslated literals (e.g. `e.g. WO-2024-001` translates the "e.g."
+but not the code itself), matching the established
+acronym/identifier-preservation convention. The empty-state hint
+paragraph ("Scan a `<strong>`PO-`</strong>` or `<strong>`RCV-`</strong>`
+barcode...") needed one `{% blocktrans %}` preserving both `<strong>`
+tags around the two literal prefixes, the same embedded-HTML pattern
+established in the Customers/Credit and Sales passes.
+
+**A real, pre-existing, unrelated-to-i18n bug was found while trying to
+browser-verify the loaded-PO items table with live data, flagged here
+rather than fixed, matching the Purchasing/Sales precedent of leaving
+out-of-scope bugs for a separate pass**: `views/_barcode.py`'s
+`receive_scan()` strips a literal `"PO-"` or `"RCV-"` prefix off the
+scanned code and looks up `purchase_order.po_number = <stripped
+value>` — but every real `po_number` in this schema already includes
+its own `"PO-"` prefix as part of the stored value (`PO-2026-0001`,
+`PO-CORRECTNESS-CHECK-1`, etc.), so stripping a second, redundant `PO-`
+before the lookup means the query can never match any real PO — scanning
+any genuine PO barcode always falls through to `"PO not found: ..."`,
+confirmed live against every sample PO in the dev DB. `tests/
+test_barcode_core.py` covers the sibling `scan_lookup`/`resolve_scan_url`
+code path (used by `scan_home.html`) thoroughly, but has no coverage at
+all for this second, independent prefix-stripping implementation inside
+`receive_scan()` itself — the gap that let this ship unnoticed. Verified
+the table itself renders and translates correctly by rendering
+`scan_receive.html` directly with a mocked `po`/`items` context instead
+(confirmed the Description/SKU/Ordered/Received/Status headers and the
+Complete/Partial/Pending pill states in both French and German with
+real-shaped sample rows) rather than via the (broken) live scan flow.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check` clean
+on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically. The auto-merged generic labels this batch reused
+(Ordered, Received, Status, Description, Complete, Partial, Pending,
+Print Receiving Label) all cross-checked semantically compatible with
+their existing catalog translations — no "Make"-style cross-context
+mistranslation risk. Verified end-to-end against the real dev server,
+in German with real sample data: the Barcode Scanner home page
+(confirmed the full prefix-legend table renders with all 5 untranslated
+codes and their translated descriptions/examples), and the Receive
+Goods scan-session page's empty state (confirmed the
+`<strong>`-tag-embedded hint paragraph and the "Unrecognised scan"/"PO
+not found" error messages, which are themselves untranslated Python
+f-strings from the view — same class of gap as `menus.py`'s
+`DASHBOARD_DEPARTMENTS` before it was wrapped in `gettext_lazy`, left
+out of scope for this pass since fixing it means auditing every
+f-string in `_barcode.py`, not a template-marking change) — no console
+or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
