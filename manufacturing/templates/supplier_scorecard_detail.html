@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Supplier Scorecard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Supplier Scorecard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/suppliers/scorecard/" class="btn">All Scorecards</a>
+<a href="/suppliers/scorecard/" class="btn">{% trans "All Scorecards" %}</a>
 {% if scorecard %}
-<a href="/suppliers/{{ scorecard.supplier_id }}/" class="btn">Supplier Detail</a>
+<a href="/suppliers/{{ scorecard.supplier_id }}/" class="btn">{% trans "Supplier Detail" %}</a>
 {% endif %}
-<a href="/qa/suppliers/" class="btn">Supplier Quality Ratings</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/suppliers/" class="btn">{% trans "Supplier Quality Ratings" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -34,40 +35,40 @@
 
 {% block body %}
 <div class="content">
-<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="ssc-wrap">
     {% if not scorecard %}
-    <h2>Supplier Scorecard</h2>
-    <div class="card">Supplier not found.</div>
+    <h2>{% trans "Supplier Scorecard" %}</h2>
+    <div class="card">{% trans "Supplier not found." %}</div>
     {% else %}
-    <h2>{{ scorecard.supplier_name }} — Scorecard</h2>
-    <p class="no-data">{{ scorecard.date_from }} to {{ scorecard.date_to }}</p>
+    <h2>{% blocktrans with name=scorecard.supplier_name %}{{ name }} — Scorecard{% endblocktrans %}</h2>
+    <p class="no-data">{% blocktrans with from_date=scorecard.date_from to_date=scorecard.date_to %}{{ from_date }} to {{ to_date }}{% endblocktrans %}</p>
 
     <div class="ssc-summary">
         <div class="card">
             <div class="num composite">{% if scorecard.composite_score is not None %}{{ scorecard.composite_score }}{% else %}—{% endif %}</div>
-            <div class="lbl">Composite Score</div>
+            <div class="lbl">{% trans "Composite Score" %}</div>
         </div>
         <div class="card">
             <div class="num">{% if scorecard.on_time_pct is not None %}{{ scorecard.on_time_pct }}%{% else %}—{% endif %}</div>
-            <div class="lbl">On-Time Delivery ({{ scorecard.on_time_sample }} PO{{ scorecard.on_time_sample|pluralize }})</div>
+            <div class="lbl">{% blocktrans count counter=scorecard.on_time_sample %}On-Time Delivery ({{ counter }} PO){% plural %}On-Time Delivery ({{ counter }} POs){% endblocktrans %}</div>
         </div>
         <div class="card">
             <div class="num">{% if scorecard.fill_rate_pct is not None %}{{ scorecard.fill_rate_pct }}%{% else %}—{% endif %}</div>
-            <div class="lbl">Quantity Fill Rate</div>
+            <div class="lbl">{% trans "Quantity Fill Rate" %}</div>
         </div>
         <div class="card">
             <div class="num">{% if scorecard.quality_reject_pct is not None %}{{ scorecard.quality_reject_pct }}%{% else %}—{% endif %}</div>
-            <div class="lbl">Quality Reject Rate ({{ scorecard.quality_sample }} material{{ scorecard.quality_sample|pluralize }})</div>
+            <div class="lbl">{% blocktrans count counter=scorecard.quality_sample %}Quality Reject Rate ({{ counter }} material){% plural %}Quality Reject Rate ({{ counter }} materials){% endblocktrans %}</div>
         </div>
     </div>
 
     <div class="card">
-        <h3 style="margin-top:0;">Monthly Trend</h3>
+        <h3 style="margin-top:0;">{% trans "Monthly Trend" %}</h3>
         {% if scorecard.trend %}
         <canvas id="chart-trend" height="90"></canvas>
         {% else %}
-        <p class="no-data">No purchase order activity in this window.</p>
+        <p class="no-data">{% trans "No purchase order activity in this window." %}</p>
         {% endif %}
     </div>
     {% endif %}
