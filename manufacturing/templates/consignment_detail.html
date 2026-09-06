@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page_title %}{{ agreement.agreement_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">← Back</a>
-<a href="/inventory/{{ agreement.product_id }}/" class="btn">Product</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">{% trans "← Back" %}</a>
+<a href="/inventory/{{ agreement.product_id }}/" class="btn">{% trans "Product" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,25 +50,25 @@
                 <span class="pill">{{ agreement.status|capfirst }}</span>
             </div>
             <div class="po-meta">
-                <div><b>Supplier:</b> {{ agreement.supplier_name|default:"—" }}</div>
-                <div><b>Product:</b> {{ agreement.product_name }}</div>
-                <div><b>Unit Cost:</b> ${{ agreement.unit_cost|floatformat:2 }}</div>
-                <div><b>Validity:</b> {{ agreement.start_date|default:"—" }} – {{ agreement.end_date|default:"—" }}</div>
-                <div><b>On Hand (vendor-owned):</b> {{ agreement.on_hand_qty|floatformat:2 }}
+                <div><b>{% trans "Supplier:" %}</b> {{ agreement.supplier_name|default:"—" }}</div>
+                <div><b>{% trans "Product:" %}</b> {{ agreement.product_name }}</div>
+                <div><b>{% trans "Unit Cost:" %}</b> ${{ agreement.unit_cost|floatformat:2 }}</div>
+                <div><b>{% trans "Validity:" %}</b> {{ agreement.start_date|default:"—" }} – {{ agreement.end_date|default:"—" }}</div>
+                <div><b>{% trans "On Hand (vendor-owned):" %}</b> {{ agreement.on_hand_qty|floatformat:2 }}
                     (${{ agreement.on_hand_value|floatformat:2 }})</div>
-                <div><b>Used to Date:</b> {{ agreement.used_qty|floatformat:2 }}
+                <div><b>{% trans "Used to Date:" %}</b> {{ agreement.used_qty|floatformat:2 }}
                     (${{ agreement.used_value|floatformat:2 }})</div>
-                <div style="grid-column: 1 / -1;"><b>Notes:</b> {{ agreement.notes|default:"—" }}</div>
+                <div style="grid-column: 1 / -1;"><b>{% trans "Notes:" %}</b> {{ agreement.notes|default:"—" }}</div>
             </div>
             {% if can_edit and agreement.status != 'cancelled' %}
             <div style="margin-top:12px;display:flex;gap:8px;">
-                <a href="/consignment/{{ agreement.id }}/receive/" class="btn btn-sm">+ Receive Stock</a>
-                <a href="/consignment/{{ agreement.id }}/use/" class="btn btn-sm">Record Usage</a>
+                <a href="/consignment/{{ agreement.id }}/receive/" class="btn btn-sm">{% trans "+ Receive Stock" %}</a>
+                <a href="/consignment/{{ agreement.id }}/use/" class="btn btn-sm">{% trans "Record Usage" %}</a>
                 {% if agreement.status == 'active' %}
                 <form method="post" action="/consignment/{{ agreement.id }}/cancel/"
-                      onsubmit="return confirm('Cancel this consignment agreement?');">
+                      onsubmit="return confirm('{% trans "Cancel this consignment agreement?" %}');">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-danger">Cancel Agreement</button>
+                    <button type="submit" class="btn btn-sm btn-danger">{% trans "Cancel Agreement" %}</button>
                 </form>
                 {% endif %}
             </div>
@@ -75,11 +76,11 @@
         </div>
 
         <div class="po-card">
-            <h3 style="margin:0 0 10px;">Receipts (Vendor Shipments In)</h3>
+            <h3 style="margin:0 0 10px;">{% trans "Receipts (Vendor Shipments In)" %}</h3>
             {% if receipts %}
             <table class="po-table">
                 <thead>
-                    <tr><th class="num">Qty</th><th>Reference</th><th>Date</th></tr>
+                    <tr><th class="num">{% trans "Qty" %}</th><th>{% trans "Reference" %}</th><th>{% trans "Date" %}</th></tr>
                 </thead>
                 <tbody>
                     {% for r in receipts %}
@@ -92,17 +93,17 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="po-empty">No receipts recorded yet.</div>
+            <div class="po-empty">{% trans "No receipts recorded yet." %}</div>
             {% endif %}
         </div>
 
         <div class="po-card">
-            <h3 style="margin:0 0 10px;">Usage (Ownership Transferred, Vendor Billed)</h3>
+            <h3 style="margin:0 0 10px;">{% trans "Usage (Ownership Transferred, Vendor Billed)" %}</h3>
             {% if usages %}
             <table class="po-table">
                 <thead>
-                    <tr><th class="num">Qty</th><th class="num">Unit Cost</th>
-                        <th class="num">Total</th><th>AP Invoice</th><th>Reference</th><th>Date</th></tr>
+                    <tr><th class="num">{% trans "Qty" %}</th><th class="num">{% trans "Unit Cost" %}</th>
+                        <th class="num">{% trans "Total" %}</th><th>{% trans "AP Invoice" %}</th><th>{% trans "Reference" %}</th><th>{% trans "Date" %}</th></tr>
                 </thead>
                 <tbody>
                     {% for u in usages %}
@@ -118,7 +119,7 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="po-empty">No usage recorded yet.</div>
+            <div class="po-empty">{% trans "No usage recorded yet." %}</div>
             {% endif %}
         </div>
     </div>

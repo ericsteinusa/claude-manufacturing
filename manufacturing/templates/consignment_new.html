@@ -1,14 +1,15 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}New Consignment Agreement{% endblock %}
+{% block page_title %}{% trans "New Consignment Agreement" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/consignment/" class="btn">← Back</a>
+<a href="/consignment/" class="btn">{% trans "← Back" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">New Consignment Agreement</div>
+    <div class="menu-title">{% trans "New Consignment Agreement" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -17,42 +18,42 @@
             <form method="post" action="">
                 {% csrf_token %}
                 <div class="form-row">
-                    <label>Supplier</label>
+                    <label>{% trans "Supplier" %}</label>
                     <select name="supplier_id" required>
-                        <option value="">(select a supplier)</option>
+                        <option value="">{% trans "(select a supplier)" %}</option>
                         {% for s in suppliers %}
                         <option value="{{ s.id }}">{{ s.company_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Product</label>
+                    <label>{% trans "Product" %}</label>
                     <select name="product_id" required>
-                        <option value="">(select a product)</option>
+                        <option value="">{% trans "(select a product)" %}</option>
                         {% for p in products %}
                         <option value="{{ p.id }}">{{ p.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Unit Cost (owed to vendor per unit used)</label>
+                    <label>{% trans "Unit Cost (owed to vendor per unit used)" %}</label>
                     <input type="number" name="unit_cost" min="0" step="0.01" value="0.00" required>
                 </div>
                 <div class="form-row">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date">
                 </div>
                 <div class="form-row">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date">
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="3"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn">Create Agreement</button>
-                    <a href="/consignment/" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn">{% trans "Create Agreement" %}</button>
+                    <a href="/consignment/" class="btn btn-cancel">{% trans "Cancel" %}</a>
                 </div>
             </form>
         </div>

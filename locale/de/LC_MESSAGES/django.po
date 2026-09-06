@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 20:22+0000\n"
+"POT-Creation-Date: 2026-09-06 00:05+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -282,6 +282,8 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/compliance_template_detail.html:8
 #: manufacturing/templates/compliance_template_list.html:8
 #: manufacturing/templates/compliance_template_new.html:7
+#: manufacturing/templates/consignment_detail.html:9
+#: manufacturing/templates/consignment_list.html:9
 #: manufacturing/templates/control_plan_detail.html:8
 #: manufacturing/templates/control_plan_list.html:8
 #: manufacturing/templates/control_plan_new.html:7
@@ -525,6 +527,8 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/so_list.html:17
 #: manufacturing/templates/spc_list.html:8
 #: manufacturing/templates/spc_log.html:8
+#: manufacturing/templates/supplier_scorecard_detail.html:11
+#: manufacturing/templates/supplier_scorecard_list.html:9
 #: manufacturing/templates/tc_ot_report.html:9
 #: manufacturing/templates/tc_schedule.html:10
 #: manufacturing/templates/termination_detail.html:10
@@ -565,6 +569,9 @@ msgstr "Kostentreiberverbrauch nach Produkt"
 #: manufacturing/templates/bom_list.html:30
 #: manufacturing/templates/coa_detail.html:36
 #: manufacturing/templates/coa_list.html:29
+#: manufacturing/templates/consignment_detail.html:8
+#: manufacturing/templates/consignment_list.html:37
+#: manufacturing/templates/consignment_new.html:30
 #: manufacturing/templates/control_plan_list.html:24
 #: manufacturing/templates/inventory_list.html:65
 #: manufacturing/templates/lot_list.html:65
@@ -637,6 +644,8 @@ msgid "Driver Qty Consumed"
 msgstr "Verbrauchte Treibermenge"
 
 #: manufacturing/templates/abc_activity_detail.html:86
+#: manufacturing/templates/consignment_detail.html:66
+#: manufacturing/templates/consignment_use.html:41
 msgid "Record Usage"
 msgstr "Nutzung Erfassen"
 
@@ -765,6 +774,7 @@ msgstr "z. B. pro Rüstvorgang, pro Maschinenstunde"
 #: manufacturing/templates/bom_explode.html:61
 #: manufacturing/templates/coa_detail.html:40
 #: manufacturing/templates/coa_new.html:47
+#: manufacturing/templates/consignment_new.html:51
 #: manufacturing/templates/credit_account_detail.html:87
 #: manufacturing/templates/credit_account_detail.html:121
 #: manufacturing/templates/credit_account_list.html:136
@@ -1351,6 +1361,8 @@ msgstr "Letzte Buchungen"
 #: manufacturing/templates/ar_invoice_detail.html:177
 #: manufacturing/templates/ar_invoice_payments_kpis.html:5
 #: manufacturing/templates/ats_application_detail.html:46
+#: manufacturing/templates/consignment_detail.html:83
+#: manufacturing/templates/consignment_detail.html:106
 #: manufacturing/templates/credit_account_detail.html:133
 #: manufacturing/templates/credit_account_detail.html:172
 #: manufacturing/templates/credit_collections_detail.html:62
@@ -1389,6 +1401,10 @@ msgstr "Datum"
 #: manufacturing/templates/ap_invoice_payments_kpis.html:5
 #: manufacturing/templates/ar_invoice_detail.html:192
 #: manufacturing/templates/ar_invoice_payments_kpis.html:5
+#: manufacturing/templates/consignment_detail.html:83
+#: manufacturing/templates/consignment_detail.html:106
+#: manufacturing/templates/consignment_receive.html:35
+#: manufacturing/templates/consignment_use.html:37
 #: manufacturing/templates/finance_dashboard_kpis.html:56
 #: manufacturing/templates/finance_tax_detail.html:148
 #: manufacturing/templates/gl_dashboard_kpis.html:46
@@ -1507,6 +1523,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/compliance_checklist_detail.html:48
 #: manufacturing/templates/compliance_checklist_list.html:16
 #: manufacturing/templates/compliance_checklist_list.html:27
+#: manufacturing/templates/consignment_list.html:41
 #: manufacturing/templates/control_plan_detail.html:43
 #: manufacturing/templates/control_plan_list.html:26
 #: manufacturing/templates/credit_account_detail.html:62
@@ -1913,6 +1930,7 @@ msgstr "HB"
 #: manufacturing/templates/sales_contracts_detail.html:62
 #: manufacturing/templates/so_detail.html:91
 #: manufacturing/templates/supplier_portal_po_detail.html:21
+#: manufacturing/templates/supplier_scorecard_detail.html:38
 #: manufacturing/templates/wms_pick_list_detail.html:28
 #: manufacturing/templates/wms_transfer_detail.html:23
 #: manufacturing/templates/wo_detail.html:90
@@ -2269,6 +2287,7 @@ msgstr "Excel exportieren"
 #: manufacturing/templates/ap_list.html:36
 #: manufacturing/templates/ar_list.html:36
 #: manufacturing/templates/blanket_po_list.html:17
+#: manufacturing/templates/consignment_list.html:22
 #: manufacturing/templates/eng_ecr_detail.html:58
 #: manufacturing/templates/eng_ecrs.html:47
 #: manufacturing/templates/eng_projects.html:50
@@ -2320,6 +2339,7 @@ msgstr "Fällig Von:"
 #: manufacturing/templates/prod_schedule.html:50
 #: manufacturing/templates/prod_schedule_gantt.html:47
 #: manufacturing/templates/sales_orders.html:66
+#: manufacturing/templates/supplier_scorecard_list.html:41
 msgid "To:"
 msgstr "Bis:"
 
@@ -2391,6 +2411,7 @@ msgstr "Bis:"
 #: manufacturing/templates/sales_quotes.html:60
 #: manufacturing/templates/sales_targets.html:69
 #: manufacturing/templates/sales_territories.html:68
+#: manufacturing/templates/supplier_scorecard_list.html:43
 #: manufacturing/templates/termination_list.html:63
 msgid "Filter"
 msgstr "Filtern"
@@ -2471,6 +2492,7 @@ msgstr "Filtern"
 #: manufacturing/templates/sales_quotes.html:61
 #: manufacturing/templates/sales_targets.html:70
 #: manufacturing/templates/sales_territories.html:69
+#: manufacturing/templates/supplier_scorecard_list.html:44
 #: manufacturing/templates/termination_list.html:64
 msgid "Clear"
 msgstr "Zurücksetzen"
@@ -3765,6 +3787,7 @@ msgstr "Beschaffung"
 #: manufacturing/templates/supplier_portal_home.html:27
 #: manufacturing/templates/supplier_portal_pos.html:3
 #: manufacturing/templates/supplier_portal_pos.html:4
+#: manufacturing/templates/supplier_scorecard_list.html:8
 msgid "Purchase Orders"
 msgstr "Bestellungen"
 
@@ -3775,6 +3798,7 @@ msgstr "Bestellungen"
 #: manufacturing/templates/purchasing_dashboard.html:58
 #: manufacturing/templates/qa_inspection_list.html:8
 #: manufacturing/templates/req_list.html:11
+#: manufacturing/templates/supplier_scorecard_list.html:6
 msgid "Suppliers"
 msgstr "Lieferanten"
 
@@ -4311,6 +4335,7 @@ msgid "Back"
 msgstr "Zurück"
 
 #: manufacturing/templates/blanket_po_detail.html:62
+#: manufacturing/templates/consignment_detail.html:53
 #: manufacturing/templates/po_detail.html:104
 msgid "Supplier:"
 msgstr "Lieferant:"
@@ -4324,6 +4349,7 @@ msgid "Description:"
 msgstr "Beschreibung:"
 
 #: manufacturing/templates/blanket_po_detail.html:64
+#: manufacturing/templates/consignment_detail.html:56
 msgid "Validity:"
 msgstr "Gültigkeit:"
 
@@ -4346,6 +4372,7 @@ msgstr ""
 "                    (Freigegeben: %(rel)s, Verbleibend: %(rem)s)"
 
 #: manufacturing/templates/blanket_po_detail.html:74
+#: manufacturing/templates/consignment_detail.html:61
 #: manufacturing/templates/ess_review_detail.html:41
 #: manufacturing/templates/ess_training_detail.html:41
 #: manufacturing/templates/pers_review_detail.html:112
@@ -4383,6 +4410,8 @@ msgstr "Freigabe-Nr."
 #: manufacturing/templates/blanket_po_detail.html:97
 #: manufacturing/templates/blanket_po_release_new.html:29
 #: manufacturing/templates/bom_detail.html:231
+#: manufacturing/templates/consignment_detail.html:83
+#: manufacturing/templates/consignment_detail.html:105
 #: manufacturing/templates/inventory_detail.html:127
 #: manufacturing/templates/inventory_detail.html:229
 #: manufacturing/templates/lot_list.html:66
@@ -4454,6 +4483,7 @@ msgstr "Neue Rahmenbestellung"
 #: manufacturing/templates/blanket_po_list.html:18
 #: manufacturing/templates/bom_list.html:18
 #: manufacturing/templates/compliance_checklist_list.html:18
+#: manufacturing/templates/consignment_list.html:23
 #: manufacturing/templates/cs_plans.html:64
 #: manufacturing/templates/eng_ecrs.html:49
 #: manufacturing/templates/eng_projects.html:52
@@ -4496,6 +4526,8 @@ msgstr "Rahmen-Nr."
 
 #: manufacturing/templates/blanket_po_list.html:31
 #: manufacturing/templates/blanket_po_new.html:21
+#: manufacturing/templates/consignment_list.html:36
+#: manufacturing/templates/consignment_new.html:21
 #: manufacturing/templates/inventory_detail.html:163
 #: manufacturing/templates/inventory_detail.html:215
 #: manufacturing/templates/inventory_list.html:73
@@ -4513,6 +4545,7 @@ msgstr "Rahmen-Nr."
 #: manufacturing/templates/purch_reports.html:123
 #: manufacturing/templates/purchasing_dashboard_kpis.html:35
 #: manufacturing/templates/qa_supplier_list.html:84
+#: manufacturing/templates/supplier_scorecard_list.html:50
 msgid "Supplier"
 msgstr "Lieferant"
 
@@ -4521,6 +4554,7 @@ msgid "Validity"
 msgstr "Gültigkeit"
 
 #: manufacturing/templates/blanket_po_list.html:33
+#: manufacturing/templates/consignment_detail.html:106
 #: manufacturing/templates/cs_reports_kpis.html:41
 #: manufacturing/templates/finance_budget_detail.html:135
 #: manufacturing/templates/marketing_dashboard_kpis.html:5
@@ -4579,6 +4613,7 @@ msgid "Total Quantity (leave 0 to track by value instead)"
 msgstr "Gesamtmenge (0 lassen, um stattdessen nach Wert zu verfolgen)"
 
 #: manufacturing/templates/blanket_po_new.html:42
+#: manufacturing/templates/consignment_new.html:43
 #: manufacturing/templates/cs_surveys_detail.html:105
 #: manufacturing/templates/cs_surveys_list.html:83
 #: manufacturing/templates/cs_surveys_list.html:135
@@ -4618,6 +4653,7 @@ msgid "Start Date"
 msgstr "Startdatum"
 
 #: manufacturing/templates/blanket_po_new.html:46
+#: manufacturing/templates/consignment_new.html:47
 #: manufacturing/templates/cs_surveys_detail.html:109
 #: manufacturing/templates/cs_surveys_list.html:84
 #: manufacturing/templates/cs_surveys_list.html:139
@@ -4662,6 +4698,9 @@ msgstr "Rahmenbestellung Erstellen"
 #: manufacturing/templates/blanket_po_release_new.html:49
 #: manufacturing/templates/bom_detail.html:191
 #: manufacturing/templates/change_password.html:42
+#: manufacturing/templates/consignment_new.html:56
+#: manufacturing/templates/consignment_receive.html:40
+#: manufacturing/templates/consignment_use.html:42
 #: manufacturing/templates/eng_project_detail.html:175
 #: manufacturing/templates/forgot_password.html:37
 #: manufacturing/templates/forgot_password_reset.html:40
@@ -5584,6 +5623,199 @@ msgstr "z. B. ISO 13485:2016"
 #: manufacturing/templates/compliance_template_new.html:40
 msgid "Create Template"
 msgstr "Vorlage Erstellen"
+
+#: manufacturing/templates/consignment_detail.html:7
+#: manufacturing/templates/consignment_list.html:7
+#: manufacturing/templates/consignment_new.html:7
+#: manufacturing/templates/consignment_receive.html:7
+#: manufacturing/templates/consignment_use.html:7
+msgid "← Back"
+msgstr "← Zurück"
+
+#: manufacturing/templates/consignment_detail.html:54
+#: manufacturing/templates/lot_detail.html:64
+#: manufacturing/templates/wo_detail.html:106
+msgid "Product:"
+msgstr "Produkt:"
+
+#: manufacturing/templates/consignment_detail.html:55
+msgid "Unit Cost:"
+msgstr "Stückkosten:"
+
+#: manufacturing/templates/consignment_detail.html:57
+msgid "On Hand (vendor-owned):"
+msgstr "Auf Lager (im Eigentum des Lieferanten):"
+
+#: manufacturing/templates/consignment_detail.html:59
+msgid "Used to Date:"
+msgstr "Bisher Verwendet:"
+
+#: manufacturing/templates/consignment_detail.html:65
+msgid "+ Receive Stock"
+msgstr "+ Bestand Empfangen"
+
+#: manufacturing/templates/consignment_detail.html:69
+msgid "Cancel this consignment agreement?"
+msgstr "Diese Konsignationsvereinbarung stornieren?"
+
+#: manufacturing/templates/consignment_detail.html:71
+msgid "Cancel Agreement"
+msgstr "Vereinbarung Stornieren"
+
+#: manufacturing/templates/consignment_detail.html:79
+msgid "Receipts (Vendor Shipments In)"
+msgstr "Wareneingänge (Lieferantensendungen Eingehend)"
+
+#: manufacturing/templates/consignment_detail.html:96
+msgid "No receipts recorded yet."
+msgstr "Noch keine Wareneingänge erfasst."
+
+#: manufacturing/templates/consignment_detail.html:101
+msgid "Usage (Ownership Transferred, Vendor Billed)"
+msgstr "Verwendung (Eigentum Übertragen, Lieferant Fakturiert)"
+
+#: manufacturing/templates/consignment_detail.html:105
+#: manufacturing/templates/consignment_list.html:38
+#: manufacturing/templates/inventory_detail.html:212
+#: manufacturing/templates/inventory_list.html:71
+#: manufacturing/templates/maint_parts_list.html:78
+msgid "Unit Cost"
+msgstr "Stückkosten"
+
+#: manufacturing/templates/consignment_detail.html:106
+msgid "AP Invoice"
+msgstr "Kreditorenrechnung"
+
+#: manufacturing/templates/consignment_detail.html:122
+msgid "No usage recorded yet."
+msgstr "Noch keine Verwendung erfasst."
+
+#: manufacturing/templates/consignment_list.html:4
+#: manufacturing/templates/consignment_list.html:14
+msgid "Consignment Inventory"
+msgstr "Konsignationsbestand"
+
+#: manufacturing/templates/consignment_list.html:8
+msgid "+ New Agreement"
+msgstr "+ Neue Vereinbarung"
+
+#: manufacturing/templates/consignment_list.html:16
+msgid ""
+"Vendor-owned stock held in our warehouse. Received quantity doesn't touch\n"
+"        product.amount until it's used — using it credits our inventory and "
+"opens\n"
+"        an AP invoice for the vendor."
+msgstr "Bestand im Eigentum des Lieferanten, gelagert in unserem Lager. Die empfangene Menge berührt\n        product.amount erst bei Verwendung — die Verwendung schreibt unserem Bestand gut und eröffnet\n        eine Kreditorenrechnung für den Lieferanten."
+
+#: manufacturing/templates/consignment_list.html:35
+msgid "Agreement #"
+msgstr "Vereinbarungs-Nr."
+
+#: manufacturing/templates/consignment_list.html:39
+msgid "On Hand (Vendor-Owned)"
+msgstr "Auf Lager (Im Eigentum des Lieferanten)"
+
+#: manufacturing/templates/consignment_list.html:40
+msgid "Used to Date"
+msgstr "Bisher Verwendet"
+
+#: manufacturing/templates/consignment_list.html:63
+msgid "No consignment agreements"
+msgstr "Keine Konsignationsvereinbarungen"
+
+#: manufacturing/templates/consignment_list.html:63
+#: manufacturing/templates/inventory_list.html:113
+#, python-format
+msgid " with status \"%(s)s\""
+msgstr " mit Status \"%(s)s\""
+
+#: manufacturing/templates/consignment_new.html:4
+#: manufacturing/templates/consignment_new.html:12
+msgid "New Consignment Agreement"
+msgstr "Neue Konsignationsvereinbarung"
+
+#: manufacturing/templates/consignment_new.html:23
+msgid "(select a supplier)"
+msgstr "(Lieferanten auswählen)"
+
+#: manufacturing/templates/consignment_new.html:32
+msgid "(select a product)"
+msgstr "(Produkt auswählen)"
+
+#: manufacturing/templates/consignment_new.html:39
+msgid "Unit Cost (owed to vendor per unit used)"
+msgstr "Stückkosten (dem Lieferanten je verwendeter Einheit geschuldet)"
+
+#: manufacturing/templates/consignment_new.html:55
+msgid "Create Agreement"
+msgstr "Vereinbarung Erstellen"
+
+#: manufacturing/templates/consignment_receive.html:4
+#: manufacturing/templates/consignment_receive.html:12
+#, python-format
+msgid "Receive Stock — %(num)s"
+msgstr "Bestand Empfangen — %(num)s"
+
+#: manufacturing/templates/consignment_receive.html:14
+msgid ""
+"\n"
+"        Vendor-owned stock arriving. This does not touch product.amount —\n"
+"        it isn't ours until it's used (see \"Record Usage\").\n"
+"        "
+msgstr "\n        Eingehender Bestand im Eigentum des Lieferanten. Dies berührt product.amount nicht —\n        er gehört uns erst bei Verwendung (siehe „Verwendung Erfassen\").\n        "
+
+#: manufacturing/templates/consignment_receive.html:25
+#, python-format
+msgid ""
+"Currently on hand (vendor-owned): <b>%(qty)s</b>\n"
+"                %(name)s"
+msgstr "Derzeit auf Lager (im Eigentum des Lieferanten): <b>%(qty)s</b>\n                %(name)s"
+
+#: manufacturing/templates/consignment_receive.html:31
+#: manufacturing/templates/po_landed_cost_detail.html:31
+#: manufacturing/templates/po_landed_cost_new.html:51
+#: manufacturing/templates/supplier_portal_po_detail.html:52
+msgid "Qty Received"
+msgstr "Empf. Menge"
+
+#: manufacturing/templates/consignment_receive.html:36
+msgid "Vendor shipment #, packing slip, etc."
+msgstr "Lieferanten-Versandnr., Lieferschein usw."
+
+#: manufacturing/templates/consignment_receive.html:39
+msgid "Receive Stock"
+msgstr "Bestand Empfangen"
+
+#: manufacturing/templates/consignment_use.html:4
+#: manufacturing/templates/consignment_use.html:12
+#, python-format
+msgid "Record Usage — %(num)s"
+msgstr "Verwendung Erfassen — %(num)s"
+
+#: manufacturing/templates/consignment_use.html:14
+#, python-format
+msgid ""
+"\n"
+"        Marks vendor-owned stock as used: credits our own inventory count\n"
+"        (product.amount) and opens an AP invoice for the vendor at\n"
+"        $%(cost)s per unit.\n"
+"        "
+msgstr "\n        Markiert Bestand im Eigentum des Lieferanten als verwendet: schreibt unserem eigenen Bestandszähler\n        (product.amount) gut und eröffnet eine Kreditorenrechnung für den Lieferanten zu\n        $%(cost)s pro Einheit.\n        "
+
+#: manufacturing/templates/consignment_use.html:27
+#, python-format
+msgid ""
+"On hand (vendor-owned): <b>%(qty)s</b>\n"
+"                %(name)s"
+msgstr "Auf Lager (im Eigentum des Lieferanten): <b>%(qty)s</b>\n                %(name)s"
+
+#: manufacturing/templates/consignment_use.html:33
+msgid "Qty Used"
+msgstr "Verw. Menge"
+
+#: manufacturing/templates/consignment_use.html:38
+msgid "WO#, SO#, etc."
+msgstr "FA-Nr., Auftr.-Nr. usw."
 
 #: manufacturing/templates/control_plan_detail.html:6
 #: manufacturing/templates/control_plan_list.html:3
@@ -9761,6 +9993,7 @@ msgstr "NICHT AUSGEGLICHEN"
 #: manufacturing/templates/prod_schedule.html:48
 #: manufacturing/templates/prod_schedule_gantt.html:45
 #: manufacturing/templates/sales_orders.html:64
+#: manufacturing/templates/supplier_scorecard_list.html:39
 msgid "From:"
 msgstr "Von:"
 
@@ -10323,12 +10556,6 @@ msgstr "BOM Anzeigen"
 msgid "Bin"
 msgstr "Lagerplatz"
 
-#: manufacturing/templates/inventory_detail.html:212
-#: manufacturing/templates/inventory_list.html:71
-#: manufacturing/templates/maint_parts_list.html:78
-msgid "Unit Cost"
-msgstr "Stückkosten"
-
 #: manufacturing/templates/inventory_detail.html:222
 msgid "Transaction History (last 50)"
 msgstr "Transaktionsverlauf (letzte 50)"
@@ -10411,11 +10638,6 @@ msgstr[1] "%(counter)s Produkte"
 #, python-format
 msgid " matching \"%(s)s\""
 msgstr " passend zu \"%(s)s\""
-
-#: manufacturing/templates/inventory_list.html:113
-#, python-format
-msgid " with status \"%(s)s\""
-msgstr " mit Status \"%(s)s\""
 
 #: manufacturing/templates/inventory_new.html:3
 msgid "New Product — Inventory"
@@ -11737,11 +11959,6 @@ msgstr "Los %(num)s"
 #: manufacturing/templates/lot_new.html:6
 msgid "Lots"
 msgstr "Lose"
-
-#: manufacturing/templates/lot_detail.html:64
-#: manufacturing/templates/wo_detail.html:106
-msgid "Product:"
-msgstr "Produkt:"
 
 #: manufacturing/templates/lot_detail.html:71
 msgid "Lot Details"
@@ -14706,12 +14923,6 @@ msgstr "von"
 #: manufacturing/templates/po_landed_cost_detail.html:25
 msgid "Allocation Detail"
 msgstr "Zuordnungsdetail"
-
-#: manufacturing/templates/po_landed_cost_detail.html:31
-#: manufacturing/templates/po_landed_cost_new.html:51
-#: manufacturing/templates/supplier_portal_po_detail.html:52
-msgid "Qty Received"
-msgstr "Empf. Menge"
 
 #: manufacturing/templates/po_landed_cost_detail.html:32
 msgid "Weight Used"
@@ -18674,6 +18885,126 @@ msgid ""
 msgstr ""
 "Noch keine Angebotsanfragen — Ihr Einkäufer wird Sie einladen, ein Angebot "
 "abzugeben, sobald eine Anfrage vorliegt."
+
+#: manufacturing/templates/supplier_scorecard_detail.html:3
+#: manufacturing/templates/supplier_scorecard_detail.html:41
+msgid "Supplier Scorecard"
+msgstr "Lieferanten-Bewertungsbogen"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:6
+msgid "All Scorecards"
+msgstr "Alle Bewertungsbögen"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:8
+msgid "Supplier Detail"
+msgstr "Lieferantendetail"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:10
+#: manufacturing/templates/supplier_scorecard_list.html:7
+msgid "Supplier Quality Ratings"
+msgstr "Lieferanten-Qualitätsbewertungen"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:42
+msgid "Supplier not found."
+msgstr "Lieferant nicht gefunden."
+
+#: manufacturing/templates/supplier_scorecard_detail.html:44
+#, python-format
+msgid "%(name)s — Scorecard"
+msgstr "%(name)s — Bewertungsbogen"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:45
+#, python-format
+msgid "%(from_date)s to %(to_date)s"
+msgstr "%(from_date)s bis %(to_date)s"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:50
+#: manufacturing/templates/supplier_scorecard_list.html:54
+msgid "Composite Score"
+msgstr "Gesamtpunktzahl"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:54
+#, python-format
+msgid "On-Time Delivery (%(counter)s PO)"
+msgid_plural "On-Time Delivery (%(counter)s POs)"
+msgstr[0] "Pünktliche Lieferung (%(counter)s Bestellung)"
+msgstr[1] "Pünktliche Lieferung (%(counter)s Bestellungen)"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:58
+msgid "Quantity Fill Rate"
+msgstr "Mengenerfüllungsrate"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:62
+#, python-format
+msgid "Quality Reject Rate (%(counter)s material)"
+msgid_plural "Quality Reject Rate (%(counter)s materials)"
+msgstr[0] "Qualitäts-Ablehnungsrate (%(counter)s Material)"
+msgstr[1] "Qualitäts-Ablehnungsrate (%(counter)s Materialien)"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:67
+msgid "Monthly Trend"
+msgstr "Monatlicher Trend"
+
+#: manufacturing/templates/supplier_scorecard_detail.html:71
+msgid "No purchase order activity in this window."
+msgstr "Keine Bestellaktivität in diesem Zeitraum."
+
+#: manufacturing/templates/supplier_scorecard_list.html:3
+#: manufacturing/templates/supplier_scorecard_list.html:36
+msgid "Supplier Scorecards"
+msgstr "Lieferanten-Bewertungsbögen"
+
+#: manufacturing/templates/supplier_scorecard_list.html:51
+msgid "On-Time Delivery"
+msgstr "Pünktliche Lieferung"
+
+#: manufacturing/templates/supplier_scorecard_list.html:52
+msgid "Fill Rate"
+msgstr "Erfüllungsrate"
+
+#: manufacturing/templates/supplier_scorecard_list.html:53
+msgid "Quality Reject Rate"
+msgstr "Qualitäts-Ablehnungsrate"
+
+#: manufacturing/templates/supplier_scorecard_list.html:63
+#, python-format
+msgid "%(counter)s PO"
+msgid_plural "%(counter)s POs"
+msgstr[0] "%(counter)s Bestellung"
+msgstr[1] "%(counter)s Bestellungen"
+
+#: manufacturing/templates/supplier_scorecard_list.html:65
+#: manufacturing/templates/supplier_scorecard_list.html:70
+#: manufacturing/templates/supplier_scorecard_list.html:76
+#: manufacturing/templates/supplier_scorecard_list.html:85
+msgid "no data"
+msgstr "keine Daten"
+
+#: manufacturing/templates/supplier_scorecard_list.html:74
+#, python-format
+msgid "%(counter)s rated material"
+msgid_plural "%(counter)s rated materials"
+msgstr[0] "%(counter)s bewertetes Material"
+msgstr[1] "%(counter)s bewertete Materialien"
+
+#: manufacturing/templates/supplier_scorecard_list.html:90
+msgid "No suppliers found."
+msgstr "Keine Lieferanten gefunden."
+
+#: manufacturing/templates/supplier_scorecard_list.html:95
+#, python-format
+msgid ""
+"\n"
+"        Composite score = 40%% on-time delivery + 35%% quantity fill rate + "
+"25%% quality\n"
+"        (100 − reject rate), renormalised over whichever of the three a "
+"supplier has\n"
+"        data for. On-time delivery only counts fully-received POs with both "
+"an expected\n"
+"        and an actual receipt date; fill rate covers POs that have been "
+"sent.\n"
+"        "
+msgstr "\n        Gesamtpunktzahl = 40%% pünktliche Lieferung + 35%% Mengenerfüllungsrate + 25%% Qualität\n        (100 − Ablehnungsrate), renormiert auf die der drei Kennzahlen, für die der Lieferant\n        Daten hat. Pünktliche Lieferung zählt nur vollständig erhaltene Bestellungen mit einem erwarteten\n        und einem tatsächlichen Eingangsdatum; die Erfüllungsrate umfasst versendete Bestellungen.\n        "
 
 #: manufacturing/templates/tc_device_form.html:3
 msgid "Add Time Clock"

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Supplier Scorecards{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Supplier Scorecards" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/suppliers/" class="btn">Suppliers</a>
-<a href="/qa/suppliers/" class="btn">Supplier Quality Ratings</a>
-<a href="/po/" class="btn">Purchase Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/suppliers/" class="btn">{% trans "Suppliers" %}</a>
+<a href="/qa/suppliers/" class="btn">{% trans "Supplier Quality Ratings" %}</a>
+<a href="/po/" class="btn">{% trans "Purchase Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -32,25 +33,25 @@
 {% block body %}
 <div class="content">
 <div class="ssc-wrap">
-    <h2>Supplier Scorecards</h2>
+    <h2>{% trans "Supplier Scorecards" %}</h2>
 
     <form method="get" class="filter-bar">
-        <label>From:</label>
+        <label>{% trans "From:" %}</label>
         <input type="date" name="date_from" value="{{ date_from }}">
-        <label>To:</label>
+        <label>{% trans "To:" %}</label>
         <input type="date" name="date_to" value="{{ date_to }}">
-        <button type="submit" class="btn">Filter</button>
-        <a href="/suppliers/scorecard/" style="font-size:13px;color:var(--accent);margin-left:4px;">Clear</a>
+        <button type="submit" class="btn">{% trans "Filter" %}</button>
+        <a href="/suppliers/scorecard/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <table class="list-table">
         <thead>
             <tr>
-                <th>Supplier</th>
-                <th>On-Time Delivery</th>
-                <th>Fill Rate</th>
-                <th>Quality Reject Rate</th>
-                <th>Composite Score</th>
+                <th>{% trans "Supplier" %}</th>
+                <th>{% trans "On-Time Delivery" %}</th>
+                <th>{% trans "Fill Rate" %}</th>
+                <th>{% trans "Quality Reject Rate" %}</th>
+                <th>{% trans "Composite Score" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -59,20 +60,20 @@
                 <td><a href="/suppliers/scorecard/{{ s.supplier_id }}/">{{ s.supplier_name }}</a></td>
                 <td>
                     {% if s.on_time_pct is not None %}
-                        {{ s.on_time_pct }}% <span class="no-data">({{ s.on_time_sample }} PO{{ s.on_time_sample|pluralize }})</span>
+                        {{ s.on_time_pct }}% <span class="no-data">({% blocktrans count counter=s.on_time_sample %}{{ counter }} PO{% plural %}{{ counter }} POs{% endblocktrans %})</span>
                     {% else %}
-                        <span class="no-data">no data</span>
+                        <span class="no-data">{% trans "no data" %}</span>
                     {% endif %}
                 </td>
                 <td>
                     {% if s.fill_rate_pct is not None %}{{ s.fill_rate_pct }}%
-                    {% else %}<span class="no-data">no data</span>{% endif %}
+                    {% else %}<span class="no-data">{% trans "no data" %}</span>{% endif %}
                 </td>
                 <td>
                     {% if s.quality_reject_pct is not None %}
-                        {{ s.quality_reject_pct }}% <span class="no-data">({{ s.quality_sample }} rated material{{ s.quality_sample|pluralize }})</span>
+                        {{ s.quality_reject_pct }}% <span class="no-data">({% blocktrans count counter=s.quality_sample %}{{ counter }} rated material{% plural %}{{ counter }} rated materials{% endblocktrans %})</span>
                     {% else %}
-                        <span class="no-data">no data</span>
+                        <span class="no-data">{% trans "no data" %}</span>
                     {% endif %}
                 </td>
                 <td>
@@ -81,20 +82,22 @@
                         style="width:{{ s.composite_score }}%;"></span></span>
                     {{ s.composite_score }}
                     {% else %}
-                        <span class="no-data">no data</span>
+                        <span class="no-data">{% trans "no data" %}</span>
                     {% endif %}
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No suppliers found.</td></tr>
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">{% trans "No suppliers found." %}</td></tr>
             {% endfor %}
         </tbody>
     </table>
     <p class="no-data">
+        {% blocktrans %}
         Composite score = 40% on-time delivery + 35% quantity fill rate + 25% quality
         (100 − reject rate), renormalised over whichever of the three a supplier has
         data for. On-time delivery only counts fully-received POs with both an expected
         and an actual receipt date; fill rate covers POs that have been sent.
+        {% endblocktrans %}
     </p>
 </div>
 </div>

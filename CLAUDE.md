@@ -2038,6 +2038,77 @@ Business Continuity, Insurance Policies, and Key Risk Indicators — all
 7 pages return 200 with correctly translated titles, headings, table
 headers, and toolbar navigation.
 
+Also fully translated: **Consignment Inventory** and the **Supplier
+Scorecard** (`consignment_list.html`/`_detail.html`/`_new.html`/
+`_receive.html`/`_use.html`, `supplier_scorecard_list.html`/`_detail.html`
+— 7 templates, the twenty-second "whole feature" pass, and the last two
+gaps explicitly named as deferred in the original Purchasing department
+pass — everything else on that exclusion list (`/supplier-portal/`) was
+already closed by the Portals batch). Marked up by two parallel subagents
+(consignment list/detail/new vs. consignment receive/use + both scorecard
+pages), translated by hand afterward — small enough (56 strings: 52
+simple + 4 plural) to skip delegating the translation step. Both
+subagents' diffs checked out clean on review — correct dynamic-title
+`{% blocktrans with %}` bindings on `consignment_receive.html`/`_use.html`
+(`Receive Stock — {{ num }}` / `Record Usage — {{ num }}`) and
+`supplier_scorecard_detail.html` (`{{ name }} — Scorecard`), all four
+`{{ x }}...{{ x|pluralize }}` occurrences converted to proper
+`{% blocktrans count %}` blocks, raw DB enum values (`{{ s|capfirst }}`
+status filters/pills) correctly left untouched, and Chart.js dataset
+labels (`'On-Time %'`, `'Fill Rate %'`) deliberately left as bare JS
+strings per this pass's own scope decision — translating every chart
+legend label was judged unnecessary scope creep, unlike the Risk pass's
+"No data yet" empty-state text which the Chart.js precedent was
+established for.
+
+**A raw `gettext()` sanity check briefly looked like a doubled-`%%`
+bug, but wasn't one** — worth documenting since it could mislead a
+future audit: calling `django.utils.translation.gettext()` directly on
+the Composite Score explanation msgid returned the literal two-character
+`%%` in the output (e.g. "40%% on-time delivery"), which looks exactly
+like the double-escape bug class documented earlier in this file. But
+`gettext()` alone never performs `%`-substitution — that only happens
+inside `{% blocktrans %}`'s own render path, which always applies
+`result % data` (even with an empty `data` dict when the block has no
+`{% blocktrans with %}` bindings) specifically to collapse a
+`python-format`-flagged string's escaped `%%` back to a literal `%`.
+Confirmed by rendering the actual template tag via `django.template
+.Template(...).render()` instead of calling `gettext()` in isolation —
+the real render path correctly produces "40% on-time delivery", and a
+live browser fetch of the scorecard list page confirmed the same.
+Worth a standing amendment to this file's runtime-verification habit:
+a bare `gettext()` call is the wrong tool for confirming `%%`-escaped
+strings specifically — render the actual `{% blocktrans %}`/`{% trans %}`
+tag (via `Template.render()` or a live page fetch) instead, since
+`gettext()` skips the substitution step blocktrans depends on.
+
+Also reconfirmed, not a new finding: French's `n > 1` plural rule (as
+opposed to English's `n != 1`) means a zero count renders in the
+*singular* form — `supplier_scorecard_detail.html`'s "0 matériau" (not
+"0 matériaux") for a supplier with no rated-material samples yet is
+linguistically correct per the `.po` file's own `Plural-Forms: nplurals=2;
+plural=(n > 1);` header, not a translation bug, confirmed by checking
+that header directly rather than assuming English pluralization rules
+apply universally.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check` clean
+on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically. Grepped the generic single-word/short-phrase labels
+reused via exact-msgid auto-merge (Qty Used, Composite Score, AP Invoice,
+Supplier Detail, no data) for the "Make"-style cross-context
+mistranslation risk — all merges are exclusively within this batch's own
+7 files, no cross-department collision, no bug. Verified end-to-end
+against the real dev server, in French with real sample data:
+Consignment Inventory list + New Agreement form, a real supplier
+scorecard's list page (confirmed the Composite Score explanation
+paragraph renders with real single `%` signs, not doubled), and a real
+scorecard's detail page (confirmed the "{name} — Bilan" dynamic title
+and both pluralized "N Commande(s)"/"N matériau(x)" KPI sub-labels,
+including the French zero-count singular case) — all pages return 200
+with correctly translated titles, headings, and labels, no console or
+server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

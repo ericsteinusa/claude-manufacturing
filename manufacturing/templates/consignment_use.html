@@ -1,18 +1,21 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Record Usage — {{ agreement.agreement_number }}{% endblock %}
+{% block page_title %}{% blocktrans with num=agreement.agreement_number %}Record Usage — {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/consignment/{{ agreement.id }}/" class="btn">← Back</a>
+<a href="/consignment/{{ agreement.id }}/" class="btn">{% trans "← Back" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Record Usage — {{ agreement.agreement_number }}</div>
+    <div class="menu-title">{% blocktrans with num=agreement.agreement_number %}Record Usage — {{ num }}{% endblocktrans %}</div>
     <p style="font-size:12px;color:var(--text-muted);max-width:600px;">
+        {% blocktrans with cost=agreement.unit_cost|floatformat:2 %}
         Marks vendor-owned stock as used: credits our own inventory count
         (product.amount) and opens an AP invoice for the vendor at
-        ${{ agreement.unit_cost|floatformat:2 }} per unit.
+        ${{ cost }} per unit.
+        {% endblocktrans %}
     </p>
 
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -21,22 +24,22 @@
     <div class="erp-form">
         <div class="card">
             <p style="font-size:13px;color:#555;margin-bottom:14px;">
-                On hand (vendor-owned): <b>{{ agreement.on_hand_qty|floatformat:2 }}</b>
-                {{ agreement.product_name }}
+                {% blocktrans with qty=agreement.on_hand_qty|floatformat:2 name=agreement.product_name %}On hand (vendor-owned): <b>{{ qty }}</b>
+                {{ name }}{% endblocktrans %}
             </p>
             <form method="post" action="">
                 {% csrf_token %}
                 <div class="form-row">
-                    <label>Qty Used</label>
+                    <label>{% trans "Qty Used" %}</label>
                     <input type="number" name="qty" min="0" step="any" value="0" required>
                 </div>
                 <div class="form-row">
-                    <label>Reference</label>
-                    <input type="text" name="reference" placeholder="WO#, SO#, etc.">
+                    <label>{% trans "Reference" %}</label>
+                    <input type="text" name="reference" placeholder="{% trans 'WO#, SO#, etc.' %}">
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn">Record Usage</button>
-                    <a href="/consignment/{{ agreement.id }}/" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn">{% trans "Record Usage" %}</button>
+                    <a href="/consignment/{{ agreement.id }}/" class="btn btn-cancel">{% trans "Cancel" %}</a>
                 </div>
             </form>
         </div>
