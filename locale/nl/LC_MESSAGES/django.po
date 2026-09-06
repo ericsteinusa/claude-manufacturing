@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 02:40+0000\n"
+"POT-Creation-Date: 2026-09-06 16:25+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -318,6 +318,7 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/currency_list.html:6
 #: manufacturing/templates/data_governance_dashboard.html:6
 #: manufacturing/templates/ecommerce_connection_list.html:9
+#: manufacturing/templates/edi_partner_list.html:10
 #: manufacturing/templates/employee_benefits.html:7
 #: manufacturing/templates/employee_employment_dates.html:8
 #: manufacturing/templates/employee_gap_detail.html:7
@@ -1436,6 +1437,7 @@ msgstr "Recente Journaalposten"
 #: manufacturing/templates/cs_dashboard_kpis.html:36
 #: manufacturing/templates/cs_surveys_detail.html:127
 #: manufacturing/templates/ecommerce_sync_log_list.html:18
+#: manufacturing/templates/edi_transaction_log_list.html:18
 #: manufacturing/templates/ess_reviews.html:34
 #: manufacturing/templates/finance_dashboard_kpis.html:55
 #: manufacturing/templates/fixed_asset_detail.html:169
@@ -1632,6 +1634,7 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/data_governance_dashboard.html:88
 #: manufacturing/templates/ecommerce_connection_list.html:26
 #: manufacturing/templates/ecommerce_sync_log_list.html:22
+#: manufacturing/templates/edi_partner_list.html:26
 #: manufacturing/templates/employee_gap_detail.html:39
 #: manufacturing/templates/eng_dashboard_kpis.html:15
 #: manufacturing/templates/eng_dashboard_kpis.html:32
@@ -2389,6 +2392,7 @@ msgstr "Excel Exporteren"
 #: manufacturing/templates/cc_list.html:18
 #: manufacturing/templates/consignment_list.html:22
 #: manufacturing/templates/ecommerce_connection_detail.html:31
+#: manufacturing/templates/edi_partner_detail.html:29
 #: manufacturing/templates/eng_ecr_detail.html:58
 #: manufacturing/templates/eng_ecrs.html:47
 #: manufacturing/templates/eng_projects.html:50
@@ -2866,6 +2870,8 @@ msgstr "Goedkeuringsregels"
 #: manufacturing/templates/data_governance_dashboard.html:97
 #: manufacturing/templates/ecommerce_connection_detail.html:31
 #: manufacturing/templates/ecommerce_connection_list.html:38
+#: manufacturing/templates/edi_partner_detail.html:29
+#: manufacturing/templates/edi_partner_list.html:37
 #: manufacturing/templates/finance_bank_rec_detail.html:74
 #: manufacturing/templates/finance_bank_rec_detail.html:94
 #: manufacturing/templates/finance_bank_rec_list.html:71
@@ -2911,6 +2917,8 @@ msgstr "Actief"
 #: manufacturing/templates/data_governance_dashboard.html:97
 #: manufacturing/templates/ecommerce_connection_detail.html:31
 #: manufacturing/templates/ecommerce_connection_list.html:38
+#: manufacturing/templates/edi_partner_detail.html:29
+#: manufacturing/templates/edi_partner_list.html:37
 #: manufacturing/templates/finance_bank_rec_list.html:85
 #: manufacturing/templates/gl_accounts.html:75
 #: manufacturing/templates/payroll_deductions.html:66
@@ -3253,6 +3261,10 @@ msgstr "(selecteer een klant)"
 #: manufacturing/templates/cs_returns_detail.html:119
 #: manufacturing/templates/cs_returns_list.html:78
 #: manufacturing/templates/cs_surveys_detail.html:128
+#: manufacturing/templates/edi_850_upload.html:34
+#: manufacturing/templates/edi_partner_list.html:22
+#: manufacturing/templates/edi_partner_new.html:20
+#: manufacturing/templates/edi_transaction_log_list.html:21
 #: manufacturing/templates/prod_returns_detail.html:61
 #: manufacturing/templates/prod_returns_detail.html:96
 #: manufacturing/templates/prod_returns_list.html:80
@@ -3275,6 +3287,7 @@ msgid "Customer"
 msgstr "Klant"
 
 #: manufacturing/templates/ar_list.html:43
+#: manufacturing/templates/edi_partner_detail.html:28
 #: manufacturing/templates/sales_orders.html:55
 #: manufacturing/templates/so_detail.html:105
 msgid "Customer:"
@@ -4881,6 +4894,11 @@ msgstr "Nog geen voordelenplannen."
 #: manufacturing/templates/ecommerce_connection_list.html:6
 #: manufacturing/templates/ecommerce_connection_new.html:6
 #: manufacturing/templates/ecommerce_sync_log_list.html:6
+#: manufacturing/templates/edi_850_upload.html:6
+#: manufacturing/templates/edi_partner_detail.html:6
+#: manufacturing/templates/edi_partner_list.html:6
+#: manufacturing/templates/edi_partner_new.html:6
+#: manufacturing/templates/edi_transaction_log_list.html:6
 #: manufacturing/templates/inventory_detail.html:6
 #: manufacturing/templates/people_detail.html:7
 #: manufacturing/templates/people_form.html:7
@@ -5249,6 +5267,7 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/consignment_receive.html:40
 #: manufacturing/templates/consignment_use.html:42
 #: manufacturing/templates/ecommerce_connection_new.html:65
+#: manufacturing/templates/edi_partner_new.html:42
 #: manufacturing/templates/eng_project_detail.html:175
 #: manufacturing/templates/forgot_password.html:37
 #: manufacturing/templates/forgot_password_reset.html:40
@@ -8050,6 +8069,7 @@ msgstr "Terugbetalingsbedrag"
 
 #: manufacturing/templates/cs_returns_detail.html:125
 #: manufacturing/templates/ecommerce_sync_log_list.html:24
+#: manufacturing/templates/edi_transaction_log_list.html:23
 #: manufacturing/templates/eng_ecr_detail.html:77
 #: manufacturing/templates/eng_spec_detail.html:124
 #: manufacturing/templates/eng_task_detail.html:121
@@ -8536,7 +8556,11 @@ msgid ""
 "Configure this URL as the \"order created\" webhook in %(platform)s's\n"
 "                    admin, signed with the webhook secret above (HMAC-"
 "SHA256, base64-encoded)."
-msgstr "Configureer deze URL als de \"bestelling aangemaakt\"-webhook in het beheerpaneel van\n                    %(platform)s, ondertekend met het bovenstaande webhookgeheim (HMAC-SHA256, base64-gecodeerd)."
+msgstr ""
+"Configureer deze URL als de \"bestelling aangemaakt\"-webhook in het "
+"beheerpaneel van\n"
+"                    %(platform)s, ondertekend met het bovenstaande "
+"webhookgeheim (HMAC-SHA256, base64-gecodeerd)."
 
 #: manufacturing/templates/ecommerce_connection_detail.html:50
 msgid "Sync Endpoint URL"
@@ -8551,7 +8575,11 @@ msgid ""
 "Inventory/price/shipment pushes POST here when set; with no endpoint "
 "they're\n"
 "                logged as \"queued\" instead of sent."
-msgstr "Voorraad-/prijs-/verzendpushes doen hier een POST wanneer ingesteld; zonder eindpunt\n                worden ze geregistreerd als \"in wachtrij\" in plaats van verzonden."
+msgstr ""
+"Voorraad-/prijs-/verzendpushes doen hier een POST wanneer ingesteld; zonder "
+"eindpunt\n"
+"                worden ze geregistreerd als \"in wachtrij\" in plaats van "
+"verzonden."
 
 #: manufacturing/templates/ecommerce_connection_detail.html:63
 msgid "Item Cross-Reference (storefront SKU → our product)"
@@ -8568,7 +8596,16 @@ msgid ""
 "                under the storefront's own SKU. Unmapped lines still import "
 "— just without a\n"
 "                linked product."
-msgstr "Onze producten hebben geen SKU-/codeveld, dus deze koppeling zorgt ervoor dat de\n                regelitem van een inkomende bestelling-webhook (met de eigen SKU van de webwinkel) wordt herleid tot een van\n                onze producten, en zorgt ervoor dat uitgaande voorraad-/prijspushes ons product terugmelden\n                onder de eigen SKU van de webwinkel. Niet-gekoppelde regels worden nog steeds geïmporteerd — alleen zonder\n                gekoppeld product."
+msgstr ""
+"Onze producten hebben geen SKU-/codeveld, dus deze koppeling zorgt ervoor "
+"dat de\n"
+"                regelitem van een inkomende bestelling-webhook (met de eigen "
+"SKU van de webwinkel) wordt herleid tot een van\n"
+"                onze producten, en zorgt ervoor dat uitgaande voorraad-/"
+"prijspushes ons product terugmelden\n"
+"                onder de eigen SKU van de webwinkel. Niet-gekoppelde regels "
+"worden nog steeds geïmporteerd — alleen zonder\n"
+"                gekoppeld product."
 
 #: manufacturing/templates/ecommerce_connection_detail.html:78
 #: manufacturing/templates/ecommerce_connection_detail.html:95
@@ -8577,10 +8614,13 @@ msgstr "Webwinkel-SKU"
 
 #: manufacturing/templates/ecommerce_connection_detail.html:82
 #: manufacturing/templates/ecommerce_connection_detail.html:95
+#: manufacturing/templates/edi_partner_detail.html:52
+#: manufacturing/templates/edi_partner_detail.html:65
 msgid "Our Product"
 msgstr "Ons Product"
 
 #: manufacturing/templates/ecommerce_connection_detail.html:89
+#: manufacturing/templates/edi_partner_detail.html:59
 msgid "Add Mapping"
 msgstr "Koppeling Toevoegen"
 
@@ -8593,6 +8633,7 @@ msgid "Sync Price"
 msgstr "Prijs Synchroniseren"
 
 #: manufacturing/templates/ecommerce_connection_detail.html:122
+#: manufacturing/templates/edi_partner_detail.html:76
 msgid "No item mappings yet."
 msgstr "Nog geen artikelkoppelingen."
 
@@ -8636,6 +8677,7 @@ msgid "(queued only)"
 msgstr "(alleen in wachtrij)"
 
 #: manufacturing/templates/ecommerce_connection_list.html:39
+#: manufacturing/templates/edi_partner_list.html:38
 msgid "Manage"
 msgstr "Beheren"
 
@@ -8649,6 +8691,8 @@ msgid "New e-Commerce Connection"
 msgstr "Nieuwe E-commerceverbinding"
 
 #: manufacturing/templates/ecommerce_connection_new.html:22
+#: manufacturing/templates/edi_850_upload.html:36
+#: manufacturing/templates/edi_partner_new.html:22
 msgid "(select)"
 msgstr "(selecteren)"
 
@@ -8678,7 +8722,12 @@ msgid ""
 "                    still logged (status \"queued\") but no HTTP call is "
 "made — there is no live\n"
 "                    storefront reachable from this environment by default."
-msgstr "Als er geen sync-eindpunt is geconfigureerd, worden voorraad-/prijs-/verzendpushes\n                    nog steeds geregistreerd (status \"in wachtrij\"), maar wordt er geen HTTP-aanroep gedaan — er is standaard geen live\n                    webwinkel bereikbaar vanuit deze omgeving."
+msgstr ""
+"Als er geen sync-eindpunt is geconfigureerd, worden voorraad-/prijs-/"
+"verzendpushes\n"
+"                    nog steeds geregistreerd (status \"in wachtrij\"), maar "
+"wordt er geen HTTP-aanroep gedaan — er is standaard geen live\n"
+"                    webwinkel bereikbaar vanuit deze omgeving."
 
 #: manufacturing/templates/ecommerce_connection_new.html:64
 msgid "Create Connection"
@@ -8696,12 +8745,153 @@ msgid "Event"
 msgstr "Gebeurtenis"
 
 #: manufacturing/templates/ecommerce_sync_log_list.html:21
+#: manufacturing/templates/edi_transaction_log_list.html:20
 msgid "Direction"
 msgstr "Richting"
 
 #: manufacturing/templates/ecommerce_sync_log_list.html:43
 msgid "No e-commerce sync activity logged yet."
 msgstr "Nog geen e-commerce-syncactiviteit geregistreerd."
+
+#: manufacturing/templates/edi_850_upload.html:3
+#: manufacturing/templates/edi_partner_list.html:8
+msgid "Import EDI 850"
+msgstr "EDI 850 Importeren"
+
+#: manufacturing/templates/edi_850_upload.html:11
+msgid "Import EDI 850 (Purchase Order)"
+msgstr "EDI 850 Importeren (Inkooporder)"
+
+#: manufacturing/templates/edi_850_upload.html:13
+msgid ""
+"Upload a customer's EDI 850 file (segment-delimited X12 text) to auto-"
+"create\n"
+"        a Sales Order. Lines whose partner item number has no mapping still "
+"import,\n"
+"        using the partner's raw item number as a text description."
+msgstr "Upload het EDI 850-bestand van een klant (segmentgescheiden X12-tekst) om automatisch\n        een verkooporder aan te maken. Regels waarvan het partnerartikelnummer geen koppeling heeft, worden nog steeds geïmporteerd,\n        met het ruwe artikelnummer van de partner als tekstbeschrijving."
+
+#: manufacturing/templates/edi_850_upload.html:21
+#, python-format
+msgid ""
+"Created <a href=\"/so/%(id)s/\">%(num)s</a> with\n"
+"        %(counter)s line"
+msgid_plural ""
+"Created <a href=\"/so/%(id)s/\">%(num)s</a> with\n"
+"        %(counter)s lines"
+msgstr[0] "<a href=\"/so/%(id)s/\">%(num)s</a> aangemaakt met\n        %(counter)s regel"
+msgstr[1] "<a href=\"/so/%(id)s/\">%(num)s</a> aangemaakt met\n        %(counter)s regels"
+
+#: manufacturing/templates/edi_850_upload.html:23
+#, python-format
+msgid ""
+"%(counter)s\n"
+"        unmapped"
+msgid_plural ""
+"%(counter)s\n"
+"        unmapped"
+msgstr[0] "%(counter)s\n        niet gekoppeld"
+msgstr[1] "%(counter)s\n        niet gekoppeld"
+
+#: manufacturing/templates/edi_850_upload.html:43
+msgid "EDI 850 File"
+msgstr "EDI 850-bestand"
+
+#: manufacturing/templates/edi_850_upload.html:47
+msgid "Import"
+msgstr "Importeren"
+
+#: manufacturing/templates/edi_partner_detail.html:3
+#: manufacturing/templates/edi_partner_detail.html:26
+msgid "Trading Partner"
+msgstr "Handelspartner"
+
+#: manufacturing/templates/edi_partner_detail.html:30
+msgid "ISA Sender ID:"
+msgstr "ISA-afzender-ID:"
+
+#: manufacturing/templates/edi_partner_detail.html:31
+msgid "ISA Receiver ID:"
+msgstr "ISA-ontvanger-ID:"
+
+#: manufacturing/templates/edi_partner_detail.html:36
+msgid "Item Cross-Reference (partner part number → our product)"
+msgstr "Artikel-kruisverwijzing (onderdeelnummer van partner → ons product)"
+
+#: manufacturing/templates/edi_partner_detail.html:38
+msgid ""
+"Our products have no SKU/code field, so this mapping is what lets an "
+"inbound\n"
+"                EDI 850's PO1 line (carrying the partner's own part number) "
+"resolve to one of\n"
+"                our products. Unmapped lines still import — just without a "
+"linked product."
+msgstr "Onze producten hebben geen SKU-/codeveld, dus deze koppeling zorgt ervoor dat een\n                PO1-regel van een inkomende EDI 850 (met het eigen onderdeelnummer van de partner) wordt herleid tot een van\n                onze producten. Niet-gekoppelde regels worden nog steeds geïmporteerd — alleen zonder gekoppeld product."
+
+#: manufacturing/templates/edi_partner_detail.html:48
+#: manufacturing/templates/edi_partner_detail.html:65
+msgid "Partner Item #"
+msgstr "Partnerartikelnr."
+
+#: manufacturing/templates/edi_partner_list.html:3
+#: manufacturing/templates/edi_partner_list.html:15
+msgid "EDI Trading Partners"
+msgstr "EDI-handelspartners"
+
+#: manufacturing/templates/edi_partner_list.html:7
+msgid "New Trading Partner"
+msgstr "Nieuwe Handelspartner"
+
+#: manufacturing/templates/edi_partner_list.html:9
+msgid "Transaction Log"
+msgstr "Transactielogboek"
+
+#: manufacturing/templates/edi_partner_list.html:23
+#: manufacturing/templates/edi_partner_new.html:29
+msgid "Partner Name"
+msgstr "Partnernaam"
+
+#: manufacturing/templates/edi_partner_list.html:24
+#: manufacturing/templates/edi_partner_new.html:33
+msgid "ISA Sender ID"
+msgstr "ISA-afzender-ID"
+
+#: manufacturing/templates/edi_partner_list.html:25
+#: manufacturing/templates/edi_partner_new.html:37
+msgid "ISA Receiver ID"
+msgstr "ISA-ontvanger-ID"
+
+#: manufacturing/templates/edi_partner_list.html:45
+msgid "No EDI trading partners configured yet."
+msgstr "Nog geen EDI-handelspartners geconfigureerd."
+
+#: manufacturing/templates/edi_partner_new.html:3
+#: manufacturing/templates/edi_partner_new.html:11
+msgid "New EDI Trading Partner"
+msgstr "Nieuwe EDI-handelspartner"
+
+#: manufacturing/templates/edi_partner_new.html:41
+msgid "Create Trading Partner"
+msgstr "Handelspartner Aanmaken"
+
+#: manufacturing/templates/edi_transaction_log_list.html:3
+#: manufacturing/templates/edi_transaction_log_list.html:11
+msgid "EDI Transaction Log"
+msgstr "EDI-transactielogboek"
+
+#: manufacturing/templates/edi_transaction_log_list.html:19
+msgid "Doc Type"
+msgstr "Documenttype"
+
+#: manufacturing/templates/edi_transaction_log_list.html:22
+#: manufacturing/templates/finance_tax_detail.html:132
+#: manufacturing/templates/finance_tax_list.html:153
+msgid "Reference #"
+msgstr "Referentienr."
+
+#: manufacturing/templates/edi_transaction_log_list.html:41
+msgid "No EDI transactions logged yet."
+msgstr "Nog geen EDI-transacties geregistreerd."
 
 #: manufacturing/templates/employee_benefits.html:3
 #: manufacturing/templates/employee_benefits.html:19
@@ -10573,11 +10763,6 @@ msgstr "Betaald bedrag ($)"
 #: manufacturing/templates/legal_litigation_list.html:142
 msgid "Filed Date"
 msgstr "Indieningsdatum"
-
-#: manufacturing/templates/finance_tax_detail.html:132
-#: manufacturing/templates/finance_tax_list.html:153
-msgid "Reference #"
-msgstr "Referentienr."
 
 #: manufacturing/templates/finance_tax_list.html:76
 msgid "Search type / jurisdiction / period…"
