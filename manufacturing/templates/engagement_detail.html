@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ engagement.engagement_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/consultants/engagements/" class="btn">Engagements</a>
-<a href="/consultants/{{ engagement.consultant_id }}/" class="btn">Consultant</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/consultants/engagements/" class="btn">{% trans "Engagements" %}</a>
+<a href="/consultants/{{ engagement.consultant_id }}/" class="btn">{% trans "Consultant" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -56,45 +57,45 @@
 
     <div class="card">
         <div class="detail-grid">
-            <div class="field"><div class="lbl">Engagement #</div><div class="val">{{ engagement.engagement_number }}</div></div>
-            <div class="field"><div class="lbl">Consultant</div><div class="val"><a href="/consultants/{{ engagement.consultant_id }}/">{{ engagement.consultant_name }}</a></div></div>
-            <div class="field"><div class="lbl">Department</div><div class="val">{{ engagement.dept_name|default:"—" }}</div></div>
-            <div class="field"><div class="lbl">Dates</div><div class="val">{{ engagement.start_date|default:"—" }} → {{ engagement.end_date|default:"—" }}</div></div>
-            <div class="field"><div class="lbl">Default Rate</div><div class="val">{% if engagement.default_hourly_rate %}${{ engagement.default_hourly_rate|floatformat:2 }}/hr{% else %}—{% endif %}</div></div>
-            <div class="field"><div class="lbl">Requested By</div><div class="val">{{ engagement.requested_by|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Engagement #" %}</div><div class="val">{{ engagement.engagement_number }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Consultant" %}</div><div class="val"><a href="/consultants/{{ engagement.consultant_id }}/">{{ engagement.consultant_name }}</a></div></div>
+            <div class="field"><div class="lbl">{% trans "Department" %}</div><div class="val">{{ engagement.dept_name|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Dates" %}</div><div class="val">{{ engagement.start_date|default:"—" }} → {{ engagement.end_date|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Default Rate" %}</div><div class="val">{% if engagement.default_hourly_rate %}{% blocktrans with rate=engagement.default_hourly_rate|floatformat:2 %}${{ rate }}/hr{% endblocktrans %}{% else %}—{% endif %}</div></div>
+            <div class="field"><div class="lbl">{% trans "Requested By" %}</div><div class="val">{{ engagement.requested_by|default:"—" }}</div></div>
             {% if engagement.purpose %}
-            <div class="field full-span"><div class="lbl">Purpose</div><div class="val">{{ engagement.purpose }}</div></div>
+            <div class="field full-span"><div class="lbl">{% trans "Purpose" %}</div><div class="val">{{ engagement.purpose }}</div></div>
             {% endif %}
         </div>
         {% if can_edit and engagement.status == 'draft' %}
         <form method="post" style="display:inline-block;margin-top:6px;">
             {% csrf_token %}<input type="hidden" name="action" value="activate">
-            <button type="submit" class="btn-submit">Activate</button>
+            <button type="submit" class="btn-submit">{% trans "Activate" %}</button>
         </form>
         {% endif %}
         {% if can_edit and engagement.status == 'active' %}
         <form method="post" style="display:inline-block;margin-top:6px;">
             {% csrf_token %}<input type="hidden" name="action" value="close">
-            <button type="submit" class="btn-submit btn-secondary">Close Engagement</button>
+            <button type="submit" class="btn-submit btn-secondary">{% trans "Close Engagement" %}</button>
         </form>
         {% endif %}
     </div>
 
     <div class="card" style="overflow-x:auto;">
-        <h3>Time Entries</h3>
+        <h3>{% trans "Time Entries" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Date</th><th>Description</th><th class="metric">Hours</th><th class="metric">Rate</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Date" %}</th><th>{% trans "Description" %}</th><th class="metric">{% trans "Hours" %}</th><th class="metric">{% trans "Rate" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
             {% for t in time_entries %}
             <tr>
                 <td>{{ t.work_date }}</td>
                 <td>{{ t.description|default:"—" }}</td>
                 <td class="metric">{{ t.hours|floatformat:2 }}</td>
-                <td class="metric">{% if t.hourly_rate %}${{ t.hourly_rate|floatformat:2 }}{% else %}<span class="unbilled">(default)</span>{% endif %}</td>
-                <td>{% if t.invoice_id %}<span class="billed">Invoiced</span>{% else %}<span class="unbilled">Unbilled</span>{% endif %}</td>
+                <td class="metric">{% if t.hourly_rate %}${{ t.hourly_rate|floatformat:2 }}{% else %}<span class="unbilled">({% trans "default" %})</span>{% endif %}</td>
+                <td>{% if t.invoice_id %}<span class="billed">{% trans "Invoiced" %}</span>{% else %}<span class="unbilled">{% trans "Unbilled" %}</span>{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No time entries yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">{% trans "No time entries yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -104,20 +105,20 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="add_time">
             <div class="form-grid">
-                <div class="form-group"><label>Date *</label><input type="date" name="work_date" required></div>
-                <div class="form-group"><label>Hours *</label><input type="number" name="hours" step="0.25" min="0" required></div>
-                <div class="form-group"><label>Rate ($/hr)</label><input type="number" name="hourly_rate" step="0.01" min="0" placeholder="Use default"></div>
-                <div class="form-group"><label>Description</label><input type="text" name="description"></div>
+                <div class="form-group"><label>{% trans "Date *" %}</label><input type="date" name="work_date" required></div>
+                <div class="form-group"><label>{% trans "Hours *" %}</label><input type="number" name="hours" step="0.25" min="0" required></div>
+                <div class="form-group"><label>{% trans "Rate ($/hr)" %}</label><input type="number" name="hourly_rate" step="0.01" min="0" placeholder="{% trans "Use default" %}"></div>
+                <div class="form-group"><label>{% trans "Description" %}</label><input type="text" name="description"></div>
             </div>
-            <button type="submit" class="btn-submit">Add Time Entry</button>
+            <button type="submit" class="btn-submit">{% trans "Add Time Entry" %}</button>
         </form>
         {% endif %}
     </div>
 
     <div class="card" style="overflow-x:auto;">
-        <h3>Charges</h3>
+        <h3>{% trans "Charges" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="metric">Amount</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Date" %}</th><th>{% trans "Category" %}</th><th>{% trans "Description" %}</th><th class="metric">{% trans "Amount" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
             {% for c in charges %}
             <tr>
@@ -125,10 +126,10 @@
                 <td>{{ c.category }}</td>
                 <td>{{ c.description|default:"—" }}</td>
                 <td class="metric">${{ c.amount|floatformat:2 }}</td>
-                <td>{% if c.invoice_id %}<span class="billed">Invoiced</span>{% else %}<span class="unbilled">Unbilled</span>{% endif %}</td>
+                <td>{% if c.invoice_id %}<span class="billed">{% trans "Invoiced" %}</span>{% else %}<span class="unbilled">{% trans "Unbilled" %}</span>{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No charges yet.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">{% trans "No charges yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -138,25 +139,25 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="add_charge">
             <div class="form-grid">
-                <div class="form-group"><label>Date *</label><input type="date" name="charge_date" required></div>
+                <div class="form-group"><label>{% trans "Date *" %}</label><input type="date" name="charge_date" required></div>
                 <div class="form-group">
-                    <label>Category *</label>
+                    <label>{% trans "Category *" %}</label>
                     <select name="category" required>
                         {% for cat in charge_categories %}<option value="{{ cat }}">{{ cat }}</option>{% endfor %}
                     </select>
                 </div>
-                <div class="form-group"><label>Amount ($) *</label><input type="number" name="amount" step="0.01" min="0" required></div>
-                <div class="form-group"><label>Description</label><input type="text" name="description"></div>
+                <div class="form-group"><label>{% trans "Amount ($) *" %}</label><input type="number" name="amount" step="0.01" min="0" required></div>
+                <div class="form-group"><label>{% trans "Description" %}</label><input type="text" name="description"></div>
             </div>
-            <button type="submit" class="btn-submit">Add Charge</button>
+            <button type="submit" class="btn-submit">{% trans "Add Charge" %}</button>
         </form>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Invoices</h3>
+        <h3>{% trans "Invoices" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Invoice #</th><th>Period</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Invoice #" %}</th><th>{% trans "Period" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
             {% for i in invoices %}
             <tr>
@@ -165,7 +166,7 @@
                 <td><span class="badge s-{{ i.status }}">{{ i.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="3" style="color:var(--text-muted);text-align:center;">No invoices cut yet.</td></tr>
+            <tr><td colspan="3" style="color:var(--text-muted);text-align:center;">{% trans "No invoices cut yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -174,16 +175,16 @@
         <form method="post" action="/consultants/engagements/{{ engagement.id }}/invoice/new/" style="margin-top:14px;">
             {% csrf_token %}
             <div class="form-grid">
-                <div class="form-group"><label>Period Start *</label><input type="date" name="period_start" required></div>
-                <div class="form-group"><label>Period End *</label><input type="date" name="period_end" required></div>
+                <div class="form-group"><label>{% trans "Period Start *" %}</label><input type="date" name="period_start" required></div>
+                <div class="form-group"><label>{% trans "Period End *" %}</label><input type="date" name="period_end" required></div>
                 <div class="form-group full-span">
-                    <button type="submit" class="btn-submit">Cut Invoice for Unbilled Time &amp; Charges in Period</button>
+                    <button type="submit" class="btn-submit">{% trans "Cut Invoice for Unbilled Time &amp; Charges in Period" %}</button>
                 </div>
             </div>
         </form>
         <p style="font-size:11px;color:var(--text-muted);margin-top:6px;">
-            {{ unbilled_time|length }} unbilled time entr{{ unbilled_time|length|pluralize:"y,ies" }},
-            {{ unbilled_charges|length }} unbilled charge{{ unbilled_charges|length|pluralize }} on this engagement.
+            {% blocktrans count counter=unbilled_time|length %}{{ counter }} unbilled time entry{% plural %}{{ counter }} unbilled time entries{% endblocktrans %},
+            {% blocktrans count counter=unbilled_charges|length %}{{ counter }} unbilled charge{% plural %}{{ counter }} unbilled charges{% endblocktrans %} {% trans "on this engagement." %}
         </p>
         {% endif %}
     </div>
