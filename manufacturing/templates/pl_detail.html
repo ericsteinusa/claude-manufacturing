@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ price_list.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/price-lists/" class="btn">Price Lists</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/price-lists/" class="btn">{% trans "Price Lists" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -21,9 +22,9 @@
 <div class="pl-wrap">
     <div class="menu-title">{{ price_list.name }}
         {% if price_list.is_active %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
         {% else %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Inactive" %}</span>
         {% endif %}
     </div>
 
@@ -32,17 +33,17 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Price List Details</h3>
+        <h3>{% trans "Price List Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update_header">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Name</label>
+                    <label>{% trans "Name" %}</label>
                     <input type="text" name="name" value="{{ price_list.name }}" required>
                 </div>
                 <div class="form-row">
-                    <label>Currency</label>
+                    <label>{% trans "Currency" %}</label>
                     <select name="currency">
                         {% for c in currencies %}
                         <option value="{{ c.code }}" {% if c.code == price_list.currency %}selected{% endif %}>{{ c.code }}</option>
@@ -50,40 +51,40 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Active</label>
+                    <label>{% trans "Active" %}</label>
                     <select name="is_active">
-                        <option value="1" {% if price_list.is_active %}selected{% endif %}>Yes</option>
-                        <option value="0" {% if not price_list.is_active %}selected{% endif %}>No</option>
+                        <option value="1" {% if price_list.is_active %}selected{% endif %}>{% trans "Yes" %}</option>
+                        <option value="0" {% if not price_list.is_active %}selected{% endif %}>{% trans "No" %}</option>
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Effective Date</label>
+                    <label>{% trans "Effective Date" %}</label>
                     <input type="date" name="effective_date" value="{{ price_list.effective_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Expiry Date</label>
+                    <label>{% trans "Expiry Date" %}</label>
                     <input type="date" name="expiry_date" value="{{ price_list.expiry_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <input type="text" name="notes" value="{{ price_list.notes|default:'' }}">
                 </div>
             </div>
-            <button type="submit" class="btn">Save Details</button>
+            <button type="submit" class="btn">{% trans "Save Details" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Price Lines</h3>
+        <h3>{% trans "Price Lines" %}</h3>
         {% if lines %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th class="num">Min Qty</th>
-                        <th class="num">Unit Price</th>
+                        <th>{% trans "Product" %}</th>
+                        <th class="num">{% trans "Min Qty" %}</th>
+                        <th class="num">{% trans "Unit Price" %}</th>
                         {% if can_edit %}<th></th>{% endif %}
                     </tr>
                 </thead>
@@ -97,11 +98,11 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="update_line">
                                 <input type="hidden" name="line_id" value="{{ line.id }}">
-                                <label style="font-size:11px;color:var(--text-muted);">Min Qty</label>
+                                <label style="font-size:11px;color:var(--text-muted);">{% trans "Min Qty" %}</label>
                                 <input type="number" name="min_qty" step="any" min="0" value="{{ line.min_qty|floatformat:'g' }}" style="width:70px;padding:3px 6px;border:1.5px solid var(--border);border-radius:4px;">
-                                <label style="font-size:11px;color:var(--text-muted);">Price</label>
+                                <label style="font-size:11px;color:var(--text-muted);">{% trans "Price" %}</label>
                                 <input type="number" name="unit_price" step="0.01" min="0" value="{{ line.unit_price|floatformat:2 }}" style="width:80px;padding:3px 6px;border:1.5px solid var(--border);border-radius:4px;">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Save</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Save" %}</button>
                             </form>
                         </td>
                         <td>
@@ -109,7 +110,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="delete_line">
                                 <input type="hidden" name="line_id" value="{{ line.id }}">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Remove" %}</button>
                             </form>
                         </td>
                         {% else %}
@@ -122,19 +123,19 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No price lines yet.</div>
+        <div class="empty-state">{% trans "No price lines yet." %}</div>
         {% endif %}
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Price Line</h3>
+        <h3>{% trans "Add Price Line" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_line">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Product</label>
+                    <label>{% trans "Product" %}</label>
                     <select name="product_id" required>
                         {% for p in products %}
                         <option value="{{ p.id }}">{{ p.product_name }}</option>
@@ -142,15 +143,15 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Min Qty (for tiered pricing)</label>
+                    <label>{% trans "Min Qty (for tiered pricing)" %}</label>
                     <input type="number" name="min_qty" step="any" min="0" value="1">
                 </div>
                 <div class="form-row">
-                    <label>Unit Price</label>
+                    <label>{% trans "Unit Price" %}</label>
                     <input type="number" name="unit_price" step="0.01" min="0" value="0.00" required>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Add Line</button>
+            <button type="submit" class="btn btn-primary">{% trans "Add Line" %}</button>
         </form>
     </div>
     {% endif %}

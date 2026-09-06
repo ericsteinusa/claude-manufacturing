@@ -11,6 +11,7 @@ import psycopg2
 
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from ..log_utils import get_logger
 from ..schema import init_schema
@@ -4335,8 +4336,8 @@ def customer_list(request):
         request,
         contacts=customers,
         search=search,
-        contact_type='customer',
-        contact_type_plural='customers',
+        contact_type=_('customer'),
+        contact_type_plural=_('customers'),
         list_url='/customers/',
         new_url='/customers/new/',
         detail_base='/customers/',
@@ -4372,8 +4373,8 @@ def customer_new(request):
         conn.close()
     return render(request, 'contacts_new.html', _contacts_context(
         request,
-        contact_type='customer',
-        contact_type_plural='customers',
+        contact_type=_('customer'),
+        contact_type_plural=_('customers'),
         list_url='/customers/',
         error=error,
         form=request.POST if request.method == 'POST' else {},
@@ -4428,11 +4429,12 @@ def customer_detail(request, customer_id):
         request,
         contact=contact,
         orders=orders,
-        contact_type='customer',
-        contact_type_plural='customers',
+        contact_type=_('customer'),
+        contact_type_plural=_('customers'),
         list_url='/customers/',
         new_url='/customers/new/',
-        order_label='Sales Order',
+        order_label=_('Sales Order'),
+        order_label_plural=_('Sales Orders'),
         order_url_prefix='/so/',
         price_lists=price_lists,
         error=error,
@@ -4463,8 +4465,8 @@ def supplier_list(request):
         request,
         contacts=suppliers,
         search=search,
-        contact_type='supplier',
-        contact_type_plural='suppliers',
+        contact_type=_('supplier'),
+        contact_type_plural=_('suppliers'),
         list_url='/suppliers/',
         new_url='/suppliers/new/',
         detail_base='/suppliers/',
@@ -4500,8 +4502,8 @@ def supplier_new(request):
         conn.close()
     return render(request, 'contacts_new.html', _contacts_context(
         request,
-        contact_type='supplier',
-        contact_type_plural='suppliers',
+        contact_type=_('supplier'),
+        contact_type_plural=_('suppliers'),
         list_url='/suppliers/',
         error=error,
         form=request.POST if request.method == 'POST' else {},
@@ -4545,11 +4547,12 @@ def supplier_detail(request, supplier_id):
         request,
         contact=contact,
         orders=orders,
-        contact_type='supplier',
-        contact_type_plural='suppliers',
+        contact_type=_('supplier'),
+        contact_type_plural=_('suppliers'),
         list_url='/suppliers/',
         new_url='/suppliers/new/',
-        order_label='Purchase Order',
+        order_label=_('Purchase Order'),
+        order_label_plural=_('Purchase Orders'),
         order_url_prefix='/po/',
         error=error,
         success=success,

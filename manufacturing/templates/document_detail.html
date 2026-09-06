@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ doc.doc_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/documents/" class="btn">Document Control</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/documents/" class="btn">{% trans "Document Control" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -27,19 +28,19 @@
 <div class="doc-wrap">
     <div class="menu-title">{{ doc.doc_number }} — {{ doc.title }}
         {% if doc.status == 'draft' %}
-        <span class="pill pill-draft" style="font-size:11px;padding:2px 8px;">Draft</span>
+        <span class="pill pill-draft" style="font-size:11px;padding:2px 8px;">{% trans "Draft" %}</span>
         {% elif doc.status == 'in_review' %}
-        <span class="pill pill-pending" style="font-size:11px;padding:2px 8px;">In Review</span>
+        <span class="pill pill-pending" style="font-size:11px;padding:2px 8px;">{% trans "In Review" %}</span>
         {% elif doc.status == 'approved' %}
-        <span class="pill pill-approved" style="font-size:11px;padding:2px 8px;">Approved</span>
+        <span class="pill pill-approved" style="font-size:11px;padding:2px 8px;">{% trans "Approved" %}</span>
         {% elif doc.status == 'superseded' %}
-        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">Superseded</span>
+        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">{% trans "Superseded" %}</span>
         {% else %}
-        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">Obsolete</span>
+        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">{% trans "Obsolete" %}</span>
         {% endif %}
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">
-        {{ doc.doc_type }} · Revision {{ doc.current_revision }} · created {{ doc.created_at|date:"Y-m-d" }} by {{ doc.created_by|default:"—" }}
+        {% blocktrans with doc_type=doc.doc_type rev=doc.current_revision created=doc.created_at|date:"Y-m-d" by=doc.created_by|default:"—" %}{{ doc_type }} · Revision {{ rev }} · created {{ created }} by {{ by }}{% endblocktrans %}
     </p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
@@ -48,47 +49,51 @@
     {% if doc.status == 'in_review' %}
         {% if pending_step %}
         <div class="alert alert-warning">
-            Awaiting your approval as <strong>{{ pending_step.approver_role }}</strong>.
+            {% blocktrans with role=pending_step.approver_role %}Awaiting your approval as <strong>{{ role }}</strong>.{% endblocktrans %}
             <form method="post" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="decide">
                 <input type="hidden" name="step_id" value="{{ pending_step.id }}">
-                <input type="text" name="signature_meaning" placeholder="Meaning of signature (e.g. &quot;I approve this document for release&quot;)" required style="flex:1;min-width:220px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
-                <input type="password" name="password" placeholder="Re-enter your password" required style="width:170px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
-                <button type="submit" name="decision" value="approved" class="btn btn-primary" style="padding:4px 12px;font-size:12px;">Approve</button>
-                <button type="submit" name="decision" value="rejected" class="btn" style="padding:4px 12px;font-size:12px;">Reject</button>
+                <input type="text" name="signature_meaning" placeholder="{% trans "Meaning of signature (e.g. &quot;I approve this document for release&quot;)" %}" required style="flex:1;min-width:220px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                <input type="password" name="password" placeholder="{% trans "Re-enter your password" %}" required style="width:170px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                <button type="submit" name="decision" value="approved" class="btn btn-primary" style="padding:4px 12px;font-size:12px;">{% trans "Approve" %}</button>
+                <button type="submit" name="decision" value="rejected" class="btn" style="padding:4px 12px;font-size:12px;">{% trans "Reject" %}</button>
             </form>
         </div>
         {% else %}
         <div class="alert alert-warning">
-            In review{% if approval.steps %} — awaiting <strong>{{ approval.steps.0.approver_role }}</strong>{% endif %}.
+            {% if approval.steps %}
+            {% blocktrans with role=approval.steps.0.approver_role %}In review — awaiting <strong>{{ role }}</strong>.{% endblocktrans %}
+            {% else %}
+            {% trans "In review." %}
+            {% endif %}
         </div>
         {% endif %}
     {% endif %}
 
     <div class="card">
-        <h3>Document Info</h3>
+        <h3>{% trans "Document Info" %}</h3>
         <div class="info-grid">
             <div class="info-item">
-                <label>Owner</label>
+                <label>{% trans "Owner" %}</label>
                 <div class="val">{{ doc.owner|default:"—" }}</div>
             </div>
             <div class="info-item">
-                <label>Department</label>
+                <label>{% trans "Department" %}</label>
                 <div class="val">{{ doc.dept_key|default:"—" }}</div>
             </div>
             <div class="info-item">
-                <label>Current File</label>
+                <label>{% trans "Current File" %}</label>
                 <div class="val">
                     {% if doc.file_name %}
                     <a href="/documents/{{ doc.id }}/download/">{{ doc.file_name }}</a>
                     {% else %}
-                    no file attached
+                    {% trans "no file attached" %}
                     {% endif %}
                 </div>
             </div>
             <div class="info-item">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <div class="val">{{ doc.notes|default:"—" }}</div>
             </div>
         </div>
@@ -100,26 +105,26 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="upload">
                 <input type="file" name="file" required>
-                <button type="submit" class="btn" style="padding:5px 12px;font-size:12px;">Attach File</button>
+                <button type="submit" class="btn" style="padding:5px 12px;font-size:12px;">{% trans "Attach File" %}</button>
             </form>
-            <form method="post" onsubmit="return confirm('Submit this revision for review?');">
+            <form method="post" onsubmit="return confirm('{% trans "Submit this revision for review?" %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="submit_review">
-                <button type="submit" class="btn btn-primary" style="padding:5px 12px;font-size:12px;">Submit for Review</button>
+                <button type="submit" class="btn btn-primary" style="padding:5px 12px;font-size:12px;">{% trans "Submit for Review" %}</button>
             </form>
             {% endif %}
             {% if doc.status == 'approved' %}
-            <form method="post" onsubmit="return confirm('Mark this document superseded?');">
+            <form method="post" onsubmit="return confirm('{% trans "Mark this document superseded?" %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="supersede">
-                <button type="submit" class="btn" style="padding:5px 12px;font-size:12px;">Mark Superseded</button>
+                <button type="submit" class="btn" style="padding:5px 12px;font-size:12px;">{% trans "Mark Superseded" %}</button>
             </form>
             {% endif %}
             {% if doc.status != 'obsolete' %}
-            <form method="post" onsubmit="return confirm('Mark this document obsolete? This cannot be undone.');">
+            <form method="post" onsubmit="return confirm('{% trans "Mark this document obsolete? This cannot be undone." %}');">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="obsolete">
-                <button type="submit" class="btn btn-danger" style="padding:5px 12px;font-size:12px;">Mark Obsolete</button>
+                <button type="submit" class="btn btn-danger" style="padding:5px 12px;font-size:12px;">{% trans "Mark Obsolete" %}</button>
             </form>
             {% endif %}
         </div>
@@ -128,34 +133,34 @@
 
     {% if can_edit and doc.status == 'approved' %}
     <div class="card">
-        <h3>Create New Revision</h3>
+        <h3>{% trans "Create New Revision" %}</h3>
         <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">
-            Bumps to revision {{ doc.current_revision }} + 1 and resets status to 'draft' so it
-            can go through review again.
+            {% blocktrans with rev=doc.current_revision %}Bumps to revision {{ rev }} + 1 and resets status to 'draft' so it
+            can go through review again.{% endblocktrans %}
         </p>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="action" value="revise">
             <div class="form-row">
-                <label>Change Description *</label>
-                <textarea name="change_description" required placeholder="What changed and why"></textarea>
+                <label>{% trans "Change Description" %} *</label>
+                <textarea name="change_description" required placeholder="{% trans "What changed and why" %}"></textarea>
             </div>
             <div class="form-row">
-                <label>Replacement File (optional)</label>
+                <label>{% trans "Replacement File (optional)" %}</label>
                 <input type="file" name="file">
             </div>
-            <button type="submit" class="btn btn-primary">Create Revision</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Revision" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Revision History</h3>
+        <h3>{% trans "Revision History" %}</h3>
         {% if revisions %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
-                    <tr><th>Rev</th><th>Change Description</th><th>Changed By</th><th>Date</th><th>File</th></tr>
+                    <tr><th>{% trans "Rev" %}</th><th>{% trans "Change Description" %}</th><th>{% trans "Changed By" %}</th><th>{% trans "Date" %}</th><th>{% trans "File" %}</th></tr>
                 </thead>
                 <tbody>
                     {% for r in revisions %}
@@ -171,16 +176,16 @@
             </table>
         </div>
         {% else %}
-        <p style="color:var(--text-muted);font-size:13px;">No revisions recorded.</p>
+        <p style="color:var(--text-muted);font-size:13px;">{% trans "No revisions recorded." %}</p>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Linked Records</h3>
+        <h3>{% trans "Linked Records" %}</h3>
         {% if links %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Type</th><th>Linked Record</th><th></th></tr></thead>
+                <thead><tr><th>{% trans "Type" %}</th><th>{% trans "Linked Record" %}</th><th></th></tr></thead>
                 <tbody>
                     {% for l in links %}
                     <tr>
@@ -192,7 +197,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="remove_link">
                                 <input type="hidden" name="link_id" value="{{ l.id }}">
-                                <button type="submit" class="btn" style="padding:2px 8px;font-size:11px;">Remove</button>
+                                <button type="submit" class="btn" style="padding:2px 8px;font-size:11px;">{% trans "Remove" %}</button>
                             </form>
                             {% endif %}
                         </td>
@@ -202,14 +207,14 @@
             </table>
         </div>
         {% else %}
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">No linked records yet.</p>
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">{% trans "No linked records yet." %}</p>
         {% endif %}
 
         {% if can_edit %}
         <div class="link-row">
             <form method="post" class="form-row">
                 {% csrf_token %}
-                <label>Link to BOM (product)</label>
+                <label>{% trans "Link to BOM (product)" %}</label>
                 <input type="hidden" name="action" value="add_link">
                 <input type="hidden" name="linked_type" value="bom">
                 <div style="display:flex;gap:6px;">
@@ -218,14 +223,14 @@
                         <option value="{{ p.id }}">{{ p.product_name }}</option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">{% trans "Add" %}</button>
                 </div>
             </form>
         </div>
         <div class="link-row">
             <form method="post" class="form-row">
                 {% csrf_token %}
-                <label>Link to Sampling Plan</label>
+                <label>{% trans "Link to Sampling Plan" %}</label>
                 <input type="hidden" name="action" value="add_link">
                 <input type="hidden" name="linked_type" value="sampling_plan">
                 <div style="display:flex;gap:6px;">
@@ -234,14 +239,14 @@
                         <option value="{{ sp.id }}">{{ sp.plan_name }}</option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">{% trans "Add" %}</button>
                 </div>
             </form>
         </div>
         <div class="link-row">
             <form method="post" class="form-row">
                 {% csrf_token %}
-                <label>Link to Equipment</label>
+                <label>{% trans "Link to Equipment" %}</label>
                 <input type="hidden" name="action" value="add_link">
                 <input type="hidden" name="linked_type" value="maint_equipment">
                 <div style="display:flex;gap:6px;">
@@ -250,14 +255,14 @@
                         <option value="{{ eq.id }}">{{ eq.name }}</option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">{% trans "Add" %}</button>
                 </div>
             </form>
         </div>
         <div class="link-row">
             <form method="post" class="form-row">
                 {% csrf_token %}
-                <label>Link to Workcenter</label>
+                <label>{% trans "Link to Workcenter" %}</label>
                 <input type="hidden" name="action" value="add_link">
                 <input type="hidden" name="linked_type" value="workcenter">
                 <div style="display:flex;gap:6px;">
@@ -266,19 +271,19 @@
                         <option value="{{ wc.id }}">{{ wc.name }}</option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">{% trans "Add" %}</button>
                 </div>
             </form>
         </div>
         <div class="link-row">
             <form method="post" class="form-row">
                 {% csrf_token %}
-                <label>Link to Routing (by ID)</label>
+                <label>{% trans "Link to Routing (by ID)" %}</label>
                 <input type="hidden" name="action" value="add_link">
                 <input type="hidden" name="linked_type" value="routing">
                 <div style="display:flex;gap:6px;">
-                    <input type="number" name="linked_id" min="1" placeholder="Routing step ID" style="width:140px;">
-                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                    <input type="number" name="linked_id" min="1" placeholder="{% trans "Routing step ID" %}" style="width:140px;">
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">{% trans "Add" %}</button>
                 </div>
             </form>
         </div>

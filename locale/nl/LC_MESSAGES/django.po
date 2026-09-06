@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 16:25+0000\n"
+"POT-Creation-Date: 2026-09-06 17:25+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -61,6 +61,7 @@ msgstr "Geleverd"
 
 #: manufacturing/menus.py:1689 manufacturing/templates/acct_dashboard.html:6
 #: manufacturing/templates/base.html:540
+#: manufacturing/templates/budget_dashboard.html:39
 msgid "Accounting"
 msgstr "Boekhouding"
 
@@ -72,6 +73,7 @@ msgstr "Klantenservice"
 
 #: manufacturing/menus.py:1691 manufacturing/templates/base.html:569
 #: manufacturing/templates/base.html:571
+#: manufacturing/templates/document_list.html:7
 msgid "Engineering"
 msgstr "Techniek"
 
@@ -163,6 +165,7 @@ msgid "Budget Management"
 msgstr "Budgetbeheer"
 
 #: manufacturing/menus.py:1702 manufacturing/templates/base.html:538
+#: manufacturing/templates/budget_dashboard.html:7
 #: manufacturing/templates/dashboard_kpis.html:39
 msgid "Finance"
 msgstr "Financiën"
@@ -179,6 +182,7 @@ msgstr "Risicobeheer"
 #: manufacturing/menus.py:1705
 #: manufacturing/templates/ai_insights_dashboard.html:6
 #: manufacturing/templates/base.html:619
+#: manufacturing/templates/budget_dashboard.html:40
 #: manufacturing/templates/cs_dashboard.html:9
 #: manufacturing/templates/cs_dashboard.html:46
 #: manufacturing/templates/cs_escalations.html:8
@@ -260,6 +264,7 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/approval_rule_new.html:7
 #: manufacturing/templates/ar_invoice_detail.html:10
 #: manufacturing/templates/ar_list.html:10
+#: manufacturing/templates/atp_inquiry.html:7
 #: manufacturing/templates/ats_application_detail.html:9
 #: manufacturing/templates/ats_candidate_detail.html:8
 #: manufacturing/templates/ats_candidate_list.html:8
@@ -278,11 +283,16 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/bom_detail.html:12
 #: manufacturing/templates/bom_explode.html:8
 #: manufacturing/templates/bom_list.html:7
+#: manufacturing/templates/budget_dashboard.html:8
+#: manufacturing/templates/budget_dashboard.html:41
+#: manufacturing/templates/capacity_planning.html:9
 #: manufacturing/templates/cc_detail.html:7
 #: manufacturing/templates/cc_list.html:7 manufacturing/templates/cc_new.html:7
 #: manufacturing/templates/coa_detail.html:8
 #: manufacturing/templates/coa_list.html:7
 #: manufacturing/templates/coa_new.html:7
+#: manufacturing/templates/company_detail.html:7
+#: manufacturing/templates/company_list.html:10
 #: manufacturing/templates/compliance_checklist_detail.html:8
 #: manufacturing/templates/compliance_checklist_list.html:8
 #: manufacturing/templates/compliance_template_detail.html:8
@@ -290,6 +300,10 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/compliance_template_new.html:7
 #: manufacturing/templates/consignment_detail.html:9
 #: manufacturing/templates/consignment_list.html:9
+#: manufacturing/templates/consolidated_financials.html:8
+#: manufacturing/templates/contacts_detail.html:10
+#: manufacturing/templates/contacts_list.html:6
+#: manufacturing/templates/contacts_new.html:7
 #: manufacturing/templates/control_plan_detail.html:8
 #: manufacturing/templates/control_plan_list.html:8
 #: manufacturing/templates/control_plan_new.html:7
@@ -315,8 +329,17 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/cs_returns_list.html:11
 #: manufacturing/templates/cs_surveys_detail.html:11
 #: manufacturing/templates/cs_surveys_list.html:11
+#: manufacturing/templates/cto_configure.html:7
+#: manufacturing/templates/cto_options.html:7
+#: manufacturing/templates/cto_product_list.html:8
+#: manufacturing/templates/ctp_inquiry.html:8
 #: manufacturing/templates/currency_list.html:6
 #: manufacturing/templates/data_governance_dashboard.html:6
+#: manufacturing/templates/demand_forecast.html:8
+#: manufacturing/templates/dept_menu.html:8
+#: manufacturing/templates/document_detail.html:7
+#: manufacturing/templates/document_list.html:8
+#: manufacturing/templates/document_new.html:7
 #: manufacturing/templates/ecommerce_connection_list.html:9
 #: manufacturing/templates/edi_partner_list.html:10
 #: manufacturing/templates/employee_benefits.html:7
@@ -332,6 +355,7 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/eng_specs_list.html:12
 #: manufacturing/templates/eng_task_detail.html:12
 #: manufacturing/templates/eng_tasks_list.html:12
+#: manufacturing/templates/esg_dashboard.html:7
 #: manufacturing/templates/ess_home.html:11
 #: manufacturing/templates/ess_pay_stub_detail.html:8
 #: manufacturing/templates/ess_pay_stubs.html:8
@@ -355,6 +379,7 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/finance_tax_list.html:13
 #: manufacturing/templates/fixed_asset_detail.html:6
 #: manufacturing/templates/fixed_asset_list.html:6
+#: manufacturing/templates/fmea_risk_register.html:7
 #: manufacturing/templates/gl_accounts.html:9
 #: manufacturing/templates/gl_balance_sheet.html:9
 #: manufacturing/templates/gl_cash_flow_statement.html:10
@@ -364,6 +389,7 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/gl_journals.html:11
 #: manufacturing/templates/gl_trial_balance.html:9
 #: manufacturing/templates/headcount_plan_new.html:7
+#: manufacturing/templates/intercompany_list.html:9
 #: manufacturing/templates/inventory_dashboard.html:10
 #: manufacturing/templates/inventory_detail.html:7
 #: manufacturing/templates/inventory_list.html:6
@@ -453,6 +479,8 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/pers_training_list.html:12
 #: manufacturing/templates/personnel_dashboard.html:20
 #: manufacturing/templates/personnel_dashboard.html:64
+#: manufacturing/templates/pl_detail.html:7
+#: manufacturing/templates/pl_list.html:8 manufacturing/templates/pl_new.html:7
 #: manufacturing/templates/po_approvals.html:7
 #: manufacturing/templates/po_detail.html:12
 #: manufacturing/templates/po_form.html:8
@@ -496,6 +524,9 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/recipe_detail.html:7
 #: manufacturing/templates/recipe_list.html:8
 #: manufacturing/templates/recipe_new.html:7
+#: manufacturing/templates/repetitive_schedule_detail.html:7
+#: manufacturing/templates/repetitive_schedule_list.html:7
+#: manufacturing/templates/repetitive_schedule_new.html:7
 #: manufacturing/templates/report_builder_list.html:8
 #: manufacturing/templates/reports_dashboard.html:11
 #: manufacturing/templates/req_detail.html:8
@@ -538,6 +569,13 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/sampling_plan_new.html:7
 #: manufacturing/templates/scan_home.html:8
 #: manufacturing/templates/scan_receive.html:8
+#: manufacturing/templates/scenario_detail.html:8
+#: manufacturing/templates/scenario_list.html:7
+#: manufacturing/templates/scenario_new.html:7
+#: manufacturing/templates/scenario_run.html:8
+#: manufacturing/templates/sf_dashboard.html:9
+#: manufacturing/templates/sf_entry.html:9
+#: manufacturing/templates/sf_shift_plan.html:9
 #: manufacturing/templates/skill_list.html:8
 #: manufacturing/templates/skill_new.html:7
 #: manufacturing/templates/skill_requirements.html:8
@@ -591,6 +629,7 @@ msgstr "Costdriververbruik per Product"
 #: manufacturing/templates/abc_activity_detail.html:42
 #: manufacturing/templates/abc_activity_detail.html:74
 #: manufacturing/templates/abc_report.html:24
+#: manufacturing/templates/atp_inquiry.html:35
 #: manufacturing/templates/batch_record_list.html:57
 #: manufacturing/templates/bom_list.html:30
 #: manufacturing/templates/cc_detail.html:67
@@ -602,6 +641,10 @@ msgstr "Costdriververbruik per Product"
 #: manufacturing/templates/control_plan_list.html:24
 #: manufacturing/templates/costing_product_detail.html:6
 #: manufacturing/templates/costing_valuation_list.html:22
+#: manufacturing/templates/cto_product_list.html:22
+#: manufacturing/templates/ctp_inquiry.html:44
+#: manufacturing/templates/esg_dashboard.html:109
+#: manufacturing/templates/fmea_risk_register.html:36
 #: manufacturing/templates/inventory_list.html:65
 #: manufacturing/templates/lot_list.html:65
 #: manufacturing/templates/mrp_home.html:60
@@ -609,6 +652,8 @@ msgstr "Costdriververbruik per Product"
 #: manufacturing/templates/mrp_release.html:51
 #: manufacturing/templates/mrp_release.html:83
 #: manufacturing/templates/mrp_safety_stock.html:56
+#: manufacturing/templates/pl_detail.html:85
+#: manufacturing/templates/pl_detail.html:138
 #: manufacturing/templates/po_detail.html:165
 #: manufacturing/templates/prod_daily_report.html:83
 #: manufacturing/templates/prod_dashboard.html:112
@@ -625,6 +670,7 @@ msgstr "Costdriververbruik per Product"
 #: manufacturing/templates/qa_inspection_list.html:114
 #: manufacturing/templates/qa_ncr_list.html:87
 #: manufacturing/templates/recipe_list.html:30
+#: manufacturing/templates/repetitive_schedule_list.html:29
 #: manufacturing/templates/reports_dashboard.html:199
 #: manufacturing/templates/routing_detail.html:6
 #: manufacturing/templates/sales_demand.html:149
@@ -632,6 +678,8 @@ msgstr "Costdriververbruik per Product"
 #: manufacturing/templates/sales_order_detail.html:170
 #: manufacturing/templates/sales_reports_kpis.html:34
 #: manufacturing/templates/sampling_plan_list.html:34
+#: manufacturing/templates/scenario_detail.html:36
+#: manufacturing/templates/scenario_detail.html:70
 #: manufacturing/templates/so_detail.html:196
 #: manufacturing/templates/spc_list.html:41
 #: manufacturing/templates/spc_list.html:88
@@ -660,10 +708,14 @@ msgstr "Driverhoeveelheid"
 #: manufacturing/templates/abc_activity_detail.html:55
 #: manufacturing/templates/bom_detail.html:200
 #: manufacturing/templates/control_plan_detail.html:108
+#: manufacturing/templates/document_detail.html:200
 #: manufacturing/templates/payroll_deductions.html:141
+#: manufacturing/templates/pl_detail.html:113
 #: manufacturing/templates/po_detail.html:202
 #: manufacturing/templates/rfq_detail.html:57
 #: manufacturing/templates/routing_detail.html:82
+#: manufacturing/templates/scenario_detail.html:51
+#: manufacturing/templates/scenario_detail.html:117
 #: manufacturing/templates/skill_requirements.html:54
 #: manufacturing/templates/so_detail.html:220
 #: manufacturing/templates/wms_transfer_detail.html:53
@@ -700,6 +752,7 @@ msgstr "Activiteitskostenpools"
 
 #: manufacturing/templates/abc_activity_list.html:18
 #: manufacturing/templates/promo_list.html:19
+#: manufacturing/templates/scenario_list.html:22
 msgid "Search by name..."
 msgstr "Zoeken op naam..."
 
@@ -708,10 +761,12 @@ msgstr "Zoeken op naam..."
 #: manufacturing/templates/ats_requisition_list.html:27
 #: manufacturing/templates/batch_record_list.html:52
 #: manufacturing/templates/coa_list.html:20
+#: manufacturing/templates/contacts_list.html:23
 #: manufacturing/templates/cs_list.html:44
 #: manufacturing/templates/data_governance_dashboard.html:41
 #: manufacturing/templates/people_list.html:31
 #: manufacturing/templates/promo_list.html:21
+#: manufacturing/templates/scenario_list.html:24
 #: manufacturing/templates/skill_list.html:21
 msgid "Search"
 msgstr "Zoeken"
@@ -742,13 +797,17 @@ msgstr "Kostenpool"
 #: manufacturing/templates/compliance_template_list.html:34
 #: manufacturing/templates/control_plan_list.html:45
 #: manufacturing/templates/costing_valuation_list.html:37
+#: manufacturing/templates/document_list.html:92
 #: manufacturing/templates/ecommerce_sync_log_list.html:23
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/inventory_list.html:102
+#: manufacturing/templates/pl_list.html:45
 #: manufacturing/templates/promo_list.html:67
 #: manufacturing/templates/recipe_list.html:47
+#: manufacturing/templates/repetitive_schedule_list.html:44
 #: manufacturing/templates/rfq_list.html:55
 #: manufacturing/templates/sampling_plan_list.html:55
+#: manufacturing/templates/scenario_list.html:45
 #: manufacturing/templates/skills_matrix_summary.html:48
 #: manufacturing/templates/technician_route_list.html:46
 #: manufacturing/templates/wms_bin_list.html:60
@@ -779,6 +838,7 @@ msgstr "Nieuwe Activiteitskostenpool"
 #: manufacturing/templates/maint_mechanics_list.html:100
 #: manufacturing/templates/maint_part_detail.html:47
 #: manufacturing/templates/maint_parts_list.html:106
+#: manufacturing/templates/pl_new.html:29
 #: manufacturing/templates/promo_new.html:30
 #: manufacturing/templates/skill_new.html:29
 #: manufacturing/templates/workcenter_list.html:98
@@ -824,6 +884,7 @@ msgstr "bijv. per omstelling, per machine-uur"
 #: manufacturing/templates/bom_explode.html:61
 #: manufacturing/templates/coa_detail.html:40
 #: manufacturing/templates/coa_new.html:47
+#: manufacturing/templates/company_new.html:40
 #: manufacturing/templates/consignment_new.html:51
 #: manufacturing/templates/credit_account_detail.html:87
 #: manufacturing/templates/credit_account_detail.html:121
@@ -837,6 +898,8 @@ msgstr "bijv. per omstelling, per machine-uur"
 #: manufacturing/templates/cs_returns_detail.html:109
 #: manufacturing/templates/cs_returns_detail.html:124
 #: manufacturing/templates/cs_returns_list.html:137
+#: manufacturing/templates/document_detail.html:96
+#: manufacturing/templates/document_new.html:45
 #: manufacturing/templates/employee_gap_detail.html:95
 #: manufacturing/templates/eng_ecr_detail.html:116
 #: manufacturing/templates/eng_ecr_detail.html:124
@@ -851,6 +914,8 @@ msgstr "bijv. per omstelling, per machine-uur"
 #: manufacturing/templates/eng_task_detail.html:107
 #: manufacturing/templates/eng_task_detail.html:122
 #: manufacturing/templates/eng_tasks_list.html:155
+#: manufacturing/templates/esg_dashboard.html:142
+#: manufacturing/templates/esg_dashboard.html:150
 #: manufacturing/templates/exit_interview_list.html:120
 #: manufacturing/templates/finance_audit_detail.html:98
 #: manufacturing/templates/finance_audit_detail.html:113
@@ -954,6 +1019,8 @@ msgstr "bijv. per omstelling, per machine-uur"
 #: manufacturing/templates/pers_reviews_list.html:153
 #: manufacturing/templates/pers_training_detail.html:92
 #: manufacturing/templates/pers_training_list.html:154
+#: manufacturing/templates/pl_detail.html:69
+#: manufacturing/templates/pl_new.html:49
 #: manufacturing/templates/po_form.html:74
 #: manufacturing/templates/prod_delivery_status.html:66
 #: manufacturing/templates/prod_shipping_detail.html:126
@@ -1001,6 +1068,12 @@ msgstr "bijv. per omstelling, per machine-uur"
 #: manufacturing/templates/sales_territories.html:173
 #: manufacturing/templates/sampling_plan_detail.html:78
 #: manufacturing/templates/sampling_plan_new.html:69
+#: manufacturing/templates/scenario_detail.html:36
+#: manufacturing/templates/scenario_detail.html:86
+#: manufacturing/templates/scenario_detail.html:101
+#: manufacturing/templates/scenario_detail.html:157
+#: manufacturing/templates/sf_dashboard.html:76
+#: manufacturing/templates/sf_entry.html:101
 #: manufacturing/templates/skill_requirements.html:37
 #: manufacturing/templates/skill_requirements.html:101
 #: manufacturing/templates/so_form.html:74
@@ -1030,6 +1103,7 @@ msgstr "Notities"
 #: manufacturing/templates/qa_ncr_list.html:131
 #: manufacturing/templates/req_detail.html:166
 #: manufacturing/templates/routing_detail.html:122
+#: manufacturing/templates/scenario_detail.html:87
 #: manufacturing/templates/skill_requirements.html:102
 #: manufacturing/templates/technician_route_detail.html:134
 #: manufacturing/templates/webhook_edit.html:54
@@ -1087,6 +1161,7 @@ msgid "Output Quantity (for period)"
 msgstr "Outputhoeveelheid (voor de periode)"
 
 #: manufacturing/templates/abc_product_output.html:62
+#: manufacturing/templates/sf_entry.html:60
 msgid "Units Produced"
 msgstr "Geproduceerde Eenheden"
 
@@ -1212,6 +1287,7 @@ msgstr "Grootboek"
 
 #: manufacturing/templates/acct_dashboard.html:10
 #: manufacturing/templates/acct_dashboard.html:31
+#: manufacturing/templates/budget_dashboard.html:6
 #: manufacturing/templates/finance_audit_detail.html:7
 #: manufacturing/templates/finance_audit_list.html:7
 #: manufacturing/templates/finance_bank_rec_detail.html:7
@@ -1300,6 +1376,7 @@ msgid "Journal Entries"
 msgstr "Journaalposten"
 
 #: manufacturing/templates/acct_dashboard.html:28
+#: manufacturing/templates/company_detail.html:51
 #: manufacturing/templates/finance_dashboard.html:56
 #: manufacturing/templates/gl_accounts.html:8
 #: manufacturing/templates/gl_balance_sheet.html:7
@@ -1428,6 +1505,7 @@ msgstr "Recente Journaalposten"
 #: manufacturing/templates/batch_record_detail.html:61
 #: manufacturing/templates/consignment_detail.html:83
 #: manufacturing/templates/consignment_detail.html:106
+#: manufacturing/templates/contacts_detail.html:187
 #: manufacturing/templates/costing_product_detail.html:158
 #: manufacturing/templates/credit_account_detail.html:133
 #: manufacturing/templates/credit_account_detail.html:172
@@ -1436,6 +1514,7 @@ msgstr "Recente Journaalposten"
 #: manufacturing/templates/credit_dashboard_kpis.html:85
 #: manufacturing/templates/cs_dashboard_kpis.html:36
 #: manufacturing/templates/cs_surveys_detail.html:127
+#: manufacturing/templates/document_detail.html:163
 #: manufacturing/templates/ecommerce_sync_log_list.html:18
 #: manufacturing/templates/edi_transaction_log_list.html:18
 #: manufacturing/templates/ess_reviews.html:34
@@ -1444,6 +1523,7 @@ msgstr "Recente Journaalposten"
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:56
 #: manufacturing/templates/gl_journals.html:59
+#: manufacturing/templates/intercompany_list.html:58
 #: manufacturing/templates/inventory_detail.html:227
 #: manufacturing/templates/it_asset_detail.html:253
 #: manufacturing/templates/it_dashboard_kpis.html:34
@@ -1453,6 +1533,7 @@ msgstr "Recente Journaalposten"
 #: manufacturing/templates/portal_invoice_detail.html:32
 #: manufacturing/templates/qa_inspection_detail.html:100
 #: manufacturing/templates/qa_inspection_list.html:81
+#: manufacturing/templates/repetitive_schedule_detail.html:88
 #: manufacturing/templates/req_detail.html:126
 #: manufacturing/templates/sales_coaching.html:76
 #: manufacturing/templates/sales_commission_history.html:61
@@ -1519,6 +1600,8 @@ msgstr "Referentie"
 #: manufacturing/templates/gl_journal_detail.html:58
 #: manufacturing/templates/gl_journal_detail.html:124
 #: manufacturing/templates/gl_journals.html:59
+#: manufacturing/templates/intercompany_list.html:61
+#: manufacturing/templates/intercompany_new.html:37
 #: manufacturing/templates/it_incident_detail.html:72
 #: manufacturing/templates/it_incident_detail.html:95
 #: manufacturing/templates/it_incident_list.html:125
@@ -1556,6 +1639,8 @@ msgstr "Referentie"
 #: manufacturing/templates/sales_quotes.html:114
 #: manufacturing/templates/sales_quotes.html:139
 #: manufacturing/templates/scan_receive.html:64
+#: manufacturing/templates/scenario_list.html:33
+#: manufacturing/templates/scenario_new.html:33
 #: manufacturing/templates/skill_list.html:31
 #: manufacturing/templates/skill_new.html:37
 #: manufacturing/templates/so_detail.html:195
@@ -1595,11 +1680,13 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/benefit_plan_detail.html:56
 #: manufacturing/templates/benefits_dashboard.html:73
 #: manufacturing/templates/blanket_po_list.html:36
+#: manufacturing/templates/budget_dashboard.html:89
 #: manufacturing/templates/cc_list.html:33
 #: manufacturing/templates/compliance_checklist_detail.html:48
 #: manufacturing/templates/compliance_checklist_list.html:16
 #: manufacturing/templates/compliance_checklist_list.html:27
 #: manufacturing/templates/consignment_list.html:41
+#: manufacturing/templates/contacts_detail.html:188
 #: manufacturing/templates/control_plan_detail.html:43
 #: manufacturing/templates/control_plan_list.html:26
 #: manufacturing/templates/credit_account_detail.html:62
@@ -1632,6 +1719,7 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/cs_surveys_list.html:127
 #: manufacturing/templates/currency_list.html:74
 #: manufacturing/templates/data_governance_dashboard.html:88
+#: manufacturing/templates/document_list.html:66
 #: manufacturing/templates/ecommerce_connection_list.html:26
 #: manufacturing/templates/ecommerce_sync_log_list.html:22
 #: manufacturing/templates/edi_partner_list.html:26
@@ -1680,6 +1768,7 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/fixed_asset_list.html:113
 #: manufacturing/templates/gl_accounts.html:63
 #: manufacturing/templates/gl_journal_detail.html:60
+#: manufacturing/templates/intercompany_list.html:63
 #: manufacturing/templates/inventory_list.html:72
 #: manufacturing/templates/it_asset_detail.html:75
 #: manufacturing/templates/it_asset_detail.html:138
@@ -1782,6 +1871,7 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/pers_training_detail.html:105
 #: manufacturing/templates/pers_training_list.html:90
 #: manufacturing/templates/pers_training_list.html:146
+#: manufacturing/templates/pl_list.html:27
 #: manufacturing/templates/po_form.html:57
 #: manufacturing/templates/po_form.html:62
 #: manufacturing/templates/po_list.html:42
@@ -1828,6 +1918,8 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/qa_supplier_list.html:85
 #: manufacturing/templates/qa_supplier_list.html:134
 #: manufacturing/templates/recipe_list.html:30
+#: manufacturing/templates/repetitive_schedule_detail.html:43
+#: manufacturing/templates/repetitive_schedule_list.html:29
 #: manufacturing/templates/req_list.html:83
 #: manufacturing/templates/rfq_list.html:32
 #: manufacturing/templates/risk_assessment_list.html:74
@@ -1927,8 +2019,11 @@ msgid "Posted"
 msgstr "Geboekt"
 
 #: manufacturing/templates/acct_dashboard_kpis.html:60
+#: manufacturing/templates/budget_dashboard.html:58
 #: manufacturing/templates/control_plan_detail.html:34
 #: manufacturing/templates/control_plan_list.html:42
+#: manufacturing/templates/document_detail.html:31
+#: manufacturing/templates/document_list.html:80
 #: manufacturing/templates/finance_dashboard_kpis.html:75
 #: manufacturing/templates/legal_dashboard.html:67
 #: manufacturing/templates/marketing_dashboard_kpis.html:41
@@ -2085,6 +2180,8 @@ msgstr "Leverancier"
 #: manufacturing/templates/ap_invoice_detail.html:95
 #: manufacturing/templates/ap_list.html:103
 #: manufacturing/templates/blanket_po_new.html:23
+#: manufacturing/templates/contacts_detail.html:160
+#: manufacturing/templates/contacts_detail.html:172
 #: manufacturing/templates/ecommerce_connection_new.html:39
 #: manufacturing/templates/ecommerce_connection_new.html:49
 #: manufacturing/templates/inventory_detail.html:165
@@ -2138,6 +2235,8 @@ msgstr "Vervaldatum *"
 #: manufacturing/templates/ar_invoice_detail.html:154
 #: manufacturing/templates/ar_invoice_payments_kpis.html:6
 #: manufacturing/templates/ar_list.html:65
+#: manufacturing/templates/intercompany_list.html:62
+#: manufacturing/templates/intercompany_new.html:41
 #: manufacturing/templates/mkt_budget_list.html:83
 #: manufacturing/templates/payroll_deductions.html:121
 #: manufacturing/templates/portal_invoice_detail.html:32
@@ -2150,6 +2249,10 @@ msgstr "Bedrag"
 
 #: manufacturing/templates/ap_invoice_detail.html:127
 #: manufacturing/templates/ar_invoice_detail.html:127
+#: manufacturing/templates/company_list.html:25
+#: manufacturing/templates/pl_detail.html:46
+#: manufacturing/templates/pl_list.html:24
+#: manufacturing/templates/pl_new.html:33
 msgid "Currency"
 msgstr "Valuta"
 
@@ -2161,6 +2264,7 @@ msgstr "Wisselkoers"
 #: manufacturing/templates/ap_invoice_detail.html:145
 #: manufacturing/templates/approval_rule_edit.html:79
 #: manufacturing/templates/ar_invoice_detail.html:145
+#: manufacturing/templates/contacts_detail.html:141
 #: manufacturing/templates/credit_account_detail.html:125
 #: manufacturing/templates/credit_collections_detail.html:133
 #: manufacturing/templates/cs_detail.html:166
@@ -2438,6 +2542,7 @@ msgstr "Vervaldatum Vanaf:"
 
 #: manufacturing/templates/ap_list.html:52
 #: manufacturing/templates/ar_list.html:52
+#: manufacturing/templates/consolidated_financials.html:48
 #: manufacturing/templates/gl_cash_flow_statement.html:47
 #: manufacturing/templates/gl_income_statement.html:45
 #: manufacturing/templates/gl_journals.html:48
@@ -2461,6 +2566,7 @@ msgstr "Tot:"
 #: manufacturing/templates/eng_projects.html:66
 #: manufacturing/templates/eng_specs_list.html:77
 #: manufacturing/templates/eng_tasks_list.html:81
+#: manufacturing/templates/esg_dashboard.html:71
 #: manufacturing/templates/exit_interview_list.html:51
 #: manufacturing/templates/finance_audit_list.html:76
 #: manufacturing/templates/finance_bank_rec_list.html:60
@@ -2524,6 +2630,7 @@ msgstr "Filteren"
 #: manufacturing/templates/ap_list.html:56
 #: manufacturing/templates/ar_list.html:56
 #: manufacturing/templates/audit_log.html:22
+#: manufacturing/templates/contacts_list.html:25
 #: manufacturing/templates/credit_account_list.html:69
 #: manufacturing/templates/credit_application_list.html:68
 #: manufacturing/templates/credit_collections_list.html:69
@@ -2778,13 +2885,16 @@ msgstr "bijv. CNC-01"
 #: manufacturing/templates/apm_criticality.html:78
 #: manufacturing/templates/bom_detail.html:96
 #: manufacturing/templates/bom_detail.html:189
+#: manufacturing/templates/contacts_detail.html:165
 #: manufacturing/templates/employee_employment_dates.html:49
 #: manufacturing/templates/employee_gap_detail.html:99
+#: manufacturing/templates/esg_dashboard.html:183
 #: manufacturing/templates/gl_accounts.html:113
 #: manufacturing/templates/payroll_pay_rates.html:127
 #: manufacturing/templates/people_form.html:122
 #: manufacturing/templates/pers_depts.html:67
 #: manufacturing/templates/pers_depts.html:117
+#: manufacturing/templates/pl_detail.html:105
 #: manufacturing/templates/po_detail.html:191
 #: manufacturing/templates/po_form.html:80
 #: manufacturing/templates/sales_commission_plans.html:126
@@ -2865,6 +2975,7 @@ msgstr "Goedkeuringsregels"
 #: manufacturing/templates/approval_rule_list.html:60
 #: manufacturing/templates/benefit_plan_detail.html:25
 #: manufacturing/templates/benefits_dashboard.html:85
+#: manufacturing/templates/budget_dashboard.html:54
 #: manufacturing/templates/control_plan_detail.html:30
 #: manufacturing/templates/control_plan_list.html:38
 #: manufacturing/templates/data_governance_dashboard.html:97
@@ -2886,11 +2997,16 @@ msgstr "Goedkeuringsregels"
 #: manufacturing/templates/payroll_deductions.html:66
 #: manufacturing/templates/payroll_deductions.html:121
 #: manufacturing/templates/payroll_deductions.html:189
+#: manufacturing/templates/pl_detail.html:25
+#: manufacturing/templates/pl_detail.html:54
+#: manufacturing/templates/pl_list.html:40
 #: manufacturing/templates/promo_detail.html:25
 #: manufacturing/templates/promo_detail.html:44
 #: manufacturing/templates/promo_list.html:62
 #: manufacturing/templates/recipe_detail.html:25
 #: manufacturing/templates/recipe_list.html:40
+#: manufacturing/templates/repetitive_schedule_detail.html:29
+#: manufacturing/templates/repetitive_schedule_list.html:39
 #: manufacturing/templates/retention_policy_edit.html:27
 #: manufacturing/templates/sales_commission_plans.html:63
 #: manufacturing/templates/sales_commission_plans.html:76
@@ -2922,8 +3038,12 @@ msgstr "Actief"
 #: manufacturing/templates/finance_bank_rec_list.html:85
 #: manufacturing/templates/gl_accounts.html:75
 #: manufacturing/templates/payroll_deductions.html:66
+#: manufacturing/templates/pl_detail.html:27
+#: manufacturing/templates/pl_list.html:42
 #: manufacturing/templates/promo_detail.html:27
 #: manufacturing/templates/promo_list.html:64
+#: manufacturing/templates/repetitive_schedule_detail.html:31
+#: manufacturing/templates/repetitive_schedule_list.html:41
 #: manufacturing/templates/retention_policy_edit.html:27
 #: manufacturing/templates/sales_commission_plans.html:76
 #: manufacturing/templates/sampling_plan_detail.html:74
@@ -2951,6 +3071,7 @@ msgstr "Entiteitstype *"
 #: manufacturing/templates/ats_requisition_list.html:33
 #: manufacturing/templates/ats_requisition_new.html:33
 #: manufacturing/templates/data_governance_dashboard.html:49
+#: manufacturing/templates/document_detail.html:82
 #: manufacturing/templates/finance_audit_detail.html:74
 #: manufacturing/templates/finance_audit_detail.html:109
 #: manufacturing/templates/finance_audit_detail.html:126
@@ -3027,6 +3148,7 @@ msgstr "Escaleren Na (uur) *"
 #: manufacturing/templates/it_software_list.html:130
 #: manufacturing/templates/mkt_ad_list.html:181
 #: manufacturing/templates/mkt_research_list.html:166
+#: manufacturing/templates/pl_new.html:50
 #: manufacturing/templates/promo_new.html:81
 #: manufacturing/templates/sales_commissions.html:238
 #: manufacturing/templates/sampling_plan_new.html:70
@@ -3119,6 +3241,7 @@ msgid "Entity Type"
 msgstr "Entiteitstype"
 
 #: manufacturing/templates/approval_rule_list.html:41
+#: manufacturing/templates/fmea_risk_register.html:25
 #: manufacturing/templates/risk_kri_list.html:72
 #: manufacturing/templates/risk_kri_list.html:109
 msgid "Threshold"
@@ -3303,6 +3426,167 @@ msgstr "Klant:"
 msgid "Received"
 msgstr "Ontvangen"
 
+#: manufacturing/templates/atp_inquiry.html:3
+#: manufacturing/templates/ctp_inquiry.html:7
+#: manufacturing/templates/so_list.html:11
+msgid "ATP Inquiry"
+msgstr "ATP-aanvraag"
+
+#: manufacturing/templates/atp_inquiry.html:6
+#: manufacturing/templates/blanket_po_detail.html:7
+#: manufacturing/templates/blanket_po_list.html:7
+#: manufacturing/templates/blanket_po_new.html:7
+#: manufacturing/templates/blanket_po_release_new.html:7
+#: manufacturing/templates/bom_list.html:6
+#: manufacturing/templates/company_detail.html:6
+#: manufacturing/templates/company_new.html:6
+#: manufacturing/templates/ctp_inquiry.html:6
+#: manufacturing/templates/dept_menu.html:7
+#: manufacturing/templates/ecommerce_connection_detail.html:6
+#: manufacturing/templates/ecommerce_connection_list.html:6
+#: manufacturing/templates/ecommerce_connection_new.html:6
+#: manufacturing/templates/ecommerce_sync_log_list.html:6
+#: manufacturing/templates/edi_850_upload.html:6
+#: manufacturing/templates/edi_partner_detail.html:6
+#: manufacturing/templates/edi_partner_list.html:6
+#: manufacturing/templates/edi_partner_new.html:6
+#: manufacturing/templates/edi_transaction_log_list.html:6
+#: manufacturing/templates/intercompany_new.html:6
+#: manufacturing/templates/inventory_detail.html:6
+#: manufacturing/templates/people_detail.html:7
+#: manufacturing/templates/people_form.html:7
+#: manufacturing/templates/people_list.html:7
+#: manufacturing/templates/po_detail.html:7
+#: manufacturing/templates/po_form.html:7
+#: manufacturing/templates/po_list.html:7
+#: manufacturing/templates/report_builder_detail.html:6
+#: manufacturing/templates/report_builder_form.html:6
+#: manufacturing/templates/report_builder_list.html:6
+#: manufacturing/templates/reports_dashboard.html:7
+#: manufacturing/templates/sensor_reading_new.html:6
+#: manufacturing/templates/sensor_threshold_set.html:6
+#: manufacturing/templates/so_detail.html:7
+#: manufacturing/templates/so_form.html:7
+#: manufacturing/templates/so_list.html:7
+#: manufacturing/templates/tc_device_form.html:6
+#: manufacturing/templates/tc_device_list.html:6
+#: manufacturing/templates/time_clock_attendance.html:6
+#: manufacturing/templates/time_clock_hours.html:6
+#: manufacturing/templates/time_clock_status.html:6
+#: manufacturing/templates/time_off_detail.html:7
+#: manufacturing/templates/time_off_form.html:7
+#: manufacturing/templates/time_off_list.html:7
+#: manufacturing/templates/wo_detail.html:7
+#: manufacturing/templates/wo_form.html:7
+#: manufacturing/templates/wo_list.html:7
+msgid "Back"
+msgstr "Terug"
+
+#: manufacturing/templates/atp_inquiry.html:27
+msgid "Available-to-Promise Inquiry"
+msgstr "Aanvraag Beschikbaar om te Beloven (ATP)"
+
+#: manufacturing/templates/atp_inquiry.html:37
+#: manufacturing/templates/ctp_inquiry.html:46
+#: manufacturing/templates/ecommerce_connection_new.html:22
+#: manufacturing/templates/edi_850_upload.html:36
+#: manufacturing/templates/edi_partner_new.html:22
+msgid "(select)"
+msgstr "(selecteren)"
+
+#: manufacturing/templates/atp_inquiry.html:44
+#: manufacturing/templates/batch_record_list.html:57
+#: manufacturing/templates/blanket_po_detail.html:97
+#: manufacturing/templates/blanket_po_release_new.html:29
+#: manufacturing/templates/bom_detail.html:231
+#: manufacturing/templates/consignment_detail.html:83
+#: manufacturing/templates/consignment_detail.html:105
+#: manufacturing/templates/costing_product_detail.html:105
+#: manufacturing/templates/costing_product_detail.html:117
+#: manufacturing/templates/costing_product_detail.html:158
+#: manufacturing/templates/cto_options.html:34
+#: manufacturing/templates/ctp_inquiry.html:53
+#: manufacturing/templates/demand_forecast.html:76
+#: manufacturing/templates/inventory_detail.html:127
+#: manufacturing/templates/inventory_detail.html:229
+#: manufacturing/templates/lot_list.html:66
+#: manufacturing/templates/maint_parts_list.html:78
+#: manufacturing/templates/mrp_plan.html:81
+#: manufacturing/templates/mrp_release.html:52
+#: manufacturing/templates/mrp_release.html:85
+#: manufacturing/templates/po_detail.html:166
+#: manufacturing/templates/po_detail.html:274
+#: manufacturing/templates/portal_order_detail.html:19
+#: manufacturing/templates/portal_shipment_detail.html:36
+#: manufacturing/templates/prod_daily_report.html:84
+#: manufacturing/templates/prod_schedule.html:69
+#: manufacturing/templates/prod_shipping_detail.html:153
+#: manufacturing/templates/prod_shipping_detail.html:180
+#: manufacturing/templates/req_detail.html:83
+#: manufacturing/templates/req_detail.html:109
+#: manufacturing/templates/rfq_detail.html:100
+#: manufacturing/templates/rfq_detail.html:123
+#: manufacturing/templates/sales_order_detail.html:122
+#: manufacturing/templates/sales_order_detail.html:178
+#: manufacturing/templates/so_detail.html:197
+#: manufacturing/templates/so_detail.html:259
+#: manufacturing/templates/supplier_portal_rfq_detail.html:20
+#: manufacturing/templates/wms_bin_detail.html:26
+#: manufacturing/templates/wms_pack_station.html:54
+#: manufacturing/templates/wms_rfid_tag_list.html:41
+#: manufacturing/templates/wms_rfid_tag_list.html:59
+#: manufacturing/templates/wms_transfer_detail.html:36
+#: manufacturing/templates/wms_transfer_detail.html:94
+#: manufacturing/templates/wo_list.html:35
+msgid "Qty"
+msgstr "Aantal"
+
+#: manufacturing/templates/atp_inquiry.html:48
+#: manufacturing/templates/ctp_inquiry.html:57
+#: manufacturing/templates/maint_wo_detail.html:160
+#: manufacturing/templates/maint_wo_list.html:138
+msgid "Requested Date"
+msgstr "Aangevraagde datum"
+
+#: manufacturing/templates/atp_inquiry.html:51
+msgid "Check ATP"
+msgstr "ATP controleren"
+
+#: manufacturing/templates/atp_inquiry.html:59
+msgid "Yes — sufficient"
+msgstr "Ja — voldoende"
+
+#: manufacturing/templates/atp_inquiry.html:59
+msgid "No — insufficient"
+msgstr "Nee — onvoldoende"
+
+#: manufacturing/templates/atp_inquiry.html:62
+msgid "On hand:"
+msgstr "Op voorraad:"
+
+#: manufacturing/templates/atp_inquiry.html:63
+msgid "Committed (confirmed SOs):"
+msgstr "Toegewezen (bevestigde SO's):"
+
+#: manufacturing/templates/atp_inquiry.html:64
+#, python-format
+msgid "Open PO receipts by %(rd)s:"
+msgstr "Openstaande PO-ontvangsten tot %(rd)s:"
+
+#: manufacturing/templates/atp_inquiry.html:65
+msgid "ATP qty:"
+msgstr "ATP-hoeveelheid:"
+
+#: manufacturing/templates/atp_inquiry.html:67
+msgid "Earliest available:"
+msgstr "Eerst beschikbaar:"
+
+#: manufacturing/templates/atp_inquiry.html:69
+#: manufacturing/templates/ctp_inquiry.html:77
+#: manufacturing/templates/ctp_inquiry.html:89
+msgid "Not available within 90 days"
+msgstr "Niet beschikbaar binnen 90 dagen"
+
 #: manufacturing/templates/ats_application_detail.html:6
 #: manufacturing/templates/ats_candidate_detail.html:37
 #: manufacturing/templates/ats_dashboard.html:62
@@ -3357,6 +3641,7 @@ msgstr "Fase"
 
 #: manufacturing/templates/ats_application_detail.html:46
 #: manufacturing/templates/credit_account_detail.html:133
+#: manufacturing/templates/document_detail.html:163
 msgid "Changed By"
 msgstr "Gewijzigd Door"
 
@@ -3455,6 +3740,8 @@ msgstr "Openstaande aanvraag *"
 
 #: manufacturing/templates/ats_candidate_detail.html:72
 #: manufacturing/templates/ats_requisition_detail.html:95
+#: manufacturing/templates/capacity_planning.html:157
+#: manufacturing/templates/fmea_risk_register.html:28
 #: manufacturing/templates/tc_ot_report.html:51
 msgid "Apply"
 msgstr "Solliciteren"
@@ -3483,6 +3770,9 @@ msgstr "Zoeken op naam of e-mail..."
 
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/benefits_dashboard.html:73
+#: manufacturing/templates/company_detail.html:95
+#: manufacturing/templates/company_list.html:22
+#: manufacturing/templates/company_new.html:20
 #: manufacturing/templates/compliance_checklist_list.html:27
 #: manufacturing/templates/compliance_template_list.html:27
 #: manufacturing/templates/control_plan_list.html:23
@@ -3510,10 +3800,14 @@ msgstr "Zoeken op naam of e-mail..."
 #: manufacturing/templates/payroll_deductions.html:83
 #: manufacturing/templates/people_list.html:47
 #: manufacturing/templates/personnel_dashboard.html:122
+#: manufacturing/templates/pl_detail.html:42
+#: manufacturing/templates/pl_list.html:23
 #: manufacturing/templates/promo_detail.html:40
 #: manufacturing/templates/promo_list.html:29
 #: manufacturing/templates/recipe_list.html:30
 #: manufacturing/templates/report_builder_list.html:20
+#: manufacturing/templates/scenario_list.html:32
+#: manufacturing/templates/scenario_new.html:29
 #: manufacturing/templates/skill_list.html:29
 #: manufacturing/templates/tc_device_list.html:40
 #: manufacturing/templates/user_roles.html:20
@@ -3526,6 +3820,10 @@ msgstr "Naam"
 
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/ats_candidate_new.html:37
+#: manufacturing/templates/company_detail.html:95
+#: manufacturing/templates/contacts_detail.html:108
+#: manufacturing/templates/contacts_list.html:38
+#: manufacturing/templates/contacts_new.html:67
 #: manufacturing/templates/credit_account_detail.html:78
 #: manufacturing/templates/data_governance_dashboard.html:49
 #: manufacturing/templates/home.html:18
@@ -3547,6 +3845,9 @@ msgstr "E-mail"
 
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/ats_candidate_new.html:41
+#: manufacturing/templates/contacts_detail.html:102
+#: manufacturing/templates/contacts_list.html:36
+#: manufacturing/templates/contacts_new.html:61
 #: manufacturing/templates/credit_account_detail.html:82
 #: manufacturing/templates/ess_profile.html:60
 #: manufacturing/templates/ess_profile.html:70
@@ -3558,6 +3859,7 @@ msgstr "Telefoon"
 
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/ats_candidate_new.html:45
+#: manufacturing/templates/cto_configure.html:59
 #: manufacturing/templates/mkt_lead_detail.html:60
 #: manufacturing/templates/mkt_lead_detail.html:107
 #: manufacturing/templates/mkt_lead_list.html:90
@@ -3665,6 +3967,8 @@ msgstr "Nog geen aanwervingen."
 #: manufacturing/templates/cs_surveys_detail.html:85
 #: manufacturing/templates/cs_surveys_list.html:81
 #: manufacturing/templates/cs_surveys_list.html:115
+#: manufacturing/templates/document_list.html:63
+#: manufacturing/templates/document_new.html:29
 #: manufacturing/templates/eng_dashboard_kpis.html:15
 #: manufacturing/templates/eng_dashboard_kpis.html:32
 #: manufacturing/templates/eng_ecr_detail.html:88
@@ -3724,6 +4028,7 @@ msgid "No open requisitions."
 msgstr "Geen openstaande aanvragen."
 
 #: manufacturing/templates/ats_requisition_detail.html:24
+#: manufacturing/templates/repetitive_schedule_detail.html:27
 #: manufacturing/templates/sales_territory_performance.html:48
 msgid "Unassigned"
 msgstr "Niet toegewezen"
@@ -3763,6 +4068,7 @@ msgstr "Open"
 #: manufacturing/templates/it_repairs_detail.html:121
 #: manufacturing/templates/it_task_detail.html:42
 #: manufacturing/templates/lot_detail.html:84
+#: manufacturing/templates/repetitive_schedule_detail.html:52
 #: manufacturing/templates/technician_route_detail.html:57
 msgid "Update Status"
 msgstr "Status bijwerken"
@@ -3836,6 +4142,7 @@ msgstr "Zoeken op functie..."
 #: manufacturing/templates/prod_shipping_list.html:64
 #: manufacturing/templates/purch_contracts_list.html:65
 #: manufacturing/templates/recipe_list.html:20
+#: manufacturing/templates/repetitive_schedule_list.html:19
 #: manufacturing/templates/req_list.html:67
 #: manufacturing/templates/risk_assessment_list.html:59
 #: manufacturing/templates/risk_audit_list.html:59
@@ -4123,6 +4430,7 @@ msgid "MRP"
 msgstr "MRP"
 
 #: manufacturing/templates/base.html:508
+#: manufacturing/templates/capacity_planning.html:7
 #: manufacturing/templates/routing_detail.html:7
 #: manufacturing/templates/workcenter_calendar.html:6
 #: manufacturing/templates/workcenter_list.html:3
@@ -4152,6 +4460,7 @@ msgstr "Inkoop"
 #: manufacturing/templates/supplier_portal_pos.html:3
 #: manufacturing/templates/supplier_portal_pos.html:4
 #: manufacturing/templates/supplier_scorecard_list.html:8
+#: manufacturing/views/__init__.py:4555
 msgid "Purchase Orders"
 msgstr "Inkooporders"
 
@@ -4166,13 +4475,13 @@ msgstr "Inkooporders"
 msgid "Suppliers"
 msgstr "Leveranciers"
 
-#: manufacturing/templates/base.html:521
+#: manufacturing/templates/base.html:521 manufacturing/templates/pl_list.html:7
 #: manufacturing/templates/promo_list.html:7
 #: manufacturing/templates/sales_dashboard.html:59
 #: manufacturing/templates/sales_orders.html:3
 #: manufacturing/templates/sales_orders.html:44
 #: manufacturing/templates/so_list.html:4
-#: manufacturing/templates/so_list.html:22
+#: manufacturing/templates/so_list.html:22 manufacturing/views/__init__.py:4437
 msgid "Sales Orders"
 msgstr "Verkooporders"
 
@@ -4437,12 +4746,15 @@ msgstr "Verbruikte Materialen"
 #: manufacturing/templates/batch_record_detail.html:43
 #: manufacturing/templates/bom_detail.html:118
 #: manufacturing/templates/bom_explode.html:55
+#: manufacturing/templates/cto_configure.html:59
+#: manufacturing/templates/cto_options.html:34
 #: manufacturing/templates/recipe_detail.html:44
 #: manufacturing/templates/recipe_detail.html:119
 msgid "Component"
 msgstr "Component"
 
 #: manufacturing/templates/batch_record_detail.html:43
+#: manufacturing/templates/cto_options.html:68
 #: manufacturing/templates/wo_detail.html:157
 #: manufacturing/templates/wo_detail.html:193
 msgid "Qty Required"
@@ -4493,8 +4805,10 @@ msgid "No quality inspections tied to this work order."
 msgstr "Geen kwaliteitsinspecties gekoppeld aan deze werkorder."
 
 #: manufacturing/templates/batch_record_list.html:6
+#: manufacturing/templates/cto_product_list.html:7
 #: manufacturing/templates/prod_dashboard.html:55
 #: manufacturing/templates/recipe_list.html:7
+#: manufacturing/templates/repetitive_schedule_list.html:6
 msgid "Production Dashboard"
 msgstr "Productiedashboard"
 
@@ -4542,49 +4856,6 @@ msgstr "Recordnr."
 #: manufacturing/templates/wo_cost_detail.html:6
 msgid "Work Order"
 msgstr "Werkorder"
-
-#: manufacturing/templates/batch_record_list.html:57
-#: manufacturing/templates/blanket_po_detail.html:97
-#: manufacturing/templates/blanket_po_release_new.html:29
-#: manufacturing/templates/bom_detail.html:231
-#: manufacturing/templates/consignment_detail.html:83
-#: manufacturing/templates/consignment_detail.html:105
-#: manufacturing/templates/costing_product_detail.html:105
-#: manufacturing/templates/costing_product_detail.html:117
-#: manufacturing/templates/costing_product_detail.html:158
-#: manufacturing/templates/inventory_detail.html:127
-#: manufacturing/templates/inventory_detail.html:229
-#: manufacturing/templates/lot_list.html:66
-#: manufacturing/templates/maint_parts_list.html:78
-#: manufacturing/templates/mrp_plan.html:81
-#: manufacturing/templates/mrp_release.html:52
-#: manufacturing/templates/mrp_release.html:85
-#: manufacturing/templates/po_detail.html:166
-#: manufacturing/templates/po_detail.html:274
-#: manufacturing/templates/portal_order_detail.html:19
-#: manufacturing/templates/portal_shipment_detail.html:36
-#: manufacturing/templates/prod_daily_report.html:84
-#: manufacturing/templates/prod_schedule.html:69
-#: manufacturing/templates/prod_shipping_detail.html:153
-#: manufacturing/templates/prod_shipping_detail.html:180
-#: manufacturing/templates/req_detail.html:83
-#: manufacturing/templates/req_detail.html:109
-#: manufacturing/templates/rfq_detail.html:100
-#: manufacturing/templates/rfq_detail.html:123
-#: manufacturing/templates/sales_order_detail.html:122
-#: manufacturing/templates/sales_order_detail.html:178
-#: manufacturing/templates/so_detail.html:197
-#: manufacturing/templates/so_detail.html:259
-#: manufacturing/templates/supplier_portal_rfq_detail.html:20
-#: manufacturing/templates/wms_bin_detail.html:26
-#: manufacturing/templates/wms_pack_station.html:54
-#: manufacturing/templates/wms_rfid_tag_list.html:41
-#: manufacturing/templates/wms_rfid_tag_list.html:59
-#: manufacturing/templates/wms_transfer_detail.html:36
-#: manufacturing/templates/wms_transfer_detail.html:94
-#: manufacturing/templates/wo_list.html:35
-msgid "Qty"
-msgstr "Aantal"
 
 #: manufacturing/templates/batch_record_list.html:57
 #: manufacturing/templates/costing_product_detail.html:159
@@ -4785,6 +5056,7 @@ msgstr "Plannen"
 #: manufacturing/templates/bom_detail.html:119
 #: manufacturing/templates/bom_explode.html:56
 #: manufacturing/templates/bom_list.html:31
+#: manufacturing/templates/company_detail.html:59
 #: manufacturing/templates/credit_account_detail.html:172
 #: manufacturing/templates/credit_collections_detail.html:58
 #: manufacturing/templates/credit_collections_detail.html:97
@@ -4794,6 +5066,9 @@ msgstr "Plannen"
 #: manufacturing/templates/cs_surveys_detail.html:89
 #: manufacturing/templates/cs_surveys_list.html:82
 #: manufacturing/templates/cs_surveys_list.html:119
+#: manufacturing/templates/document_detail.html:188
+#: manufacturing/templates/document_list.html:64
+#: manufacturing/templates/document_new.html:33
 #: manufacturing/templates/employee_benefits.html:27
 #: manufacturing/templates/ess_reviews.html:34
 #: manufacturing/templates/ess_time_off.html:54
@@ -4885,50 +5160,6 @@ msgstr "Werkgever $/loon"
 msgid "No benefit plans yet."
 msgstr "Nog geen voordelenplannen."
 
-#: manufacturing/templates/blanket_po_detail.html:7
-#: manufacturing/templates/blanket_po_list.html:7
-#: manufacturing/templates/blanket_po_new.html:7
-#: manufacturing/templates/blanket_po_release_new.html:7
-#: manufacturing/templates/bom_list.html:6
-#: manufacturing/templates/ecommerce_connection_detail.html:6
-#: manufacturing/templates/ecommerce_connection_list.html:6
-#: manufacturing/templates/ecommerce_connection_new.html:6
-#: manufacturing/templates/ecommerce_sync_log_list.html:6
-#: manufacturing/templates/edi_850_upload.html:6
-#: manufacturing/templates/edi_partner_detail.html:6
-#: manufacturing/templates/edi_partner_list.html:6
-#: manufacturing/templates/edi_partner_new.html:6
-#: manufacturing/templates/edi_transaction_log_list.html:6
-#: manufacturing/templates/inventory_detail.html:6
-#: manufacturing/templates/people_detail.html:7
-#: manufacturing/templates/people_form.html:7
-#: manufacturing/templates/people_list.html:7
-#: manufacturing/templates/po_detail.html:7
-#: manufacturing/templates/po_form.html:7
-#: manufacturing/templates/po_list.html:7
-#: manufacturing/templates/report_builder_detail.html:6
-#: manufacturing/templates/report_builder_form.html:6
-#: manufacturing/templates/report_builder_list.html:6
-#: manufacturing/templates/reports_dashboard.html:7
-#: manufacturing/templates/sensor_reading_new.html:6
-#: manufacturing/templates/sensor_threshold_set.html:6
-#: manufacturing/templates/so_detail.html:7
-#: manufacturing/templates/so_form.html:7
-#: manufacturing/templates/so_list.html:7
-#: manufacturing/templates/tc_device_form.html:6
-#: manufacturing/templates/tc_device_list.html:6
-#: manufacturing/templates/time_clock_attendance.html:6
-#: manufacturing/templates/time_clock_hours.html:6
-#: manufacturing/templates/time_clock_status.html:6
-#: manufacturing/templates/time_off_detail.html:7
-#: manufacturing/templates/time_off_form.html:7
-#: manufacturing/templates/time_off_list.html:7
-#: manufacturing/templates/wo_detail.html:7
-#: manufacturing/templates/wo_form.html:7
-#: manufacturing/templates/wo_list.html:7
-msgid "Back"
-msgstr "Terug"
-
 #: manufacturing/templates/blanket_po_detail.html:62
 #: manufacturing/templates/consignment_detail.html:53
 #: manufacturing/templates/po_detail.html:104
@@ -4967,6 +5198,7 @@ msgstr ""
 "                    (Vrijgegeven: %(rel)s, Resterend: %(rem)s)"
 
 #: manufacturing/templates/blanket_po_detail.html:74
+#: manufacturing/templates/company_detail.html:46
 #: manufacturing/templates/consignment_detail.html:61
 #: manufacturing/templates/ess_review_detail.html:41
 #: manufacturing/templates/ess_training_detail.html:41
@@ -5044,6 +5276,7 @@ msgstr "Nieuwe raam-PO"
 #: manufacturing/templates/compliance_checklist_list.html:18
 #: manufacturing/templates/consignment_list.html:23
 #: manufacturing/templates/cs_plans.html:64
+#: manufacturing/templates/document_list.html:38
 #: manufacturing/templates/eng_ecrs.html:49
 #: manufacturing/templates/eng_projects.html:52
 #: manufacturing/templates/eng_projects.html:59
@@ -5115,6 +5348,7 @@ msgstr "Geldigheid"
 
 #: manufacturing/templates/blanket_po_list.html:33
 #: manufacturing/templates/consignment_detail.html:106
+#: manufacturing/templates/contacts_detail.html:189
 #: manufacturing/templates/cost_detail.html:111
 #: manufacturing/templates/cs_reports_kpis.html:41
 #: manufacturing/templates/finance_budget_detail.html:135
@@ -5263,6 +5497,7 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/blanket_po_release_new.html:49
 #: manufacturing/templates/bom_detail.html:191
 #: manufacturing/templates/change_password.html:42
+#: manufacturing/templates/company_new.html:45
 #: manufacturing/templates/consignment_new.html:56
 #: manufacturing/templates/consignment_receive.html:40
 #: manufacturing/templates/consignment_use.html:42
@@ -5272,6 +5507,7 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/forgot_password.html:37
 #: manufacturing/templates/forgot_password_reset.html:40
 #: manufacturing/templates/gl_accounts.html:115
+#: manufacturing/templates/intercompany_new.html:50
 #: manufacturing/templates/it_incident_detail.html:82
 #: manufacturing/templates/it_task_detail.html:98
 #: manufacturing/templates/lot_new.html:75
@@ -5517,6 +5753,7 @@ msgid "Add Component"
 msgstr "Component Toevoegen"
 
 #: manufacturing/templates/bom_detail.html:220
+#: manufacturing/templates/cto_options.html:60
 #: manufacturing/templates/recipe_detail.html:66
 msgid "Component *"
 msgstr "Component *"
@@ -5542,6 +5779,11 @@ msgid "optional"
 msgstr "optioneel"
 
 #: manufacturing/templates/bom_detail.html:249
+#: manufacturing/templates/document_detail.html:226
+#: manufacturing/templates/document_detail.html:242
+#: manufacturing/templates/document_detail.html:258
+#: manufacturing/templates/document_detail.html:274
+#: manufacturing/templates/document_detail.html:286
 #: manufacturing/templates/pers_depts.html:82
 #: manufacturing/templates/pers_depts.html:138
 #: manufacturing/templates/po_detail.html:283
@@ -5670,6 +5912,364 @@ msgstr "Geen producten gevonden"
 msgid " with type \"%(t)s\""
 msgstr " met type \"%(t)s\""
 
+#: manufacturing/templates/budget_dashboard.html:3
+#: manufacturing/templates/budget_dashboard.html:33
+msgid "Budget Management Dashboard"
+msgstr "Dashboard Budgetbeheer"
+
+#: manufacturing/templates/budget_dashboard.html:36
+#: manufacturing/templates/budget_dashboard.html:86
+msgid "All Budgets"
+msgstr "Alle Budgetten"
+
+#: manufacturing/templates/budget_dashboard.html:37
+#: manufacturing/templates/finance_budget_list.html:104
+msgid "New Budget"
+msgstr "Nieuw Budget"
+
+#: manufacturing/templates/budget_dashboard.html:38
+#: manufacturing/templates/fin_cash_forecast.html:6
+#: manufacturing/templates/finance_audit_detail.html:6
+#: manufacturing/templates/finance_audit_list.html:6
+#: manufacturing/templates/finance_bank_rec_detail.html:6
+#: manufacturing/templates/finance_bank_rec_list.html:6
+#: manufacturing/templates/finance_budget_detail.html:6
+#: manufacturing/templates/finance_budget_list.html:6
+#: manufacturing/templates/finance_dashboard.html:3
+#: manufacturing/templates/finance_dashboard.html:50
+#: manufacturing/templates/finance_tax_detail.html:6
+#: manufacturing/templates/finance_tax_list.html:6
+msgid "Finance Dashboard"
+msgstr "Financieel Dashboard"
+
+#: manufacturing/templates/budget_dashboard.html:46
+#: manufacturing/templates/budget_dashboard.html:89
+msgid "Total Budgeted"
+msgstr "Totaal Begroot"
+
+#: manufacturing/templates/budget_dashboard.html:50
+msgid "Total Budgets"
+msgstr "Totaal Budgetten"
+
+#: manufacturing/templates/budget_dashboard.html:65
+msgid "Budget Status Breakdown"
+msgstr "Overzicht Budgetstatus"
+
+#: manufacturing/templates/budget_dashboard.html:69
+msgid "Active Budgets by Total ($)"
+msgstr "Actieve Budgetten naar Totaal ($)"
+
+#: manufacturing/templates/budget_dashboard.html:76
+msgid "Spend by Category"
+msgstr "Uitgaven per Categorie"
+
+#: manufacturing/templates/budget_dashboard.html:80
+msgid "Total Budgeted by Fiscal Year"
+msgstr "Totaal Begroot per Boekjaar"
+
+#: manufacturing/templates/budget_dashboard.html:89
+#: manufacturing/templates/finance_budget_list.html:79
+msgid "Budget Name"
+msgstr "Budgetnaam"
+
+#: manufacturing/templates/budget_dashboard.html:89
+#: manufacturing/templates/finance_budget_detail.html:69
+#: manufacturing/templates/finance_budget_detail.html:91
+#: manufacturing/templates/finance_budget_list.html:69
+#: manufacturing/templates/finance_budget_list.html:80
+#: manufacturing/templates/sales_forecast_detail.html:148
+#: manufacturing/templates/sales_forecast_list.html:140
+#: manufacturing/templates/sales_forecast_list.html:212
+msgid "Fiscal Year"
+msgstr "Boekjaar"
+
+#: manufacturing/templates/budget_dashboard.html:100
+#: manufacturing/templates/finance_budget_list.html:96
+msgid "No budgets found."
+msgstr "Geen budgetten gevonden."
+
+#: manufacturing/templates/capacity_planning.html:3
+#: manufacturing/templates/capacity_planning.html:42
+#: manufacturing/templates/prod_schedule_gantt.html:9
+#: manufacturing/templates/scenario_list.html:6
+#: manufacturing/templates/workcenter_calendar.html:7
+#: manufacturing/templates/workcenter_list.html:7
+msgid "Capacity Planning"
+msgstr "Capaciteitsplanning"
+
+#: manufacturing/templates/capacity_planning.html:6
+#: manufacturing/templates/prod_schedule_gantt.html:8
+#: manufacturing/templates/workcenter_list.html:6
+msgid "Gantt"
+msgstr "Gantt"
+
+#: manufacturing/templates/capacity_planning.html:8
+#: manufacturing/templates/scenario_list.html:3
+#: manufacturing/templates/scenario_list.html:15
+msgid "What-If Scenarios"
+msgstr "Wat-als-scenario's"
+
+#: manufacturing/templates/capacity_planning.html:43
+msgid ""
+"Booked vs. available hours per work center per day, bottleneck ranking,\n"
+"        and load-leveling suggestions for over-capacity days."
+msgstr ""
+"Geboekte versus beschikbare uren per werkplek per dag, "
+"knelpuntrangschikking\n"
+"en suggesties voor capaciteitsnivellering voor dagen met overcapaciteit."
+
+#: manufacturing/templates/capacity_planning.html:50
+#: manufacturing/templates/esg_dashboard.html:64
+#: manufacturing/templates/intercompany_list.html:59
+#: manufacturing/templates/repetitive_schedule_detail.html:111
+#: manufacturing/templates/scenario_detail.html:101
+#: manufacturing/templates/scenario_detail.html:144
+#: manufacturing/templates/wms_transfer_list.html:33
+msgid "From"
+msgstr "Van"
+
+#: manufacturing/templates/capacity_planning.html:52
+#: manufacturing/templates/esg_dashboard.html:68
+#: manufacturing/templates/intercompany_list.html:60
+#: manufacturing/templates/repetitive_schedule_detail.html:115
+#: manufacturing/templates/scenario_detail.html:101
+#: manufacturing/templates/scenario_detail.html:148
+#: manufacturing/templates/wms_transfer_list.html:33
+msgid "To"
+msgstr "Naar"
+
+#: manufacturing/templates/capacity_planning.html:54
+#: manufacturing/templates/document_list.html:53
+#: manufacturing/templates/inventory_list.html:55
+#: manufacturing/templates/maint_downtime_list.html:71
+#: manufacturing/templates/maint_equipment_list.html:71
+#: manufacturing/templates/maint_inspection_list.html:71
+#: manufacturing/templates/maint_labor_report.html:65
+#: manufacturing/templates/maint_mechanics_list.html:68
+#: manufacturing/templates/maint_oee_report.html:64
+#: manufacturing/templates/maint_parts_list.html:70
+#: manufacturing/templates/maint_schedule_list.html:66
+#: manufacturing/templates/maint_wo_list.html:72
+#: manufacturing/templates/payroll_pay_rates.html:57
+#: manufacturing/templates/prod_labor_report.html:65
+#: manufacturing/templates/qa_capa_list.html:76
+#: manufacturing/templates/qa_inspection_list.html:72
+#: manufacturing/templates/qa_ncr_list.html:78
+#: manufacturing/templates/qa_supplier_list.html:76
+#: manufacturing/templates/sales_reports.html:54
+#: manufacturing/templates/scan_home.html:59
+#: manufacturing/templates/sf_dashboard.html:53
+#: manufacturing/templates/sf_entry.html:40
+#: manufacturing/templates/sf_shift_plan.html:39
+#: manufacturing/templates/wms_bin_list.html:34
+msgid "Go"
+msgstr "Ga"
+
+#: manufacturing/templates/capacity_planning.html:58
+msgid "Bottleneck Ranking"
+msgstr "Knelpuntrangschikking"
+
+#: manufacturing/templates/capacity_planning.html:62
+#: manufacturing/templates/capacity_planning.html:94
+#: manufacturing/templates/capacity_planning.html:127
+#: manufacturing/templates/routing_detail.html:61
+#: manufacturing/templates/routing_detail.html:108
+#: manufacturing/templates/wo_detail.html:227
+msgid "Work Center"
+msgstr "Werkplek"
+
+#: manufacturing/templates/capacity_planning.html:63
+msgid "Utilization"
+msgstr "Bezetting"
+
+#: manufacturing/templates/capacity_planning.html:64
+msgid "Booked hrs"
+msgstr "Geboekte uren"
+
+#: manufacturing/templates/capacity_planning.html:65
+msgid "Available hrs"
+msgstr "Beschikbare uren"
+
+#: manufacturing/templates/capacity_planning.html:66
+msgid "Over-Capacity Days"
+msgstr "Dagen met Overcapaciteit"
+
+#: manufacturing/templates/capacity_planning.html:83
+#: manufacturing/templates/capacity_planning.html:115
+msgid "No active work centers."
+msgstr "Geen actieve werkplekken."
+
+#: manufacturing/templates/capacity_planning.html:90
+msgid "Daily Capacity — Booked / Available Hours"
+msgstr "Dagelijkse Capaciteit — Geboekte / Beschikbare Uren"
+
+#: manufacturing/templates/capacity_planning.html:107
+msgid "off"
+msgstr "vrij"
+
+#: manufacturing/templates/capacity_planning.html:122
+msgid "Load-Leveling Suggestions"
+msgstr "Suggesties voor Capaciteitsnivellering"
+
+#: manufacturing/templates/capacity_planning.html:128
+msgid "Over-Capacity Date"
+msgstr "Datum met Overcapaciteit"
+
+#: manufacturing/templates/capacity_planning.html:129
+msgid "Over By (hrs)"
+msgstr "Overschrijding (uur)"
+
+#: manufacturing/templates/capacity_planning.html:130
+#: manufacturing/templates/routing_detail.html:60
+#: manufacturing/templates/wo_detail.html:226
+msgid "Operation"
+msgstr "Bewerking"
+
+#: manufacturing/templates/capacity_planning.html:132
+msgid "Suggestion"
+msgstr "Suggestie"
+
+#: manufacturing/templates/capacity_planning.html:146
+#, python-format
+msgid "Delay to %(dt)s (%(counter)s day)"
+msgid_plural "Delay to %(dt)s (%(counter)s days)"
+msgstr[0] "Vertraging tot %(dt)s (%(counter)s dag)"
+msgstr[1] "Vertraging tot %(dt)s (%(counter)s dagen)"
+
+#: manufacturing/templates/capacity_planning.html:148
+msgid "no slack found nearby"
+msgstr "geen speling in de buurt gevonden"
+
+#: manufacturing/templates/capacity_planning.html:166
+msgid "No over-capacity days in this window."
+msgstr "Geen dagen met overcapaciteit in deze periode."
+
+#: manufacturing/templates/carbon_detail.html:3
+#: manufacturing/templates/carbon_detail.html:47
+#, python-format
+msgid "Carbon Footprint — %(name)s"
+msgstr "Koolstofvoetafdruk — %(name)s"
+
+#: manufacturing/templates/carbon_detail.html:6
+#: manufacturing/templates/cost_detail.html:6
+msgid "← Product"
+msgstr "← Product"
+
+#: manufacturing/templates/carbon_detail.html:7
+#: manufacturing/templates/costing_product_detail.html:7
+msgid "Standard Cost"
+msgstr "Standaardkosten"
+
+#: manufacturing/templates/carbon_detail.html:8
+#: manufacturing/templates/cost_detail.html:7
+msgid "Routing"
+msgstr "Routing"
+
+#: manufacturing/templates/carbon_detail.html:9
+#: manufacturing/templates/esg_dashboard.html:3
+#: manufacturing/templates/esg_dashboard.html:51
+#: manufacturing/templates/reports_dashboard.html:9
+#: manufacturing/templates/wo_carbon_detail.html:7
+msgid "ESG Dashboard"
+msgstr "ESG-dashboard"
+
+#: manufacturing/templates/carbon_detail.html:48
+msgid "Item type:"
+msgstr "Itemtype:"
+
+#: manufacturing/templates/carbon_detail.html:55
+msgid "Direct Material Emission Factor"
+msgstr "Emissiefactor Directe Materialen"
+
+#: manufacturing/templates/carbon_detail.html:57
+msgid ""
+"kg CO2e per unit of this product, used directly when it's a purchased\n"
+"            (\"buy\") component in another product's rollup."
+msgstr ""
+"kg CO2e per eenheid van dit product, rechtstreeks gebruikt wanneer het een "
+"ingekocht\n"
+"            (\"kopen\")-onderdeel is in de rollup van een ander product."
+
+#: manufacturing/templates/carbon_detail.html:64
+msgid "Save Factor"
+msgstr "Factor Opslaan"
+
+#: manufacturing/templates/carbon_detail.html:71
+msgid "Current Carbon Footprint"
+msgstr "Huidige Koolstofvoetafdruk"
+
+#: manufacturing/templates/carbon_detail.html:73
+#, python-format
+msgid "— rolled %(d)s"
+msgstr "— berekend op %(d)s"
+
+#: manufacturing/templates/carbon_detail.html:78
+#: manufacturing/templates/wo_carbon_detail.html:43
+msgid "Material (Scope 3)"
+msgstr "Materiaal (Scope 3)"
+
+#: manufacturing/templates/carbon_detail.html:82
+#: manufacturing/templates/wo_carbon_detail.html:45
+msgid "Process (Scope 1)"
+msgstr "Proces (Scope 1)"
+
+#: manufacturing/templates/carbon_detail.html:87
+msgid "Total Carbon Intensity (per unit)"
+msgstr "Totale Koolstofintensiteit (per eenheid)"
+
+#: manufacturing/templates/carbon_detail.html:93
+msgid "No carbon footprint on record yet."
+msgstr "Nog geen koolstofvoetafdruk geregistreerd."
+
+#: manufacturing/templates/carbon_detail.html:99
+#: manufacturing/templates/carbon_detail.html:107
+msgid "Roll Carbon Footprint"
+msgstr "Koolstofvoetafdruk Berekenen"
+
+#: manufacturing/templates/carbon_detail.html:101
+msgid ""
+"Recalculates material emissions from the Bill of Materials, plus process\n"
+"            emissions from routing operations. Saves a new snapshot with "
+"timestamp."
+msgstr ""
+"Berekent de materiaalemissies opnieuw op basis van de Stuklijst, plus "
+"procesemissies\n"
+"            van routeringsbewerkingen. Slaat een nieuwe momentopname op met "
+"tijdstempel."
+
+#: manufacturing/templates/carbon_detail.html:114
+msgid "Carbon History"
+msgstr "Koolstofgeschiedenis"
+
+#: manufacturing/templates/carbon_detail.html:118
+#: manufacturing/templates/cost_detail.html:107
+msgid "Rolled At"
+msgstr "Berekend op"
+
+#: manufacturing/templates/carbon_detail.html:119
+msgid "Material (kg)"
+msgstr "Materiaal (kg)"
+
+#: manufacturing/templates/carbon_detail.html:120
+msgid "Process (kg)"
+msgstr "Proces (kg)"
+
+#: manufacturing/templates/carbon_detail.html:121
+#: manufacturing/templates/esg_dashboard.html:150
+msgid "Total (kg)"
+msgstr "Totaal (kg)"
+
+#: manufacturing/templates/carbon_detail.html:122
+#: manufacturing/templates/cost_detail.html:112
+#: manufacturing/templates/fixed_asset_detail.html:172
+#: manufacturing/templates/gl_dashboard_kpis.html:47
+#: manufacturing/templates/inventory_detail.html:232
+#: manufacturing/templates/it_asset_detail.html:256
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:101
+msgid "By"
+msgstr "Door"
+
 #: manufacturing/templates/cc_detail.html:6
 #: manufacturing/templates/cc_list.html:3
 #: manufacturing/templates/cc_list.html:15
@@ -5694,6 +6294,7 @@ msgid "Grouped by %(gb)s: %(gv)s — created %(dt)s by %(by)s"
 msgstr "Gegroepeerd op %(gb)s: %(gv)s — aangemaakt op %(dt)s door %(by)s"
 
 #: manufacturing/templates/cc_detail.html:41
+#: manufacturing/templates/document_detail.html:52
 #, python-format
 msgid "Awaiting your approval as <strong>%(role)s</strong>."
 msgstr "Wacht op uw goedkeuring als <strong>%(role)s</strong>."
@@ -5706,11 +6307,13 @@ msgstr ""
 "goed&quot;)"
 
 #: manufacturing/templates/cc_detail.html:47
+#: manufacturing/templates/document_detail.html:58
 msgid "Re-enter your password"
 msgstr "Voer uw wachtwoord opnieuw in"
 
 #: manufacturing/templates/cc_detail.html:48
 #: manufacturing/templates/credit_application_detail.html:120
+#: manufacturing/templates/document_detail.html:59
 #: manufacturing/templates/po_approvals.html:58
 #: manufacturing/templates/req_detail.html:168
 #: manufacturing/templates/time_off_detail.html:71
@@ -5718,6 +6321,7 @@ msgid "Approve"
 msgstr "Goedkeuren"
 
 #: manufacturing/templates/cc_detail.html:49
+#: manufacturing/templates/document_detail.html:60
 #: manufacturing/templates/po_approvals.html:65
 msgid "Reject"
 msgstr "Afwijzen"
@@ -5773,6 +6377,7 @@ msgstr "Groepering"
 #: manufacturing/templates/sales_forecast_detail.html:184
 #: manufacturing/templates/sales_leads_detail.html:118
 #: manufacturing/templates/sales_leads_list.html:91
+#: manufacturing/templates/scenario_list.html:34
 #: manufacturing/templates/wms_pick_list_list.html:63
 #: manufacturing/templates/wms_transfer_list.html:33
 #: manufacturing/templates/wms_wave_list.html:66
@@ -5931,6 +6536,7 @@ msgstr "Gecertificeerde Kenmerken"
 
 #: manufacturing/templates/coa_detail.html:51
 #: manufacturing/templates/control_plan_detail.html:65
+#: manufacturing/templates/fmea_risk_register.html:38
 #: manufacturing/templates/spc_list.html:49
 #: manufacturing/templates/spc_list.html:88
 #: manufacturing/templates/spc_list.html:117
@@ -6030,6 +6636,188 @@ msgstr "Inspecteur / QA-ondertekenaar"
 msgid "Generate Certificate"
 msgstr "Certificaat Genereren"
 
+#: manufacturing/templates/company_detail.html:39
+#: manufacturing/templates/company_list.html:34
+msgid "Home Entity"
+msgstr "Hoofdentiteit"
+
+#: manufacturing/templates/company_detail.html:42
+msgid "Legal Name:"
+msgstr "Statutaire Naam:"
+
+#: manufacturing/templates/company_detail.html:43
+msgid "Tax ID:"
+msgstr "Fiscaal Nummer:"
+
+#: manufacturing/templates/company_detail.html:44
+#: manufacturing/templates/po_detail.html:120
+#: manufacturing/templates/so_detail.html:121
+msgid "Currency:"
+msgstr "Valuta:"
+
+#: manufacturing/templates/company_detail.html:45
+#: manufacturing/templates/people_detail.html:61
+msgid "Address:"
+msgstr "Adres:"
+
+#: manufacturing/templates/company_detail.html:54
+msgid "Includes journal entries recorded before Multi-Entity was set up."
+msgstr ""
+"Bevat journaalposten die zijn vastgelegd vóór het instellen van Multi-Entity."
+
+#: manufacturing/templates/company_detail.html:59
+#: manufacturing/templates/gl_accounts.html:62
+#: manufacturing/templates/gl_trial_balance.html:47
+msgid "Acct #"
+msgstr "Rek.nr."
+
+#: manufacturing/templates/company_detail.html:59
+#: manufacturing/templates/finance_bank_rec_list.html:68
+#: manufacturing/templates/gl_accounts.html:62
+#: manufacturing/templates/gl_trial_balance.html:47
+msgid "Account Name"
+msgstr "Rekeningnaam"
+
+#: manufacturing/templates/company_detail.html:60
+#: manufacturing/templates/gl_journal_detail.html:91
+#: manufacturing/templates/gl_trial_balance.html:48
+msgid "Debit"
+msgstr "Debet"
+
+#: manufacturing/templates/company_detail.html:60
+#: manufacturing/templates/gl_journal_detail.html:91
+#: manufacturing/templates/gl_trial_balance.html:48
+msgid "Credit"
+msgstr "Credit"
+
+#: manufacturing/templates/company_detail.html:75
+#: manufacturing/templates/gl_trial_balance.html:63
+#: manufacturing/templates/payroll_run_detail.html:91
+#: manufacturing/templates/payroll_ytd.html:80
+msgid "TOTALS"
+msgstr "TOTALEN"
+
+#: manufacturing/templates/company_detail.html:82
+#: manufacturing/templates/consolidated_financials.html:105
+#: manufacturing/templates/gl_balance_sheet.html:112
+#: manufacturing/templates/gl_trial_balance.html:70
+msgid "BALANCED"
+msgstr "IN BALANS"
+
+#: manufacturing/templates/company_detail.html:82
+#: manufacturing/templates/consolidated_financials.html:105
+#: manufacturing/templates/gl_balance_sheet.html:112
+msgid "OUT OF BALANCE"
+msgstr "NIET IN BALANS"
+
+#: manufacturing/templates/company_detail.html:85
+msgid "No posted journal entries for this entity yet."
+msgstr "Nog geen geboekte journaalposten voor deze entiteit."
+
+#: manufacturing/templates/company_detail.html:90
+msgid "Assigned Users"
+msgstr "Toegewezen Gebruikers"
+
+#: manufacturing/templates/company_detail.html:92
+msgid "President/Vice President roles always have access to every company."
+msgstr ""
+"De rollen President/Vicepresident hebben altijd toegang tot elk bedrijf."
+
+#: manufacturing/templates/company_detail.html:104
+msgid "Revoke access for this user?"
+msgstr "Toegang voor deze gebruiker intrekken?"
+
+#: manufacturing/templates/company_detail.html:106
+msgid "Revoke"
+msgstr "Intrekken"
+
+#: manufacturing/templates/company_detail.html:115
+msgid "No users individually assigned yet."
+msgstr "Nog geen individueel toegewezen gebruikers."
+
+#: manufacturing/templates/company_detail.html:123
+msgid "Select a person…"
+msgstr "Selecteer een persoon…"
+
+#: manufacturing/templates/company_detail.html:128
+msgid "Grant Access"
+msgstr "Toegang Verlenen"
+
+#: manufacturing/templates/company_list.html:3
+#: manufacturing/templates/company_list.html:15
+#: manufacturing/templates/consolidated_financials.html:6
+#: manufacturing/templates/intercompany_list.html:6
+msgid "Companies"
+msgstr "Bedrijven"
+
+#: manufacturing/templates/company_list.html:6
+#: manufacturing/templates/gl_accounts.html:6
+#: manufacturing/templates/gl_balance_sheet.html:6
+#: manufacturing/templates/gl_cash_flow_statement.html:6
+#: manufacturing/templates/gl_income_statement.html:6
+#: manufacturing/templates/gl_journals.html:6
+#: manufacturing/templates/gl_trial_balance.html:6
+msgid "G/L Dashboard"
+msgstr "G/L-dashboard"
+
+#: manufacturing/templates/company_list.html:7
+#: manufacturing/templates/company_new.html:3
+#: manufacturing/templates/company_new.html:11
+msgid "New Company"
+msgstr "Nieuw Bedrijf"
+
+#: manufacturing/templates/company_list.html:8
+#: manufacturing/templates/consolidated_financials.html:7
+msgid "Intercompany"
+msgstr "Intercompany"
+
+#: manufacturing/templates/company_list.html:9
+#: manufacturing/templates/consolidated_financials.html:3
+#: manufacturing/templates/consolidated_financials.html:41
+#: manufacturing/templates/intercompany_list.html:8
+msgid "Consolidated Financials"
+msgstr "Geconsolideerde Financiële Overzichten"
+
+#: manufacturing/templates/company_list.html:23
+#: manufacturing/templates/company_new.html:24
+msgid "Legal Name"
+msgstr "Statutaire Naam"
+
+#: manufacturing/templates/company_list.html:24
+#: manufacturing/templates/company_new.html:28
+msgid "Tax ID"
+msgstr "Fiscaal nummer"
+
+#: manufacturing/templates/company_list.html:39
+#: manufacturing/templates/contacts_detail.html:210
+#: manufacturing/templates/contacts_list.html:64
+#: manufacturing/templates/cs_escalations.html:86
+#: manufacturing/templates/cs_list.html:82
+#: manufacturing/templates/sales_demand.html:53
+msgid "View"
+msgstr "Weergeven"
+
+#: manufacturing/templates/company_list.html:46
+msgid "No companies yet."
+msgstr "Nog geen bedrijven."
+
+#: manufacturing/templates/company_new.html:32
+msgid "Currency Code"
+msgstr "Valutacode"
+
+#: manufacturing/templates/company_new.html:36
+#: manufacturing/templates/contacts_detail.html:114
+#: manufacturing/templates/contacts_new.html:72
+#: manufacturing/templates/ess_profile.html:42
+#: manufacturing/templates/people_form.html:100
+#: manufacturing/templates/register.html:58
+msgid "Address"
+msgstr "Adres"
+
+#: manufacturing/templates/company_new.html:44
+msgid "Create Company"
+msgstr "Bedrijf Aanmaken"
+
 #: manufacturing/templates/compliance_checklist_detail.html:6
 #: manufacturing/templates/compliance_template_detail.html:7
 #: manufacturing/templates/compliance_template_list.html:7
@@ -6043,6 +6831,7 @@ msgstr "Sjablonen"
 #: manufacturing/templates/compliance_checklist_detail.html:25
 #: manufacturing/templates/compliance_checklist_list.html:20
 #: manufacturing/templates/compliance_checklist_list.html:37
+#: manufacturing/templates/cto_configure.html:22
 #: manufacturing/templates/scan_receive.html:81
 #: manufacturing/templates/technician_route_detail.html:98
 #: manufacturing/work_orders_core.py:36
@@ -6114,6 +6903,7 @@ msgstr "Nalevingssjablonen"
 #: manufacturing/templates/compliance_checklist_list.html:7
 #: manufacturing/templates/compliance_template_list.html:6
 #: manufacturing/templates/control_plan_list.html:6
+#: manufacturing/templates/document_list.html:6
 #: manufacturing/templates/qa_dashboard.html:3
 #: manufacturing/templates/qa_reports.html:6
 #: manufacturing/templates/sampling_plan_list.html:10
@@ -6134,6 +6924,9 @@ msgstr "Norm"
 #: manufacturing/templates/compliance_template_detail.html:90
 #: manufacturing/templates/cs_plans.html:77
 #: manufacturing/templates/cs_plans.html:123
+#: manufacturing/templates/document_detail.html:78
+#: manufacturing/templates/document_list.html:67
+#: manufacturing/templates/document_new.html:41
 #: manufacturing/templates/legal_compliance_detail.html:62
 #: manufacturing/templates/legal_compliance_detail.html:97
 #: manufacturing/templates/legal_compliance_list.html:83
@@ -6536,10 +7329,288 @@ msgstr "Gebr. Hvh."
 msgid "WO#, SO#, etc."
 msgstr "WO-nr., Order-nr., enz."
 
+#: manufacturing/templates/consolidated_financials.html:43
+msgid "All companies combined, with intercompany transactions eliminated."
+msgstr ""
+"Alle bedrijven gecombineerd, met intercompany-transacties geëlimineerd."
+
+#: manufacturing/templates/consolidated_financials.html:46
+#: manufacturing/templates/gl_cash_flow_statement.html:45
+#: manufacturing/templates/gl_income_statement.html:43
+#: manufacturing/templates/gl_journals.html:46
+#: manufacturing/templates/prod_schedule.html:48
+#: manufacturing/templates/prod_schedule_gantt.html:45
+#: manufacturing/templates/sales_orders.html:64
+#: manufacturing/templates/supplier_scorecard_list.html:39
+msgid "From:"
+msgstr "Van:"
+
+#: manufacturing/templates/consolidated_financials.html:50
+#: manufacturing/templates/fin_cash_forecast.html:37
+#: manufacturing/templates/gl_balance_sheet.html:46
+#: manufacturing/templates/gl_cash_flow_statement.html:49
+#: manufacturing/templates/gl_income_statement.html:47
+#: manufacturing/templates/gl_trial_balance.html:40
+#: manufacturing/templates/scenario_list.html:46
+msgid "Run"
+msgstr "Uitvoeren"
+
+#: manufacturing/templates/consolidated_financials.html:55
+msgid "Consolidated Income Statement"
+msgstr "Geconsolideerde Winst- en Verliesrekening"
+
+#: manufacturing/templates/consolidated_financials.html:56
+#: manufacturing/templates/supplier_scorecard_detail.html:45
+#, python-format
+msgid "%(from_date)s to %(to_date)s"
+msgstr "%(from_date)s tot %(to_date)s"
+
+#: manufacturing/templates/consolidated_financials.html:60
+#: manufacturing/templates/gl_income_statement.html:57
+#: manufacturing/templates/sales_performance_kpis.html:56
+#: manufacturing/templates/sales_reports_kpis.html:21
+#: manufacturing/templates/sales_reports_kpis.html:34
+msgid "Revenue"
+msgstr "Omzet"
+
+#: manufacturing/templates/consolidated_financials.html:61
+msgid "Gross Revenue"
+msgstr "Bruto-omzet"
+
+#: manufacturing/templates/consolidated_financials.html:62
+#: manufacturing/templates/consolidated_financials.html:69
+#: manufacturing/templates/consolidated_financials.html:92
+#: manufacturing/templates/consolidated_financials.html:98
+msgid "Less: Intercompany Elimination"
+msgstr "Min: Intercompany-eliminatie"
+
+#: manufacturing/templates/consolidated_financials.html:63
+msgid "Consolidated Revenue"
+msgstr "Geconsolideerde Omzet"
+
+#: manufacturing/templates/consolidated_financials.html:67
+#: manufacturing/templates/gl_income_statement.html:93
+msgid "Expenses"
+msgstr "Kosten"
+
+#: manufacturing/templates/consolidated_financials.html:68
+msgid "Gross Expenses"
+msgstr "Bruto Kosten"
+
+#: manufacturing/templates/consolidated_financials.html:70
+msgid "Consolidated Expenses"
+msgstr "Geconsolideerde Kosten"
+
+#: manufacturing/templates/consolidated_financials.html:76
+msgid "Consolidated Net Income"
+msgstr "Geconsolideerde Nettowinst"
+
+#: manufacturing/templates/consolidated_financials.html:84
+msgid "Consolidated Balance Sheet"
+msgstr "Geconsolideerde Balans"
+
+#: manufacturing/templates/consolidated_financials.html:85
+#, python-format
+msgid "as of %(to_date)s"
+msgstr "per %(to_date)s"
+
+#: manufacturing/templates/consolidated_financials.html:90
+#: manufacturing/templates/gl_balance_sheet.html:58
+#: manufacturing/templates/it_asset_detail.html:8
+#: manufacturing/templates/it_asset_list.html:8
+#: manufacturing/templates/it_dashboard.html:8
+#: manufacturing/templates/it_incident_list.html:9
+#: manufacturing/templates/it_license_list.html:8
+#: manufacturing/templates/it_network_detail.html:8
+#: manufacturing/templates/it_network_list.html:8
+#: manufacturing/templates/it_repairs_detail.html:8
+#: manufacturing/templates/it_repairs_list.html:8
+#: manufacturing/templates/it_software_list.html:8
+#: manufacturing/templates/it_task_list.html:9
+#: manufacturing/templates/it_ticket_detail.html:8
+#: manufacturing/templates/it_ticket_list.html:8
+msgid "Assets"
+msgstr "Activa"
+
+#: manufacturing/templates/consolidated_financials.html:91
+msgid "Gross Assets"
+msgstr "Bruto Activa"
+
+#: manufacturing/templates/consolidated_financials.html:93
+msgid "Consolidated Assets"
+msgstr "Geconsolideerde Activa"
+
+#: manufacturing/templates/consolidated_financials.html:96
+msgid "Liabilities + Equity"
+msgstr "Verplichtingen + Eigen Vermogen"
+
+#: manufacturing/templates/consolidated_financials.html:97
+msgid "Gross Liabilities"
+msgstr "Bruto Passiva"
+
+#: manufacturing/templates/consolidated_financials.html:99
+msgid "Consolidated Liabilities"
+msgstr "Geconsolideerde Passiva"
+
+#: manufacturing/templates/consolidated_financials.html:100
+#: manufacturing/templates/gl_balance_sheet.html:86
+msgid "Equity"
+msgstr "Eigen vermogen"
+
+#: manufacturing/templates/contacts_detail.html:6
+#: manufacturing/templates/contacts_new.html:6
+#, python-format
+msgid "Back to %(cat)s"
+msgstr "Terug naar %(cat)s"
+
+#: manufacturing/templates/contacts_detail.html:8
+#: manufacturing/templates/contacts_list.html:8
+#: manufacturing/templates/contacts_new.html:3
+#: manufacturing/templates/contacts_new.html:33
+#, python-format
+msgid "New %(ct)s"
+msgstr "Nieuw %(ct)s"
+
+#: manufacturing/templates/contacts_detail.html:79
+msgid "Contact Details"
+msgstr "Contactgegevens"
+
+#: manufacturing/templates/contacts_detail.html:84
+#: manufacturing/templates/contacts_new.html:46
+#: manufacturing/templates/register.html:40
+msgid "First Name"
+msgstr "Voornaam"
+
+#: manufacturing/templates/contacts_detail.html:90
+#: manufacturing/templates/contacts_new.html:51
+#: manufacturing/templates/register.html:45
+msgid "Last Name"
+msgstr "Achternaam"
+
+#: manufacturing/templates/contacts_detail.html:96
+#: manufacturing/templates/contacts_new.html:56
+msgid "Company Name"
+msgstr "Bedrijfsnaam"
+
+#: manufacturing/templates/contacts_detail.html:120
+#: manufacturing/templates/contacts_new.html:77
+#: manufacturing/templates/ess_profile.html:48
+#: manufacturing/templates/people_form.html:107
+#: manufacturing/templates/register.html:65
+#: manufacturing/templates/register.html:66
+msgid "City"
+msgstr "Plaats"
+
+#: manufacturing/templates/contacts_detail.html:127
+#: manufacturing/templates/contacts_new.html:83
+#: manufacturing/templates/ess_profile.html:52
+#: manufacturing/templates/people_form.html:111
+#: manufacturing/templates/register.html:69
+msgid "State"
+msgstr "Provincie"
+
+#: manufacturing/templates/contacts_detail.html:133
+#: manufacturing/templates/contacts_new.html:88
+#: manufacturing/templates/ess_profile.html:56
+#: manufacturing/templates/people_form.html:116
+msgid "Zip Code"
+msgstr "Postcode"
+
+#: manufacturing/templates/contacts_detail.html:149
+#: manufacturing/templates/ecommerce_connection_list.html:24
+msgid "Price List"
+msgstr "Prijslijst"
+
+#: manufacturing/templates/contacts_detail.html:151
+msgid ""
+"Assigns which price list auto-populates unit prices when adding\n"
+"            line items to this customer's sales orders."
+msgstr ""
+"Bepaalt welke prijslijst automatisch de stuksprijzen invult bij het "
+"toevoegen van\n"
+"            regels aan de verkooporders van deze klant."
+
+#: manufacturing/templates/contacts_detail.html:153
+msgid "Manage price lists"
+msgstr "Prijslijsten beheren"
+
+#: manufacturing/templates/contacts_detail.html:181
+#, python-format
+msgid "Recent %(lbl)s"
+msgstr "Recente %(lbl)s"
+
+#: manufacturing/templates/contacts_detail.html:217
+#, python-format
+msgid "No %(lbl)s on record."
+msgstr "Geen %(lbl)s geregistreerd."
+
+#: manufacturing/templates/contacts_detail.html:223
+#: manufacturing/templates/cs_detail.html:172
+#, python-format
+msgid "Created by %(by)s"
+msgstr "Aangemaakt door %(by)s"
+
+#: manufacturing/templates/contacts_detail.html:225
+msgid "Created by unknown"
+msgstr "Aangemaakt door onbekend"
+
+#: manufacturing/templates/contacts_detail.html:228
+#, python-format
+msgid "ID: %(id)s"
+msgstr "ID: %(id)s"
+
+#: manufacturing/templates/contacts_list.html:21
+msgid "Search by name, company, or email…"
+msgstr "Zoeken op naam, bedrijf of e-mail…"
+
+#: manufacturing/templates/contacts_list.html:34
+msgid "Name / Company"
+msgstr "Naam / Bedrijf"
+
+#: manufacturing/templates/contacts_list.html:35
+#: manufacturing/templates/credit_account_detail.html:172
+#: manufacturing/templates/credit_collections_detail.html:66
+#: manufacturing/templates/credit_collections_list.html:79
+#: manufacturing/templates/sales_leads_detail.html:67
+#: manufacturing/templates/sales_leads_detail.html:113
+#: manufacturing/templates/sales_leads_list.html:85
+#: manufacturing/templates/sales_leads_list.html:124
+msgid "Contact"
+msgstr "Contact"
+
+#: manufacturing/templates/contacts_list.html:37
+msgid "City, State"
+msgstr "Plaats, Provincie"
+
+#: manufacturing/templates/contacts_list.html:72
+#: manufacturing/templates/contacts_list.html:76
+#, python-format
+msgid "matching \"%(search)s\""
+msgstr "die overeenkomt met „%(search)s”"
+
+#: manufacturing/templates/contacts_list.html:76
+#, python-format
+msgid "No %(contact_type_plural)s found"
+msgstr "Geen %(contact_type_plural)s gevonden"
+
+#: manufacturing/templates/contacts_list.html:77
+msgid "Add one"
+msgstr "Voeg er een toe"
+
+#: manufacturing/templates/contacts_new.html:43
+msgid "Fill in at least a name or company name."
+msgstr "Vul minstens een naam of bedrijfsnaam in."
+
+#: manufacturing/templates/contacts_new.html:95
+#, python-format
+msgid "Create %(ct)s"
+msgstr "%(ct)s aanmaken"
+
 #: manufacturing/templates/control_plan_detail.html:6
 #: manufacturing/templates/control_plan_list.html:3
 #: manufacturing/templates/control_plan_list.html:16
 #: manufacturing/templates/control_plan_new.html:6
+#: manufacturing/templates/fmea_risk_register.html:6
 #: manufacturing/templates/sampling_plan_list.html:7
 msgid "Control Plans"
 msgstr "Controleplannen"
@@ -6567,6 +7638,8 @@ msgstr "%(name)s (%(product)s, Rev. %(rev)s)"
 
 #: manufacturing/templates/control_plan_detail.html:32
 #: manufacturing/templates/control_plan_list.html:40
+#: manufacturing/templates/document_detail.html:37
+#: manufacturing/templates/document_list.html:86
 #: manufacturing/templates/recipe_detail.html:27
 #: manufacturing/templates/recipe_list.html:42
 msgid "Superseded"
@@ -6586,6 +7659,7 @@ msgid "Control Method"
 msgstr "Controlemethode"
 
 #: manufacturing/templates/control_plan_detail.html:72
+#: manufacturing/templates/fmea_risk_register.html:43
 #: manufacturing/templates/risk_dashboard.html:115
 #: manufacturing/templates/risk_register_list.html:73
 msgid "Risk"
@@ -6642,6 +7716,7 @@ msgid "Detection (1-10)"
 msgstr "Detectie (1-10)"
 
 #: manufacturing/templates/control_plan_detail.html:158
+#: manufacturing/templates/fmea_risk_register.html:44
 msgid "Recommended Action"
 msgstr "Aanbevolen Actie"
 
@@ -6665,6 +7740,7 @@ msgstr "Nog geen controleplannen."
 #: manufacturing/templates/control_plan_new.html:29
 #: manufacturing/templates/lot_new.html:41
 #: manufacturing/templates/recipe_new.html:29
+#: manufacturing/templates/repetitive_schedule_new.html:29
 msgid "Product *"
 msgstr "Product *"
 
@@ -6681,14 +7757,6 @@ msgstr "Controleplan Aanmaken"
 #, python-format
 msgid "Standard Cost — %(name)s"
 msgstr "Standaardkosten — %(name)s"
-
-#: manufacturing/templates/cost_detail.html:6
-msgid "← Product"
-msgstr "← Product"
-
-#: manufacturing/templates/cost_detail.html:7
-msgid "Routing"
-msgstr "Routing"
 
 #: manufacturing/templates/cost_detail.html:8
 msgid "Carbon Footprint"
@@ -6765,29 +7833,11 @@ msgstr "Kosten Berekenen"
 msgid "Cost History"
 msgstr "Kostengeschiedenis"
 
-#: manufacturing/templates/cost_detail.html:107
-msgid "Rolled At"
-msgstr "Berekend op"
-
-#: manufacturing/templates/cost_detail.html:112
-#: manufacturing/templates/fixed_asset_detail.html:172
-#: manufacturing/templates/gl_dashboard_kpis.html:47
-#: manufacturing/templates/inventory_detail.html:232
-#: manufacturing/templates/it_asset_detail.html:256
-#: manufacturing/templates/spc_list.html:117
-#: manufacturing/templates/spc_log.html:101
-msgid "By"
-msgstr "Door"
-
 #: manufacturing/templates/costing_product_detail.html:3
 #: manufacturing/templates/costing_product_detail.html:43
 #, python-format
 msgid "Cost Valuation — %(name)s"
 msgstr "Kostenwaardering — %(name)s"
-
-#: manufacturing/templates/costing_product_detail.html:7
-msgid "Standard Cost"
-msgstr "Standaardkosten"
 
 #: manufacturing/templates/costing_product_detail.html:8
 msgid "All Valuations"
@@ -7043,6 +8093,8 @@ msgstr "Limiet"
 #: manufacturing/templates/prod_returns_list.html:124
 #: manufacturing/templates/prod_returns_reports.html:61
 #: manufacturing/templates/prod_returns_reports.html:84
+#: manufacturing/templates/sf_dashboard.html:76
+#: manufacturing/templates/sf_entry.html:89
 #: manufacturing/templates/termination_detail.html:44
 #: manufacturing/templates/termination_list.html:72
 #: manufacturing/templates/termination_list.html:129
@@ -7060,6 +8112,8 @@ msgstr "Aangevraagd"
 
 #: manufacturing/templates/credit_account_detail.html:153
 #: manufacturing/templates/credit_application_list.html:78
+#: manufacturing/templates/document_detail.html:35
+#: manufacturing/templates/document_list.html:84
 #: manufacturing/templates/sales_commissions.html:74
 msgid "Approved"
 msgstr "Goedgekeurd"
@@ -7071,16 +8125,6 @@ msgstr "Geen aanvragen op bestand."
 #: manufacturing/templates/credit_account_detail.html:170
 msgid "Collection Activities"
 msgstr "Incassoactiviteiten"
-
-#: manufacturing/templates/credit_account_detail.html:172
-#: manufacturing/templates/credit_collections_detail.html:66
-#: manufacturing/templates/credit_collections_list.html:79
-#: manufacturing/templates/sales_leads_detail.html:67
-#: manufacturing/templates/sales_leads_detail.html:113
-#: manufacturing/templates/sales_leads_list.html:85
-#: manufacturing/templates/sales_leads_list.html:124
-msgid "Contact"
-msgstr "Contact"
 
 #: manufacturing/templates/credit_account_detail.html:182
 msgid "No collection activity."
@@ -7440,6 +8484,7 @@ msgstr "Openstaande tickets"
 #: manufacturing/templates/prod_performance_report.html:60
 #: manufacturing/templates/prod_performance_report.html:83
 #: manufacturing/templates/qa_audit_list.html:70
+#: manufacturing/templates/repetitive_schedule_detail.html:88
 #: manufacturing/templates/risk_audit_list.html:74
 #: manufacturing/templates/technician_route_detail.html:29
 #: manufacturing/templates/technician_route_detail.html:42
@@ -7590,11 +8635,6 @@ msgid "Mark as completed"
 msgstr "Markeren als voltooid"
 
 #: manufacturing/templates/cs_detail.html:172
-#, python-format
-msgid "Created by %(by)s"
-msgstr "Aangemaakt door %(by)s"
-
-#: manufacturing/templates/cs_detail.html:172
 msgid "ID:"
 msgstr "ID:"
 
@@ -7662,12 +8702,6 @@ msgstr "Prioriteit"
 #: manufacturing/templates/rfq_detail.html:157
 msgid "days"
 msgstr "dagen"
-
-#: manufacturing/templates/cs_escalations.html:86
-#: manufacturing/templates/cs_list.html:82
-#: manufacturing/templates/sales_demand.html:53
-msgid "View"
-msgstr "Weergeven"
 
 #: manufacturing/templates/cs_escalations.html:93
 msgid "Critical &ge;14 days"
@@ -7992,6 +9026,7 @@ msgid "Monthly Call Volume"
 msgstr "Maandelijks belvolume"
 
 #: manufacturing/templates/cs_reports_kpis.html:40
+#: manufacturing/templates/demand_forecast.html:75
 #: manufacturing/templates/purch_reports.html:91
 #: manufacturing/templates/qa_reports.html:214
 #: manufacturing/templates/workforce_analytics.html:73
@@ -8131,6 +9166,7 @@ msgid "Avg Score"
 msgstr "Gem. score"
 
 #: manufacturing/templates/cs_surveys_detail.html:70
+#: manufacturing/templates/esg_dashboard.html:150
 #: manufacturing/templates/finance_tax_detail.html:104
 #: manufacturing/templates/finance_tax_detail.html:146
 #: manufacturing/templates/finance_tax_list.html:87
@@ -8201,6 +9237,7 @@ msgid "Surveys & Feedback"
 msgstr "Enquêtes en feedback"
 
 #: manufacturing/templates/cs_surveys_list.html:67
+#: manufacturing/templates/document_list.html:47
 #: manufacturing/templates/finance_audit_list.html:70
 #: manufacturing/templates/finance_tax_list.html:71
 #: manufacturing/templates/fixed_asset_list.html:87
@@ -8237,6 +9274,244 @@ msgstr "Beschrijving van de enquête…"
 #: manufacturing/templates/cs_surveys_list.html:147
 msgid "Create Survey"
 msgstr "Enquête aanmaken"
+
+#: manufacturing/templates/cto_configure.html:3
+#: manufacturing/templates/cto_configure.html:20
+#, python-format
+msgid "Configure — %(desc)s"
+msgstr "Configureren — %(desc)s"
+
+#: manufacturing/templates/cto_configure.html:6
+msgid "Back to Order"
+msgstr "Terug naar Order"
+
+#: manufacturing/templates/cto_configure.html:24
+#: manufacturing/templates/it_dashboard_kpis.html:9
+#: manufacturing/templates/it_task_list.html:88
+#: manufacturing/templates/prod_daily_report.html:64
+#: manufacturing/templates/prod_dashboard_kpis.html:8
+#: manufacturing/templates/technician_route_detail.html:31
+#: manufacturing/templates/technician_route_list.html:41
+msgid "In Progress"
+msgstr "In behandeling"
+
+#: manufacturing/templates/cto_configure.html:32
+msgid "This product has no configurable option groups yet."
+msgstr "Dit product heeft nog geen configureerbare optiegroepen."
+
+#: manufacturing/templates/cto_configure.html:56
+msgid "Resolved Configuration"
+msgstr "Opgeloste Configuratie"
+
+#: manufacturing/templates/cto_configure.html:59
+msgid "Qty per Unit"
+msgstr "Aantal per Eenheid"
+
+#: manufacturing/templates/cto_configure.html:77
+#: manufacturing/templates/lot_detail.html:74
+#: manufacturing/templates/maint_part_detail.html:83
+#: manufacturing/templates/maint_parts_list.html:124
+#: manufacturing/templates/wo_form.html:51
+msgid "Quantity"
+msgstr "Hoeveelheid"
+
+#: manufacturing/templates/cto_configure.html:81
+msgid "Release Work Order"
+msgstr "Werkorder Vrijgeven"
+
+#: manufacturing/templates/cto_options.html:3
+#, python-format
+msgid "%(name)s — Options"
+msgstr "%(name)s — Opties"
+
+#: manufacturing/templates/cto_options.html:6
+#: manufacturing/templates/cto_product_list.html:3
+#: manufacturing/templates/cto_product_list.html:13
+#: manufacturing/templates/prod_dashboard.html:12
+msgid "Configure-to-Order"
+msgstr "Configureren op Bestelling"
+
+#: manufacturing/templates/cto_options.html:23
+#, python-format
+msgid "%(name)s — Option Groups"
+msgstr "%(name)s — Optiegroepen"
+
+#: manufacturing/templates/cto_options.html:34
+msgid "Option"
+msgstr "Optie"
+
+#: manufacturing/templates/cto_options.html:47
+msgid "No options in this group yet."
+msgstr "Nog geen opties in deze groep."
+
+#: manufacturing/templates/cto_options.html:56
+msgid "Option Name *"
+msgstr "Optienaam *"
+
+#: manufacturing/templates/cto_options.html:57
+msgid "e.g. Red"
+msgstr "bijv. Rood"
+
+#: manufacturing/templates/cto_options.html:72
+msgid "Add Option"
+msgstr "Optie Toevoegen"
+
+#: manufacturing/templates/cto_options.html:80
+msgid "Add Option Group"
+msgstr "Optiegroep Toevoegen"
+
+#: manufacturing/templates/cto_options.html:85
+msgid "Group Name *"
+msgstr "Groepsnaam *"
+
+#: manufacturing/templates/cto_options.html:86
+msgid "e.g. Frame Color"
+msgstr "bijv. Framekleur"
+
+#: manufacturing/templates/cto_options.html:88
+msgid "Add Group"
+msgstr "Groep Toevoegen"
+
+#: manufacturing/templates/cto_product_list.html:15
+msgid ""
+"Set up option groups per make product below, then configure individual sales "
+"order\n"
+"        lines from the SO detail page's \"Configure\" link."
+msgstr ""
+"Stel hieronder optiegroepen per zelfgemaakt product in en configureer "
+"vervolgens afzonderlijke verkooporderregels\n"
+"        via de link „Configureren” op de SO-detailpagina."
+
+#: manufacturing/templates/cto_product_list.html:22
+msgid "Configurable"
+msgstr "Configureerbaar"
+
+#: manufacturing/templates/cto_product_list.html:29
+#: manufacturing/templates/ctp_inquiry.html:74
+#: manufacturing/templates/currency_list.html:150
+#: manufacturing/templates/finance_bank_rec_detail.html:76
+#: manufacturing/templates/finance_bank_rec_detail.html:94
+#: manufacturing/templates/gl_dashboard_kpis.html:58
+#: manufacturing/templates/payroll_deductions.html:64
+#: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/pl_detail.html:56
+#: manufacturing/templates/promo_detail.html:46
+#: manufacturing/templates/wms_putaway_rule_list.html:53
+msgid "Yes"
+msgstr "Ja"
+
+#: manufacturing/templates/cto_product_list.html:31
+#: manufacturing/templates/ctp_inquiry.html:74
+#: manufacturing/templates/currency_list.html:143
+#: manufacturing/templates/currency_list.html:151
+#: manufacturing/templates/finance_bank_rec_detail.html:77
+#: manufacturing/templates/finance_bank_rec_detail.html:94
+#: manufacturing/templates/gl_dashboard_kpis.html:58
+#: manufacturing/templates/payroll_deductions.html:64
+#: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/pl_detail.html:57
+#: manufacturing/templates/promo_detail.html:47
+#: manufacturing/templates/wms_putaway_rule_list.html:53
+msgid "No"
+msgstr "Nee"
+
+#: manufacturing/templates/cto_product_list.html:34
+msgid "Manage Options"
+msgstr "Opties Beheren"
+
+#: manufacturing/templates/cto_product_list.html:41
+msgid "No make products yet."
+msgstr "Nog geen zelfgemaakte producten."
+
+#: manufacturing/templates/ctp_inquiry.html:3
+#: manufacturing/templates/so_list.html:12
+msgid "CTP Inquiry"
+msgstr "CTP-aanvraag"
+
+#: manufacturing/templates/ctp_inquiry.html:33
+msgid "Capable-to-Promise Inquiry"
+msgstr "Levercapaciteitscontrole"
+
+#: manufacturing/templates/ctp_inquiry.html:35
+msgid ""
+"Extends ATP with a routing capacity check — the CTP date is the later of\n"
+"        when material is available and when workcenter capacity is free."
+msgstr ""
+"Breidt de ATP uit met een capaciteitscontrole van de routing — de CTP-datum "
+"is de laatste van\n"
+"        wanneer materiaal beschikbaar is en wanneer de capaciteit van het "
+"werkstation vrij is."
+
+#: manufacturing/templates/ctp_inquiry.html:60
+msgid "Check CTP"
+msgstr "CTP Controleren"
+
+#: manufacturing/templates/ctp_inquiry.html:68
+#, python-format
+msgid "Yes — capable of promising by %(rd)s"
+msgstr "Ja — kan worden toegezegd vóór %(rd)s"
+
+#: manufacturing/templates/ctp_inquiry.html:69
+#, python-format
+msgid "No — cannot meet %(rd)s"
+msgstr "Nee — kan %(rd)s niet halen"
+
+#: manufacturing/templates/ctp_inquiry.html:72
+msgid "Material (ATP)"
+msgstr "Materiaal (ATP)"
+
+#: manufacturing/templates/ctp_inquiry.html:74
+msgid "Sufficient by requested date:"
+msgstr "Voldoende op de gewenste datum:"
+
+#: manufacturing/templates/ctp_inquiry.html:75
+msgid "Material ready:"
+msgstr "Materiaal gereed:"
+
+#: manufacturing/templates/ctp_inquiry.html:80
+msgid "Capacity (Routing)"
+msgstr "Capaciteit (Routing)"
+
+#: manufacturing/templates/ctp_inquiry.html:83
+#: manufacturing/templates/esg_dashboard.html:173
+#: manufacturing/templates/maint_oee_report.html:117
+#: manufacturing/templates/repetitive_schedule_list.html:29
+#: manufacturing/templates/repetitive_schedule_new.html:37
+#: manufacturing/templates/scenario_detail.html:101
+#: manufacturing/templates/scenario_detail.html:136
+#: manufacturing/templates/sf_dashboard.html:76
+#: manufacturing/templates/sf_entry.html:52
+#: manufacturing/templates/sf_entry.html:81
+#: manufacturing/templates/sf_entry.html:114
+#: manufacturing/templates/sf_shift_plan.html:49
+#: manufacturing/templates/sf_shift_plan.html:69
+msgid "Workcenter"
+msgstr "Werkplek"
+
+#: manufacturing/templates/ctp_inquiry.html:83
+msgid "Hours Required"
+msgstr "Benodigde Uren"
+
+#: manufacturing/templates/ctp_inquiry.html:83
+msgid "Earliest Available"
+msgstr "Vroegst Beschikbaar"
+
+#: manufacturing/templates/ctp_inquiry.html:95
+msgid "No routing defined for this product — capacity isn't a constraint."
+msgstr ""
+"Geen routing gedefinieerd voor dit product — capaciteit is geen beperking."
+
+#: manufacturing/templates/ctp_inquiry.html:98
+msgid "Combined"
+msgstr "Gecombineerd"
+
+#: manufacturing/templates/ctp_inquiry.html:100
+msgid "CTP Date:"
+msgstr "CTP-datum:"
+
+#: manufacturing/templates/ctp_inquiry.html:102
+msgid "Not achievable within 90 days"
+msgstr "Niet haalbaar binnen 90 dagen"
 
 #: manufacturing/templates/currency_list.html:3
 #: manufacturing/templates/currency_list.html:45
@@ -8297,18 +9572,6 @@ msgstr "Code (bijv. EUR)"
 msgid "Set as Base?"
 msgstr "Instellen als basis?"
 
-#: manufacturing/templates/currency_list.html:143
-#: manufacturing/templates/currency_list.html:151
-#: manufacturing/templates/finance_bank_rec_detail.html:77
-#: manufacturing/templates/finance_bank_rec_detail.html:94
-#: manufacturing/templates/gl_dashboard_kpis.html:58
-#: manufacturing/templates/payroll_deductions.html:64
-#: manufacturing/templates/payroll_deductions.html:132
-#: manufacturing/templates/promo_detail.html:47
-#: manufacturing/templates/wms_putaway_rule_list.html:53
-msgid "No"
-msgstr "Nee"
-
 #: manufacturing/templates/currency_list.html:144
 msgid "Yes (make base)"
 msgstr "Ja (als basis instellen)"
@@ -8316,17 +9579,6 @@ msgstr "Ja (als basis instellen)"
 #: manufacturing/templates/currency_list.html:148
 msgid "Active?"
 msgstr "Actief?"
-
-#: manufacturing/templates/currency_list.html:150
-#: manufacturing/templates/finance_bank_rec_detail.html:76
-#: manufacturing/templates/finance_bank_rec_detail.html:94
-#: manufacturing/templates/gl_dashboard_kpis.html:58
-#: manufacturing/templates/payroll_deductions.html:64
-#: manufacturing/templates/payroll_deductions.html:132
-#: manufacturing/templates/promo_detail.html:46
-#: manufacturing/templates/wms_putaway_rule_list.html:53
-msgid "Yes"
-msgstr "Ja"
 
 #: manufacturing/templates/currency_list.html:155
 msgid "Save Currency"
@@ -8529,6 +9781,292 @@ msgstr "%(name)s (id %(pid)s)"
 msgid "No erasures recorded yet."
 msgstr "Nog geen verwijderingen geregistreerd."
 
+#: manufacturing/templates/demand_forecast.html:3
+#: manufacturing/templates/demand_forecast.html:41
+#: manufacturing/templates/mrp_home.html:99
+#: manufacturing/templates/sales_demand.html:8
+msgid "AI Demand Forecast"
+msgstr "AI-vraagprognose"
+
+#: manufacturing/templates/demand_forecast.html:6
+msgid "Sales Demand"
+msgstr "Verkoopvraag"
+
+#: manufacturing/templates/demand_forecast.html:43
+msgid ""
+"Computed from 24 months of shipped/closed Sales Order history via seasonal\n"
+"        decomposition (trend + calendar-month seasonality) — not the manual "
+"rep quota\n"
+"        on the <a href=\"/sales/forecast/\">Sales Forecast</a> page."
+msgstr ""
+"Berekend op basis van 24 maanden geschiedenis van verzonden/afgesloten "
+"verkooporders via\n"
+"        seizoensdecompositie (trend + kalendermaand-seizoenspatroon) — niet "
+"het handmatige quotum\n"
+"        van de vertegenwoordiger op de pagina <a href=\"/sales/forecast/"
+"\">Verkoopprognose</a>."
+
+#: manufacturing/templates/demand_forecast.html:52
+msgid "Unknown Product"
+msgstr "Onbekend Product"
+
+#: manufacturing/templates/demand_forecast.html:52
+#, python-format
+msgid "(%(qty)s forecasted)"
+msgstr "(%(qty)s voorspeld)"
+
+#: manufacturing/templates/demand_forecast.html:61
+msgid "Regenerate All Forecasts"
+msgstr "Alle Prognoses Opnieuw Genereren"
+
+#: manufacturing/templates/demand_forecast.html:66
+msgid "Actual vs. Forecast — Monthly Units"
+msgstr "Werkelijk vs. Prognose — Maandelijkse Eenheden"
+
+#: manufacturing/templates/demand_forecast.html:69
+msgid "Actual (history)"
+msgstr "Werkelijk (geschiedenis)"
+
+#: manufacturing/templates/demand_forecast.html:70
+msgid "Forecast (projected)"
+msgstr "Prognose (geprojecteerd)"
+
+#: manufacturing/templates/demand_forecast.html:77
+msgid "Overlay"
+msgstr "Overlay"
+
+#: manufacturing/templates/demand_forecast.html:83
+msgid "forecast"
+msgstr "prognose"
+
+#: manufacturing/templates/demand_forecast.html:103
+msgid "No forecast generated yet."
+msgstr "Er is nog geen prognose gegenereerd."
+
+#: manufacturing/templates/demand_forecast.html:104
+msgid "Click \"Regenerate All Forecasts\" above to build one from SO history."
+msgstr ""
+"Klik hierboven op \"Alle Prognoses Opnieuw Genereren\" om er een op te "
+"bouwen uit de SO-geschiedenis."
+
+#: manufacturing/templates/document_detail.html:6
+#: manufacturing/templates/document_list.html:3
+#: manufacturing/templates/document_list.html:28
+#: manufacturing/templates/document_new.html:6
+msgid "Document Control"
+msgstr "Documentbeheersing"
+
+#: manufacturing/templates/document_detail.html:33
+#: manufacturing/templates/document_list.html:82
+msgid "In Review"
+msgstr "In Beoordeling"
+
+#: manufacturing/templates/document_detail.html:39
+#: manufacturing/templates/document_list.html:88
+msgid "Obsolete"
+msgstr "Verouderd"
+
+#: manufacturing/templates/document_detail.html:43
+#, python-format
+msgid "%(doc_type)s · Revision %(rev)s · created %(created)s by %(by)s"
+msgstr "%(doc_type)s · Revisie %(rev)s · aangemaakt op %(created)s door %(by)s"
+
+#: manufacturing/templates/document_detail.html:57
+msgid ""
+"Meaning of signature (e.g. &quot;I approve this document for release&quot;)"
+msgstr ""
+"Betekenis van de handtekening (bijv. &quot;Ik keur dit document goed voor "
+"vrijgave&quot;)"
+
+#: manufacturing/templates/document_detail.html:66
+#, python-format
+msgid "In review — awaiting <strong>%(role)s</strong>."
+msgstr "In beoordeling — wachtend op <strong>%(role)s</strong>."
+
+#: manufacturing/templates/document_detail.html:68
+msgid "In review."
+msgstr "In beoordeling."
+
+#: manufacturing/templates/document_detail.html:75
+msgid "Document Info"
+msgstr "Documentinformatie"
+
+#: manufacturing/templates/document_detail.html:86
+msgid "Current File"
+msgstr "Huidig Bestand"
+
+#: manufacturing/templates/document_detail.html:91
+msgid "no file attached"
+msgstr "geen bestand bijgevoegd"
+
+#: manufacturing/templates/document_detail.html:108
+msgid "Attach File"
+msgstr "Bestand Bijvoegen"
+
+#: manufacturing/templates/document_detail.html:110
+msgid "Submit this revision for review?"
+msgstr "Deze revisie ter beoordeling indienen?"
+
+#: manufacturing/templates/document_detail.html:113
+msgid "Submit for Review"
+msgstr "Indienen ter Beoordeling"
+
+#: manufacturing/templates/document_detail.html:117
+msgid "Mark this document superseded?"
+msgstr "Dit document als vervangen markeren?"
+
+#: manufacturing/templates/document_detail.html:120
+msgid "Mark Superseded"
+msgstr "Markeren als Vervangen"
+
+#: manufacturing/templates/document_detail.html:124
+msgid "Mark this document obsolete? This cannot be undone."
+msgstr ""
+"Dit document als verouderd markeren? Dit kan niet ongedaan worden gemaakt."
+
+#: manufacturing/templates/document_detail.html:127
+msgid "Mark Obsolete"
+msgstr "Markeren als Verouderd"
+
+#: manufacturing/templates/document_detail.html:136
+msgid "Create New Revision"
+msgstr "Nieuwe Revisie Maken"
+
+#: manufacturing/templates/document_detail.html:138
+#, python-format
+msgid ""
+"Bumps to revision %(rev)s + 1 and resets status to 'draft' so it\n"
+"            can go through review again."
+msgstr ""
+"Verhoogt naar revisie %(rev)s + 1 en zet de status terug naar 'draft' zodat "
+"het\n"
+"            opnieuw de beoordeling kan doorlopen."
+
+#: manufacturing/templates/document_detail.html:145
+#: manufacturing/templates/document_detail.html:163
+msgid "Change Description"
+msgstr "Wijzigingsbeschrijving"
+
+#: manufacturing/templates/document_detail.html:146
+msgid "What changed and why"
+msgstr "Wat er is gewijzigd en waarom"
+
+#: manufacturing/templates/document_detail.html:149
+msgid "Replacement File (optional)"
+msgstr "Vervangend Bestand (optioneel)"
+
+#: manufacturing/templates/document_detail.html:152
+msgid "Create Revision"
+msgstr "Revisie Maken"
+
+#: manufacturing/templates/document_detail.html:158
+msgid "Revision History"
+msgstr "Revisiegeschiedenis"
+
+#: manufacturing/templates/document_detail.html:163
+#: manufacturing/templates/document_list.html:65
+msgid "Rev"
+msgstr "Rev"
+
+#: manufacturing/templates/document_detail.html:163
+msgid "File"
+msgstr "Bestand"
+
+#: manufacturing/templates/document_detail.html:179
+msgid "No revisions recorded."
+msgstr "Geen revisies geregistreerd."
+
+#: manufacturing/templates/document_detail.html:184
+msgid "Linked Records"
+msgstr "Gekoppelde Records"
+
+#: manufacturing/templates/document_detail.html:188
+msgid "Linked Record"
+msgstr "Gekoppeld Record"
+
+#: manufacturing/templates/document_detail.html:210
+msgid "No linked records yet."
+msgstr "Nog geen gekoppelde records."
+
+#: manufacturing/templates/document_detail.html:217
+msgid "Link to BOM (product)"
+msgstr "Koppelen aan BOM (product)"
+
+#: manufacturing/templates/document_detail.html:233
+msgid "Link to Sampling Plan"
+msgstr "Koppelen aan Steekproefplan"
+
+#: manufacturing/templates/document_detail.html:249
+msgid "Link to Equipment"
+msgstr "Koppelen aan Apparatuur"
+
+#: manufacturing/templates/document_detail.html:265
+msgid "Link to Workcenter"
+msgstr "Koppelen aan Werkplek"
+
+#: manufacturing/templates/document_detail.html:281
+msgid "Link to Routing (by ID)"
+msgstr "Koppelen aan Routing (op ID)"
+
+#: manufacturing/templates/document_detail.html:285
+msgid "Routing step ID"
+msgstr "ID van de routingstap"
+
+#: manufacturing/templates/document_list.html:10
+#: manufacturing/templates/document_new.html:3
+#: manufacturing/templates/document_new.html:21
+msgid "New Document"
+msgstr "Nieuw Document"
+
+#: manufacturing/templates/document_list.html:30
+msgid ""
+"SOPs, work instructions, drawings, and specs — with revision history, an\n"
+"        approval workflow, and links to the BOMs, routings, sampling plans, "
+"and\n"
+"        equipment they govern."
+msgstr ""
+"SOPs, werkinstructies, tekeningen en specificaties — met "
+"revisiegeschiedenis, een\n"
+"        goedkeuringsworkflow en koppelingen naar de BOM's, routings, "
+"steekproefplannen en\n"
+"        apparatuur die ze beheersen."
+
+#: manufacturing/templates/document_list.html:52
+msgid "Search title or #…"
+msgstr "Zoek titel of nr.…"
+
+#: manufacturing/templates/document_list.html:62
+msgid "Doc #"
+msgstr "Doc.-nr."
+
+#: manufacturing/templates/document_list.html:99
+msgid "No documents found."
+msgstr "Geen documenten gevonden."
+
+#: manufacturing/templates/document_new.html:30
+msgid "e.g. Incoming Inspection Work Instruction"
+msgstr "bijv. Werkinstructie Ingangscontrole"
+
+#: manufacturing/templates/document_new.html:42
+#: manufacturing/templates/it_task_list.html:132
+#: manufacturing/templates/people_list.html:33
+msgid "Name or email"
+msgstr "Naam of e-mail"
+
+#: manufacturing/templates/document_new.html:48
+msgid "Create Document"
+msgstr "Document Maken"
+
+#: manufacturing/templates/document_new.html:51
+msgid ""
+"Created as revision A in 'draft' status. Attach a file and submit it for\n"
+"            review from the document's detail page once you're ready."
+msgstr ""
+"Aangemaakt als revisie A met status 'draft'. Voeg een bestand toe en dien "
+"het ter\n"
+"            beoordeling in vanaf de detailpagina van het document zodra u "
+"klaar bent."
+
 #: manufacturing/templates/ecommerce_connection_detail.html:3
 #: manufacturing/templates/ecommerce_connection_detail.html:28
 msgid "Storefront Connection"
@@ -8664,10 +10202,6 @@ msgstr "Platform"
 msgid "Default Customer"
 msgstr "Standaardklant"
 
-#: manufacturing/templates/ecommerce_connection_list.html:24
-msgid "Price List"
-msgstr "Prijslijst"
-
 #: manufacturing/templates/ecommerce_connection_list.html:25
 msgid "Sync Endpoint"
 msgstr "Sync-eindpunt"
@@ -8689,12 +10223,6 @@ msgstr "Nog geen webwinkelverbindingen geconfigureerd."
 #: manufacturing/templates/ecommerce_connection_new.html:11
 msgid "New e-Commerce Connection"
 msgstr "Nieuwe E-commerceverbinding"
-
-#: manufacturing/templates/ecommerce_connection_new.html:22
-#: manufacturing/templates/edi_850_upload.html:36
-#: manufacturing/templates/edi_partner_new.html:22
-msgid "(select)"
-msgstr "(selecteren)"
 
 #: manufacturing/templates/ecommerce_connection_new.html:29
 msgid "Store Name"
@@ -8769,7 +10297,12 @@ msgid ""
 "        a Sales Order. Lines whose partner item number has no mapping still "
 "import,\n"
 "        using the partner's raw item number as a text description."
-msgstr "Upload het EDI 850-bestand van een klant (segmentgescheiden X12-tekst) om automatisch\n        een verkooporder aan te maken. Regels waarvan het partnerartikelnummer geen koppeling heeft, worden nog steeds geïmporteerd,\n        met het ruwe artikelnummer van de partner als tekstbeschrijving."
+msgstr ""
+"Upload het EDI 850-bestand van een klant (segmentgescheiden X12-tekst) om "
+"automatisch\n"
+"        een verkooporder aan te maken. Regels waarvan het "
+"partnerartikelnummer geen koppeling heeft, worden nog steeds geïmporteerd,\n"
+"        met het ruwe artikelnummer van de partner als tekstbeschrijving."
 
 #: manufacturing/templates/edi_850_upload.html:21
 #, python-format
@@ -8779,8 +10312,12 @@ msgid ""
 msgid_plural ""
 "Created <a href=\"/so/%(id)s/\">%(num)s</a> with\n"
 "        %(counter)s lines"
-msgstr[0] "<a href=\"/so/%(id)s/\">%(num)s</a> aangemaakt met\n        %(counter)s regel"
-msgstr[1] "<a href=\"/so/%(id)s/\">%(num)s</a> aangemaakt met\n        %(counter)s regels"
+msgstr[0] ""
+"<a href=\"/so/%(id)s/\">%(num)s</a> aangemaakt met\n"
+"        %(counter)s regel"
+msgstr[1] ""
+"<a href=\"/so/%(id)s/\">%(num)s</a> aangemaakt met\n"
+"        %(counter)s regels"
 
 #: manufacturing/templates/edi_850_upload.html:23
 #, python-format
@@ -8790,8 +10327,12 @@ msgid ""
 msgid_plural ""
 "%(counter)s\n"
 "        unmapped"
-msgstr[0] "%(counter)s\n        niet gekoppeld"
-msgstr[1] "%(counter)s\n        niet gekoppeld"
+msgstr[0] ""
+"%(counter)s\n"
+"        niet gekoppeld"
+msgstr[1] ""
+"%(counter)s\n"
+"        niet gekoppeld"
 
 #: manufacturing/templates/edi_850_upload.html:43
 msgid "EDI 850 File"
@@ -8826,7 +10367,13 @@ msgid ""
 "resolve to one of\n"
 "                our products. Unmapped lines still import — just without a "
 "linked product."
-msgstr "Onze producten hebben geen SKU-/codeveld, dus deze koppeling zorgt ervoor dat een\n                PO1-regel van een inkomende EDI 850 (met het eigen onderdeelnummer van de partner) wordt herleid tot een van\n                onze producten. Niet-gekoppelde regels worden nog steeds geïmporteerd — alleen zonder gekoppeld product."
+msgstr ""
+"Onze producten hebben geen SKU-/codeveld, dus deze koppeling zorgt ervoor "
+"dat een\n"
+"                PO1-regel van een inkomende EDI 850 (met het eigen "
+"onderdeelnummer van de partner) wordt herleid tot een van\n"
+"                onze producten. Niet-gekoppelde regels worden nog steeds "
+"geïmporteerd — alleen zonder gekoppeld product."
 
 #: manufacturing/templates/edi_partner_detail.html:48
 #: manufacturing/templates/edi_partner_detail.html:65
@@ -8988,9 +10535,11 @@ msgid "Required"
 msgstr "Vereist"
 
 #: manufacturing/templates/employee_gap_detail.html:37
+#: manufacturing/templates/repetitive_schedule_detail.html:123
 #: manufacturing/templates/sales_forecast_detail.html:77
 #: manufacturing/templates/sales_performance_kpis.html:10
 #: manufacturing/templates/sales_targets.html:76
+#: manufacturing/templates/sf_shift_plan.html:69
 #: manufacturing/templates/workforce_analytics.html:91
 msgid "Actual"
 msgstr "Werkelijk"
@@ -9608,6 +11157,113 @@ msgstr "— Geen —"
 msgid "Create Task"
 msgstr "Taak Aanmaken"
 
+#: manufacturing/templates/esg_dashboard.html:6
+msgid "← Reports"
+msgstr "← Rapporten"
+
+#: manufacturing/templates/esg_dashboard.html:53
+msgid ""
+"A simplified GHG-Protocol-inspired scope 1/2/3 view — not full compliance "
+"tooling.\n"
+"        Scope 1 (direct operations) and Scope 3 (purchased goods) are "
+"computed from actual\n"
+"        production runs' rolled carbon footprints; Scope 2 (purchased "
+"energy) is manual\n"
+"        monthly entry since no energy telemetry exists in this system."
+msgstr ""
+"Een vereenvoudigd Scope 1/2/3-overzicht geïnspireerd op het GHG Protocol — "
+"geen volledige compliance-tool.\n"
+"        Scope 1 (directe activiteiten) en Scope 3 (ingekochte goederen) "
+"worden berekend op basis van de\n"
+"        opgetelde koolstofvoetafdrukken van werkelijke productieorders; "
+"Scope 2 (ingekochte energie) is een\n"
+"        handmatige maandelijkse invoer, aangezien dit systeem geen "
+"energietelemetrie heeft."
+
+#: manufacturing/templates/esg_dashboard.html:76
+msgid "Scope 1 — Direct"
+msgstr "Scope 1 — Direct"
+
+#: manufacturing/templates/esg_dashboard.html:80
+msgid "Scope 2 — Energy"
+msgstr "Scope 2 — Energie"
+
+#: manufacturing/templates/esg_dashboard.html:84
+msgid "Scope 3 — Supply Chain"
+msgstr "Scope 3 — Toeleveringsketen"
+
+#: manufacturing/templates/esg_dashboard.html:88
+msgid "Total CO2e"
+msgstr "Totaal CO2e"
+
+#: manufacturing/templates/esg_dashboard.html:96
+msgid "Scope Breakdown"
+msgstr "Uitsplitsing per Scope"
+
+#: manufacturing/templates/esg_dashboard.html:100
+msgid "Monthly Trend (Scope 1 + 3)"
+msgstr "Maandelijkse Trend (Scope 1 + 3)"
+
+#: manufacturing/templates/esg_dashboard.html:106
+msgid "Top Products by Carbon Footprint"
+msgstr "Topproducten naar CO2-voetafdruk"
+
+#: manufacturing/templates/esg_dashboard.html:109
+msgid "Total CO2e (kg)"
+msgstr "Totaal CO2e (kg)"
+
+#: manufacturing/templates/esg_dashboard.html:120
+msgid "No production carbon data yet."
+msgstr "Nog geen productie-CO2-gegevens beschikbaar."
+
+#: manufacturing/templates/esg_dashboard.html:125
+msgid "Scope 2 — Purchased Energy (Manual Entry)"
+msgstr "Scope 2 — Ingekochte Energie (Handmatige Invoer)"
+
+#: manufacturing/templates/esg_dashboard.html:130
+msgid "Period (YYYY-MM)"
+msgstr "Periode (JJJJ-MM)"
+
+#: manufacturing/templates/esg_dashboard.html:134
+msgid "kWh Used"
+msgstr "Gebruikte kWh"
+
+#: manufacturing/templates/esg_dashboard.html:138
+msgid "Grid Factor (kg CO2e/kWh)"
+msgstr "Netfactor (kg CO2e/kWh)"
+
+#: manufacturing/templates/esg_dashboard.html:145
+msgid "Save Entry"
+msgstr "Invoer Opslaan"
+
+#: manufacturing/templates/esg_dashboard.html:150
+msgid "kWh"
+msgstr "kWh"
+
+#: manufacturing/templates/esg_dashboard.html:150
+msgid "Grid Factor"
+msgstr "Netfactor"
+
+#: manufacturing/templates/esg_dashboard.html:164
+msgid "No Scope 2 entries yet."
+msgstr "Nog geen Scope 2-invoer."
+
+#: manufacturing/templates/esg_dashboard.html:169
+msgid "Process Emission Factors (kg CO2e / hour by Workcenter)"
+msgstr "Procesemissiefactoren (kg CO2e / uur per Werkplek)"
+
+#: manufacturing/templates/esg_dashboard.html:173
+msgid "kg CO2e / hour"
+msgstr "kg CO2e / uur"
+
+#: manufacturing/templates/esg_dashboard.html:191
+#: manufacturing/templates/maint_oee_report.html:144
+#: manufacturing/templates/prod_schedule_gantt.html:82
+#: manufacturing/templates/sf_entry.html:127
+#: manufacturing/templates/sf_shift_plan.html:81
+msgid "No active workcenters."
+msgstr "Geen actieve werkplekken."
+
 #: manufacturing/templates/ess_home.html:6
 msgid "Pay Stubs"
 msgstr "Loonstroken"
@@ -9904,34 +11560,10 @@ msgstr ""
 "— naam, e-mail en afdeling worden beheerd door HR en zijn hier niet "
 "bewerkbaar."
 
-#: manufacturing/templates/ess_profile.html:42
-#: manufacturing/templates/people_form.html:100
-#: manufacturing/templates/register.html:58
-msgid "Address"
-msgstr "Adres"
-
 #: manufacturing/templates/ess_profile.html:44
 #: manufacturing/templates/people_form.html:102
 msgid "Street Address"
 msgstr "Straatnaam en Huisnummer"
-
-#: manufacturing/templates/ess_profile.html:48
-#: manufacturing/templates/people_form.html:107
-#: manufacturing/templates/register.html:65
-#: manufacturing/templates/register.html:66
-msgid "City"
-msgstr "Plaats"
-
-#: manufacturing/templates/ess_profile.html:52
-#: manufacturing/templates/people_form.html:111
-#: manufacturing/templates/register.html:69
-msgid "State"
-msgstr "Provincie"
-
-#: manufacturing/templates/ess_profile.html:56
-#: manufacturing/templates/people_form.html:116
-msgid "Zip Code"
-msgstr "Postcode"
 
 #: manufacturing/templates/ess_profile.html:64
 msgid "Emergency Contact"
@@ -10198,20 +11830,6 @@ msgstr "Exitgesprek Opslaan"
 msgid "13-Week Cash Forecast"
 msgstr "13-weekse Kasstroomprognose"
 
-#: manufacturing/templates/fin_cash_forecast.html:6
-#: manufacturing/templates/finance_audit_detail.html:6
-#: manufacturing/templates/finance_audit_list.html:6
-#: manufacturing/templates/finance_bank_rec_detail.html:6
-#: manufacturing/templates/finance_bank_rec_list.html:6
-#: manufacturing/templates/finance_budget_detail.html:6
-#: manufacturing/templates/finance_budget_list.html:6
-#: manufacturing/templates/finance_dashboard.html:3
-#: manufacturing/templates/finance_dashboard.html:50
-#: manufacturing/templates/finance_tax_detail.html:6
-#: manufacturing/templates/finance_tax_list.html:6
-msgid "Finance Dashboard"
-msgstr "Financieel Dashboard"
-
 #: manufacturing/templates/fin_cash_forecast.html:7
 #: manufacturing/templates/finance_dashboard.html:65
 #: manufacturing/templates/gl_cash_flow_statement.html:3
@@ -10224,14 +11842,6 @@ msgstr "Kasstroomoverzicht"
 #: manufacturing/templates/wo_detail.html:108
 msgid "Start Date:"
 msgstr "Startdatum:"
-
-#: manufacturing/templates/fin_cash_forecast.html:37
-#: manufacturing/templates/gl_balance_sheet.html:46
-#: manufacturing/templates/gl_cash_flow_statement.html:49
-#: manufacturing/templates/gl_income_statement.html:47
-#: manufacturing/templates/gl_trial_balance.html:40
-msgid "Run"
-msgstr "Uitvoeren"
 
 #: manufacturing/templates/fin_cash_forecast.html:41
 msgid "Projected Cash Balance"
@@ -10524,12 +12134,6 @@ msgstr "Bankrekeningen"
 msgid "Search account / bank…"
 msgstr "Zoek rekening / bank…"
 
-#: manufacturing/templates/finance_bank_rec_list.html:68
-#: manufacturing/templates/gl_accounts.html:62
-#: manufacturing/templates/gl_trial_balance.html:47
-msgid "Account Name"
-msgstr "Rekeningnaam"
-
 #: manufacturing/templates/finance_bank_rec_list.html:91
 msgid "No bank accounts found."
 msgstr "Geen bankrekeningen gevonden."
@@ -10565,16 +12169,6 @@ msgstr "Budget Bewerken"
 #: manufacturing/templates/finance_budget_list.html:109
 msgid "Budget Name *"
 msgstr "Budgetnaam *"
-
-#: manufacturing/templates/finance_budget_detail.html:69
-#: manufacturing/templates/finance_budget_detail.html:91
-#: manufacturing/templates/finance_budget_list.html:69
-#: manufacturing/templates/finance_budget_list.html:80
-#: manufacturing/templates/sales_forecast_detail.html:148
-#: manufacturing/templates/sales_forecast_list.html:140
-#: manufacturing/templates/sales_forecast_list.html:212
-msgid "Fiscal Year"
-msgstr "Boekjaar"
 
 #: manufacturing/templates/finance_budget_detail.html:100
 msgid "Budget Lines"
@@ -10620,6 +12214,7 @@ msgstr "Begroot Bedrag ($)"
 
 #: manufacturing/templates/finance_budget_detail.html:168
 #: manufacturing/templates/gl_journal_detail.html:153
+#: manufacturing/templates/pl_detail.html:154
 #: manufacturing/templates/wms_transfer_detail.html:81
 #: manufacturing/templates/wms_transfer_detail.html:95
 msgid "Add Line"
@@ -10628,18 +12223,6 @@ msgstr "Regel Toevoegen"
 #: manufacturing/templates/finance_budget_list.html:70
 msgid "Search name…"
 msgstr "Zoek naam…"
-
-#: manufacturing/templates/finance_budget_list.html:79
-msgid "Budget Name"
-msgstr "Budgetnaam"
-
-#: manufacturing/templates/finance_budget_list.html:96
-msgid "No budgets found."
-msgstr "Geen budgetten gevonden."
-
-#: manufacturing/templates/finance_budget_list.html:104
-msgid "New Budget"
-msgstr "Nieuw Budget"
 
 #: manufacturing/templates/finance_budget_list.html:110
 msgid "e.g. Operations FY2026"
@@ -11153,6 +12736,29 @@ msgstr "Optionele notities..."
 msgid "Create Asset"
 msgstr "Actief Aanmaken"
 
+#: manufacturing/templates/fmea_risk_register.html:3
+#: manufacturing/templates/fmea_risk_register.html:19
+#: manufacturing/templates/risk_dashboard.html:46
+msgid "FMEA Risk Register"
+msgstr "FMEA-Risicoregister"
+
+#: manufacturing/templates/fmea_risk_register.html:21
+#, python-format
+msgid ""
+"Every characteristic at or above RPN %(threshold)s on an active control "
+"plan, highest risk first."
+msgstr ""
+"Alle kenmerken met RPN %(threshold)s of hoger in een actief controleplan, "
+"hoogste risico eerst."
+
+#: manufacturing/templates/fmea_risk_register.html:37
+msgid "Control Plan"
+msgstr "Controleplan"
+
+#: manufacturing/templates/fmea_risk_register.html:65
+msgid "No items at or above this threshold."
+msgstr "Geen items op of boven deze drempelwaarde."
+
 #: manufacturing/templates/forgot_password.html:4
 #: manufacturing/templates/forgot_password_reset.html:38
 msgid "Reset Password"
@@ -11187,15 +12793,6 @@ msgstr "Nieuw wachtwoord instellen voor %(email)s"
 msgid "Minimum 8 characters"
 msgstr "Minimaal 8 tekens"
 
-#: manufacturing/templates/gl_accounts.html:6
-#: manufacturing/templates/gl_balance_sheet.html:6
-#: manufacturing/templates/gl_cash_flow_statement.html:6
-#: manufacturing/templates/gl_income_statement.html:6
-#: manufacturing/templates/gl_journals.html:6
-#: manufacturing/templates/gl_trial_balance.html:6
-msgid "G/L Dashboard"
-msgstr "G/L-dashboard"
-
 #: manufacturing/templates/gl_accounts.html:7
 msgid "Journals"
 msgstr "Journaalposten"
@@ -11203,11 +12800,6 @@ msgstr "Journaalposten"
 #: manufacturing/templates/gl_accounts.html:56
 msgid "Show Inactive"
 msgstr "Inactieve tonen"
-
-#: manufacturing/templates/gl_accounts.html:62
-#: manufacturing/templates/gl_trial_balance.html:47
-msgid "Acct #"
-msgstr "Rek.nr."
 
 #: manufacturing/templates/gl_accounts.html:62
 #: manufacturing/templates/gl_accounts.html:106
@@ -11252,23 +12844,6 @@ msgstr "Per:"
 msgid "Balance Sheet as of %(as_of)s"
 msgstr "Balans per %(as_of)s"
 
-#: manufacturing/templates/gl_balance_sheet.html:58
-#: manufacturing/templates/it_asset_detail.html:8
-#: manufacturing/templates/it_asset_list.html:8
-#: manufacturing/templates/it_dashboard.html:8
-#: manufacturing/templates/it_incident_list.html:9
-#: manufacturing/templates/it_license_list.html:8
-#: manufacturing/templates/it_network_detail.html:8
-#: manufacturing/templates/it_network_list.html:8
-#: manufacturing/templates/it_repairs_detail.html:8
-#: manufacturing/templates/it_repairs_list.html:8
-#: manufacturing/templates/it_software_list.html:8
-#: manufacturing/templates/it_task_list.html:9
-#: manufacturing/templates/it_ticket_detail.html:8
-#: manufacturing/templates/it_ticket_list.html:8
-msgid "Assets"
-msgstr "Activa"
-
 #: manufacturing/templates/gl_balance_sheet.html:73
 msgid "Liabilities"
 msgstr "Passiva"
@@ -11277,10 +12852,6 @@ msgstr "Passiva"
 msgid "Total Liabilities"
 msgstr "Totaal passiva"
 
-#: manufacturing/templates/gl_balance_sheet.html:86
-msgid "Equity"
-msgstr "Eigen vermogen"
-
 #: manufacturing/templates/gl_balance_sheet.html:94
 msgid "Total Equity"
 msgstr "Totaal eigen vermogen"
@@ -11288,25 +12859,6 @@ msgstr "Totaal eigen vermogen"
 #: manufacturing/templates/gl_balance_sheet.html:107
 msgid "Total Liabilities + Equity"
 msgstr "Totaal passiva + eigen vermogen"
-
-#: manufacturing/templates/gl_balance_sheet.html:112
-#: manufacturing/templates/gl_trial_balance.html:70
-msgid "BALANCED"
-msgstr "IN BALANS"
-
-#: manufacturing/templates/gl_balance_sheet.html:112
-msgid "OUT OF BALANCE"
-msgstr "NIET IN BALANS"
-
-#: manufacturing/templates/gl_cash_flow_statement.html:45
-#: manufacturing/templates/gl_income_statement.html:43
-#: manufacturing/templates/gl_journals.html:46
-#: manufacturing/templates/prod_schedule.html:48
-#: manufacturing/templates/prod_schedule_gantt.html:45
-#: manufacturing/templates/sales_orders.html:64
-#: manufacturing/templates/supplier_scorecard_list.html:39
-msgid "From:"
-msgstr "Van:"
 
 #: manufacturing/templates/gl_cash_flow_statement.html:54
 msgid "Cash Flow Statement (Indirect Method)"
@@ -11425,13 +12977,6 @@ msgstr "Nieuwe journaalpost"
 msgid "Total Dr"
 msgstr "Totaal Deb."
 
-#: manufacturing/templates/gl_income_statement.html:57
-#: manufacturing/templates/sales_performance_kpis.html:56
-#: manufacturing/templates/sales_reports_kpis.html:21
-#: manufacturing/templates/sales_reports_kpis.html:34
-msgid "Revenue"
-msgstr "Omzet"
-
 #: manufacturing/templates/gl_income_statement.html:65
 #: manufacturing/templates/sales_reports_kpis.html:5
 msgid "Total Revenue"
@@ -11448,10 +12993,6 @@ msgstr "Totale kostprijs omzet"
 #: manufacturing/templates/gl_income_statement.html:86
 msgid "Gross Profit (Revenue – COGS)"
 msgstr "Brutowinst (omzet – kostprijs omzet)"
-
-#: manufacturing/templates/gl_income_statement.html:93
-msgid "Expenses"
-msgstr "Kosten"
 
 #: manufacturing/templates/gl_income_statement.html:101
 #: manufacturing/templates/gl_income_statement.html:112
@@ -11505,16 +13046,6 @@ msgstr "Journaalregels"
 #: manufacturing/templates/gl_journal_detail.html:134
 msgid "Account"
 msgstr "Rekening"
-
-#: manufacturing/templates/gl_journal_detail.html:91
-#: manufacturing/templates/gl_trial_balance.html:48
-msgid "Debit"
-msgstr "Debet"
-
-#: manufacturing/templates/gl_journal_detail.html:91
-#: manufacturing/templates/gl_trial_balance.html:48
-msgid "Credit"
-msgstr "Credit"
 
 #: manufacturing/templates/gl_journal_detail.html:91
 #: manufacturing/templates/gl_journal_detail.html:150
@@ -11577,12 +13108,6 @@ msgstr "Alleen niet-geboekt"
 #: manufacturing/templates/gl_journals.html:79
 msgid "No journal entries found."
 msgstr "Geen journaalposten gevonden."
-
-#: manufacturing/templates/gl_trial_balance.html:63
-#: manufacturing/templates/payroll_run_detail.html:91
-#: manufacturing/templates/payroll_ytd.html:80
-msgid "TOTALS"
-msgstr "TOTALEN"
 
 #: manufacturing/templates/gl_trial_balance.html:70
 #, python-format
@@ -11681,6 +13206,68 @@ msgstr "Verifiëren"
 #: manufacturing/templates/home_mfa.html:28
 msgid "Cancel and sign in again"
 msgstr "Annuleren en opnieuw inloggen"
+
+#: manufacturing/templates/intercompany_list.html:3
+#: manufacturing/templates/intercompany_list.html:22
+msgid "Intercompany Transactions"
+msgstr "Intercompany-Transacties"
+
+#: manufacturing/templates/intercompany_list.html:7
+msgid "New Transaction"
+msgstr "Nieuwe Transactie"
+
+#: manufacturing/templates/intercompany_list.html:29
+msgid "IC Account Mapping"
+msgstr "IC-Rekeningtoewijzing"
+
+#: manufacturing/templates/intercompany_list.html:31
+msgid ""
+"Transactions post only once all four accounts are mapped; until then they're "
+"recorded but left unposted."
+msgstr ""
+"Transacties worden pas geboekt zodra alle vier rekeningen zijn toegewezen; "
+"tot die tijd worden ze geregistreerd maar niet geboekt."
+
+#: manufacturing/templates/intercompany_list.html:39
+msgid "(unmapped)"
+msgstr "(niet toegewezen)"
+
+#: manufacturing/templates/intercompany_list.html:48
+msgid "Save Mapping"
+msgstr "Toewijzing Opslaan"
+
+#: manufacturing/templates/intercompany_list.html:79
+msgid "Void this transaction?"
+msgstr "Deze transactie ongeldig maken?"
+
+#: manufacturing/templates/intercompany_list.html:83
+msgid "Void"
+msgstr "Ongeldig Maken"
+
+#: manufacturing/templates/intercompany_list.html:94
+msgid "No intercompany transactions yet."
+msgstr "Nog geen intercompany-transacties."
+
+#: manufacturing/templates/intercompany_new.html:3
+#: manufacturing/templates/intercompany_new.html:11
+msgid "New Intercompany Transaction"
+msgstr "Nieuwe Intercompany-Transactie"
+
+#: manufacturing/templates/intercompany_new.html:21
+msgid "From Company (billing entity)"
+msgstr "Van Bedrijf (factureerende entiteit)"
+
+#: manufacturing/templates/intercompany_new.html:29
+msgid "To Company (billed entity)"
+msgstr "Naar Bedrijf (gefactureerde entiteit)"
+
+#: manufacturing/templates/intercompany_new.html:45
+msgid "Transaction Date"
+msgstr "Transactiedatum"
+
+#: manufacturing/templates/intercompany_new.html:49
+msgid "Record Transaction"
+msgstr "Transactie Registreren"
 
 #: manufacturing/templates/inventory_dashboard.html:3
 #: manufacturing/templates/inventory_dashboard.html:33
@@ -11882,28 +13469,6 @@ msgstr "Alleen Nul"
 #: manufacturing/templates/inventory_list.html:54
 msgid "Search products…"
 msgstr "Producten zoeken…"
-
-#: manufacturing/templates/inventory_list.html:55
-#: manufacturing/templates/maint_downtime_list.html:71
-#: manufacturing/templates/maint_equipment_list.html:71
-#: manufacturing/templates/maint_inspection_list.html:71
-#: manufacturing/templates/maint_labor_report.html:65
-#: manufacturing/templates/maint_mechanics_list.html:68
-#: manufacturing/templates/maint_oee_report.html:64
-#: manufacturing/templates/maint_parts_list.html:70
-#: manufacturing/templates/maint_schedule_list.html:66
-#: manufacturing/templates/maint_wo_list.html:72
-#: manufacturing/templates/payroll_pay_rates.html:57
-#: manufacturing/templates/prod_labor_report.html:65
-#: manufacturing/templates/qa_capa_list.html:76
-#: manufacturing/templates/qa_inspection_list.html:72
-#: manufacturing/templates/qa_ncr_list.html:78
-#: manufacturing/templates/qa_supplier_list.html:76
-#: manufacturing/templates/sales_reports.html:54
-#: manufacturing/templates/scan_home.html:59
-#: manufacturing/templates/wms_bin_list.html:34
-msgid "Go"
-msgstr "Ga"
 
 #: manufacturing/templates/inventory_list.html:94
 msgid "Zero"
@@ -12250,15 +13815,6 @@ msgstr "Activa per type"
 msgid "Help Desk Tickets"
 msgstr "Helpdesktickets"
 
-#: manufacturing/templates/it_dashboard_kpis.html:9
-#: manufacturing/templates/it_task_list.html:88
-#: manufacturing/templates/prod_daily_report.html:64
-#: manufacturing/templates/prod_dashboard_kpis.html:8
-#: manufacturing/templates/technician_route_detail.html:31
-#: manufacturing/templates/technician_route_list.html:41
-msgid "In Progress"
-msgstr "In behandeling"
-
 #: manufacturing/templates/it_dashboard_kpis.html:13
 msgid "Critical (Open)"
 msgstr "Kritiek (open)"
@@ -12422,6 +13978,7 @@ msgstr "Gebruikte seats / totaal"
 #: manufacturing/templates/legal_ip_list.html:77
 #: manufacturing/templates/legal_ip_list.html:137
 #: manufacturing/templates/lot_new.html:66
+#: manufacturing/templates/pl_detail.html:65
 msgid "Expiry Date"
 msgstr "Vervaldatum"
 
@@ -12794,11 +14351,6 @@ msgstr "Geannuleerd"
 #: manufacturing/templates/it_task_list.html:112
 msgid "Short descriptive name"
 msgstr "Korte beschrijvende naam"
-
-#: manufacturing/templates/it_task_list.html:132
-#: manufacturing/templates/people_list.html:33
-msgid "Name or email"
-msgstr "Naam of e-mail"
 
 #: manufacturing/templates/it_task_list.html:148
 msgid "What needs to be done…"
@@ -13258,13 +14810,6 @@ msgstr "Lots"
 #: manufacturing/templates/lot_detail.html:71
 msgid "Lot Details"
 msgstr "Lotdetails"
-
-#: manufacturing/templates/lot_detail.html:74
-#: manufacturing/templates/maint_part_detail.html:83
-#: manufacturing/templates/maint_parts_list.html:124
-#: manufacturing/templates/wo_form.html:51
-msgid "Quantity"
-msgstr "Hoeveelheid"
 
 #: manufacturing/templates/lot_detail.html:76
 #: manufacturing/templates/lot_list.html:69
@@ -13893,6 +15438,7 @@ msgstr "%(sched)su gepland / %(down)su stilstand"
 #: manufacturing/templates/sales_performance_reviews.html:7
 #: manufacturing/templates/sales_reports.html:9
 #: manufacturing/templates/sales_territories.html:9
+#: manufacturing/templates/sf_shift_plan.html:70
 msgid "Performance"
 msgstr "Prestatie"
 
@@ -13921,10 +15467,6 @@ msgstr "Beschikbaarheid / prestatie / kwaliteit per werkplek"
 msgid "Workcenter Detail"
 msgstr "Werkplekdetail"
 
-#: manufacturing/templates/maint_oee_report.html:117
-msgid "Workcenter"
-msgstr "Werkplek"
-
 #: manufacturing/templates/maint_oee_report.html:118
 msgid "Avail."
 msgstr "Besch."
@@ -13932,11 +15474,6 @@ msgstr "Besch."
 #: manufacturing/templates/maint_oee_report.html:119
 msgid "Perf."
 msgstr "Prest."
-
-#: manufacturing/templates/maint_oee_report.html:144
-#: manufacturing/templates/prod_schedule_gantt.html:82
-msgid "No active workcenters."
-msgstr "Geen actieve werkplekken."
 
 #: manufacturing/templates/maint_oee_report.html:153
 msgid "How OEE is Calculated"
@@ -14138,11 +15675,6 @@ msgstr "Werkorderdetails"
 msgid "Work Type"
 msgstr "Werktype"
 
-#: manufacturing/templates/maint_wo_detail.html:160
-#: manufacturing/templates/maint_wo_list.html:138
-msgid "Requested Date"
-msgstr "Aangevraagde datum"
-
 #: manufacturing/templates/maint_wo_detail.html:184
 #: manufacturing/templates/maint_wo_list.html:146
 msgid "Estimated Hours"
@@ -14318,6 +15850,8 @@ msgid "Content by Status"
 msgstr "Inhoud op status"
 
 #: manufacturing/templates/marketing_dashboard_kpis.html:13
+#: manufacturing/templates/repetitive_schedule_detail.html:122
+#: manufacturing/templates/sf_shift_plan.html:69
 #: manufacturing/templates/technician_route_detail.html:33
 #: manufacturing/templates/technician_route_list.html:43
 msgid "Planned"
@@ -14884,11 +16418,6 @@ msgstr "Bijdragende Orders"
 msgid "Include forecasted demand"
 msgstr "Voorspelde vraag opnemen"
 
-#: manufacturing/templates/mrp_home.html:99
-#: manufacturing/templates/sales_demand.html:8
-msgid "AI Demand Forecast"
-msgstr "AI-vraagprognose"
-
 #: manufacturing/templates/mrp_home.html:101
 msgid "Run MRP Plan"
 msgstr "MRP-Plan Uitvoeren"
@@ -15369,10 +16898,12 @@ msgstr "Salaristarief"
 #: manufacturing/templates/payroll_pay_rates.html:64
 #: manufacturing/templates/payroll_pay_rates.html:122
 #: manufacturing/templates/payroll_pay_rates.html:167
+#: manufacturing/templates/pl_detail.html:61
 msgid "Effective Date"
 msgstr "Ingangsdatum"
 
 #: manufacturing/templates/payroll_pay_rates.html:75
+#: manufacturing/templates/sf_shift_plan.html:76
 msgid "not set"
 msgstr "niet ingesteld"
 
@@ -15563,10 +17094,6 @@ msgstr "Afdeling:"
 #: manufacturing/templates/people_detail.html:58
 msgid "Sub-Dept:"
 msgstr "Subafdeling:"
-
-#: manufacturing/templates/people_detail.html:61
-msgid "Address:"
-msgstr "Adres:"
 
 #: manufacturing/templates/people_detail.html:67
 msgid "Created by:"
@@ -15898,6 +17425,106 @@ msgstr "Recente medewerkers"
 msgid "No employees found."
 msgstr "Geen medewerkers gevonden."
 
+#: manufacturing/templates/pl_detail.html:6
+#: manufacturing/templates/pl_list.html:3
+#: manufacturing/templates/pl_list.html:16
+#: manufacturing/templates/pl_new.html:6
+#: manufacturing/templates/promo_list.html:6
+#: manufacturing/templates/so_list.html:9
+msgid "Price Lists"
+msgstr "Prijslijsten"
+
+#: manufacturing/templates/pl_detail.html:36
+msgid "Price List Details"
+msgstr "Prijslijstdetails"
+
+#: manufacturing/templates/pl_detail.html:73
+msgid "Save Details"
+msgstr "Details Opslaan"
+
+#: manufacturing/templates/pl_detail.html:79
+msgid "Price Lines"
+msgstr "Prijsregels"
+
+#: manufacturing/templates/pl_detail.html:86
+#: manufacturing/templates/pl_detail.html:101
+#: manufacturing/templates/promo_list.html:33
+msgid "Min Qty"
+msgstr "Min. Hoeveelheid"
+
+#: manufacturing/templates/pl_detail.html:87
+#: manufacturing/templates/pl_detail.html:150
+#: manufacturing/templates/po_detail.html:167
+#: manufacturing/templates/po_detail.html:278
+#: manufacturing/templates/po_landed_cost_new.html:52
+#: manufacturing/templates/portal_order_detail.html:19
+#: manufacturing/templates/sales_order_detail.html:122
+#: manufacturing/templates/sales_order_detail.html:180
+#: manufacturing/templates/so_detail.html:198
+#: manufacturing/templates/so_detail.html:264
+#: manufacturing/templates/supplier_portal_po_detail.html:52
+msgid "Unit Price"
+msgstr "Stukprijs"
+
+#: manufacturing/templates/pl_detail.html:103
+#: manufacturing/templates/supplier_portal_rfq_detail.html:33
+msgid "Price"
+msgstr "Prijs"
+
+#: manufacturing/templates/pl_detail.html:126
+msgid "No price lines yet."
+msgstr "Nog geen prijsregels."
+
+#: manufacturing/templates/pl_detail.html:132
+msgid "Add Price Line"
+msgstr "Prijsregel Toevoegen"
+
+#: manufacturing/templates/pl_detail.html:146
+msgid "Min Qty (for tiered pricing)"
+msgstr "Min. Aantal (voor gestaffelde prijzen)"
+
+#: manufacturing/templates/pl_list.html:6
+#: manufacturing/templates/promo_detail.html:6
+#: manufacturing/templates/promo_list.html:16
+#: manufacturing/templates/promo_new.html:6
+#: manufacturing/templates/so_list.html:10
+msgid "Discounts &amp; Promotions"
+msgstr "Kortingen en Acties"
+
+#: manufacturing/templates/pl_list.html:10
+#: manufacturing/templates/pl_new.html:3 manufacturing/templates/pl_new.html:21
+msgid "New Price List"
+msgstr "Nieuwe Prijslijst"
+
+#: manufacturing/templates/pl_list.html:25
+#: manufacturing/templates/repetitive_schedule_list.html:29
+msgid "Effective"
+msgstr "Ingangsdatum"
+
+#: manufacturing/templates/pl_list.html:26
+msgid "Expiry"
+msgstr "Vervaldatum"
+
+#: manufacturing/templates/pl_list.html:52
+msgid "No price lists yet."
+msgstr "Nog geen prijslijsten."
+
+#: manufacturing/templates/pl_new.html:30
+msgid "e.g. Wholesale 2026"
+msgstr "bijv. Groothandel 2026"
+
+#: manufacturing/templates/pl_new.html:41
+msgid "Effective Date (optional)"
+msgstr "Ingangsdatum (optioneel)"
+
+#: manufacturing/templates/pl_new.html:45
+msgid "Expiry Date (optional)"
+msgstr "Vervaldatum (optioneel)"
+
+#: manufacturing/templates/pl_new.html:52
+msgid "Create Price List"
+msgstr "Prijslijst Aanmaken"
+
 #: manufacturing/templates/po_approvals.html:3
 #: manufacturing/templates/po_approvals.html:24
 msgid "PO Approval Queue"
@@ -15968,11 +17595,6 @@ msgstr "Besteldatum:"
 msgid "Expected:"
 msgstr "Verwacht:"
 
-#: manufacturing/templates/po_detail.html:120
-#: manufacturing/templates/so_detail.html:121
-msgid "Currency:"
-msgstr "Valuta:"
-
 #: manufacturing/templates/po_detail.html:130
 #: manufacturing/templates/so_detail.html:131
 msgid "Set Currency"
@@ -15998,18 +17620,6 @@ msgstr "Ga naar goedkeuringswachtrij"
 #: manufacturing/templates/po_detail.html:148
 msgid "Cancel this PO?"
 msgstr "Deze PO annuleren?"
-
-#: manufacturing/templates/po_detail.html:167
-#: manufacturing/templates/po_detail.html:278
-#: manufacturing/templates/po_landed_cost_new.html:52
-#: manufacturing/templates/portal_order_detail.html:19
-#: manufacturing/templates/sales_order_detail.html:122
-#: manufacturing/templates/sales_order_detail.html:180
-#: manufacturing/templates/so_detail.html:198
-#: manufacturing/templates/so_detail.html:264
-#: manufacturing/templates/supplier_portal_po_detail.html:52
-msgid "Unit Price"
-msgstr "Stukprijs"
 
 #: manufacturing/templates/po_detail.html:170
 #: manufacturing/templates/portal_order_detail.html:19
@@ -16516,6 +18126,7 @@ msgstr "U heeft nog geen retourverzoeken."
 #: manufacturing/templates/prod_returns_list.html:115
 #: manufacturing/templates/prod_shipping_detail.html:95
 #: manufacturing/templates/prod_shipping_list.html:110
+#: manufacturing/views/__init__.py:4436
 msgid "Sales Order"
 msgstr "Verkooporder"
 
@@ -16718,10 +18329,6 @@ msgstr "Geen werkorders met deze vervaldatum."
 #: manufacturing/templates/prod_tracking_dashboard.html:7
 msgid "Shipping"
 msgstr "Verzending"
-
-#: manufacturing/templates/prod_dashboard.html:12
-msgid "Configure-to-Order"
-msgstr "Configureren op Bestelling"
 
 #: manufacturing/templates/prod_dashboard.html:13
 #: manufacturing/templates/recipe_detail.html:6
@@ -17060,17 +18667,6 @@ msgstr "Productie-Gantt"
 msgid "List View"
 msgstr "Lijstweergave"
 
-#: manufacturing/templates/prod_schedule_gantt.html:8
-#: manufacturing/templates/workcenter_list.html:6
-msgid "Gantt"
-msgstr "Gantt"
-
-#: manufacturing/templates/prod_schedule_gantt.html:9
-#: manufacturing/templates/workcenter_calendar.html:7
-#: manufacturing/templates/workcenter_list.html:7
-msgid "Capacity Planning"
-msgstr "Capaciteitsplanning"
-
 #: manufacturing/templates/prod_schedule_gantt.html:42
 msgid "Production Gantt Chart"
 msgstr "Productie-Ganttdiagram"
@@ -17163,13 +18759,6 @@ msgstr "Recente zendingen"
 msgid "No shipments on record."
 msgstr "Geen zendingen geregistreerd."
 
-#: manufacturing/templates/promo_detail.html:6
-#: manufacturing/templates/promo_list.html:16
-#: manufacturing/templates/promo_new.html:6
-#: manufacturing/templates/so_list.html:10
-msgid "Discounts &amp; Promotions"
-msgstr "Kortingen en Acties"
-
 #: manufacturing/templates/promo_detail.html:35
 msgid "Promotion Details"
 msgstr "Promotiedetails"
@@ -17203,11 +18792,6 @@ msgstr "Minimale Hoeveelheid"
 msgid "Discounts & Promotions"
 msgstr "Kortingen en Promoties"
 
-#: manufacturing/templates/promo_list.html:6
-#: manufacturing/templates/so_list.html:9
-msgid "Price Lists"
-msgstr "Prijslijsten"
-
 #: manufacturing/templates/promo_list.html:10
 #: manufacturing/templates/promo_new.html:3
 #: manufacturing/templates/promo_new.html:22
@@ -17217,10 +18801,6 @@ msgstr "Nieuwe Promotie"
 #: manufacturing/templates/promo_list.html:30
 msgid "Discount"
 msgstr "Korting"
-
-#: manufacturing/templates/promo_list.html:33
-msgid "Min Qty"
-msgstr "Min. Hoeveelheid"
 
 #: manufacturing/templates/promo_list.html:34
 msgid "Window"
@@ -18085,17 +19665,9 @@ msgstr "Nieuwe Gebruiker Registreren"
 msgid "Register New Employee"
 msgstr "Nieuwe Werknemer Registreren"
 
-#: manufacturing/templates/register.html:40
-msgid "First Name"
-msgstr "Voornaam"
-
 #: manufacturing/templates/register.html:42
 msgid "First name"
 msgstr "Voornaam"
-
-#: manufacturing/templates/register.html:45
-msgid "Last Name"
-msgstr "Achternaam"
 
 #: manufacturing/templates/register.html:47
 msgid "Last name"
@@ -18129,6 +19701,123 @@ msgstr "Wachtwoord opnieuw invoeren"
 #: manufacturing/templates/register.html:97
 msgid "Register"
 msgstr "Registreren"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:3
+#, python-format
+msgid "%(name)s — Repetitive Schedule"
+msgstr "%(name)s — Repeterend Schema"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:6
+#: manufacturing/templates/repetitive_schedule_list.html:3
+#: manufacturing/templates/repetitive_schedule_new.html:6
+msgid "Repetitive Manufacturing"
+msgstr "Repeterende Productie"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:35
+#, python-format
+msgid "Rate: %(rate)s / day"
+msgstr "Snelheid: %(rate)s / dag"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:35
+#, python-format
+msgid "Effective %(start)s"
+msgstr "Geldig vanaf %(start)s"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:57
+#: manufacturing/templates/sf_entry.html:45
+#: manufacturing/templates/sf_entry.html:68
+msgid "Log Production"
+msgstr "Productie Registreren"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:59
+msgid ""
+"Completed units are backflushed automatically: components are issued and the "
+"finished product is received."
+msgstr ""
+"Voltooide eenheden worden automatisch teruggeboekt: componenten worden "
+"uitgeboekt en het eindproduct wordt ontvangen."
+
+#: manufacturing/templates/repetitive_schedule_detail.html:66
+msgid "Production Date *"
+msgstr "Productiedatum *"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:70
+msgid "Qty Completed *"
+msgstr "Aantal Voltooid *"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:74
+msgid "Qty Scrapped"
+msgstr "Aantal Afgekeurd"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:78
+msgid "Log &amp; Backflush"
+msgstr "Registreren en Terugboeken"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:84
+msgid "Production Log"
+msgstr "Productielogboek"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:88
+#: manufacturing/templates/repetitive_schedule_detail.html:124
+#: manufacturing/templates/sf_entry.html:114
+msgid "Scrapped"
+msgstr "Afgekeurd"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:101
+msgid "No production logged yet."
+msgstr "Nog geen productie geregistreerd."
+
+#: manufacturing/templates/repetitive_schedule_detail.html:106
+msgid "Planned vs. Actual"
+msgstr "Gepland vs. Werkelijk"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:118
+msgid "Compute"
+msgstr "Berekenen"
+
+#: manufacturing/templates/repetitive_schedule_detail.html:125
+#: manufacturing/templates/sales_demand.html:95
+#: manufacturing/templates/sales_performance_kpis.html:12
+#: manufacturing/templates/sales_targets.html:77
+msgid "Attainment"
+msgstr "Realisatie"
+
+#: manufacturing/templates/repetitive_schedule_list.html:9
+msgid "New Schedule"
+msgstr "Nieuw Schema"
+
+#: manufacturing/templates/repetitive_schedule_list.html:15
+msgid "Repetitive Manufacturing Schedules"
+msgstr "Repeterende Productieschema's"
+
+#: manufacturing/templates/repetitive_schedule_list.html:29
+msgid "Rate/Day"
+msgstr "Snelheid/Dag"
+
+#: manufacturing/templates/repetitive_schedule_list.html:51
+msgid "No repetitive schedules yet."
+msgstr "Nog geen repeterende schema's."
+
+#: manufacturing/templates/repetitive_schedule_new.html:3
+#: manufacturing/templates/repetitive_schedule_new.html:21
+msgid "New Repetitive Schedule"
+msgstr "Nieuw Repeterend Schema"
+
+#: manufacturing/templates/repetitive_schedule_new.html:46
+msgid "Rate / Day *"
+msgstr "Snelheid / Dag *"
+
+#: manufacturing/templates/repetitive_schedule_new.html:50
+msgid "Effective Start"
+msgstr "Ingangsdatum"
+
+#: manufacturing/templates/repetitive_schedule_new.html:54
+msgid "Effective End"
+msgstr "Einddatum"
+
+#: manufacturing/templates/repetitive_schedule_new.html:57
+msgid "Create Schedule"
+msgstr "Schema Aanmaken"
 
 #: manufacturing/templates/report_builder_detail.html:9
 msgid "Export PDF"
@@ -18340,11 +20029,6 @@ msgstr "Nog geen aangepaste rapporten."
 #: manufacturing/templates/reports_dashboard.html:139
 msgid "Reports Dashboard"
 msgstr "Rapportendashboard"
-
-#: manufacturing/templates/reports_dashboard.html:9
-#: manufacturing/templates/wo_carbon_detail.html:7
-msgid "ESG Dashboard"
-msgstr "ESG-dashboard"
 
 #: manufacturing/templates/reports_dashboard.html:148
 msgid "total active spend"
@@ -18773,10 +20457,6 @@ msgstr "Plan *"
 msgid "Risk Management Dashboard"
 msgstr "Risicobeheer-Dashboard"
 
-#: manufacturing/templates/risk_dashboard.html:46
-msgid "FMEA Risk Register"
-msgstr "FMEA-Risicoregister"
-
 #: manufacturing/templates/risk_dashboard.html:53
 msgid "Open Risks"
 msgstr "Open Risico's"
@@ -18970,17 +20650,6 @@ msgstr[1] "%(counter)s bewerkingen"
 #: manufacturing/templates/routing_detail.html:49
 msgid "View Cost Roll"
 msgstr "Kostenoverzicht Bekijken"
-
-#: manufacturing/templates/routing_detail.html:60
-#: manufacturing/templates/wo_detail.html:226
-msgid "Operation"
-msgstr "Bewerking"
-
-#: manufacturing/templates/routing_detail.html:61
-#: manufacturing/templates/routing_detail.html:108
-#: manufacturing/templates/wo_detail.html:227
-msgid "Work Center"
-msgstr "Werkplek"
 
 #: manufacturing/templates/routing_detail.html:62
 #: manufacturing/templates/routing_detail.html:117
@@ -19433,12 +21102,6 @@ msgstr "Gewogen prognose ($)"
 #: manufacturing/templates/sales_forecast_detail.html:120
 msgid "Actual Revenue ($)"
 msgstr "Werkelijke omzet ($)"
-
-#: manufacturing/templates/sales_demand.html:95
-#: manufacturing/templates/sales_performance_kpis.html:12
-#: manufacturing/templates/sales_targets.html:77
-msgid "Attainment"
-msgstr "Realisatie"
 
 #: manufacturing/templates/sales_demand.html:144
 #, python-format
@@ -20119,6 +21782,7 @@ msgid "e.g. PART-SKU123"
 msgstr "bijv. PART-SKU123"
 
 #: manufacturing/templates/scan_home.html:67
+#: manufacturing/views/__init__.py:4554
 msgid "Purchase Order"
 msgstr "Inkooporder"
 
@@ -20195,6 +21859,177 @@ msgstr ""
 "inkooporder te laden en scan vervolgens elk onderdeel om het als ontvangen "
 "te markeren."
 
+#: manufacturing/templates/scenario_detail.html:6
+#: manufacturing/templates/scenario_new.html:6
+msgid "Scenarios"
+msgstr "Scenario's"
+
+#: manufacturing/templates/scenario_detail.html:7
+msgid "Run Scenario"
+msgstr "Scenario Uitvoeren"
+
+#: manufacturing/templates/scenario_detail.html:31
+msgid "Demand Adjustments"
+msgstr "Vraagaanpassingen"
+
+#: manufacturing/templates/scenario_detail.html:36
+#: manufacturing/templates/scenario_detail.html:78
+msgid "Extra Qty"
+msgstr "Extra Hoeveelheid"
+
+#: manufacturing/templates/scenario_detail.html:36
+#: manufacturing/templates/scenario_detail.html:82
+msgid "Need Date"
+msgstr "Benodigde Datum"
+
+#: manufacturing/templates/scenario_detail.html:61
+msgid "No hypothetical demand added yet."
+msgstr "Nog geen hypothetische vraag toegevoegd."
+
+#: manufacturing/templates/scenario_detail.html:90
+msgid "Add Demand"
+msgstr "Vraag Toevoegen"
+
+#: manufacturing/templates/scenario_detail.html:96
+msgid "Capacity Adjustments"
+msgstr "Capaciteitsaanpassingen"
+
+#: manufacturing/templates/scenario_detail.html:101
+#: manufacturing/templates/scenario_detail.html:152
+msgid "Hours/Day"
+msgstr "Uren/Dag"
+
+#: manufacturing/templates/scenario_detail.html:127
+msgid "No hypothetical capacity changes added yet."
+msgstr "Nog geen hypothetische capaciteitswijzigingen toegevoegd."
+
+#: manufacturing/templates/scenario_detail.html:158
+msgid "e.g. Added Saturday shift"
+msgstr "bijv. Zaterdagdienst toegevoegd"
+
+#: manufacturing/templates/scenario_detail.html:160
+msgid "Add Capacity Override"
+msgstr "Capaciteitsoverschrijving Toevoegen"
+
+#: manufacturing/templates/scenario_detail.html:167
+#: manufacturing/templates/scenario_detail.html:171
+msgid "Delete Scenario"
+msgstr "Scenario Verwijderen"
+
+#: manufacturing/templates/scenario_detail.html:168
+msgid "Delete this scenario and all its adjustments?"
+msgstr "Dit scenario en alle bijbehorende aanpassingen verwijderen?"
+
+#: manufacturing/templates/scenario_list.html:9
+#: manufacturing/templates/scenario_new.html:3
+msgid "New Scenario"
+msgstr "Nieuw Scenario"
+
+#: manufacturing/templates/scenario_list.html:17
+msgid ""
+"Compare hypothetical demand or capacity changes against real MRP and\n"
+"        workcenter data without committing anything."
+msgstr ""
+"Vergelijk hypothetische vraag- of capaciteitswijzigingen met de werkelijke\n"
+"        MRP- en werkplekgegevens, zonder iets vast te leggen."
+
+#: manufacturing/templates/scenario_list.html:54
+msgid "No scenarios yet."
+msgstr "Nog geen scenario's."
+
+#: manufacturing/templates/scenario_new.html:21
+msgid "New What-If Scenario"
+msgstr "Nieuw Wat-als-scenario"
+
+#: manufacturing/templates/scenario_new.html:30
+msgid "e.g. Holiday Rush + Saturday Shift"
+msgstr "bijv. Feestdagenpiek + zaterdagdienst"
+
+#: manufacturing/templates/scenario_new.html:34
+#: manufacturing/templates/skill_new.html:38
+msgid "Optional description"
+msgstr "Optionele beschrijving"
+
+#: manufacturing/templates/scenario_new.html:36
+msgid "Create Scenario"
+msgstr "Scenario Aanmaken"
+
+#: manufacturing/templates/scenario_run.html:3
+#, python-format
+msgid "%(name)s — Comparison"
+msgstr "%(name)s — Vergelijking"
+
+#: manufacturing/templates/scenario_run.html:6
+msgid "Scenario"
+msgstr "Scenario"
+
+#: manufacturing/templates/scenario_run.html:7
+msgid "All Scenarios"
+msgstr "Alle Scenario's"
+
+#: manufacturing/templates/scenario_run.html:26
+#, python-format
+msgid "%(name)s — Baseline vs. Scenario"
+msgstr "%(name)s — Basislijn vs. Scenario"
+
+#: manufacturing/templates/scenario_run.html:29
+msgid "MRP Demand"
+msgstr "MRP-vraag"
+
+#: manufacturing/templates/scenario_run.html:32
+#: manufacturing/templates/scenario_run.html:52
+msgid "Baseline (real)"
+msgstr "Basislijn (werkelijk)"
+
+#: manufacturing/templates/scenario_run.html:33
+#: manufacturing/templates/scenario_run.html:40
+msgid "Planned Orders"
+msgstr "Geplande Orders"
+
+#: manufacturing/templates/scenario_run.html:34
+#: manufacturing/templates/scenario_run.html:41
+msgid "Make Qty"
+msgstr "Te Maken Hoeveelheid"
+
+#: manufacturing/templates/scenario_run.html:35
+#: manufacturing/templates/scenario_run.html:42
+msgid "Buy Qty"
+msgstr "Te Kopen Hoeveelheid"
+
+#: manufacturing/templates/scenario_run.html:36
+#: manufacturing/templates/scenario_run.html:43
+msgid "Total Qty"
+msgstr "Totale Hoeveelheid"
+
+#: manufacturing/templates/scenario_run.html:39
+#: manufacturing/templates/scenario_run.html:63
+msgid "Scenario (what-if)"
+msgstr "Scenario (hypothetisch)"
+
+#: manufacturing/templates/scenario_run.html:49
+#, python-format
+msgid "Workcenter Bottlenecks (Utilization %%)"
+msgstr "Knelpunten per Werkplek (Bezetting %%)"
+
+#: manufacturing/templates/scenario_run.html:59
+#: manufacturing/templates/scenario_run.html:70
+msgid "No workcenters."
+msgstr "Geen werkplekken."
+
+#: manufacturing/templates/scenario_run.html:78
+msgid "Adjustments Applied"
+msgstr "Toegepaste Aanpassingen"
+
+#: manufacturing/templates/scenario_run.html:80
+#, python-format
+msgid "+%(qty)s of %(product)s needed %(need_date)s"
+msgstr "+%(qty)s van %(product)s nodig op %(need_date)s"
+
+#: manufacturing/templates/scenario_run.html:83
+#, python-format
+msgid "%(wc)s: %(hrs)s hrs/day from %(df)s to %(dt)s"
+msgstr "%(wc)s: %(hrs)s uur/dag van %(df)s tot %(dt)s"
+
 #: manufacturing/templates/sensor_reading_new.html:18
 msgid ""
 "Manual entry — this codebase has no real IoT/sensor hardware connectivity;\n"
@@ -20230,6 +22065,121 @@ msgstr "Kritieke Drempel (≥)"
 msgid "Save Thresholds"
 msgstr "Drempels Opslaan"
 
+#: manufacturing/templates/sf_dashboard.html:3
+#: manufacturing/templates/sf_dashboard.html:42
+msgid "Live OEE Dashboard"
+msgstr "Live OEE-dashboard"
+
+#: manufacturing/templates/sf_dashboard.html:6
+#: manufacturing/templates/sf_shift_plan.html:7
+msgid "Entry"
+msgstr "Invoer"
+
+#: manufacturing/templates/sf_dashboard.html:7
+#: manufacturing/templates/sf_entry.html:7
+#: manufacturing/templates/sf_shift_plan.html:3
+msgid "Shift Plan"
+msgstr "Ploegplan"
+
+#: manufacturing/templates/sf_dashboard.html:8
+#: manufacturing/templates/sf_entry.html:8
+#: manufacturing/templates/sf_shift_plan.html:8
+msgid "TV Display"
+msgstr "TV-weergave"
+
+#: manufacturing/templates/sf_dashboard.html:45
+#: manufacturing/templates/sf_entry.html:32
+#: manufacturing/templates/sf_shift_plan.html:31
+msgid "Shift:"
+msgstr "Ploeg:"
+
+#: manufacturing/templates/sf_dashboard.html:51
+#: manufacturing/templates/sf_entry.html:38
+#: manufacturing/templates/sf_shift_plan.html:37
+msgid "Date:"
+msgstr "Datum:"
+
+#: manufacturing/templates/sf_dashboard.html:65
+#, python-format
+msgid "%(produced)s produced, %(scrapped)s scrapped"
+msgstr "%(produced)s geproduceerd, %(scrapped)s afgekeurd"
+
+#: manufacturing/templates/sf_dashboard.html:66
+msgid "no plan set"
+msgstr "geen plan ingesteld"
+
+#: manufacturing/templates/sf_dashboard.html:70
+#: manufacturing/templates/sf_tv_grid.html:28
+msgid "No active workcenters found."
+msgstr "Geen actieve werkplekken gevonden."
+
+#: manufacturing/templates/sf_dashboard.html:74
+#, python-format
+msgid "Recent Downtime — %(shift)s Shift, %(entry_date)s"
+msgstr "Recente Stilstand — Ploeg %(shift)s, %(entry_date)s"
+
+#: manufacturing/templates/sf_dashboard.html:76
+#: manufacturing/templates/sf_entry.html:97
+msgid "Minutes"
+msgstr "Minuten"
+
+#: manufacturing/templates/sf_dashboard.html:86
+msgid "No downtime logged for this shift."
+msgstr "Geen stilstand geregistreerd voor deze ploeg."
+
+#: manufacturing/templates/sf_entry.html:3
+#: manufacturing/templates/sf_entry.html:27
+msgid "Production / Downtime Entry"
+msgstr "Productie-/Stilstandinvoer"
+
+#: manufacturing/templates/sf_entry.html:6
+#: manufacturing/templates/sf_shift_plan.html:6
+msgid "Live Dashboard"
+msgstr "Live Dashboard"
+
+#: manufacturing/templates/sf_entry.html:64
+msgid "Units Scrapped"
+msgstr "Afgekeurde Eenheden"
+
+#: manufacturing/templates/sf_entry.html:74
+#: manufacturing/templates/sf_entry.html:105
+msgid "Log Downtime"
+msgstr "Stilstand Registreren"
+
+#: manufacturing/templates/sf_entry.html:111
+#, python-format
+msgid "%(shift)s Shift — %(entry_date)s"
+msgstr "Ploeg %(shift)s — %(entry_date)s"
+
+#: manufacturing/templates/sf_entry.html:114
+msgid "Produced"
+msgstr "Geproduceerd"
+
+#: manufacturing/templates/sf_entry.html:115
+msgid "Downtime (min)"
+msgstr "Stilstand (min)"
+
+#: manufacturing/templates/sf_shift_plan.html:26
+msgid "Shift Plan — Planned Output"
+msgstr "Ploegplan — Geplande Output"
+
+#: manufacturing/templates/sf_shift_plan.html:43
+msgid "Set Planned Output"
+msgstr "Geplande Output Instellen"
+
+#: manufacturing/templates/sf_shift_plan.html:57
+msgid "Planned Qty"
+msgstr "Geplande Hoeveelheid"
+
+#: manufacturing/templates/sf_shift_plan.html:61
+msgid "Save Plan"
+msgstr "Plan Opslaan"
+
+#: manufacturing/templates/sf_shift_plan.html:66
+#, python-format
+msgid "%(shift)s Shift — %(entry_date)s: Planned vs. Actual"
+msgstr "Ploeg %(shift)s — %(entry_date)s: Gepland vs. Werkelijk"
+
 #: manufacturing/templates/sf_tv.html:5 manufacturing/templates/sf_tv.html:38
 #, python-format
 msgid "Shop Floor OEE — %(shift)s Shift"
@@ -20253,10 +22203,6 @@ msgstr "%(qty)s afgekeurd"
 #: manufacturing/templates/sf_tv_grid.html:23
 msgid "No plan set for this shift"
 msgstr "Geen plan ingesteld voor deze ploeg"
-
-#: manufacturing/templates/sf_tv_grid.html:28
-msgid "No active workcenters found."
-msgstr "Geen actieve werkplekken gevonden."
 
 #: manufacturing/templates/skill_list.html:3
 #: manufacturing/templates/skill_list.html:16
@@ -20292,10 +22238,6 @@ msgstr "bijv. TIG-lassen"
 #: manufacturing/templates/skill_new.html:34
 msgid "e.g. Fabrication"
 msgstr "bijv. Fabricage"
-
-#: manufacturing/templates/skill_new.html:38
-msgid "Optional description"
-msgstr "Optionele beschrijving"
 
 #: manufacturing/templates/skill_new.html:40
 msgid "Create Skill"
@@ -20427,14 +22369,6 @@ msgstr "SO-nummer"
 #: manufacturing/templates/so_list.html:8
 msgid "New SO"
 msgstr "Nieuwe SO"
-
-#: manufacturing/templates/so_list.html:11
-msgid "ATP Inquiry"
-msgstr "ATP-aanvraag"
-
-#: manufacturing/templates/so_list.html:12
-msgid "CTP Inquiry"
-msgstr "CTP-aanvraag"
 
 #: manufacturing/templates/so_list.html:13
 msgid "EDI"
@@ -20673,10 +22607,6 @@ msgstr "Gebruik het bij uw inkoper geregistreerde e-mailadres"
 msgid "Line Items — Enter Your Quote"
 msgstr "Regelitems — Voer Uw Offerte In"
 
-#: manufacturing/templates/supplier_portal_rfq_detail.html:33
-msgid "Price"
-msgstr "Prijs"
-
 #: manufacturing/templates/supplier_portal_rfq_detail.html:36
 msgid "Lead days"
 msgstr "Levertijd (dagen)"
@@ -20735,11 +22665,6 @@ msgstr "Leverancier niet gevonden."
 #, python-format
 msgid "%(name)s — Scorecard"
 msgstr "%(name)s — Scorekaart"
-
-#: manufacturing/templates/supplier_scorecard_detail.html:45
-#, python-format
-msgid "%(from_date)s to %(to_date)s"
-msgstr "%(from_date)s tot %(to_date)s"
 
 #: manufacturing/templates/supplier_scorecard_detail.html:50
 #: manufacturing/templates/supplier_scorecard_list.html:54
@@ -22133,14 +24058,6 @@ msgstr "Nieuwe Overplaatsing"
 msgid "Transfer #"
 msgstr "Overplaatsingsnr."
 
-#: manufacturing/templates/wms_transfer_list.html:33
-msgid "From"
-msgstr "Van"
-
-#: manufacturing/templates/wms_transfer_list.html:33
-msgid "To"
-msgstr "Naar"
-
 #: manufacturing/templates/wms_transfer_list.html:52
 #, python-format
 msgid "No transfers with status \"%(s)s\"."
@@ -22288,14 +24205,6 @@ msgstr "CO2 van Deze Productierun"
 #: manufacturing/templates/wo_carbon_detail.html:41
 msgid "Quantity Produced"
 msgstr "Geproduceerde Hoeveelheid"
-
-#: manufacturing/templates/wo_carbon_detail.html:43
-msgid "Material (Scope 3)"
-msgstr "Materiaal (Scope 3)"
-
-#: manufacturing/templates/wo_carbon_detail.html:45
-msgid "Process (Scope 1)"
-msgstr "Proces (Scope 1)"
 
 #: manufacturing/templates/wo_carbon_detail.html:47
 msgid "Total for Run"
@@ -22718,6 +24627,32 @@ msgstr "Personeelsplan vs. Werkelijk"
 msgid "No headcount plans yet."
 msgstr "Nog geen personeelsplannen."
 
+#: manufacturing/views/__init__.py:4339 manufacturing/views/__init__.py:4376
+#: manufacturing/views/__init__.py:4432
+msgid "customer"
+msgstr "klant"
+
+#: manufacturing/views/__init__.py:4340 manufacturing/views/__init__.py:4377
+#: manufacturing/views/__init__.py:4433
+msgid "customers"
+msgstr "klanten"
+
+#: manufacturing/views/__init__.py:4468 manufacturing/views/__init__.py:4505
+#: manufacturing/views/__init__.py:4550
+msgid "supplier"
+msgstr "leverancier"
+
+#: manufacturing/views/__init__.py:4469 manufacturing/views/__init__.py:4506
+#: manufacturing/views/__init__.py:4551
+msgid "suppliers"
+msgstr "leveranciers"
+
 #: manufacturing/work_orders_core.py:37
 msgid "Cancel WO"
 msgstr "WO Annuleren"
+
+#, python-format
+#~ msgid "%(counter)s %(contact_type)s"
+#~ msgid_plural "%(counter)s %(contact_type_plural)s"
+#~ msgstr[0] "%(counter)s %(contact_type)s"
+#~ msgstr[1] "%(counter)s %(contact_type_plural)s"

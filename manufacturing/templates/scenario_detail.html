@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ scenario.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/scenarios/" class="btn">Scenarios</a>
-<a href="/scenarios/{{ scenario.id }}/run/" class="btn btn-primary">Run Scenario</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/scenarios/" class="btn">{% trans "Scenarios" %}</a>
+<a href="/scenarios/{{ scenario.id }}/run/" class="btn btn-primary">{% trans "Run Scenario" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -27,12 +28,12 @@
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Demand Adjustments</h3>
+        <h3>{% trans "Demand Adjustments" %}</h3>
         {% if demand_adjustments %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
-                    <tr><th>Product</th><th class="num">Extra Qty</th><th>Need Date</th><th>Notes</th>{% if can_edit %}<th></th>{% endif %}</tr>
+                    <tr><th>{% trans "Product" %}</th><th class="num">{% trans "Extra Qty" %}</th><th>{% trans "Need Date" %}</th><th>{% trans "Notes" %}</th>{% if can_edit %}<th></th>{% endif %}</tr>
                 </thead>
                 <tbody>
                     {% for a in demand_adjustments %}
@@ -47,7 +48,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="remove_demand">
                                 <input type="hidden" name="adjustment_id" value="{{ a.id }}">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Remove" %}</button>
                             </form>
                         </td>
                         {% endif %}
@@ -57,7 +58,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No hypothetical demand added yet.</div>
+        <div class="empty-state">{% trans "No hypothetical demand added yet." %}</div>
         {% endif %}
 
         {% if can_edit %}
@@ -66,7 +67,7 @@
             <input type="hidden" name="action" value="add_demand">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Product</label>
+                    <label>{% trans "Product" %}</label>
                     <select name="product_id" required>
                         {% for p in products %}
                         <option value="{{ p.id }}">{{ p.product_name }}</option>
@@ -74,30 +75,30 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Extra Qty</label>
+                    <label>{% trans "Extra Qty" %}</label>
                     <input type="number" name="qty" step="any" min="0" required>
                 </div>
                 <div class="form-row">
-                    <label>Need Date</label>
+                    <label>{% trans "Need Date" %}</label>
                     <input type="date" name="need_date" required>
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans "Optional" %}">
                 </div>
             </div>
-            <button type="submit" class="btn">Add Demand</button>
+            <button type="submit" class="btn">{% trans "Add Demand" %}</button>
         </form>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Capacity Adjustments</h3>
+        <h3>{% trans "Capacity Adjustments" %}</h3>
         {% if capacity_adjustments %}
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
-                    <tr><th>Workcenter</th><th>From</th><th>To</th><th class="num">Hours/Day</th><th>Notes</th>{% if can_edit %}<th></th>{% endif %}</tr>
+                    <tr><th>{% trans "Workcenter" %}</th><th>{% trans "From" %}</th><th>{% trans "To" %}</th><th class="num">{% trans "Hours/Day" %}</th><th>{% trans "Notes" %}</th>{% if can_edit %}<th></th>{% endif %}</tr>
                 </thead>
                 <tbody>
                     {% for a in capacity_adjustments %}
@@ -113,7 +114,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="remove_capacity">
                                 <input type="hidden" name="adjustment_id" value="{{ a.id }}">
-                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">{% trans "Remove" %}</button>
                             </form>
                         </td>
                         {% endif %}
@@ -123,7 +124,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No hypothetical capacity changes added yet.</div>
+        <div class="empty-state">{% trans "No hypothetical capacity changes added yet." %}</div>
         {% endif %}
 
         {% if can_edit %}
@@ -132,7 +133,7 @@
             <input type="hidden" name="action" value="add_capacity">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Workcenter</label>
+                    <label>{% trans "Workcenter" %}</label>
                     <select name="workcenter_id" required>
                         {% for wc in workcenters %}
                         <option value="{{ wc.id }}">{{ wc.name }}</option>
@@ -140,34 +141,34 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>From</label>
+                    <label>{% trans "From" %}</label>
                     <input type="date" name="date_from" required>
                 </div>
                 <div class="form-row">
-                    <label>To</label>
+                    <label>{% trans "To" %}</label>
                     <input type="date" name="date_to" required>
                 </div>
                 <div class="form-row">
-                    <label>Hours/Day</label>
+                    <label>{% trans "Hours/Day" %}</label>
                     <input type="number" name="hours_per_day" step="any" min="0" required>
                 </div>
             </div>
             <div class="form-row" style="margin-top:-4px;">
-                <label>Notes</label>
-                <input type="text" name="notes" placeholder="e.g. Added Saturday shift">
+                <label>{% trans "Notes" %}</label>
+                <input type="text" name="notes" placeholder="{% trans "e.g. Added Saturday shift" %}">
             </div>
-            <button type="submit" class="btn">Add Capacity Override</button>
+            <button type="submit" class="btn">{% trans "Add Capacity Override" %}</button>
         </form>
         {% endif %}
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Delete Scenario</h3>
-        <form method="post" onsubmit="return confirm('Delete this scenario and all its adjustments?');">
+        <h3>{% trans "Delete Scenario" %}</h3>
+        <form method="post" onsubmit="return confirm('{% trans "Delete this scenario and all its adjustments?" %}');">
             {% csrf_token %}
             <input type="hidden" name="action" value="delete_scenario">
-            <button type="submit" class="btn btn-danger">Delete Scenario</button>
+            <button type="submit" class="btn btn-danger">{% trans "Delete Scenario" %}</button>
         </form>
     </div>
     {% endif %}

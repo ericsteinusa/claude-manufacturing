@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}AI Demand Forecast{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "AI Demand Forecast" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/demand/" class="btn">Sales Demand</a>
+<a href="/sales/demand/" class="btn">{% trans "Sales Demand" %}</a>
 <a href="/mrp/" class="btn">MRP</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -37,18 +38,18 @@
 {% block body %}
 <div class="content">
 <div class="dm-wrap">
-    <h2>AI Demand Forecast</h2>
+    <h2>{% trans "AI Demand Forecast" %}</h2>
     <p style="font-size:12px;color:#666;margin-bottom:14px;">
-        Computed from 24 months of shipped/closed Sales Order history via seasonal
+        {% blocktrans %}Computed from 24 months of shipped/closed Sales Order history via seasonal
         decomposition (trend + calendar-month seasonality) — not the manual rep quota
-        on the <a href="/sales/forecast/">Sales Forecast</a> page.
+        on the <a href="/sales/forecast/">Sales Forecast</a> page.{% endblocktrans %}
     </p>
 
     <form method="get" class="filter-bar">
         <select name="product_id" onchange="this.form.submit()">
             {% for s in summary %}
             <option value="{{ s.product_id }}" {% if s.product_id == product_id %}selected{% endif %}>
-                {{ s.product_name|default:"Unknown Product" }} ({{ s.total_forecast_qty|floatformat:0 }} forecasted)
+                {% if s.product_name %}{{ s.product_name }}{% else %}{% trans "Unknown Product" %}{% endif %} {% blocktrans with qty=s.total_forecast_qty|floatformat:0 %}({{ qty }} forecasted){% endblocktrans %}
             </option>
             {% endfor %}
         </select>
@@ -57,29 +58,29 @@
     {% if can_edit %}
     <form method="post" action="/demand-forecast/generate/" style="margin-bottom:16px;">
         {% csrf_token %}
-        <button type="submit" class="btn">Regenerate All Forecasts</button>
+        <button type="submit" class="btn">{% trans "Regenerate All Forecasts" %}</button>
     </form>
     {% endif %}
 
     <div class="card">
-        <h3>Actual vs. Forecast — Monthly Units</h3>
+        <h3>{% trans "Actual vs. Forecast — Monthly Units" %}</h3>
         {% if series %}
         <div class="legend">
-            <span class="actual">Actual (history)</span>
-            <span class="forecast">Forecast (projected)</span>
+            <span class="actual">{% trans "Actual (history)" %}</span>
+            <span class="forecast">{% trans "Forecast (projected)" %}</span>
         </div>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Month</th>
-                    <th class="num">Qty</th>
-                    <th style="width:280px;">Overlay</th>
+                    <th>{% trans "Month" %}</th>
+                    <th class="num">{% trans "Qty" %}</th>
+                    <th style="width:280px;">{% trans "Overlay" %}</th>
                 </tr>
             </thead>
             <tbody>
             {% for row in series %}
             <tr>
-                <td>{{ row.month }}{% if row.is_forecast %} <em style="color:#a36907;">(forecast)</em>{% endif %}</td>
+                <td>{{ row.month }}{% if row.is_forecast %} <em style="color:#a36907;">({% trans "forecast" %})</em>{% endif %}</td>
                 <td class="num">
                     {% if row.is_forecast %}{{ row.forecast_qty|floatformat:0 }}
                     {% else %}{{ row.actual_qty|floatformat:0 }}{% endif %}
@@ -99,8 +100,8 @@
         </table>
         {% else %}
         <div class="empty-note">
-            No forecast generated yet.
-            {% if can_edit %}Click "Regenerate All Forecasts" above to build one from SO history.{% endif %}
+            {% trans "No forecast generated yet." %}
+            {% if can_edit %}{% blocktrans %}Click "Regenerate All Forecasts" above to build one from SO history.{% endblocktrans %}{% endif %}
         </div>
         {% endif %}
     </div>

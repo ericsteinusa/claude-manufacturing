@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}{{ schedule.product_name }} — Repetitive Schedule{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with name=schedule.product_name %}{{ name }} — Repetitive Schedule{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/repetitive/" class="btn">Repetitive Manufacturing</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/repetitive/" class="btn">{% trans "Repetitive Manufacturing" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -23,15 +24,15 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">{{ schedule.product_name }} — {{ schedule.workcenter_name|default:"Unassigned" }}
+    <div class="menu-title">{{ schedule.product_name }} — {% if schedule.workcenter_name %}{{ schedule.workcenter_name }}{% else %}{% trans "Unassigned" %}{% endif %}
         {% if schedule.status == 'active' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
         {% else %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Inactive" %}</span>
         {% endif %}
     </div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Rate: {{ schedule.rate_per_day }} / day · Effective {{ schedule.effective_start }}{% if schedule.effective_end %} – {{ schedule.effective_end }}{% endif %}
+        {% blocktrans with rate=schedule.rate_per_day %}Rate: {{ rate }} / day{% endblocktrans %} · {% blocktrans with start=schedule.effective_start %}Effective {{ start }}{% endblocktrans %}{% if schedule.effective_end %} – {{ schedule.effective_end }}{% endif %}
     </p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
@@ -39,7 +40,7 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Status</h3>
+        <h3>{% trans "Status" %}</h3>
         <form method="post" style="display:flex;gap:10px;align-items:center;">
             {% csrf_token %}
             <input type="hidden" name="action" value="set_status">
@@ -48,43 +49,43 @@
                 <option value="{{ s }}" {% if s == schedule.status %}selected{% endif %}>{{ s|title }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="btn">Update Status</button>
+            <button type="submit" class="btn">{% trans "Update Status" %}</button>
         </form>
     </div>
 
     <div class="card">
-        <h3>Log Production</h3>
+        <h3>{% trans "Log Production" %}</h3>
         <p style="font-size:12px;color:var(--text-muted);">
-            Completed units are backflushed automatically: components are issued and the finished product is received.
+            {% blocktrans %}Completed units are backflushed automatically: components are issued and the finished product is received.{% endblocktrans %}
         </p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="log">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Production Date *</label>
+                    <label>{% trans "Production Date *" %}</label>
                     <input type="date" name="production_date" value="{{ today }}" required>
                 </div>
                 <div class="form-row">
-                    <label>Qty Completed *</label>
+                    <label>{% trans "Qty Completed *" %}</label>
                     <input type="number" name="qty_completed" step="0.01" min="0" required>
                 </div>
                 <div class="form-row">
-                    <label>Qty Scrapped</label>
+                    <label>{% trans "Qty Scrapped" %}</label>
                     <input type="number" name="qty_scrapped" step="0.01" min="0" value="0">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Log &amp; Backflush</button>
+            <button type="submit" class="btn btn-primary">{% trans "Log &amp; Backflush" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Production Log</h3>
+        <h3>{% trans "Production Log" %}</h3>
         {% if log_entries %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Date</th><th class="num">Completed</th><th class="num">Scrapped</th></tr></thead>
+                <thead><tr><th>{% trans "Date" %}</th><th class="num">{% trans "Completed" %}</th><th class="num">{% trans "Scrapped" %}</th></tr></thead>
                 <tbody>
                     {% for entry in log_entries %}
                     <tr>
@@ -97,31 +98,31 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No production logged yet.</div>
+        <div class="empty-state">{% trans "No production logged yet." %}</div>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Planned vs. Actual</h3>
+        <h3>{% trans "Planned vs. Actual" %}</h3>
         <form method="post" style="display:flex;gap:10px;align-items:end;margin-bottom:14px;">
             {% csrf_token %}
             <input type="hidden" name="action" value="summary">
             <div class="form-row">
-                <label>From</label>
+                <label>{% trans "From" %}</label>
                 <input type="date" name="date_from" required>
             </div>
             <div class="form-row">
-                <label>To</label>
+                <label>{% trans "To" %}</label>
                 <input type="date" name="date_to" required>
             </div>
-            <button type="submit" class="btn">Compute</button>
+            <button type="submit" class="btn">{% trans "Compute" %}</button>
         </form>
         {% if summary %}
         <div class="kpi-row">
-            <div class="kpi"><div class="lbl">Planned</div><div class="val">{{ summary.planned_qty }}</div></div>
-            <div class="kpi"><div class="lbl">Actual</div><div class="val">{{ summary.actual_qty }}</div></div>
-            <div class="kpi"><div class="lbl">Scrapped</div><div class="val">{{ summary.scrapped_qty }}</div></div>
-            <div class="kpi"><div class="lbl">Attainment</div><div class="val">{% if summary.attainment_pct != None %}{{ summary.attainment_pct }}%{% else %}—{% endif %}</div></div>
+            <div class="kpi"><div class="lbl">{% trans "Planned" %}</div><div class="val">{{ summary.planned_qty }}</div></div>
+            <div class="kpi"><div class="lbl">{% trans "Actual" %}</div><div class="val">{{ summary.actual_qty }}</div></div>
+            <div class="kpi"><div class="lbl">{% trans "Scrapped" %}</div><div class="val">{{ summary.scrapped_qty }}</div></div>
+            <div class="kpi"><div class="lbl">{% trans "Attainment" %}</div><div class="val">{% if summary.attainment_pct != None %}{{ summary.attainment_pct }}%{% else %}—{% endif %}</div></div>
         </div>
         {% endif %}
     </div>

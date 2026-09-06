@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Consolidated Financials{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Consolidated Financials" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/companies/" class="btn">Companies</a>
-<a href="/intercompany/" class="btn">Intercompany</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/companies/" class="btn">{% trans "Companies" %}</a>
+<a href="/intercompany/" class="btn">{% trans "Intercompany" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -37,42 +38,42 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Consolidated Financials</h2>
+    <h2>{% trans "Consolidated Financials" %}</h2>
     <p style="font-size:12px;color:#555;margin-bottom:14px;">
-        All companies combined, with intercompany transactions eliminated.</p>
+        {% trans "All companies combined, with intercompany transactions eliminated." %}</p>
 
     <form method="get" class="filter-bar">
-        <label>From:</label>
+        <label>{% trans "From:" %}</label>
         <input type="date" name="date_from" value="{{ date_from }}">
-        <label>To:</label>
+        <label>{% trans "To:" %}</label>
         <input type="date" name="date_to" value="{{ date_to }}">
-        <button type="submit" class="btn-sm">Run</button>
+        <button type="submit" class="btn-sm">{% trans "Run" %}</button>
     </form>
 
     <div class="stmt">
         <div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:18px;color:#222;">
-            Consolidated Income Statement<br>
-            <span style="font-size:12px;color:#555;font-weight:normal;">{{ date_from }} to {{ date_to }}</span>
+            {% trans "Consolidated Income Statement" %}<br>
+            <span style="font-size:12px;color:#555;font-weight:normal;">{% blocktrans with from_date=date_from to_date=date_to %}{{ from_date }} to {{ to_date }}{% endblocktrans %}</span>
         </div>
 
         <div class="stmt-section">
-            <div class="sect-hdr">Revenue</div>
-            <div class="stmt-line"><span>Gross Revenue</span><span>${{ income.revenue|floatformat:2 }}</span></div>
-            <div class="stmt-line elim-line"><span>Less: Intercompany Elimination</span><span>(${{ income.elimination|floatformat:2 }})</span></div>
-            <div class="sect-total"><span>Consolidated Revenue</span><span>${{ income.revenue_consolidated|floatformat:2 }}</span></div>
+            <div class="sect-hdr">{% trans "Revenue" %}</div>
+            <div class="stmt-line"><span>{% trans "Gross Revenue" %}</span><span>${{ income.revenue|floatformat:2 }}</span></div>
+            <div class="stmt-line elim-line"><span>{% trans "Less: Intercompany Elimination" %}</span><span>(${{ income.elimination|floatformat:2 }})</span></div>
+            <div class="sect-total"><span>{% trans "Consolidated Revenue" %}</span><span>${{ income.revenue_consolidated|floatformat:2 }}</span></div>
         </div>
 
         <div class="stmt-section">
-            <div class="sect-hdr">Expenses</div>
-            <div class="stmt-line"><span>Gross Expenses</span><span>${{ income.expenses|floatformat:2 }}</span></div>
-            <div class="stmt-line elim-line"><span>Less: Intercompany Elimination</span><span>(${{ income.elimination|floatformat:2 }})</span></div>
-            <div class="sect-total"><span>Consolidated Expenses</span><span>${{ income.expenses_consolidated|floatformat:2 }}</span></div>
+            <div class="sect-hdr">{% trans "Expenses" %}</div>
+            <div class="stmt-line"><span>{% trans "Gross Expenses" %}</span><span>${{ income.expenses|floatformat:2 }}</span></div>
+            <div class="stmt-line elim-line"><span>{% trans "Less: Intercompany Elimination" %}</span><span>(${{ income.elimination|floatformat:2 }})</span></div>
+            <div class="sect-total"><span>{% trans "Consolidated Expenses" %}</span><span>${{ income.expenses_consolidated|floatformat:2 }}</span></div>
         </div>
 
         <div class="summary-box">
             <div class="summary-line"><span>COGS</span><span>${{ income.cogs|floatformat:2 }}</span></div>
             <div class="summary-line major">
-                <span>Consolidated Net Income</span>
+                <span>{% trans "Consolidated Net Income" %}</span>
                 <span>${{ income.net_income_consolidated|floatformat:2 }}</span>
             </div>
         </div>
@@ -80,28 +81,28 @@
 
     <div class="stmt">
         <div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:18px;color:#222;">
-            Consolidated Balance Sheet<br>
-            <span style="font-size:12px;color:#555;font-weight:normal;">as of {{ date_to }}</span>
+            {% trans "Consolidated Balance Sheet" %}<br>
+            <span style="font-size:12px;color:#555;font-weight:normal;">{% blocktrans with to_date=date_to %}as of {{ to_date }}{% endblocktrans %}</span>
         </div>
 
         <div class="two-col">
             <div class="stmt-section">
-                <div class="sect-hdr">Assets</div>
-                <div class="stmt-line"><span>Gross Assets</span><span>${{ bs.assets|floatformat:2 }}</span></div>
-                <div class="stmt-line elim-line"><span>Less: Intercompany Elimination</span><span>(${{ bs.elimination|floatformat:2 }})</span></div>
-                <div class="sect-total"><span>Consolidated Assets</span><span>${{ bs.assets_consolidated|floatformat:2 }}</span></div>
+                <div class="sect-hdr">{% trans "Assets" %}</div>
+                <div class="stmt-line"><span>{% trans "Gross Assets" %}</span><span>${{ bs.assets|floatformat:2 }}</span></div>
+                <div class="stmt-line elim-line"><span>{% trans "Less: Intercompany Elimination" %}</span><span>(${{ bs.elimination|floatformat:2 }})</span></div>
+                <div class="sect-total"><span>{% trans "Consolidated Assets" %}</span><span>${{ bs.assets_consolidated|floatformat:2 }}</span></div>
             </div>
             <div class="stmt-section">
-                <div class="sect-hdr">Liabilities + Equity</div>
-                <div class="stmt-line"><span>Gross Liabilities</span><span>${{ bs.liabilities|floatformat:2 }}</span></div>
-                <div class="stmt-line elim-line"><span>Less: Intercompany Elimination</span><span>(${{ bs.elimination|floatformat:2 }})</span></div>
-                <div class="stmt-line"><span>Consolidated Liabilities</span><span>${{ bs.liabilities_consolidated|floatformat:2 }}</span></div>
-                <div class="sect-total"><span>Equity</span><span>${{ bs.equity|floatformat:2 }}</span></div>
+                <div class="sect-hdr">{% trans "Liabilities + Equity" %}</div>
+                <div class="stmt-line"><span>{% trans "Gross Liabilities" %}</span><span>${{ bs.liabilities|floatformat:2 }}</span></div>
+                <div class="stmt-line elim-line"><span>{% trans "Less: Intercompany Elimination" %}</span><span>(${{ bs.elimination|floatformat:2 }})</span></div>
+                <div class="stmt-line"><span>{% trans "Consolidated Liabilities" %}</span><span>${{ bs.liabilities_consolidated|floatformat:2 }}</span></div>
+                <div class="sect-total"><span>{% trans "Equity" %}</span><span>${{ bs.equity|floatformat:2 }}</span></div>
             </div>
         </div>
 
         <span class="{% if bs.balanced %}status-ok{% else %}status-err{% endif %}">
-            {% if bs.balanced %}BALANCED{% else %}OUT OF BALANCE{% endif %}
+            {% if bs.balanced %}{% trans "BALANCED" %}{% else %}{% trans "OUT OF BALANCE" %}{% endif %}
         </span>
     </div>
 </div>

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}CTP Inquiry{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "CTP Inquiry" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/so/" class="btn">← Back</a>
-<a href="/atp/" class="btn">ATP Inquiry</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/so/" class="btn">← {% trans "Back" %}</a>
+<a href="/atp/" class="btn">{% trans "ATP Inquiry" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -29,10 +30,10 @@
 {% block body %}
 <div class="content">
 <div class="atp-wrap">
-    <div class="menu-title">Capable-to-Promise Inquiry</div>
+    <div class="menu-title">{% trans "Capable-to-Promise Inquiry" %}</div>
     <p style="font-size:12px;color:#666;margin-bottom:14px;">
-        Extends ATP with a routing capacity check — the CTP date is the later of
-        when material is available and when workcenter capacity is free.</p>
+        {% blocktrans %}Extends ATP with a routing capacity check — the CTP date is the later of
+        when material is available and when workcenter capacity is free.{% endblocktrans %}</p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -40,23 +41,23 @@
         <form method="post" action="/ctp/">
             {% csrf_token %}
             <div class="form-row">
-                <label>Product</label>
+                <label>{% trans "Product" %}</label>
                 <select name="product_id">
-                    <option value="">(select)</option>
+                    <option value="">{% trans "(select)" %}</option>
                     {% for p in products %}
                     <option value="{{ p.id }}"{% if form.product_id == p.id|stringformat:"s" %} selected{% endif %}>{{ p.product_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Qty</label>
+                <label>{% trans "Qty" %}</label>
                 <input type="number" name="qty" min="1" value="{{ form.qty }}">
             </div>
             <div class="form-row">
-                <label>Requested Date</label>
+                <label>{% trans "Requested Date" %}</label>
                 <input type="date" name="requested_date" value="{{ form.requested_date }}">
             </div>
-            <button type="submit" class="btn btn-primary">Check CTP</button>
+            <button type="submit" class="btn btn-primary">{% trans "Check CTP" %}</button>
         </form>
     </div>
 
@@ -64,41 +65,41 @@
     <div class="card atp-result">
         <h3>{{ result.product_name }}</h3>
         <div class="verdict {% if result.ctp_sufficient %}yes{% else %}no{% endif %}">
-            {% if result.ctp_sufficient %}Yes — capable of promising by {{ result.requested_date }}
-            {% else %}No — cannot meet {{ result.requested_date }}{% endif %}
+            {% if result.ctp_sufficient %}{% blocktrans with rd=result.requested_date %}Yes — capable of promising by {{ rd }}{% endblocktrans %}
+            {% else %}{% blocktrans with rd=result.requested_date %}No — cannot meet {{ rd }}{% endblocktrans %}{% endif %}
         </div>
 
-        <div class="ctp-section-title">Material (ATP)</div>
+        <div class="ctp-section-title">{% trans "Material (ATP)" %}</div>
         <div class="atp-meta">
-            <div><b>Sufficient by requested date:</b> {{ result.material_sufficient|yesno:"Yes,No" }}</div>
-            <div><b>Material ready:</b>
+            <div><b>{% trans "Sufficient by requested date:" %}</b> {% if result.material_sufficient %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</div>
+            <div><b>{% trans "Material ready:" %}</b>
                 {% if result.material_ready_date %}{{ result.material_ready_date }}
-                {% else %}Not available within 90 days{% endif %}</div>
+                {% else %}{% trans "Not available within 90 days" %}{% endif %}</div>
         </div>
 
-        <div class="ctp-section-title">Capacity (Routing)</div>
+        <div class="ctp-section-title">{% trans "Capacity (Routing)" %}</div>
         {% if result.capacity_workcenters %}
         <table class="list-table">
-            <thead><tr><th>Workcenter</th><th class="num">Hours Required</th><th>Earliest Available</th></tr></thead>
+            <thead><tr><th>{% trans "Workcenter" %}</th><th class="num">{% trans "Hours Required" %}</th><th>{% trans "Earliest Available" %}</th></tr></thead>
             <tbody>
             {% for wc in result.capacity_workcenters %}
             <tr>
                 <td>{{ wc.workcenter_name }}</td>
                 <td class="num">{{ wc.hours_required|floatformat:1 }}</td>
-                <td>{{ wc.earliest_date|default:"Not available within 90 days" }}</td>
+                <td>{% if wc.earliest_date %}{{ wc.earliest_date }}{% else %}{% trans "Not available within 90 days" %}{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <p style="font-size:13px;color:#666;">No routing defined for this product — capacity isn't a constraint.</p>
+        <p style="font-size:13px;color:#666;">{% trans "No routing defined for this product — capacity isn't a constraint." %}</p>
         {% endif %}
 
-        <div class="ctp-section-title">Combined</div>
+        <div class="ctp-section-title">{% trans "Combined" %}</div>
         <div class="atp-meta">
-            <div style="grid-column:1/-1;"><b>CTP Date:</b>
+            <div style="grid-column:1/-1;"><b>{% trans "CTP Date:" %}</b>
                 {% if result.ctp_date %}{{ result.ctp_date }}
-                {% else %}Not achievable within 90 days{% endif %}</div>
+                {% else %}{% trans "Not achievable within 90 days" %}{% endif %}</div>
         </div>
     </div>
     {% endif %}

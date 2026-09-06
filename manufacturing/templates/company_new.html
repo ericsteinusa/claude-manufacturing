@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}New Company{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Company" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/companies/" class="btn">← Back</a>
+<a href="/companies/" class="btn">← {% trans "Back" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">New Company</div>
+    <div class="menu-title">{% trans "New Company" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -16,32 +17,32 @@
             <form method="post" action="">
                 {% csrf_token %}
                 <div class="form-row">
-                    <label>Name</label>
+                    <label>{% trans "Name" %}</label>
                     <input type="text" name="name" required>
                 </div>
                 <div class="form-row">
-                    <label>Legal Name</label>
+                    <label>{% trans "Legal Name" %}</label>
                     <input type="text" name="legal_name">
                 </div>
                 <div class="form-row">
-                    <label>Tax ID</label>
+                    <label>{% trans "Tax ID" %}</label>
                     <input type="text" name="tax_id">
                 </div>
                 <div class="form-row">
-                    <label>Currency Code</label>
+                    <label>{% trans "Currency Code" %}</label>
                     <input type="text" name="currency_code" value="USD" maxlength="3">
                 </div>
                 <div class="form-row">
-                    <label>Address</label>
+                    <label>{% trans "Address" %}</label>
                     <input type="text" name="address">
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="3"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn">Create Company</button>
-                    <a href="/companies/" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn">{% trans "Create Company" %}</button>
+                    <a href="/companies/" class="btn btn-cancel">{% trans "Cancel" %}</a>
                 </div>
             </form>
         </div>

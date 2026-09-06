@@ -1,26 +1,27 @@
 {% extends "base.html" %}
-{% block page_title %}What-If Scenarios{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "What-If Scenarios" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/schedule/capacity/" class="btn">Capacity Planning</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/schedule/capacity/" class="btn">{% trans "Capacity Planning" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/scenarios/new/" class="btn btn-primary">+ New Scenario</a>
+<a href="/scenarios/new/" class="btn btn-primary">+ {% trans "New Scenario" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">What-If Scenarios</div>
+    <div class="menu-title">{% trans "What-If Scenarios" %}</div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Compare hypothetical demand or capacity changes against real MRP and
-        workcenter data without committing anything.
+        {% blocktrans %}Compare hypothetical demand or capacity changes against real MRP and
+        workcenter data without committing anything.{% endblocktrans %}
     </p>
 
     <form method="get" style="margin-bottom:14px;">
-        <input type="text" name="q" value="{{ q }}" placeholder="Search by name..."
+        <input type="text" name="q" value="{{ q }}" placeholder="{% trans "Search by name..." %}"
                style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:240px;">
-        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+        <button type="submit" class="btn" style="padding:6px 12px;">{% trans "Search" %}</button>
     </form>
 
     {% if scenarios %}
@@ -28,9 +29,9 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Created</th>
+                    <th>{% trans "Name" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Created" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -41,8 +42,8 @@
                     <td>{{ s.description|default:"—" }}</td>
                     <td>{{ s.created_at|date:"Y-m-d" }}</td>
                     <td>
-                        <a href="/scenarios/{{ s.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a>
-                        <a href="/scenarios/{{ s.id }}/run/" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Run</a>
+                        <a href="/scenarios/{{ s.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a>
+                        <a href="/scenarios/{{ s.id }}/run/" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">{% trans "Run" %}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -50,7 +51,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No scenarios yet.</div>
+    <div class="empty-state">{% trans "No scenarios yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

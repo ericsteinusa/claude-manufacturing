@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ company.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/companies/" class="btn">← Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/companies/" class="btn">← {% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -35,28 +36,28 @@
         <div class="po-card">
             <div class="po-head">
                 <h2>{{ company.name }}</h2>
-                {% if is_base %}<span class="pill">Home Entity</span>{% endif %}
+                {% if is_base %}<span class="pill">{% trans "Home Entity" %}</span>{% endif %}
             </div>
             <div class="po-meta">
-                <div><b>Legal Name:</b> {{ company.legal_name|default:"—" }}</div>
-                <div><b>Tax ID:</b> {{ company.tax_id|default:"—" }}</div>
-                <div><b>Currency:</b> {{ company.currency_code }}</div>
-                <div><b>Address:</b> {{ company.address|default:"—" }}</div>
-                <div style="grid-column: 1 / -1;"><b>Notes:</b> {{ company.notes|default:"—" }}</div>
+                <div><b>{% trans "Legal Name:" %}</b> {{ company.legal_name|default:"—" }}</div>
+                <div><b>{% trans "Tax ID:" %}</b> {{ company.tax_id|default:"—" }}</div>
+                <div><b>{% trans "Currency:" %}</b> {{ company.currency_code }}</div>
+                <div><b>{% trans "Address:" %}</b> {{ company.address|default:"—" }}</div>
+                <div style="grid-column: 1 / -1;"><b>{% trans "Notes:" %}</b> {{ company.notes|default:"—" }}</div>
             </div>
         </div>
 
         <div class="po-card">
-            <div class="po-head"><h3 style="margin:0;">Trial Balance</h3></div>
+            <div class="po-head"><h3 style="margin:0;">{% trans "Trial Balance" %}</h3></div>
             {% if is_base %}
             <p style="font-size:12px;color:#555;margin-bottom:10px;">
-                Includes journal entries recorded before Multi-Entity was set up.</p>
+                {% trans "Includes journal entries recorded before Multi-Entity was set up." %}</p>
             {% endif %}
             {% if tb.rows %}
             <table class="list-table">
                 <thead><tr>
-                    <th>Acct #</th><th>Account Name</th><th>Type</th>
-                    <th class="num">Debit</th><th class="num">Credit</th>
+                    <th>{% trans "Acct #" %}</th><th>{% trans "Account Name" %}</th><th>{% trans "Type" %}</th>
+                    <th class="num">{% trans "Debit" %}</th><th class="num">{% trans "Credit" %}</th>
                 </tr></thead>
                 <tbody>
                 {% for r in tb.rows %}
@@ -71,27 +72,27 @@
                 </tbody>
                 <tfoot>
                 <tr class="totals-row">
-                    <td colspan="3">TOTALS</td>
+                    <td colspan="3">{% trans "TOTALS" %}</td>
                     <td class="num">${{ tb.total_debit|floatformat:2 }}</td>
                     <td class="num">${{ tb.total_credit|floatformat:2 }}</td>
                 </tr>
                 </tfoot>
             </table>
             <span class="{% if tb.balanced %}status-ok{% else %}status-err{% endif %}">
-                {% if tb.balanced %}BALANCED{% else %}OUT OF BALANCE{% endif %}
+                {% if tb.balanced %}{% trans "BALANCED" %}{% else %}{% trans "OUT OF BALANCE" %}{% endif %}
             </span>
             {% else %}
-            <div class="empty-state">No posted journal entries for this entity yet.</div>
+            <div class="empty-state">{% trans "No posted journal entries for this entity yet." %}</div>
             {% endif %}
         </div>
 
         <div class="po-card">
-            <div class="po-head"><h3 style="margin:0;">Assigned Users</h3></div>
+            <div class="po-head"><h3 style="margin:0;">{% trans "Assigned Users" %}</h3></div>
             <p style="font-size:12px;color:#555;margin-bottom:10px;">
-                President/Vice President roles always have access to every company.</p>
+                {% trans "President/Vice President roles always have access to every company." %}</p>
             {% if users %}
             <table class="list-table">
-                <thead><tr><th>Name</th><th>Email</th>{% if is_admin %}<th></th>{% endif %}</tr></thead>
+                <thead><tr><th>{% trans "Name" %}</th><th>{% trans "Email" %}</th>{% if is_admin %}<th></th>{% endif %}</tr></thead>
                 <tbody>
                 {% for u in users %}
                 <tr>
@@ -100,9 +101,9 @@
                     {% if is_admin %}
                     <td>
                         <form method="post" action="/companies/{{ company.id }}/revoke-user/{{ u.people_id }}/"
-                              onsubmit="return confirm('Revoke access for this user?');">
+                              onsubmit="return confirm('{% trans "Revoke access for this user?" %}');">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm">Revoke</button>
+                            <button type="submit" class="btn btn-sm">{% trans "Revoke" %}</button>
                         </form>
                     </td>
                     {% endif %}
@@ -111,7 +112,7 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="empty-state">No users individually assigned yet.</div>
+            <div class="empty-state">{% trans "No users individually assigned yet." %}</div>
             {% endif %}
 
             {% if is_admin %}
@@ -119,12 +120,12 @@
                   style="display:flex;gap:8px;align-items:center;margin-top:10px;">
                 {% csrf_token %}
                 <select name="people_id" required>
-                    <option value="">Select a person…</option>
+                    <option value="">{% trans "Select a person…" %}</option>
                     {% for p in people %}
                     <option value="{{ p.id }}">{{ p.label }} ({{ p.email }})</option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-sm">Grant Access</button>
+                <button type="submit" class="btn btn-sm">{% trans "Grant Access" %}</button>
             </form>
             {% endif %}
         </div>

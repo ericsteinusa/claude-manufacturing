@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Budget Management Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Budget Management Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/fin/budgets/" class="btn">Budgets</a>
-<a href="/fin/" class="btn">Finance</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/fin/budgets/" class="btn">{% trans "Budgets" %}</a>
+<a href="/fin/" class="btn">{% trans "Finance" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -29,63 +30,63 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Budget Management Dashboard</h2>
+    <h2>{% trans "Budget Management Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/fin/budgets/" class="dept-btn">All Budgets</a>
-        <a href="/fin/budgets/" class="dept-btn">New Budget</a>
-        <a href="/fin/" class="dept-btn">Finance Dashboard</a>
-        <a href="/acct/" class="dept-btn">Accounting</a>
-        <a href="/reports/" class="dept-btn">Reports</a>
-        <a href="/dashboard/" class="dept-btn">Home</a>
+        <a href="/fin/budgets/" class="dept-btn">{% trans "All Budgets" %}</a>
+        <a href="/fin/budgets/" class="dept-btn">{% trans "New Budget" %}</a>
+        <a href="/fin/" class="dept-btn">{% trans "Finance Dashboard" %}</a>
+        <a href="/acct/" class="dept-btn">{% trans "Accounting" %}</a>
+        <a href="/reports/" class="dept-btn">{% trans "Reports" %}</a>
+        <a href="/dashboard/" class="dept-btn">{% trans "Home" %}</a>
     </div>
 
     <div class="kpi-row">
         <div class="kpi highlight">
-            <div class="lbl">Total Budgeted</div>
+            <div class="lbl">{% trans "Total Budgeted" %}</div>
             <div class="val" style="font-size:20px;">${{ kpis.total_budgeted|floatformat:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Total Budgets</div>
+            <div class="lbl">{% trans "Total Budgets" %}</div>
             <div class="val">{{ kpis.total_budgets|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Active</div>
+            <div class="lbl">{% trans "Active" %}</div>
             <div class="val">{{ kpis.active_budgets|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Draft</div>
+            <div class="lbl">{% trans "Draft" %}</div>
             <div class="val">{{ kpis.draft_budgets|default:0 }}</div>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Budget Status Breakdown</h3>
+            <h3>{% trans "Budget Status Breakdown" %}</h3>
             <canvas id="chart-status" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Active Budgets by Total ($)</h3>
+            <h3>{% trans "Active Budgets by Total ($)" %}</h3>
             <canvas id="chart-budgets" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Spend by Category</h3>
+            <h3>{% trans "Spend by Category" %}</h3>
             <canvas id="chart-categories" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Total Budgeted by Fiscal Year</h3>
+            <h3>{% trans "Total Budgeted by Fiscal Year" %}</h3>
             <canvas id="chart-by-year" height="220"></canvas>
         </div>
     </div>
 
     <div class="card">
-        <h3>All Budgets</h3>
+        <h3>{% trans "All Budgets" %}</h3>
         <table class="list-table">
             <thead>
-                <tr><th>Budget Name</th><th>Fiscal Year</th><th>Status</th><th>Total Budgeted</th></tr>
+                <tr><th>{% trans "Budget Name" %}</th><th>{% trans "Fiscal Year" %}</th><th>{% trans "Status" %}</th><th>{% trans "Total Budgeted" %}</th></tr>
             </thead>
             <tbody>
             {% for b in recent_budgets %}
@@ -96,7 +97,7 @@
                 <td>${{ b.total_budgeted|floatformat:0 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:var(--text-muted);">No budgets found.</td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);">{% trans "No budgets found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

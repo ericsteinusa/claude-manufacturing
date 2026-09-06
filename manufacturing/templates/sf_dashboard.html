@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Live OEE Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Live OEE Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/shop-floor/entry/" class="btn">Entry</a>
-<a href="/shop-floor/plan/" class="btn">Shift Plan</a>
-<a href="/shop-floor/tv/" class="btn" target="_blank">TV Display</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/shop-floor/entry/" class="btn">{% trans "Entry" %}</a>
+<a href="/shop-floor/plan/" class="btn">{% trans "Shift Plan" %}</a>
+<a href="/shop-floor/tv/" class="btn" target="_blank">{% trans "TV Display" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,18 +39,18 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <div class="menu-title">Live OEE Dashboard</div>
+    <div class="menu-title">{% trans "Live OEE Dashboard" %}</div>
 
     <form method="get" class="filter-bar">
-        <label>Shift:</label>
+        <label>{% trans "Shift:" %}</label>
         <select name="shift">
             {% for s in shifts %}
             <option value="{{ s }}" {% if s == shift %}selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <label>Date:</label>
+        <label>{% trans "Date:" %}</label>
         <input type="date" name="date" value="{{ entry_date }}">
-        <button type="submit" class="btn-sm">Go</button>
+        <button type="submit" class="btn-sm">{% trans "Go" %}</button>
     </form>
 
     <div class="oee-grid">
@@ -61,18 +62,18 @@
             <div class="bar-track"><div class="bar-fill {% if wc.oee_pct >= 85 %}good{% elif wc.oee_pct >= 60 %}warn{% else %}danger{% endif %}" style="width:{{ wc.oee_pct }}%;"></div></div>
             <div class="sub">
                 A {{ wc.availability_pct }}% &middot; P {{ wc.performance_pct }}% &middot; Q {{ wc.quality_pct }}%<br>
-                {{ wc.qty_produced|floatformat:0 }} produced, {{ wc.qty_scrapped|floatformat:0 }} scrapped
-                {% if not wc.has_plan %}<br><em>no plan set</em>{% endif %}
+                {% blocktrans with produced=wc.qty_produced|floatformat:0 scrapped=wc.qty_scrapped|floatformat:0 %}{{ produced }} produced, {{ scrapped }} scrapped{% endblocktrans %}
+                {% if not wc.has_plan %}<br><em>{% trans "no plan set" %}</em>{% endif %}
             </div>
         </div>
         {% empty %}
-        <p style="color:var(--text-muted);">No active workcenters found.</p>
+        <p style="color:var(--text-muted);">{% trans "No active workcenters found." %}</p>
         {% endfor %}
     </div>
 
-    <div class="card-title">Recent Downtime — {{ shift }} Shift, {{ entry_date }}</div>
+    <div class="card-title">{% blocktrans %}Recent Downtime — {{ shift }} Shift, {{ entry_date }}{% endblocktrans %}</div>
     <table class="list-table">
-        <thead><tr><th>Workcenter</th><th>Reason</th><th>Notes</th><th class="num">Minutes</th></tr></thead>
+        <thead><tr><th>{% trans "Workcenter" %}</th><th>{% trans "Reason" %}</th><th>{% trans "Notes" %}</th><th class="num">{% trans "Minutes" %}</th></tr></thead>
         <tbody>
         {% for d in downtime %}
         <tr>
@@ -82,7 +83,7 @@
             <td class="num">{{ d.minutes|floatformat:0 }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No downtime logged for this shift.</td></tr>
+        <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">{% trans "No downtime logged for this shift." %}</td></tr>
         {% endfor %}
         </tbody>
     </table>

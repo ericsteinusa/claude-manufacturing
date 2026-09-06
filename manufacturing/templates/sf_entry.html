@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Production / Downtime Entry{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Production / Downtime Entry" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/shop-floor/" class="btn">Live Dashboard</a>
-<a href="/shop-floor/plan/" class="btn">Shift Plan</a>
-<a href="/shop-floor/tv/" class="btn" target="_blank">TV Display</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/shop-floor/" class="btn">{% trans "Live Dashboard" %}</a>
+<a href="/shop-floor/plan/" class="btn">{% trans "Shift Plan" %}</a>
+<a href="/shop-floor/tv/" class="btn" target="_blank">{% trans "TV Display" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -23,32 +24,32 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Production / Downtime Entry</div>
+    <div class="menu-title">{% trans "Production / Downtime Entry" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <label>Shift:</label>
+        <label>{% trans "Shift:" %}</label>
         <select name="shift">
             {% for s in shifts %}
             <option value="{{ s }}" {% if s == shift %}selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <label>Date:</label>
+        <label>{% trans "Date:" %}</label>
         <input type="date" name="date" value="{{ entry_date }}">
-        <button type="submit" class="btn btn-sm">Go</button>
+        <button type="submit" class="btn btn-sm">{% trans "Go" %}</button>
     </form>
 
     <div class="two-col">
         <div class="card">
-            <div class="card-title">Log Production</div>
+            <div class="card-title">{% trans "Log Production" %}</div>
             <form method="post" action="">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="production">
                 <input type="hidden" name="shift" value="{{ shift }}">
                 <input type="hidden" name="entry_date" value="{{ entry_date }}">
                 <div class="form-row">
-                    <label>Workcenter</label>
+                    <label>{% trans "Workcenter" %}</label>
                     <select name="workcenter_id" required>
                         {% for wc in workcenters %}
                         <option value="{{ wc.id }}">{{ wc.name }}</option>
@@ -56,28 +57,28 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Units Produced</label>
+                    <label>{% trans "Units Produced" %}</label>
                     <input type="number" name="qty_produced" min="0" step="1" value="0" required>
                 </div>
                 <div class="form-row">
-                    <label>Units Scrapped</label>
+                    <label>{% trans "Units Scrapped" %}</label>
                     <input type="number" name="qty_scrapped" min="0" step="1" value="0">
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn">Log Production</button>
+                    <button type="submit" class="btn">{% trans "Log Production" %}</button>
                 </div>
             </form>
         </div>
 
         <div class="card">
-            <div class="card-title">Log Downtime</div>
+            <div class="card-title">{% trans "Log Downtime" %}</div>
             <form method="post" action="">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="downtime">
                 <input type="hidden" name="shift" value="{{ shift }}">
                 <input type="hidden" name="entry_date" value="{{ entry_date }}">
                 <div class="form-row">
-                    <label>Workcenter</label>
+                    <label>{% trans "Workcenter" %}</label>
                     <select name="workcenter_id" required>
                         {% for wc in workcenters %}
                         <option value="{{ wc.id }}">{{ wc.name }}</option>
@@ -85,7 +86,7 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Reason</label>
+                    <label>{% trans "Reason" %}</label>
                     <select name="reason_category" required>
                         {% for r in reason_categories %}
                         <option value="{{ r }}">{{ r }}</option>
@@ -93,25 +94,25 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Minutes</label>
+                    <label>{% trans "Minutes" %}</label>
                     <input type="number" name="minutes" min="1" step="1" value="" required>
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <input type="text" name="notes">
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn">Log Downtime</button>
+                    <button type="submit" class="btn">{% trans "Log Downtime" %}</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="card-title">{{ shift }} Shift — {{ entry_date }}</div>
+    <div class="card-title">{% blocktrans %}{{ shift }} Shift — {{ entry_date }}{% endblocktrans %}</div>
     <table class="list-table">
         <thead><tr>
-            <th>Workcenter</th><th class="num">Produced</th><th class="num">Scrapped</th>
-            <th class="num">Downtime (min)</th><th class="num">OEE</th>
+            <th>{% trans "Workcenter" %}</th><th class="num">{% trans "Produced" %}</th><th class="num">{% trans "Scrapped" %}</th>
+            <th class="num">{% trans "Downtime (min)" %}</th><th class="num">OEE</th>
         </tr></thead>
         <tbody>
         {% for wc in live %}
@@ -123,7 +124,7 @@
             <td class="num">{{ wc.oee_pct }}%</td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No active workcenters.</td></tr>
+        <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">{% trans "No active workcenters." %}</td></tr>
         {% endfor %}
         </tbody>
     </table>
