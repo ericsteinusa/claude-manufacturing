@@ -1,25 +1,26 @@
 {% extends "base.html" %}
-{% block page_title %}Cycle Counts{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Cycle Counts" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/inventory/" class="btn">Inventory</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/inventory/" class="btn">{% trans "Inventory" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/inventory/cycle-counts/new/" class="btn btn-primary">+ New Count</a>
+<a href="/inventory/cycle-counts/new/" class="btn btn-primary">+ {% trans "New Count" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Cycle Counts</div>
+    <div class="menu-title">{% trans "Cycle Counts" %}</div>
 
     <div class="filter-bar">
-        <label>Status:</label>
-        <a href="/inventory/cycle-counts/" class="{% if not status %}active{% endif %}">All</a>
-        <a href="/inventory/cycle-counts/?status=open" class="{% if status == 'open' %}active{% endif %}">Open</a>
-        <a href="/inventory/cycle-counts/?status=submitted" class="{% if status == 'submitted' %}active{% endif %}">Pending Approval</a>
-        <a href="/inventory/cycle-counts/?status=posted" class="{% if status == 'posted' %}active{% endif %}">Posted</a>
-        <a href="/inventory/cycle-counts/?status=rejected" class="{% if status == 'rejected' %}active{% endif %}">Rejected</a>
+        <label>{% trans "Status:" %}</label>
+        <a href="/inventory/cycle-counts/" class="{% if not status %}active{% endif %}">{% trans "All" %}</a>
+        <a href="/inventory/cycle-counts/?status=open" class="{% if status == 'open' %}active{% endif %}">{% trans "Open" %}</a>
+        <a href="/inventory/cycle-counts/?status=submitted" class="{% if status == 'submitted' %}active{% endif %}">{% trans "Pending Approval" %}</a>
+        <a href="/inventory/cycle-counts/?status=posted" class="{% if status == 'posted' %}active{% endif %}">{% trans "Posted" %}</a>
+        <a href="/inventory/cycle-counts/?status=rejected" class="{% if status == 'rejected' %}active{% endif %}">{% trans "Rejected" %}</a>
     </div>
 
     {% if counts %}
@@ -27,10 +28,10 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Count #</th>
-                    <th>Grouping</th>
-                    <th>Status</th>
-                    <th>Created</th>
+                    <th>{% trans "Count #" %}</th>
+                    <th>{% trans "Grouping" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Created" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -41,24 +42,24 @@
                     <td>{{ c.group_by|capfirst }}: {{ c.group_value }}</td>
                     <td>
                         {% if c.status == 'posted' %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Posted</span>
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Posted" %}</span>
                         {% elif c.status == 'rejected' %}
-                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Rejected</span>
+                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{% trans "Rejected" %}</span>
                         {% elif c.status == 'submitted' %}
-                        <span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">Pending Approval</span>
+                        <span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{% trans "Pending Approval" %}</span>
                         {% else %}
-                        <span class="pill" style="font-size:11px;padding:2px 8px;">Open</span>
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Open" %}</span>
                         {% endif %}
                     </td>
                     <td>{{ c.created_at|date:"Y-m-d H:i" }}</td>
-                    <td><a href="/inventory/cycle-counts/{{ c.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/inventory/cycle-counts/{{ c.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No cycle counts found{% if status %} with status "{{ status }}"{% endif %}.</div>
+    <div class="empty-state">{% trans "No cycle counts found" %}{% if status %}{% blocktrans with s=status %} with status "{{ s }}"{% endblocktrans %}{% endif %}.</div>
     {% endif %}
 </div>
 {% endblock %}

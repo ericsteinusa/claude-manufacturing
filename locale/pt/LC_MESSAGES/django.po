@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 00:23+0000\n"
+"POT-Creation-Date: 2026-09-06 00:37+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
@@ -129,7 +129,7 @@ msgid "Production"
 msgstr "Produção"
 
 #: manufacturing/menus.py:1697 manufacturing/templates/base.html:530
-#: manufacturing/templates/base.html:532
+#: manufacturing/templates/base.html:532 manufacturing/templates/cc_list.html:6
 #: manufacturing/templates/inventory_list.html:3
 #: manufacturing/templates/inventory_list.html:17
 #: manufacturing/templates/prod_dashboard.html:16
@@ -275,6 +275,8 @@ msgstr "Relatório ABC vs. Tradicional"
 #: manufacturing/templates/bom_detail.html:12
 #: manufacturing/templates/bom_explode.html:8
 #: manufacturing/templates/bom_list.html:7
+#: manufacturing/templates/cc_detail.html:7
+#: manufacturing/templates/cc_list.html:7 manufacturing/templates/cc_new.html:7
 #: manufacturing/templates/coa_detail.html:8
 #: manufacturing/templates/coa_list.html:7
 #: manufacturing/templates/coa_new.html:7
@@ -520,6 +522,9 @@ msgstr "Relatório ABC vs. Tradicional"
 #: manufacturing/templates/sales_targets.html:9
 #: manufacturing/templates/sales_territories.html:10
 #: manufacturing/templates/sales_territory_performance.html:9
+#: manufacturing/templates/sampling_plan_detail.html:8
+#: manufacturing/templates/sampling_plan_list.html:11
+#: manufacturing/templates/sampling_plan_new.html:7
 #: manufacturing/templates/skill_list.html:8
 #: manufacturing/templates/skill_new.html:7
 #: manufacturing/templates/skill_requirements.html:8
@@ -573,6 +578,7 @@ msgstr "Consumo de Direcionador por Produto"
 #: manufacturing/templates/abc_activity_detail.html:74
 #: manufacturing/templates/abc_report.html:24
 #: manufacturing/templates/bom_list.html:30
+#: manufacturing/templates/cc_detail.html:67
 #: manufacturing/templates/coa_detail.html:36
 #: manufacturing/templates/coa_list.html:29
 #: manufacturing/templates/consignment_detail.html:8
@@ -604,6 +610,7 @@ msgstr "Consumo de Direcionador por Produto"
 #: manufacturing/templates/sales_order_detail.html:121
 #: manufacturing/templates/sales_order_detail.html:170
 #: manufacturing/templates/sales_reports_kpis.html:34
+#: manufacturing/templates/sampling_plan_list.html:34
 #: manufacturing/templates/so_detail.html:196
 #: manufacturing/templates/spc_list.html:41
 #: manufacturing/templates/spc_list.html:88
@@ -703,6 +710,7 @@ msgstr "Pool de Custos"
 #: manufacturing/templates/ats_requisition_detail.html:64
 #: manufacturing/templates/ats_requisition_list.html:49
 #: manufacturing/templates/benefits_dashboard.html:90
+#: manufacturing/templates/cc_list.html:55
 #: manufacturing/templates/coa_list.html:54
 #: manufacturing/templates/compliance_checklist_list.html:42
 #: manufacturing/templates/compliance_template_list.html:34
@@ -710,6 +718,7 @@ msgstr "Pool de Custos"
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/inventory_list.html:102
 #: manufacturing/templates/rfq_list.html:55
+#: manufacturing/templates/sampling_plan_list.html:55
 #: manufacturing/templates/skills_matrix_summary.html:48
 #: manufacturing/templates/technician_route_list.html:46
 #: manufacturing/templates/wms_bin_list.html:60
@@ -954,6 +963,8 @@ msgstr "ex.: por preparação, por hora-máquina"
 #: manufacturing/templates/sales_territories.html:80
 #: manufacturing/templates/sales_territories.html:136
 #: manufacturing/templates/sales_territories.html:173
+#: manufacturing/templates/sampling_plan_detail.html:78
+#: manufacturing/templates/sampling_plan_new.html:69
 #: manufacturing/templates/skill_requirements.html:37
 #: manufacturing/templates/skill_requirements.html:101
 #: manufacturing/templates/so_form.html:74
@@ -1079,6 +1090,7 @@ msgid "ABC OH/Unit"
 msgstr "CI ABC/Unidade"
 
 #: manufacturing/templates/abc_report.html:27
+#: manufacturing/templates/cc_detail.html:71
 #: manufacturing/templates/maint_labor_report.html:96
 #: manufacturing/templates/maint_labor_report.html:128
 #: manufacturing/templates/prod_labor_report.html:96
@@ -1533,6 +1545,7 @@ msgstr "Total a Débito"
 #: manufacturing/templates/benefit_plan_detail.html:56
 #: manufacturing/templates/benefits_dashboard.html:73
 #: manufacturing/templates/blanket_po_list.html:36
+#: manufacturing/templates/cc_list.html:33
 #: manufacturing/templates/compliance_checklist_detail.html:48
 #: manufacturing/templates/compliance_checklist_list.html:16
 #: manufacturing/templates/compliance_checklist_list.html:27
@@ -1805,6 +1818,8 @@ msgstr "Total a Débito"
 #: manufacturing/templates/sales_territories.html:128
 #: manufacturing/templates/sales_territories.html:165
 #: manufacturing/templates/sales_territory_performance.html:40
+#: manufacturing/templates/sampling_plan_detail.html:71
+#: manufacturing/templates/sampling_plan_list.html:36
 #: manufacturing/templates/so_form.html:57
 #: manufacturing/templates/so_form.html:62
 #: manufacturing/templates/so_list.html:44
@@ -1843,6 +1858,9 @@ msgid "Status"
 msgstr "Estado"
 
 #: manufacturing/templates/acct_dashboard_kpis.html:58
+#: manufacturing/templates/cc_detail.html:22
+#: manufacturing/templates/cc_list.html:22
+#: manufacturing/templates/cc_list.html:45
 #: manufacturing/templates/finance_dashboard_kpis.html:73
 #: manufacturing/templates/gl_dashboard_kpis.html:47
 #: manufacturing/templates/gl_journal_detail.html:63
@@ -2136,6 +2154,7 @@ msgstr "Taxa de Câmbio"
 #: manufacturing/templates/sales_forecast_detail.html:176
 #: manufacturing/templates/sales_leads_detail.html:107
 #: manufacturing/templates/sales_territories.html:140
+#: manufacturing/templates/sampling_plan_detail.html:81
 #: manufacturing/templates/tc_device_form.html:192
 #: manufacturing/templates/user_roles.html:55
 #: manufacturing/templates/webhook_edit.html:56
@@ -2306,6 +2325,7 @@ msgstr "Exportar Excel"
 #: manufacturing/templates/ap_list.html:36
 #: manufacturing/templates/ar_list.html:36
 #: manufacturing/templates/blanket_po_list.html:17
+#: manufacturing/templates/cc_list.html:18
 #: manufacturing/templates/consignment_list.html:22
 #: manufacturing/templates/eng_ecr_detail.html:58
 #: manufacturing/templates/eng_ecrs.html:47
@@ -2604,20 +2624,29 @@ msgid ""
 "<strong style=\"color:#c0392b;\">Consider Replacement</strong> — repeated "
 "failures on a\n"
 "            %(c)s-criticality asset are dragging its health score down."
-msgstr "<strong style=\"color:#c0392b;\">Considerar Substituição</strong> — falhas repetidas em um ativo\n            de criticidade %(c)s estão reduzindo sua pontuação de saúde."
+msgstr ""
+"<strong style=\"color:#c0392b;\">Considerar Substituição</strong> — falhas "
+"repetidas em um ativo\n"
+"            de criticidade %(c)s estão reduzindo sua pontuação de saúde."
 
 #: manufacturing/templates/apm_asset_detail.html:39
 msgid ""
 "<strong style=\"color:#a3720b;\">Schedule Maintenance</strong> — reliability "
 "is trending down; a\n"
 "            proactive PM visit now is cheaper than a breakdown later."
-msgstr "<strong style=\"color:#a3720b;\">Agendar Manutenção</strong> — a confiabilidade está em queda; uma\n            visita de manutenção preventiva agora é mais barata do que uma quebra depois."
+msgstr ""
+"<strong style=\"color:#a3720b;\">Agendar Manutenção</strong> — a "
+"confiabilidade está em queda; uma\n"
+"            visita de manutenção preventiva agora é mais barata do que uma "
+"quebra depois."
 
 #: manufacturing/templates/apm_asset_detail.html:42
 msgid ""
 "<strong style=\"color:#1a7f37;\">Monitor</strong> — this asset is performing "
 "within normal range."
-msgstr "<strong style=\"color:#1a7f37;\">Monitorar</strong> — este ativo está operando dentro da faixa normal."
+msgstr ""
+"<strong style=\"color:#1a7f37;\">Monitorar</strong> — este ativo está "
+"operando dentro da faixa normal."
 
 #: manufacturing/templates/apm_asset_detail.html:45
 #, python-format
@@ -2722,7 +2751,10 @@ msgid ""
 "Ranked worst-first. Health score combines real availability/failure data "
 "with criticality —\n"
 "        set an asset's criticality to fine-tune its recommendation."
-msgstr "Classificado do pior para o melhor. A pontuação de saúde combina dados reais de disponibilidade/falha com a criticidade —\n        defina a criticidade de um ativo para ajustar sua recomendação."
+msgstr ""
+"Classificado do pior para o melhor. A pontuação de saúde combina dados reais "
+"de disponibilidade/falha com a criticidade —\n"
+"        defina a criticidade de um ativo para ajustar sua recomendação."
 
 #: manufacturing/templates/apm_dashboard.html:28
 msgid "Lifecycle Cost"
@@ -2746,7 +2778,9 @@ msgstr "Monitorar"
 
 #: manufacturing/templates/apm_dashboard.html:49
 msgid "No assets with criticality ratings or downtime history yet."
-msgstr "Ainda não há ativos com classificações de criticidade ou histórico de paradas."
+msgstr ""
+"Ainda não há ativos com classificações de criticidade ou histórico de "
+"paradas."
 
 #: manufacturing/templates/approval_rule_edit.html:3
 #: manufacturing/templates/approval_rule_edit.html:26
@@ -2786,6 +2820,8 @@ msgstr "Regras de Aprovação"
 #: manufacturing/templates/sales_commission_plans.html:63
 #: manufacturing/templates/sales_commission_plans.html:76
 #: manufacturing/templates/sales_commission_plans.html:118
+#: manufacturing/templates/sampling_plan_detail.html:73
+#: manufacturing/templates/sampling_plan_list.html:50
 #: manufacturing/templates/webhook_edit.html:30
 #: manufacturing/templates/webhook_list.html:56
 #: manufacturing/templates/wms_bin_detail.html:19
@@ -2808,6 +2844,8 @@ msgstr "Ativo"
 #: manufacturing/templates/payroll_deductions.html:66
 #: manufacturing/templates/retention_policy_edit.html:27
 #: manufacturing/templates/sales_commission_plans.html:76
+#: manufacturing/templates/sampling_plan_detail.html:74
+#: manufacturing/templates/sampling_plan_list.html:52
 #: manufacturing/templates/webhook_edit.html:30
 #: manufacturing/templates/webhook_list.html:58
 #: manufacturing/templates/wms_bin_detail.html:19
@@ -2905,6 +2943,7 @@ msgstr "Escalar Após (horas) *"
 #: manufacturing/templates/mkt_ad_list.html:181
 #: manufacturing/templates/mkt_research_list.html:166
 #: manufacturing/templates/sales_commissions.html:238
+#: manufacturing/templates/sampling_plan_new.html:70
 msgid "Optional notes"
 msgstr "Notas opcionais"
 
@@ -3196,6 +3235,9 @@ msgid "Hired"
 msgstr "Contratado"
 
 #: manufacturing/templates/ats_application_detail.html:29
+#: manufacturing/templates/cc_detail.html:24
+#: manufacturing/templates/cc_list.html:23
+#: manufacturing/templates/cc_list.html:47
 msgid "Rejected"
 msgstr "Rejeitado"
 
@@ -3585,6 +3627,9 @@ msgstr "Não Atribuído"
 
 #: manufacturing/templates/ats_requisition_detail.html:26
 #: manufacturing/templates/ats_requisition_list.html:41
+#: manufacturing/templates/cc_detail.html:28
+#: manufacturing/templates/cc_list.html:20
+#: manufacturing/templates/cc_list.html:51
 #: manufacturing/templates/compliance_checklist_detail.html:27
 #: manufacturing/templates/compliance_checklist_list.html:19
 #: manufacturing/templates/compliance_checklist_list.html:39
@@ -4659,6 +4704,7 @@ msgstr "Qtd."
 
 #: manufacturing/templates/blanket_po_detail.html:98
 #: manufacturing/templates/blanket_po_release_new.html:35
+#: manufacturing/templates/cc_new.html:43
 #: manufacturing/templates/legal_contract_detail.html:78
 #: manufacturing/templates/legal_contract_list.html:91
 #: manufacturing/templates/legal_dashboard.html:145
@@ -4693,6 +4739,7 @@ msgstr "Nova PO Recorrente"
 
 #: manufacturing/templates/blanket_po_list.html:18
 #: manufacturing/templates/bom_list.html:18
+#: manufacturing/templates/cc_list.html:19
 #: manufacturing/templates/compliance_checklist_list.html:18
 #: manufacturing/templates/consignment_list.html:23
 #: manufacturing/templates/cs_plans.html:64
@@ -4756,6 +4803,7 @@ msgstr "Nº do Pedido em Aberto"
 #: manufacturing/templates/purch_reports.html:123
 #: manufacturing/templates/purchasing_dashboard_kpis.html:35
 #: manufacturing/templates/qa_supplier_list.html:84
+#: manufacturing/templates/sampling_plan_list.html:35
 #: manufacturing/templates/supplier_scorecard_list.html:50
 msgid "Supplier"
 msgstr "Fornecedor"
@@ -5311,6 +5359,160 @@ msgstr "Nenhum produto encontrado"
 msgid " with type \"%(t)s\""
 msgstr " com o tipo \"%(t)s\""
 
+#: manufacturing/templates/cc_detail.html:6
+#: manufacturing/templates/cc_list.html:3
+#: manufacturing/templates/cc_list.html:15
+#: manufacturing/templates/cc_new.html:6
+#: manufacturing/templates/inventory_dashboard.html:8
+#: manufacturing/templates/inventory_dashboard.html:41
+#: manufacturing/templates/inventory_list.html:7
+msgid "Cycle Counts"
+msgstr "Contagens Cíclicas"
+
+#: manufacturing/templates/cc_detail.html:26
+#: manufacturing/templates/cc_list.html:21
+#: manufacturing/templates/cc_list.html:49
+#: manufacturing/templates/purchasing_dashboard.html:55
+#: manufacturing/templates/purchasing_dashboard_kpis.html:8
+msgid "Pending Approval"
+msgstr "Aguardando Aprovação"
+
+#: manufacturing/templates/cc_detail.html:32
+#, python-format
+msgid "Grouped by %(gb)s: %(gv)s — created %(dt)s by %(by)s"
+msgstr "Agrupado por %(gb)s: %(gv)s — criado em %(dt)s por %(by)s"
+
+#: manufacturing/templates/cc_detail.html:41
+#, python-format
+msgid "Awaiting your approval as <strong>%(role)s</strong>."
+msgstr "Aguardando sua aprovação como <strong>%(role)s</strong>."
+
+#: manufacturing/templates/cc_detail.html:46
+msgid ""
+"Meaning of signature (e.g. &quot;I approve this count as accurate&quot;)"
+msgstr "Significado da assinatura (ex.: &quot;aprovo que esta contagem está correta&quot;)"
+
+#: manufacturing/templates/cc_detail.html:47
+msgid "Re-enter your password"
+msgstr "Digite sua senha novamente"
+
+#: manufacturing/templates/cc_detail.html:48
+#: manufacturing/templates/credit_application_detail.html:120
+#: manufacturing/templates/po_approvals.html:58
+#: manufacturing/templates/req_detail.html:168
+#: manufacturing/templates/time_off_detail.html:71
+msgid "Approve"
+msgstr "Aprovar"
+
+#: manufacturing/templates/cc_detail.html:49
+#: manufacturing/templates/po_approvals.html:65
+msgid "Reject"
+msgstr "Rejeitar"
+
+#: manufacturing/templates/cc_detail.html:54
+msgid "Variance found — awaiting approval"
+msgstr "Variação encontrada — aguardando aprovação"
+
+#: manufacturing/templates/cc_detail.html:55
+#, python-format
+msgid " from <strong>%(role)s</strong>"
+msgstr " de <strong>%(role)s</strong>"
+
+#: manufacturing/templates/cc_detail.html:68
+#: manufacturing/templates/inventory_detail.html:208
+#: manufacturing/templates/inventory_list.html:68
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+#: manufacturing/templates/wms_wave_detail.html:26
+msgid "Bin"
+msgstr "Localização"
+
+#: manufacturing/templates/cc_detail.html:69
+msgid "System Qty"
+msgstr "Qtd. do Sistema"
+
+#: manufacturing/templates/cc_detail.html:70
+msgid "Counted Qty"
+msgstr "Qtd. Contada"
+
+#: manufacturing/templates/cc_detail.html:107
+msgid "Submit Counts"
+msgstr "Enviar Contagens"
+
+#: manufacturing/templates/cc_list.html:9
+msgid "New Count"
+msgstr "Nova Contagem"
+
+#: manufacturing/templates/cc_list.html:31
+msgid "Count #"
+msgstr "N.º da Contagem"
+
+#: manufacturing/templates/cc_list.html:32
+msgid "Grouping"
+msgstr "Agrupamento"
+
+#: manufacturing/templates/cc_list.html:34
+#: manufacturing/templates/cs_plans.html:79
+#: manufacturing/templates/prod_returns_detail.html:73
+#: manufacturing/templates/prod_returns_list.html:84
+#: manufacturing/templates/prod_returns_reports.html:86
+#: manufacturing/templates/rfq_list.html:35
+#: manufacturing/templates/sales_forecast_detail.html:184
+#: manufacturing/templates/sales_leads_detail.html:118
+#: manufacturing/templates/sales_leads_list.html:91
+#: manufacturing/templates/wms_pick_list_list.html:63
+#: manufacturing/templates/wms_transfer_list.html:33
+#: manufacturing/templates/wms_wave_list.html:66
+msgid "Created"
+msgstr "Criado"
+
+#: manufacturing/templates/cc_list.html:62
+msgid "No cycle counts found"
+msgstr "Nenhuma contagem cíclica encontrada"
+
+#: manufacturing/templates/cc_list.html:62
+#: manufacturing/templates/consignment_list.html:63
+#: manufacturing/templates/inventory_list.html:113
+#, python-format
+msgid " with status \"%(s)s\""
+msgstr " com status \"%(s)s\""
+
+#: manufacturing/templates/cc_new.html:3
+msgid "New Cycle Count"
+msgstr "Nova Contagem Cíclica"
+
+#: manufacturing/templates/cc_new.html:21
+msgid "Generate Cycle Count Sheet"
+msgstr "Gerar Folha de Contagem Cíclica"
+
+#: manufacturing/templates/cc_new.html:28
+msgid "Group products by"
+msgstr "Agrupar produtos por"
+
+#: manufacturing/templates/cc_new.html:32
+msgid "Bin Location"
+msgstr "Localização"
+
+#: manufacturing/templates/cc_new.html:32
+msgid "Make / Buy"
+msgstr "Fabricar / Comprar"
+
+#: manufacturing/templates/cc_new.html:32
+msgid "ABC Class (by value)"
+msgstr "Classe ABC (por valor)"
+
+#: manufacturing/templates/cc_new.html:50
+msgid "Generate Sheet"
+msgstr "Gerar Folha"
+
+#: manufacturing/templates/cc_new.html:55
+#, python-format
+msgid ""
+"Snapshots each matching product's current on-hand quantity into a\n"
+"        count sheet. ABC class is computed on the fly by extended value\n"
+"        (on-hand × unit cost) — top 20%% = A, next 30%% = B, remainder = C."
+msgstr "Registra a quantidade atual em estoque de cada produto correspondente em uma\n        folha de contagem. A classe ABC é calculada dinamicamente pelo valor estendido\n        (estoque × custo unitário) — os 20%% principais = A, os próximos 30%% = B, o restante = C."
+
 #: manufacturing/templates/change_password.html:4
 #: manufacturing/templates/change_password.html:7
 #: manufacturing/templates/change_password.html:40
@@ -5360,6 +5562,7 @@ msgstr "Digite novamente a nova senha"
 #: manufacturing/templates/coa_list.html:15
 #: manufacturing/templates/coa_new.html:6
 #: manufacturing/templates/qa_dashboard.html:101
+#: manufacturing/templates/sampling_plan_list.html:8
 msgid "Certificates of Analysis"
 msgstr "Certificados de Análise"
 
@@ -5599,6 +5802,7 @@ msgstr "Listas de Verificação de Conformidade"
 #: manufacturing/templates/compliance_template_list.html:3
 #: manufacturing/templates/compliance_template_list.html:16
 #: manufacturing/templates/compliance_template_new.html:6
+#: manufacturing/templates/sampling_plan_list.html:9
 msgid "Compliance Templates"
 msgstr "Modelos de Conformidade"
 
@@ -5607,6 +5811,7 @@ msgstr "Modelos de Conformidade"
 #: manufacturing/templates/control_plan_list.html:6
 #: manufacturing/templates/qa_dashboard.html:3
 #: manufacturing/templates/qa_reports.html:6
+#: manufacturing/templates/sampling_plan_list.html:10
 msgid "QA Dashboard"
 msgstr "Painel da Qualidade"
 
@@ -5917,12 +6122,6 @@ msgstr "Usado até Hoje"
 msgid "No consignment agreements"
 msgstr "Nenhum acordo de consignação"
 
-#: manufacturing/templates/consignment_list.html:63
-#: manufacturing/templates/inventory_list.html:113
-#, python-format
-msgid " with status \"%(s)s\""
-msgstr " com status \"%(s)s\""
-
 #: manufacturing/templates/consignment_new.html:4
 #: manufacturing/templates/consignment_new.html:12
 msgid "New Consignment Agreement"
@@ -6031,6 +6230,7 @@ msgstr "N.º OS, N.º Pedido, etc."
 #: manufacturing/templates/control_plan_list.html:3
 #: manufacturing/templates/control_plan_list.html:16
 #: manufacturing/templates/control_plan_new.html:6
+#: manufacturing/templates/sampling_plan_list.html:7
 msgid "Control Plans"
 msgstr "Planos de Controle"
 
@@ -6413,13 +6613,6 @@ msgstr "Analisar Solicitação"
 #: manufacturing/templates/credit_application_detail.html:112
 msgid "Approved Limit ($)"
 msgstr "Limite Aprovado ($)"
-
-#: manufacturing/templates/credit_application_detail.html:120
-#: manufacturing/templates/po_approvals.html:58
-#: manufacturing/templates/req_detail.html:168
-#: manufacturing/templates/time_off_detail.html:71
-msgid "Approve"
-msgstr "Aprovar"
 
 #: manufacturing/templates/credit_application_detail.html:121
 #: manufacturing/templates/req_detail.html:169
@@ -7153,20 +7346,6 @@ msgstr "Planos de Melhoria de CS"
 #: manufacturing/templates/workforce_analytics.html:91
 msgid "Target Date"
 msgstr "Data Alvo"
-
-#: manufacturing/templates/cs_plans.html:79
-#: manufacturing/templates/prod_returns_detail.html:73
-#: manufacturing/templates/prod_returns_list.html:84
-#: manufacturing/templates/prod_returns_reports.html:86
-#: manufacturing/templates/rfq_list.html:35
-#: manufacturing/templates/sales_forecast_detail.html:184
-#: manufacturing/templates/sales_leads_detail.html:118
-#: manufacturing/templates/sales_leads_list.html:91
-#: manufacturing/templates/wms_pick_list_list.html:63
-#: manufacturing/templates/wms_transfer_list.html:33
-#: manufacturing/templates/wms_wave_list.html:66
-msgid "Created"
-msgstr "Criado"
 
 #: manufacturing/templates/cs_plans.html:98
 msgid "overdue"
@@ -10597,12 +10776,6 @@ msgstr "Todos os Itens"
 msgid "New Item"
 msgstr "Novo Item"
 
-#: manufacturing/templates/inventory_dashboard.html:8
-#: manufacturing/templates/inventory_dashboard.html:41
-#: manufacturing/templates/inventory_list.html:7
-msgid "Cycle Counts"
-msgstr "Contagens Cíclicas"
-
 #: manufacturing/templates/inventory_dashboard.html:9
 msgid "Valuation"
 msgstr "Valorização"
@@ -10758,14 +10931,6 @@ msgstr "Custo Unitário ($)"
 #: manufacturing/templates/inventory_detail.html:200
 msgid "View BOM"
 msgstr "Ver BOM"
-
-#: manufacturing/templates/inventory_detail.html:208
-#: manufacturing/templates/inventory_list.html:68
-#: manufacturing/templates/wms_pick_list_detail.html:37
-#: manufacturing/templates/wms_receive.html:33
-#: manufacturing/templates/wms_wave_detail.html:26
-msgid "Bin"
-msgstr "Localização"
 
 #: manufacturing/templates/inventory_detail.html:222
 msgid "Transaction History (last 50)"
@@ -14875,10 +15040,6 @@ msgstr "Rejeitar %(num)s e retornar para rascunho?"
 msgid "Rejection reason…"
 msgstr "Motivo da rejeição…"
 
-#: manufacturing/templates/po_approvals.html:65
-msgid "Reject"
-msgstr "Rejeitar"
-
 #: manufacturing/templates/po_approvals.html:75
 msgid "No purchase orders are currently awaiting approval."
 msgstr "Nenhum pedido de compra está aguardando aprovação no momento."
@@ -15016,6 +15177,8 @@ msgstr "Nenhum custo de importação registrado ainda."
 
 #: manufacturing/templates/po_detail.html:261
 #: manufacturing/templates/rfq_detail.html:91
+#: manufacturing/templates/sampling_plan_detail.html:53
+#: manufacturing/templates/sampling_plan_new.html:51
 #: manufacturing/templates/so_detail.html:246
 #: manufacturing/templates/wo_form.html:34
 msgid "Product (optional)"
@@ -15522,7 +15685,15 @@ msgid ""
 "        Failure probability uses an exponential/Poisson-process "
 "approximation from the mean interval.\n"
 "        "
-msgstr "\n        O MTBF contínuo é calculado a partir dos intervalos reais entre eventos de parada 'Quebra'\n        (não o MTBF agregado do período no <a href=\"/maint/oee/\">relatório OEE</a>).\n        A probabilidade de falha usa uma aproximação de processo exponencial/Poisson a partir do intervalo médio.\n        "
+msgstr ""
+"\n"
+"        O MTBF contínuo é calculado a partir dos intervalos reais entre "
+"eventos de parada 'Quebra'\n"
+"        (não o MTBF agregado do período no <a href=\"/maint/oee/\">relatório "
+"OEE</a>).\n"
+"        A probabilidade de falha usa uma aproximação de processo exponencial/"
+"Poisson a partir do intervalo médio.\n"
+"        "
 
 #: manufacturing/templates/predictive_maintenance.html:53
 msgid "MTBF (days)"
@@ -16172,11 +16343,6 @@ msgstr "Painel de Compras"
 msgid "Consultants"
 msgstr "Consultores"
 
-#: manufacturing/templates/purchasing_dashboard.html:55
-#: manufacturing/templates/purchasing_dashboard_kpis.html:8
-msgid "Pending Approval"
-msgstr "Aguardando Aprovação"
-
 #: manufacturing/templates/purchasing_dashboard.html:71
 msgid "PO Status Breakdown"
 msgstr "Detalhamento de Status de PO"
@@ -16507,6 +16673,10 @@ msgid "QA Inspections"
 msgstr "Inspeções de QA"
 
 #: manufacturing/templates/qa_inspection_list.html:9
+#: manufacturing/templates/sampling_plan_detail.html:6
+#: manufacturing/templates/sampling_plan_list.html:3
+#: manufacturing/templates/sampling_plan_list.html:19
+#: manufacturing/templates/sampling_plan_new.html:6
 msgid "Sampling Plans"
 msgstr "Planos de Amostragem"
 
@@ -17815,6 +17985,7 @@ msgid "Commission Plans"
 msgstr "Planos de Comissão"
 
 #: manufacturing/templates/sales_commission_plans.html:59
+#: manufacturing/templates/sampling_plan_list.html:31
 msgid "Plan Name"
 msgstr "Nome do Plano"
 
@@ -17835,6 +18006,8 @@ msgstr "Editar Plano"
 
 #: manufacturing/templates/sales_commission_plans.html:102
 #: manufacturing/templates/sales_commission_plans.html:139
+#: manufacturing/templates/sampling_plan_detail.html:31
+#: manufacturing/templates/sampling_plan_new.html:29
 msgid "Plan Name *"
 msgstr "Nome do Plano *"
 
@@ -18658,6 +18831,78 @@ msgstr ""
 "style=\"color:var(--accent);\">Gestão de Territórios</a>\n"
 "        e defina metas em <a href=\"/sales/targets/\" style=\"color:var(--"
 "accent);\">Metas de Vendas</a>."
+
+#: manufacturing/templates/sampling_plan_detail.html:3
+msgid "Sampling Plan"
+msgstr "Plano de Amostragem"
+
+#: manufacturing/templates/sampling_plan_detail.html:7
+#: manufacturing/templates/sampling_plan_list.html:6
+msgid "Incoming Inspection"
+msgstr "Inspeção de Entrada"
+
+#: manufacturing/templates/sampling_plan_detail.html:35
+#: manufacturing/templates/sampling_plan_new.html:33
+#, python-format
+msgid "AQL %% *"
+msgstr "AQL %% *"
+
+#: manufacturing/templates/sampling_plan_detail.html:45
+#: manufacturing/templates/sampling_plan_list.html:33
+#: manufacturing/templates/sampling_plan_new.html:43
+msgid "Inspection Level"
+msgstr "Nível de Inspeção"
+
+#: manufacturing/templates/sampling_plan_detail.html:55
+#: manufacturing/templates/sampling_plan_new.html:53
+msgid "— Any product —"
+msgstr "— Qualquer produto —"
+
+#: manufacturing/templates/sampling_plan_detail.html:62
+#: manufacturing/templates/sampling_plan_new.html:60
+msgid "Supplier (optional)"
+msgstr "Fornecedor (opcional)"
+
+#: manufacturing/templates/sampling_plan_detail.html:64
+#: manufacturing/templates/sampling_plan_new.html:62
+msgid "— Any supplier —"
+msgstr "— Qualquer fornecedor —"
+
+#: manufacturing/templates/sampling_plan_list.html:13
+#: manufacturing/templates/sampling_plan_new.html:3
+#: manufacturing/templates/sampling_plan_new.html:21
+msgid "New Sampling Plan"
+msgstr "Novo Plano de Amostragem"
+
+#: manufacturing/templates/sampling_plan_list.html:21
+msgid ""
+"Attach a plan to a product or supplier so incoming inspection can auto-"
+"calculate\n"
+"        sample size and accept/reject numbers from the lot quantity. A plan "
+"with neither\n"
+"        set is a general-purpose plan usable for any inspection."
+msgstr "Vincule um plano a um produto ou fornecedor para que a inspeção de entrada possa calcular automaticamente\n        o tamanho da amostra e os números de aceitação/rejeição a partir da quantidade do lote. Um plano sem nenhum\n        dos dois é um plano de uso geral aplicável a qualquer inspeção."
+
+#: manufacturing/templates/sampling_plan_list.html:32
+#, python-format
+msgid "AQL %%"
+msgstr "AQL %%"
+
+#: manufacturing/templates/sampling_plan_list.html:62
+msgid "No sampling plans yet."
+msgstr "Ainda não há planos de amostragem."
+
+#: manufacturing/templates/sampling_plan_new.html:30
+msgid "e.g. Standard Incoming — Fasteners"
+msgstr "ex.: Entrada Padrão — Fixadores"
+
+#: manufacturing/templates/sampling_plan_new.html:35
+msgid "e.g. 2.5"
+msgstr "ex.: 2,5"
+
+#: manufacturing/templates/sampling_plan_new.html:72
+msgid "Create Sampling Plan"
+msgstr "Criar Plano de Amostragem"
 
 #: manufacturing/templates/sf_tv.html:5 manufacturing/templates/sf_tv.html:38
 #, python-format

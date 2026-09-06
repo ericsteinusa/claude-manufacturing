@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Cycle Count{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Cycle Count" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/inventory/cycle-counts/" class="btn">Cycle Counts</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/inventory/cycle-counts/" class="btn">{% trans "Cycle Counts" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,18 +18,18 @@
 {% block body %}
 <div class="content">
 <div class="cc-wrap">
-    <div class="menu-title">Generate Cycle Count Sheet</div>
+    <div class="menu-title">{% trans "Generate Cycle Count Sheet" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     <div class="card">
         <form method="get" action="/inventory/cycle-counts/new/">
             <div class="form-row">
-                <label>Group products by</label>
+                <label>{% trans "Group products by" %}</label>
                 <select name="group_by" onchange="this.form.submit()">
                     {% for opt in group_by_options %}
                     <option value="{{ opt }}" {% if group_by == opt %}selected{% endif %}>
-                        {% if opt == 'bin' %}Bin Location{% elif opt == 'item_type' %}Make / Buy{% else %}ABC Class (by value){% endif %}
+                        {% if opt == 'bin' %}{% trans "Bin Location" %}{% elif opt == 'item_type' %}{% trans "Make / Buy" %}{% else %}{% trans "ABC Class (by value)" %}{% endif %}
                     </option>
                     {% endfor %}
                 </select>
@@ -39,21 +40,21 @@
             {% csrf_token %}
             <input type="hidden" name="group_by" value="{{ group_by }}">
             <div class="form-row">
-                <label>Value</label>
+                <label>{% trans "Value" %}</label>
                 <select name="group_value">
                     {% for v in group_values %}
                     <option value="{{ v }}">{{ v }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Generate Sheet</button>
+            <button type="submit" class="btn btn-primary">{% trans "Generate Sheet" %}</button>
         </form>
     </div>
 
     <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">
-        Snapshots each matching product's current on-hand quantity into a
+        {% blocktrans %}Snapshots each matching product's current on-hand quantity into a
         count sheet. ABC class is computed on the fly by extended value
-        (on-hand × unit cost) — top 20% = A, next 30% = B, remainder = C.
+        (on-hand × unit cost) — top 20% = A, next 30% = B, remainder = C.{% endblocktrans %}
     </p>
 </div>
 </div>
