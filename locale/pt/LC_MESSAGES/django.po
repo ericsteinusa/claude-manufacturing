@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 02:29+0000\n"
+"POT-Creation-Date: 2026-09-06 02:40+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
@@ -317,6 +317,7 @@ msgstr "Relatório ABC vs. Tradicional"
 #: manufacturing/templates/cs_surveys_list.html:11
 #: manufacturing/templates/currency_list.html:6
 #: manufacturing/templates/data_governance_dashboard.html:6
+#: manufacturing/templates/ecommerce_connection_list.html:9
 #: manufacturing/templates/employee_benefits.html:7
 #: manufacturing/templates/employee_employment_dates.html:8
 #: manufacturing/templates/employee_gap_detail.html:7
@@ -741,6 +742,7 @@ msgstr "Pool de Custos"
 #: manufacturing/templates/compliance_template_list.html:34
 #: manufacturing/templates/control_plan_list.html:45
 #: manufacturing/templates/costing_valuation_list.html:37
+#: manufacturing/templates/ecommerce_sync_log_list.html:23
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/inventory_list.html:102
 #: manufacturing/templates/promo_list.html:67
@@ -1434,6 +1436,7 @@ msgstr "Lançamentos Contabilísticos Recentes"
 #: manufacturing/templates/credit_dashboard_kpis.html:85
 #: manufacturing/templates/cs_dashboard_kpis.html:36
 #: manufacturing/templates/cs_surveys_detail.html:127
+#: manufacturing/templates/ecommerce_sync_log_list.html:18
 #: manufacturing/templates/ess_reviews.html:34
 #: manufacturing/templates/finance_dashboard_kpis.html:55
 #: manufacturing/templates/fixed_asset_detail.html:169
@@ -1628,6 +1631,8 @@ msgstr "Total a Débito"
 #: manufacturing/templates/cs_surveys_list.html:127
 #: manufacturing/templates/currency_list.html:74
 #: manufacturing/templates/data_governance_dashboard.html:88
+#: manufacturing/templates/ecommerce_connection_list.html:26
+#: manufacturing/templates/ecommerce_sync_log_list.html:22
 #: manufacturing/templates/employee_gap_detail.html:39
 #: manufacturing/templates/eng_dashboard_kpis.html:15
 #: manufacturing/templates/eng_dashboard_kpis.html:32
@@ -2078,6 +2083,8 @@ msgstr "Fornecedor"
 #: manufacturing/templates/ap_invoice_detail.html:95
 #: manufacturing/templates/ap_list.html:103
 #: manufacturing/templates/blanket_po_new.html:23
+#: manufacturing/templates/ecommerce_connection_new.html:39
+#: manufacturing/templates/ecommerce_connection_new.html:49
 #: manufacturing/templates/inventory_detail.html:165
 #: manufacturing/templates/inventory_new.html:61
 #: manufacturing/templates/people_form.html:79
@@ -2382,6 +2389,7 @@ msgstr "Exportar Excel"
 #: manufacturing/templates/blanket_po_list.html:17
 #: manufacturing/templates/cc_list.html:18
 #: manufacturing/templates/consignment_list.html:22
+#: manufacturing/templates/ecommerce_connection_detail.html:31
 #: manufacturing/templates/eng_ecr_detail.html:58
 #: manufacturing/templates/eng_ecrs.html:47
 #: manufacturing/templates/eng_projects.html:50
@@ -2859,6 +2867,8 @@ msgstr "Regras de Aprovação"
 #: manufacturing/templates/control_plan_detail.html:30
 #: manufacturing/templates/control_plan_list.html:38
 #: manufacturing/templates/data_governance_dashboard.html:97
+#: manufacturing/templates/ecommerce_connection_detail.html:31
+#: manufacturing/templates/ecommerce_connection_list.html:38
 #: manufacturing/templates/finance_bank_rec_detail.html:74
 #: manufacturing/templates/finance_bank_rec_detail.html:94
 #: manufacturing/templates/finance_bank_rec_list.html:71
@@ -2902,6 +2912,8 @@ msgstr "Ativo"
 #: manufacturing/templates/benefits_dashboard.html:87
 #: manufacturing/templates/currency_list.html:90
 #: manufacturing/templates/data_governance_dashboard.html:97
+#: manufacturing/templates/ecommerce_connection_detail.html:31
+#: manufacturing/templates/ecommerce_connection_list.html:38
 #: manufacturing/templates/finance_bank_rec_list.html:85
 #: manufacturing/templates/gl_accounts.html:75
 #: manufacturing/templates/payroll_deductions.html:66
@@ -4866,6 +4878,10 @@ msgstr "Ainda não há planos de benefícios."
 #: manufacturing/templates/blanket_po_new.html:7
 #: manufacturing/templates/blanket_po_release_new.html:7
 #: manufacturing/templates/bom_list.html:6
+#: manufacturing/templates/ecommerce_connection_detail.html:6
+#: manufacturing/templates/ecommerce_connection_list.html:6
+#: manufacturing/templates/ecommerce_connection_new.html:6
+#: manufacturing/templates/ecommerce_sync_log_list.html:6
 #: manufacturing/templates/inventory_detail.html:6
 #: manufacturing/templates/people_detail.html:7
 #: manufacturing/templates/people_form.html:7
@@ -5231,6 +5247,7 @@ msgstr "Criar Pedido em Aberto"
 #: manufacturing/templates/consignment_new.html:56
 #: manufacturing/templates/consignment_receive.html:40
 #: manufacturing/templates/consignment_use.html:42
+#: manufacturing/templates/ecommerce_connection_new.html:65
 #: manufacturing/templates/eng_project_detail.html:175
 #: manufacturing/templates/forgot_password.html:37
 #: manufacturing/templates/forgot_password_reset.html:40
@@ -8024,6 +8041,7 @@ msgid "Refund Amount"
 msgstr "Valor do Reembolso"
 
 #: manufacturing/templates/cs_returns_detail.html:125
+#: manufacturing/templates/ecommerce_sync_log_list.html:24
 #: manufacturing/templates/eng_ecr_detail.html:77
 #: manufacturing/templates/eng_spec_detail.html:124
 #: manufacturing/templates/eng_task_detail.html:121
@@ -8483,6 +8501,200 @@ msgstr "%(name)s (id %(pid)s)"
 #: manufacturing/templates/data_governance_dashboard.html:145
 msgid "No erasures recorded yet."
 msgstr "Ainda não há anonimizações registradas."
+
+#: manufacturing/templates/ecommerce_connection_detail.html:3
+#: manufacturing/templates/ecommerce_connection_detail.html:28
+msgid "Storefront Connection"
+msgstr "Conexão de Loja Virtual"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:30
+msgid "Platform:"
+msgstr "Plataforma:"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:32
+msgid "Default Customer:"
+msgstr "Cliente Padrão:"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:33
+msgid "Price List:"
+msgstr "Lista de Preços:"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:36
+msgid "Order Webhook URL"
+msgstr "URL do Webhook de Pedidos"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:38
+#, python-format
+msgid ""
+"Configure this URL as the \"order created\" webhook in %(platform)s's\n"
+"                    admin, signed with the webhook secret above (HMAC-"
+"SHA256, base64-encoded)."
+msgstr "Configure esta URL como o webhook de \"pedido criado\" no painel de administração do\n                    %(platform)s, assinada com o segredo do webhook acima (HMAC-SHA256, codificado em base64)."
+
+#: manufacturing/templates/ecommerce_connection_detail.html:50
+msgid "Sync Endpoint URL"
+msgstr "URL do Endpoint de Sincronização"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:54
+msgid "Save Endpoint"
+msgstr "Salvar Endpoint"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:57
+msgid ""
+"Inventory/price/shipment pushes POST here when set; with no endpoint "
+"they're\n"
+"                logged as \"queued\" instead of sent."
+msgstr "Os envios de inventário/preço/remessa fazem POST aqui quando configurado; sem um endpoint\n                eles são registrados como \"na fila\" em vez de enviados."
+
+#: manufacturing/templates/ecommerce_connection_detail.html:63
+msgid "Item Cross-Reference (storefront SKU → our product)"
+msgstr "Referência Cruzada de Itens (SKU da loja → nosso produto)"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:65
+msgid ""
+"Our products have no SKU/code field, so this mapping is what lets an "
+"inbound\n"
+"                order webhook's line item (carrying the storefront's own "
+"SKU) resolve to one of\n"
+"                our products, and lets outbound inventory/price pushes "
+"report our product back\n"
+"                under the storefront's own SKU. Unmapped lines still import "
+"— just without a\n"
+"                linked product."
+msgstr "Nossos produtos não têm um campo de SKU/código, então este mapeamento é o que permite que o\n                item de linha de um webhook de pedido de entrada (com o SKU próprio da loja) seja resolvido para um de\n                nossos produtos, e permite que os envios de saída de inventário/preço informem nosso produto\n                sob o SKU próprio da loja. Linhas não mapeadas ainda são importadas — apenas sem um\n                produto vinculado."
+
+#: manufacturing/templates/ecommerce_connection_detail.html:78
+#: manufacturing/templates/ecommerce_connection_detail.html:95
+msgid "Storefront SKU"
+msgstr "SKU da Loja"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:82
+#: manufacturing/templates/ecommerce_connection_detail.html:95
+msgid "Our Product"
+msgstr "Nosso Produto"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:89
+msgid "Add Mapping"
+msgstr "Adicionar Mapeamento"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:107
+msgid "Sync Inventory"
+msgstr "Sincronizar Estoque"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:113
+msgid "Sync Price"
+msgstr "Sincronizar Preço"
+
+#: manufacturing/templates/ecommerce_connection_detail.html:122
+msgid "No item mappings yet."
+msgstr "Ainda não há mapeamentos de itens."
+
+#: manufacturing/templates/ecommerce_connection_list.html:3
+#: manufacturing/templates/ecommerce_connection_list.html:14
+msgid "e-Commerce Connections"
+msgstr "Conexões de e-Commerce"
+
+#: manufacturing/templates/ecommerce_connection_list.html:7
+msgid "New Connection"
+msgstr "Nova Conexão"
+
+#: manufacturing/templates/ecommerce_connection_list.html:8
+msgid "Sync Log"
+msgstr "Registro de Sincronização"
+
+#: manufacturing/templates/ecommerce_connection_list.html:21
+#: manufacturing/templates/ecommerce_sync_log_list.html:19
+msgid "Store"
+msgstr "Loja"
+
+#: manufacturing/templates/ecommerce_connection_list.html:22
+#: manufacturing/templates/ecommerce_connection_new.html:20
+msgid "Platform"
+msgstr "Plataforma"
+
+#: manufacturing/templates/ecommerce_connection_list.html:23
+msgid "Default Customer"
+msgstr "Cliente Padrão"
+
+#: manufacturing/templates/ecommerce_connection_list.html:24
+msgid "Price List"
+msgstr "Lista de Preços"
+
+#: manufacturing/templates/ecommerce_connection_list.html:25
+msgid "Sync Endpoint"
+msgstr "Endpoint de Sincronização"
+
+#: manufacturing/templates/ecommerce_connection_list.html:37
+msgid "(queued only)"
+msgstr "(apenas na fila)"
+
+#: manufacturing/templates/ecommerce_connection_list.html:39
+msgid "Manage"
+msgstr "Gerenciar"
+
+#: manufacturing/templates/ecommerce_connection_list.html:46
+msgid "No storefront connections configured yet."
+msgstr "Ainda não há conexões de loja configuradas."
+
+#: manufacturing/templates/ecommerce_connection_new.html:3
+#: manufacturing/templates/ecommerce_connection_new.html:11
+msgid "New e-Commerce Connection"
+msgstr "Nova Conexão de e-Commerce"
+
+#: manufacturing/templates/ecommerce_connection_new.html:22
+msgid "(select)"
+msgstr "(selecionar)"
+
+#: manufacturing/templates/ecommerce_connection_new.html:29
+msgid "Store Name"
+msgstr "Nome da Loja"
+
+#: manufacturing/templates/ecommerce_connection_new.html:33
+msgid "Webhook Secret"
+msgstr "Segredo do Webhook"
+
+#: manufacturing/templates/ecommerce_connection_new.html:37
+msgid "Default Customer (for orders from this store)"
+msgstr "Cliente Padrão (para pedidos desta loja)"
+
+#: manufacturing/templates/ecommerce_connection_new.html:47
+msgid "Price List (for outbound price sync)"
+msgstr "Lista de Preços (para sincronização de preço de saída)"
+
+#: manufacturing/templates/ecommerce_connection_new.html:56
+msgid "Sync Endpoint URL (optional)"
+msgstr "URL do Endpoint de Sincronização (opcional)"
+
+#: manufacturing/templates/ecommerce_connection_new.html:60
+msgid ""
+"If no sync endpoint is configured, inventory/price/shipment pushes are\n"
+"                    still logged (status \"queued\") but no HTTP call is "
+"made — there is no live\n"
+"                    storefront reachable from this environment by default."
+msgstr "Se nenhum endpoint de sincronização estiver configurado, os envios de inventário/preço/remessa ainda\n                    são registrados (status \"na fila\"), mas nenhuma chamada HTTP é feita — não há uma loja\n                    ativa acessível a partir deste ambiente por padrão."
+
+#: manufacturing/templates/ecommerce_connection_new.html:64
+msgid "Create Connection"
+msgstr "Criar Conexão"
+
+#: manufacturing/templates/ecommerce_sync_log_list.html:3
+#: manufacturing/templates/ecommerce_sync_log_list.html:11
+msgid "e-Commerce Sync Log"
+msgstr "Registro de Sincronização de e-Commerce"
+
+#: manufacturing/templates/ecommerce_sync_log_list.html:20
+#: manufacturing/templates/fixed_asset_detail.html:170
+#: manufacturing/templates/it_asset_detail.html:254
+msgid "Event"
+msgstr "Evento"
+
+#: manufacturing/templates/ecommerce_sync_log_list.html:21
+msgid "Direction"
+msgstr "Direção"
+
+#: manufacturing/templates/ecommerce_sync_log_list.html:43
+msgid "No e-commerce sync activity logged yet."
+msgstr "Ainda não há atividade de sincronização de e-commerce registrada."
 
 #: manufacturing/templates/employee_benefits.html:3
 #: manufacturing/templates/employee_benefits.html:19
@@ -10547,11 +10759,6 @@ msgstr "atual"
 #: manufacturing/templates/fixed_asset_detail.html:164
 msgid "Event History"
 msgstr "Histórico de Eventos"
-
-#: manufacturing/templates/fixed_asset_detail.html:170
-#: manufacturing/templates/it_asset_detail.html:254
-msgid "Event"
-msgstr "Evento"
 
 #: manufacturing/templates/fixed_asset_detail.html:171
 #: manufacturing/templates/it_asset_detail.html:255

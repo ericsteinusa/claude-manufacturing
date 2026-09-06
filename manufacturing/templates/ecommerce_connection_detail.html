@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block page_title %}{{ connection.store_name|default:"Storefront Connection" }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if connection.store_name %}{{ connection.store_name }}{% else %}{% trans "Storefront Connection" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ecommerce/connections/" class="btn">← Back</a>
+<a href="/ecommerce/connections/" class="btn">← {% trans "Back" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -24,18 +25,18 @@ code.webhook-url { display:block; background:#f5f5f5; border:1px solid #ddd; bor
 <div class="content">
     <div class="po-wrap">
         <div class="po-card">
-            <h2 style="margin-top:0;">{{ connection.store_name|default:"Storefront Connection" }}</h2>
+            <h2 style="margin-top:0;">{% if connection.store_name %}{{ connection.store_name }}{% else %}{% trans "Storefront Connection" %}{% endif %}</h2>
             <div class="po-meta">
-                <div><b>Platform:</b> {{ connection.platform|capfirst }}</div>
-                <div><b>Status:</b> {% if connection.is_active %}Active{% else %}Inactive{% endif %}</div>
-                <div><b>Default Customer:</b> {{ connection.company_name|default:connection.first_name }} {{ connection.last_name|default:"" }}</div>
-                <div><b>Price List:</b> {{ connection.price_list_name|default:"—" }}</div>
+                <div><b>{% trans "Platform:" %}</b> {{ connection.platform|capfirst }}</div>
+                <div><b>{% trans "Status:" %}</b> {% if connection.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}</div>
+                <div><b>{% trans "Default Customer:" %}</b> {{ connection.company_name|default:connection.first_name }} {{ connection.last_name|default:"" }}</div>
+                <div><b>{% trans "Price List:" %}</b> {{ connection.price_list_name|default:"—" }}</div>
             </div>
             <div style="margin-top:10px;">
-                <b style="color:#003cb4;font-size:13px;">Order Webhook URL</b>
+                <b style="color:#003cb4;font-size:13px;">{% trans "Order Webhook URL" %}</b>
                 <p style="font-size:12px;color:#666;margin:2px 0 0;">
-                    Configure this URL as the "order created" webhook in {{ connection.platform|capfirst }}'s
-                    admin, signed with the webhook secret above (HMAC-SHA256, base64-encoded).</p>
+                    {% blocktrans with platform=connection.platform|capfirst %}Configure this URL as the "order created" webhook in {{ platform }}'s
+                    admin, signed with the webhook secret above (HMAC-SHA256, base64-encoded).{% endblocktrans %}</p>
                 <code class="webhook-url">{{ webhook_url }}</code>
             </div>
 
@@ -46,26 +47,26 @@ code.webhook-url { display:block; background:#f5f5f5; border:1px solid #ddd; bor
                 {% csrf_token %}
                 <input type="hidden" name="action" value="endpoint">
                 <div style="flex:1;min-width:260px;">
-                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">Sync Endpoint URL</label>
+                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">{% trans "Sync Endpoint URL" %}</label>
                     <input type="text" name="sync_endpoint_url" style="width:100%;"
                         value="{{ connection.sync_endpoint_url|default:'' }}" placeholder="https://...">
                 </div>
-                <button type="submit" class="btn btn-sm">Save Endpoint</button>
+                <button type="submit" class="btn btn-sm">{% trans "Save Endpoint" %}</button>
             </form>
             <p style="font-size:12px;color:#666;">
-                Inventory/price/shipment pushes POST here when set; with no endpoint they're
-                logged as "queued" instead of sent.</p>
+                {% blocktrans %}Inventory/price/shipment pushes POST here when set; with no endpoint they're
+                logged as "queued" instead of sent.{% endblocktrans %}</p>
             {% endif %}
         </div>
 
         <div class="po-card">
-            <div class="card-title">Item Cross-Reference (storefront SKU → our product)</div>
+            <div class="card-title">{% trans "Item Cross-Reference (storefront SKU → our product)" %}</div>
             <p style="font-size:12px;color:#555;">
-                Our products have no SKU/code field, so this mapping is what lets an inbound
+                {% blocktrans %}Our products have no SKU/code field, so this mapping is what lets an inbound
                 order webhook's line item (carrying the storefront's own SKU) resolve to one of
                 our products, and lets outbound inventory/price pushes report our product back
                 under the storefront's own SKU. Unmapped lines still import — just without a
-                linked product.</p>
+                linked product.{% endblocktrans %}</p>
 
             {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -74,24 +75,24 @@ code.webhook-url { display:block; background:#f5f5f5; border:1px solid #ddd; bor
                 {% csrf_token %}
                 <input type="hidden" name="action" value="xref">
                 <div>
-                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">Storefront SKU</label>
+                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">{% trans "Storefront SKU" %}</label>
                     <input type="text" name="external_sku" required>
                 </div>
                 <div>
-                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">Our Product</label>
+                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">{% trans "Our Product" %}</label>
                     <select name="product_id" required>
                         {% for p in products %}
                         <option value="{{ p.id }}">{{ p.product_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-sm">Add Mapping</button>
+                <button type="submit" class="btn btn-sm">{% trans "Add Mapping" %}</button>
             </form>
             {% endif %}
 
             {% if xrefs %}
             <table class="list-table">
-                <thead><tr><th>Storefront SKU</th><th>Our Product</th>{% if can_edit %}<th></th>{% endif %}</tr></thead>
+                <thead><tr><th>{% trans "Storefront SKU" %}</th><th>{% trans "Our Product" %}</th>{% if can_edit %}<th></th>{% endif %}</tr></thead>
                 <tbody>
                 {% for x in xrefs %}
                 <tr>
@@ -103,13 +104,13 @@ code.webhook-url { display:block; background:#f5f5f5; border:1px solid #ddd; bor
                             {% csrf_token %}
                             <input type="hidden" name="action" value="sync_inventory">
                             <input type="hidden" name="product_id" value="{{ x.product_id }}">
-                            <button type="submit" class="btn btn-sm">Sync Inventory</button>
+                            <button type="submit" class="btn btn-sm">{% trans "Sync Inventory" %}</button>
                         </form>
                         <form method="post" action="">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="sync_price">
                             <input type="hidden" name="product_id" value="{{ x.product_id }}">
-                            <button type="submit" class="btn btn-sm">Sync Price</button>
+                            <button type="submit" class="btn btn-sm">{% trans "Sync Price" %}</button>
                         </form>
                     </td>
                     {% endif %}
@@ -118,7 +119,7 @@ code.webhook-url { display:block; background:#f5f5f5; border:1px solid #ddd; bor
                 </tbody>
             </table>
             {% else %}
-            <p style="font-size:13px;color:#666;">No item mappings yet.</p>
+            <p style="font-size:13px;color:#666;">{% trans "No item mappings yet." %}</p>
             {% endif %}
         </div>
     </div>
