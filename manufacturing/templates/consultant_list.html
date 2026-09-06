@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Consultants{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Consultants" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/consultants/" class="btn">Consultants</a>
-<a href="/consultants/engagements/" class="btn">Engagements</a>
-<a href="/consultants/invoices/" class="btn">Invoices</a>
-<a href="/consultants/reports/spend/" class="btn">Spend Report</a>
-<a href="/consultants/new/" class="btn">+ New Consultant</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/consultants/" class="btn">{% trans "Consultants" %}</a>
+<a href="/consultants/engagements/" class="btn">{% trans "Engagements" %}</a>
+<a href="/consultants/invoices/" class="btn">{% trans "Invoices" %}</a>
+<a href="/consultants/reports/spend/" class="btn">{% trans "Spend Report" %}</a>
+<a href="/consultants/new/" class="btn">{% trans "+ New Consultant" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -35,20 +36,20 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Consultants</h2>
+    <h2>{% trans "Consultants" %}</h2>
 
     <form method="get" class="filter-bar">
-        <input type="text" name="search" value="{{ search }}" placeholder="Search name / specialty…">
-        <button type="submit">Filter</button>
-        <a href="/consultants/" style="font-size:13px;color:var(--accent);margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans "Search name / specialty…" %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/consultants/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Name</th><th>Type</th><th>Specialty</th>
-                    <th class="metric">Default Rate</th><th>Status</th>
+                    <th>{% trans "Name" %}</th><th>{% trans "Type" %}</th><th>{% trans "Specialty" %}</th>
+                    <th class="metric">{% trans "Default Rate" %}</th><th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,16 +57,16 @@
             <tr>
                 <td><a href="/consultants/{{ c.id }}/">{{ c.display_name }}</a></td>
                 <td>
-                    {% if c.supplier_id %}<span class="badge b-external">External — {{ c.supplier_name|default:"Linked Supplier" }}</span>{% endif %}
-                    {% if c.people_id %}<span class="badge b-internal">Internal — {{ c.people_first_name }} {{ c.people_last_name }}</span>{% endif %}
-                    {% if not c.supplier_id and not c.people_id %}<span class="badge b-adhoc">Ad hoc</span>{% endif %}
+                    {% if c.supplier_id %}<span class="badge b-external">{% if c.supplier_name %}{% blocktrans with name=c.supplier_name %}External — {{ name }}{% endblocktrans %}{% else %}{% blocktrans %}External — Linked Supplier{% endblocktrans %}{% endif %}</span>{% endif %}
+                    {% if c.people_id %}<span class="badge b-internal">{% blocktrans with fn=c.people_first_name ln=c.people_last_name %}Internal — {{ fn }} {{ ln }}{% endblocktrans %}</span>{% endif %}
+                    {% if not c.supplier_id and not c.people_id %}<span class="badge b-adhoc">{% trans "Ad hoc" %}</span>{% endif %}
                 </td>
                 <td>{{ c.specialty|default:"—" }}</td>
-                <td class="metric">{% if c.default_hourly_rate %}${{ c.default_hourly_rate|floatformat:2 }}/hr{% else %}—{% endif %}</td>
-                <td>{% if c.is_active %}Active{% else %}<span class="badge b-inactive">Inactive</span>{% endif %}</td>
+                <td class="metric">{% if c.default_hourly_rate %}{% blocktrans with rate=c.default_hourly_rate|floatformat:2 %}${{ rate }}/hr{% endblocktrans %}{% else %}—{% endif %}</td>
+                <td>{% if c.is_active %}{% trans "Active" %}{% else %}<span class="badge b-inactive">{% trans "Inactive" %}</span>{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No consultants found.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">{% trans "No consultants found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

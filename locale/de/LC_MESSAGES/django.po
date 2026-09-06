@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 19:17+0000\n"
+"POT-Creation-Date: 2026-09-06 19:52+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -2226,6 +2226,7 @@ msgstr "Abgelehnte Projekte"
 
 #: manufacturing/menus.py:962 manufacturing/menus.py:1129
 #: manufacturing/menus.py:1188 manufacturing/menus.py:1350
+#: manufacturing/templates/consultant_invoice_detail.html:134
 #: manufacturing/templates/req_detail.html:123
 msgid "Approval History"
 msgstr "Genehmigungsverlauf"
@@ -2517,6 +2518,7 @@ msgstr "Genehmigte Arbeitsaufträge"
 #: manufacturing/templates/cc_detail.html:24
 #: manufacturing/templates/cc_list.html:23
 #: manufacturing/templates/cc_list.html:47
+#: manufacturing/templates/consultant_invoice_list.html:40
 msgid "Rejected"
 msgstr "Abgelehnt"
 
@@ -2818,24 +2820,47 @@ msgstr "Vertragsberichte"
 msgid "Consultant Management"
 msgstr "Beraterverwaltung"
 
-#: manufacturing/menus.py:1408
+#: manufacturing/menus.py:1408 manufacturing/templates/consultant_detail.html:6
+#: manufacturing/templates/consultant_form.html:6
+#: manufacturing/templates/consultant_invoice_list.html:6
+#: manufacturing/templates/consultant_list.html:3
+#: manufacturing/templates/consultant_list.html:6
+#: manufacturing/templates/consultant_list.html:39
+#: manufacturing/templates/consultant_spend_report.html:6
+#: manufacturing/templates/consultant_spend_report.html:42
+#: manufacturing/templates/consultant_spend_report.html:107
+#: manufacturing/templates/engagement_list.html:6
 #: manufacturing/templates/purchasing_dashboard.html:12
 #: manufacturing/templates/purchasing_dashboard.html:59
 msgid "Consultants"
 msgstr "Berater"
 
-#: manufacturing/menus.py:1409
+#: manufacturing/menus.py:1409 manufacturing/templates/consultant_detail.html:7
+#: manufacturing/templates/consultant_detail.html:97
+#: manufacturing/templates/consultant_invoice_list.html:7
+#: manufacturing/templates/consultant_list.html:7
+#: manufacturing/templates/consultant_spend_report.html:43
+#: manufacturing/templates/consultant_spend_report.html:52
+#: manufacturing/templates/consultant_spend_report.html:107
+#: manufacturing/templates/engagement_detail.html:6
+#: manufacturing/templates/engagement_form.html:6
+#: manufacturing/templates/engagement_list.html:7
 msgid "Engagements"
 msgstr "Aufträge"
 
 #: manufacturing/menus.py:1410 manufacturing/templates/base_portal.html:156
 #: manufacturing/templates/base_supplier_portal.html:145
+#: manufacturing/templates/consultant_invoice_detail.html:6
+#: manufacturing/templates/consultant_invoice_list.html:8
+#: manufacturing/templates/consultant_list.html:8
+#: manufacturing/templates/engagement_detail.html:158
+#: manufacturing/templates/engagement_list.html:8
 #: manufacturing/templates/supplier_portal_invoices.html:3
 #: manufacturing/templates/supplier_portal_invoices.html:4
 msgid "Invoices"
 msgstr "Rechnungen"
 
-#: manufacturing/menus.py:1411
+#: manufacturing/menus.py:1411 manufacturing/templates/consultant_list.html:9
 msgid "Spend Report"
 msgstr "Ausgabenbericht"
 
@@ -3512,6 +3537,12 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/consignment_detail.html:9
 #: manufacturing/templates/consignment_list.html:9
 #: manufacturing/templates/consolidated_financials.html:8
+#: manufacturing/templates/consultant_detail.html:8
+#: manufacturing/templates/consultant_form.html:7
+#: manufacturing/templates/consultant_invoice_detail.html:8
+#: manufacturing/templates/consultant_invoice_list.html:9
+#: manufacturing/templates/consultant_list.html:11
+#: manufacturing/templates/consultant_spend_report.html:9
 #: manufacturing/templates/contacts_detail.html:10
 #: manufacturing/templates/contacts_list.html:6
 #: manufacturing/templates/contacts_new.html:7
@@ -3566,6 +3597,9 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/eng_specs_list.html:12
 #: manufacturing/templates/eng_task_detail.html:12
 #: manufacturing/templates/eng_tasks_list.html:12
+#: manufacturing/templates/engagement_detail.html:8
+#: manufacturing/templates/engagement_form.html:7
+#: manufacturing/templates/engagement_list.html:10
 #: manufacturing/templates/esg_dashboard.html:7
 #: manufacturing/templates/ess_home.html:11
 #: manufacturing/templates/ess_pay_stub_detail.html:8
@@ -4041,6 +4075,8 @@ msgstr "Neuer Aktivitätskostenpool"
 #: manufacturing/templates/abc_activity_new.html:29
 #: manufacturing/templates/benefit_plan_new.html:29
 #: manufacturing/templates/compliance_template_new.html:29
+#: manufacturing/templates/consultant_detail.html:55
+#: manufacturing/templates/consultant_form.html:41
 #: manufacturing/templates/control_plan_new.html:37
 #: manufacturing/templates/inventory_new.html:43
 #: manufacturing/templates/maint_equipment_detail.html:62
@@ -4097,6 +4133,8 @@ msgstr "z. B. pro Rüstvorgang, pro Maschinenstunde"
 #: manufacturing/templates/coa_new.html:47
 #: manufacturing/templates/company_new.html:40
 #: manufacturing/templates/consignment_new.html:51
+#: manufacturing/templates/consultant_detail.html:76
+#: manufacturing/templates/consultant_form.html:71
 #: manufacturing/templates/credit_account_detail.html:87
 #: manufacturing/templates/credit_account_detail.html:121
 #: manufacturing/templates/credit_account_list.html:136
@@ -4338,6 +4376,8 @@ msgid "Activity Breakdown"
 msgstr "Aktivitätsaufschlüsselung"
 
 #: manufacturing/templates/abc_product_output.html:34
+#: manufacturing/templates/consultant_invoice_detail.html:94
+#: manufacturing/templates/engagement_detail.html:87
 #: manufacturing/templates/po_detail.html:129
 #: manufacturing/templates/so_detail.html:130
 msgid "Rate"
@@ -4631,6 +4671,8 @@ msgstr "Letzte Buchungen"
 #: manufacturing/templates/batch_record_detail.html:61
 #: manufacturing/templates/consignment_detail.html:83
 #: manufacturing/templates/consignment_detail.html:106
+#: manufacturing/templates/consultant_invoice_detail.html:94
+#: manufacturing/templates/consultant_invoice_detail.html:114
 #: manufacturing/templates/contacts_detail.html:187
 #: manufacturing/templates/costing_product_detail.html:158
 #: manufacturing/templates/credit_account_detail.html:133
@@ -4643,6 +4685,8 @@ msgstr "Letzte Buchungen"
 #: manufacturing/templates/document_detail.html:163
 #: manufacturing/templates/ecommerce_sync_log_list.html:18
 #: manufacturing/templates/edi_transaction_log_list.html:18
+#: manufacturing/templates/engagement_detail.html:87
+#: manufacturing/templates/engagement_detail.html:121
 #: manufacturing/templates/ess_reviews.html:34
 #: manufacturing/templates/finance_dashboard_kpis.html:55
 #: manufacturing/templates/fixed_asset_detail.html:169
@@ -4711,6 +4755,8 @@ msgstr "Referenz"
 #: manufacturing/templates/blanket_po_new.html:30
 #: manufacturing/templates/compliance_template_list.html:27
 #: manufacturing/templates/compliance_template_new.html:37
+#: manufacturing/templates/consultant_invoice_detail.html:94
+#: manufacturing/templates/consultant_invoice_detail.html:114
 #: manufacturing/templates/cs_escalations.html:67
 #: manufacturing/templates/cs_list.html:58
 #: manufacturing/templates/cs_plans.html:131
@@ -4719,6 +4765,10 @@ msgstr "Referenz"
 #: manufacturing/templates/eng_spec_detail.html:105
 #: manufacturing/templates/eng_spec_detail.html:130
 #: manufacturing/templates/eng_specs_list.html:149
+#: manufacturing/templates/engagement_detail.html:87
+#: manufacturing/templates/engagement_detail.html:111
+#: manufacturing/templates/engagement_detail.html:121
+#: manufacturing/templates/engagement_detail.html:150
 #: manufacturing/templates/finance_audit_detail.html:124
 #: manufacturing/templates/finance_budget_detail.html:105
 #: manufacturing/templates/finance_dashboard_kpis.html:57
@@ -4812,6 +4862,11 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/compliance_checklist_list.html:16
 #: manufacturing/templates/compliance_checklist_list.html:27
 #: manufacturing/templates/consignment_list.html:41
+#: manufacturing/templates/consultant_detail.html:100
+#: manufacturing/templates/consultant_invoice_detail.html:136
+#: manufacturing/templates/consultant_invoice_list.html:49
+#: manufacturing/templates/consultant_list.html:52
+#: manufacturing/templates/consultant_spend_report.html:80
 #: manufacturing/templates/contacts_detail.html:188
 #: manufacturing/templates/control_plan_detail.html:43
 #: manufacturing/templates/control_plan_list.html:26
@@ -4869,6 +4924,10 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/eng_task_detail.html:99
 #: manufacturing/templates/eng_task_detail.html:120
 #: manufacturing/templates/eng_tasks_list.html:94
+#: manufacturing/templates/engagement_detail.html:87
+#: manufacturing/templates/engagement_detail.html:121
+#: manufacturing/templates/engagement_detail.html:160
+#: manufacturing/templates/engagement_list.html:54
 #: manufacturing/templates/ess_pay_stubs.html:37
 #: manufacturing/templates/ess_review_detail.html:38
 #: manufacturing/templates/ess_reviews.html:34
@@ -5146,6 +5205,7 @@ msgstr "Gebucht"
 
 #: manufacturing/templates/acct_dashboard_kpis.html:60
 #: manufacturing/templates/budget_dashboard.html:58
+#: manufacturing/templates/consultant_invoice_list.html:38
 #: manufacturing/templates/control_plan_detail.html:34
 #: manufacturing/templates/control_plan_list.html:42
 #: manufacturing/templates/document_detail.html:31
@@ -5224,6 +5284,7 @@ msgstr "HB"
 #: manufacturing/templates/ap_invoice_detail.html:54
 #: manufacturing/templates/ar_invoice_detail.html:54
 #: manufacturing/templates/blanket_po_detail.html:54
+#: manufacturing/templates/consultant_invoice_detail.html:49
 #: manufacturing/templates/credit_application_detail.html:57
 #: manufacturing/templates/cs_returns_detail.html:56
 #: manufacturing/templates/eng_ecr_detail.html:48
@@ -5359,6 +5420,8 @@ msgstr "Fälligkeitsdatum *"
 #: manufacturing/templates/ar_invoice_detail.html:154
 #: manufacturing/templates/ar_invoice_payments_kpis.html:6
 #: manufacturing/templates/ar_list.html:65
+#: manufacturing/templates/consultant_invoice_detail.html:114
+#: manufacturing/templates/engagement_detail.html:121
 #: manufacturing/templates/intercompany_list.html:62
 #: manufacturing/templates/intercompany_new.html:41
 #: manufacturing/templates/mkt_budget_list.html:83
@@ -5462,6 +5525,8 @@ msgstr "Rechnung Erstellen"
 #: manufacturing/templates/ap_list.html:64
 #: manufacturing/templates/ar_invoice_detail.html:150
 #: manufacturing/templates/ar_list.html:64
+#: manufacturing/templates/consultant_invoice_list.html:49
+#: manufacturing/templates/engagement_detail.html:160
 #: manufacturing/templates/portal_home.html:50
 #: manufacturing/templates/portal_invoices.html:11
 #: manufacturing/templates/supplier_portal_invoices.html:15
@@ -5671,6 +5736,8 @@ msgstr "Bis:"
 #: manufacturing/templates/ap_list.html:54
 #: manufacturing/templates/ar_list.html:54
 #: manufacturing/templates/audit_log.html:20
+#: manufacturing/templates/consultant_invoice_list.html:43
+#: manufacturing/templates/consultant_list.html:43
 #: manufacturing/templates/credit_account_list.html:68
 #: manufacturing/templates/credit_application_list.html:67
 #: manufacturing/templates/credit_collections_list.html:68
@@ -5681,6 +5748,7 @@ msgstr "Bis:"
 #: manufacturing/templates/eng_projects.html:66
 #: manufacturing/templates/eng_specs_list.html:77
 #: manufacturing/templates/eng_tasks_list.html:81
+#: manufacturing/templates/engagement_list.html:45
 #: manufacturing/templates/esg_dashboard.html:71
 #: manufacturing/templates/exit_interview_list.html:51
 #: manufacturing/templates/finance_audit_list.html:76
@@ -5745,6 +5813,8 @@ msgstr "Filtern"
 #: manufacturing/templates/ap_list.html:56
 #: manufacturing/templates/ar_list.html:56
 #: manufacturing/templates/audit_log.html:22
+#: manufacturing/templates/consultant_invoice_list.html:44
+#: manufacturing/templates/consultant_list.html:44
 #: manufacturing/templates/contacts_list.html:25
 #: manufacturing/templates/credit_account_list.html:69
 #: manufacturing/templates/credit_application_list.html:68
@@ -5757,6 +5827,7 @@ msgstr "Filtern"
 #: manufacturing/templates/eng_projects.html:67
 #: manufacturing/templates/eng_specs_list.html:78
 #: manufacturing/templates/eng_tasks_list.html:82
+#: manufacturing/templates/engagement_list.html:46
 #: manufacturing/templates/exit_interview_list.html:52
 #: manufacturing/templates/finance_audit_list.html:77
 #: manufacturing/templates/finance_bank_rec_list.html:61
@@ -5840,6 +5911,7 @@ msgstr "Saldo"
 
 #: manufacturing/templates/ap_list.html:90
 #: manufacturing/templates/ar_list.html:90
+#: manufacturing/templates/consultant_invoice_list.html:60
 msgid "No invoices found."
 msgstr "Keine Rechnungen gefunden."
 
@@ -6001,6 +6073,7 @@ msgstr "z. B. CNC-01"
 #: manufacturing/templates/apm_criticality.html:78
 #: manufacturing/templates/bom_detail.html:96
 #: manufacturing/templates/bom_detail.html:189
+#: manufacturing/templates/consultant_detail.html:80
 #: manufacturing/templates/contacts_detail.html:165
 #: manufacturing/templates/employee_employment_dates.html:49
 #: manufacturing/templates/employee_gap_detail.html:99
@@ -6092,6 +6165,7 @@ msgstr "Genehmigungsregeln"
 #: manufacturing/templates/benefit_plan_detail.html:25
 #: manufacturing/templates/benefits_dashboard.html:85
 #: manufacturing/templates/budget_dashboard.html:54
+#: manufacturing/templates/consultant_list.html:66
 #: manufacturing/templates/control_plan_detail.html:30
 #: manufacturing/templates/control_plan_list.html:38
 #: manufacturing/templates/data_governance_dashboard.html:97
@@ -6145,6 +6219,8 @@ msgstr "Aktiv"
 #: manufacturing/templates/approval_rule_list.html:62
 #: manufacturing/templates/benefit_plan_detail.html:27
 #: manufacturing/templates/benefits_dashboard.html:87
+#: manufacturing/templates/consultant_detail.html:43
+#: manufacturing/templates/consultant_list.html:66
 #: manufacturing/templates/currency_list.html:90
 #: manufacturing/templates/data_governance_dashboard.html:97
 #: manufacturing/templates/ecommerce_connection_detail.html:31
@@ -6186,8 +6262,14 @@ msgstr "Entitätstyp *"
 #: manufacturing/templates/ats_dashboard.html:80
 #: manufacturing/templates/ats_requisition_list.html:33
 #: manufacturing/templates/ats_requisition_new.html:33
+#: manufacturing/templates/consultant_detail.html:100
+#: manufacturing/templates/consultant_spend_report.html:80
+#: manufacturing/templates/consultant_spend_report.html:107
 #: manufacturing/templates/data_governance_dashboard.html:49
 #: manufacturing/templates/document_detail.html:82
+#: manufacturing/templates/engagement_detail.html:62
+#: manufacturing/templates/engagement_form.html:57
+#: manufacturing/templates/engagement_list.html:54
 #: manufacturing/templates/finance_audit_detail.html:74
 #: manufacturing/templates/finance_audit_detail.html:109
 #: manufacturing/templates/finance_audit_detail.html:126
@@ -6287,6 +6369,7 @@ msgid "Activate this rule?"
 msgstr "Diese Regel aktivieren?"
 
 #: manufacturing/templates/approval_rule_edit.html:90
+#: manufacturing/templates/consultant_detail.html:86
 #: manufacturing/templates/currency_list.html:105
 #: manufacturing/templates/retention_policy_edit.html:54
 #: manufacturing/templates/webhook_edit.html:86
@@ -6294,7 +6377,9 @@ msgid "Deactivate"
 msgstr "Deaktivieren"
 
 #: manufacturing/templates/approval_rule_edit.html:90
+#: manufacturing/templates/consultant_detail.html:86
 #: manufacturing/templates/currency_list.html:105
+#: manufacturing/templates/engagement_detail.html:73
 #: manufacturing/templates/recipe_detail.html:93
 #: manufacturing/templates/retention_policy_edit.html:54
 #: manufacturing/templates/webhook_edit.html:86
@@ -6364,10 +6449,12 @@ msgid "Threshold"
 msgstr "Schwellenwert"
 
 #: manufacturing/templates/approval_rule_list.html:42
+#: manufacturing/templates/consultant_invoice_detail.html:136
 msgid "Approver Role"
 msgstr "Genehmigerrolle"
 
 #: manufacturing/templates/approval_rule_list.html:43
+#: manufacturing/templates/consultant_invoice_detail.html:136
 #: manufacturing/templates/control_plan_detail.html:64
 #: manufacturing/templates/routing_detail.html:59
 #: manufacturing/templates/wms_pick_list_detail.html:37
@@ -6872,6 +6959,7 @@ msgstr "Name oder E-Mail suchen..."
 #: manufacturing/templates/company_new.html:20
 #: manufacturing/templates/compliance_checklist_list.html:27
 #: manufacturing/templates/compliance_template_list.html:27
+#: manufacturing/templates/consultant_list.html:51
 #: manufacturing/templates/control_plan_list.html:23
 #: manufacturing/templates/currency_list.html:71
 #: manufacturing/templates/currency_list.html:129
@@ -6918,6 +7006,8 @@ msgstr "Name"
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/ats_candidate_new.html:37
 #: manufacturing/templates/company_detail.html:95
+#: manufacturing/templates/consultant_detail.html:68
+#: manufacturing/templates/consultant_form.html:63
 #: manufacturing/templates/contacts_detail.html:108
 #: manufacturing/templates/contacts_list.html:38
 #: manufacturing/templates/contacts_new.html:67
@@ -6942,6 +7032,8 @@ msgstr "E-Mail"
 
 #: manufacturing/templates/ats_candidate_list.html:27
 #: manufacturing/templates/ats_candidate_new.html:41
+#: manufacturing/templates/consultant_detail.html:72
+#: manufacturing/templates/consultant_form.html:67
 #: manufacturing/templates/contacts_detail.html:102
 #: manufacturing/templates/contacts_list.html:36
 #: manufacturing/templates/contacts_new.html:61
@@ -7048,6 +7140,7 @@ msgstr "Noch keine Einstellungen."
 
 #: manufacturing/templates/ats_dashboard.html:80
 #: manufacturing/templates/ats_requisition_list.html:33
+#: manufacturing/templates/consultant_detail.html:100
 #: manufacturing/templates/cs_kb_detail.html:61
 #: manufacturing/templates/cs_kb_list.html:81
 #: manufacturing/templates/cs_kb_list.html:115
@@ -7073,6 +7166,7 @@ msgstr "Noch keine Einstellungen."
 #: manufacturing/templates/eng_spec_detail.html:77
 #: manufacturing/templates/eng_specs_list.html:86
 #: manufacturing/templates/eng_specs_list.html:121
+#: manufacturing/templates/engagement_list.html:53
 #: manufacturing/templates/it_incident_detail.html:52
 #: manufacturing/templates/it_incident_detail.html:89
 #: manufacturing/templates/it_incident_list.html:61
@@ -7188,6 +7282,7 @@ msgid "Search title..."
 msgstr "Titel suchen..."
 
 #: manufacturing/templates/ats_requisition_list.html:22
+#: manufacturing/templates/consultant_invoice_list.html:37
 #: manufacturing/templates/credit_account_list.html:62
 #: manufacturing/templates/credit_application_list.html:61
 #: manufacturing/templates/credit_collections_list.html:62
@@ -7196,6 +7291,7 @@ msgstr "Titel suchen..."
 #: manufacturing/templates/cs_surveys_list.html:61
 #: manufacturing/templates/eng_specs_list.html:65
 #: manufacturing/templates/eng_tasks_list.html:70
+#: manufacturing/templates/engagement_list.html:40
 #: manufacturing/templates/finance_audit_list.html:64
 #: manufacturing/templates/finance_budget_list.html:64
 #: manufacturing/templates/finance_tax_list.html:65
@@ -7260,6 +7356,7 @@ msgid "No requisitions found."
 msgstr "Keine Anforderungen gefunden."
 
 #: manufacturing/templates/ats_requisition_new.html:29
+#: manufacturing/templates/engagement_form.html:45
 #: manufacturing/templates/maint_wo_detail.html:92
 #: manufacturing/templates/maint_wo_list.html:111
 #: manufacturing/templates/purch_contract_detail.html:71
@@ -7812,6 +7909,7 @@ msgid "Work Order"
 msgstr "Fertigungsauftrag"
 
 #: manufacturing/templates/batch_record_list.html:57
+#: manufacturing/templates/consultant_spend_report.html:108
 #: manufacturing/templates/costing_product_detail.html:159
 #: manufacturing/templates/fixed_asset_list.html:65
 #: manufacturing/templates/maint_labor_report.html:129
@@ -8001,6 +8099,7 @@ msgstr "Pläne"
 #: manufacturing/templates/bom_explode.html:56
 #: manufacturing/templates/bom_list.html:31
 #: manufacturing/templates/company_detail.html:59
+#: manufacturing/templates/consultant_list.html:51
 #: manufacturing/templates/credit_account_detail.html:172
 #: manufacturing/templates/credit_collections_detail.html:58
 #: manufacturing/templates/credit_collections_detail.html:97
@@ -8292,9 +8391,14 @@ msgstr "Gültigkeit"
 
 #: manufacturing/templates/blanket_po_list.html:33
 #: manufacturing/templates/consignment_detail.html:106
+#: manufacturing/templates/consultant_detail.html:100
+#: manufacturing/templates/consultant_invoice_detail.html:128
+#: manufacturing/templates/consultant_spend_report.html:53
+#: manufacturing/templates/consultant_spend_report.html:81
 #: manufacturing/templates/contacts_detail.html:189
 #: manufacturing/templates/cost_detail.html:111
 #: manufacturing/templates/cs_reports_kpis.html:41
+#: manufacturing/templates/engagement_list.html:54
 #: manufacturing/templates/finance_budget_detail.html:135
 #: manufacturing/templates/marketing_dashboard_kpis.html:5
 #: manufacturing/templates/mkt_analytics.html:141
@@ -8359,6 +8463,7 @@ msgstr "Gesamtmenge (0 lassen, um stattdessen nach Wert zu verfolgen)"
 #: manufacturing/templates/eng_project_detail.html:100
 #: manufacturing/templates/eng_project_detail.html:218
 #: manufacturing/templates/eng_projects.html:122
+#: manufacturing/templates/engagement_form.html:66
 #: manufacturing/templates/ess_training_detail.html:36
 #: manufacturing/templates/legal_contract_detail.html:82
 #: manufacturing/templates/legal_contract_detail.html:137
@@ -8397,6 +8502,7 @@ msgstr "Startdatum"
 #: manufacturing/templates/cs_surveys_detail.html:109
 #: manufacturing/templates/cs_surveys_list.html:84
 #: manufacturing/templates/cs_surveys_list.html:139
+#: manufacturing/templates/engagement_form.html:70
 #: manufacturing/templates/ess_training_detail.html:37
 #: manufacturing/templates/legal_contract_detail.html:86
 #: manufacturing/templates/legal_contract_detail.html:141
@@ -8973,6 +9079,7 @@ msgid "To"
 msgstr "Nach"
 
 #: manufacturing/templates/capacity_planning.html:54
+#: manufacturing/templates/consultant_spend_report.html:38
 #: manufacturing/templates/document_list.html:53
 #: manufacturing/templates/inventory_list.html:55
 #: manufacturing/templates/maint_downtime_list.html:71
@@ -9233,11 +9340,13 @@ msgstr ""
 "korrekt ist&quot;)"
 
 #: manufacturing/templates/cc_detail.html:47
+#: manufacturing/templates/consultant_invoice_detail.html:78
 #: manufacturing/templates/document_detail.html:58
 msgid "Re-enter your password"
 msgstr "Geben Sie Ihr Passwort erneut ein"
 
 #: manufacturing/templates/cc_detail.html:48
+#: manufacturing/templates/consultant_invoice_detail.html:79
 #: manufacturing/templates/credit_application_detail.html:120
 #: manufacturing/templates/document_detail.html:59
 #: manufacturing/templates/po_approvals.html:58
@@ -9247,6 +9356,7 @@ msgid "Approve"
 msgstr "Genehmigen"
 
 #: manufacturing/templates/cc_detail.html:49
+#: manufacturing/templates/consultant_invoice_detail.html:80
 #: manufacturing/templates/document_detail.html:60
 #: manufacturing/templates/po_approvals.html:65
 msgid "Reject"
@@ -9898,6 +10008,7 @@ msgstr "Noch keine Checklisten. Erstellen Sie eine aus einer Vorlage."
 
 #: manufacturing/templates/compliance_template_detail.html:35
 #: manufacturing/templates/compliance_template_detail.html:68
+#: manufacturing/templates/consultant_invoice_detail.html:114
 #: manufacturing/templates/cs_kb_detail.html:65
 #: manufacturing/templates/cs_kb_detail.html:103
 #: manufacturing/templates/cs_kb_list.html:82
@@ -9906,6 +10017,7 @@ msgstr "Noch keine Checklisten. Erstellen Sie eine aus einer Vorlage."
 #: manufacturing/templates/eng_spec_detail.html:120
 #: manufacturing/templates/eng_specs_list.html:87
 #: manufacturing/templates/eng_specs_list.html:125
+#: manufacturing/templates/engagement_detail.html:121
 #: manufacturing/templates/finance_budget_detail.html:104
 #: manufacturing/templates/finance_budget_detail.html:152
 #: manufacturing/templates/legal_governance_list.html:75
@@ -10088,6 +10200,7 @@ msgid "Unit Cost"
 msgstr "Stückkosten"
 
 #: manufacturing/templates/consignment_detail.html:106
+#: manufacturing/templates/consultant_invoice_detail.html:61
 msgid "AP Invoice"
 msgstr "Kreditorenrechnung"
 
@@ -10366,6 +10479,362 @@ msgstr "Konzernverbindlichkeiten"
 #: manufacturing/templates/gl_balance_sheet.html:86
 msgid "Equity"
 msgstr "Eigenkapital"
+
+#: manufacturing/templates/consultant_detail.html:50
+#: manufacturing/templates/fixed_asset_detail.html:171
+#: manufacturing/templates/it_asset_detail.html:255
+#: manufacturing/templates/it_repairs_detail.html:61
+#: manufacturing/templates/it_software_detail.html:53
+msgid "Details"
+msgstr "Details"
+
+#: manufacturing/templates/consultant_detail.html:59
+#: manufacturing/templates/consultant_form.html:55
+#: manufacturing/templates/engagement_form.html:74
+msgid "Default Hourly Rate ($)"
+msgstr "Standard-Stundensatz ($)"
+
+#: manufacturing/templates/consultant_detail.html:64
+#: manufacturing/templates/consultant_form.html:59
+#: manufacturing/templates/consultant_list.html:51
+msgid "Specialty"
+msgstr "Fachgebiet"
+
+#: manufacturing/templates/consultant_detail.html:90
+#, python-format
+msgid "External — linked to supplier <strong>%(name)s</strong>."
+msgstr "Extern — verknüpft mit Lieferant <strong>%(name)s</strong>."
+
+#: manufacturing/templates/consultant_detail.html:91
+#, python-format
+msgid "Internal — linked to %(fn)s %(ln)s."
+msgstr "Intern — verknüpft mit %(fn)s %(ln)s."
+
+#: manufacturing/templates/consultant_detail.html:92
+msgid ""
+"Ad hoc — no linked supplier or personnel record. A supplier will be auto-"
+"created on first approved invoice."
+msgstr "Ad hoc — kein verknüpfter Lieferant oder Personaldatensatz. Bei der ersten genehmigten Rechnung wird automatisch ein Lieferant angelegt."
+
+#: manufacturing/templates/consultant_detail.html:100
+#: manufacturing/templates/engagement_detail.html:60
+#: manufacturing/templates/engagement_list.html:53
+msgid "Engagement #"
+msgstr "Auftrag Nr."
+
+#: manufacturing/templates/consultant_detail.html:112
+msgid "No engagements yet."
+msgstr "Noch keine Aufträge."
+
+#: manufacturing/templates/consultant_form.html:3
+#: manufacturing/templates/consultant_form.html:32
+msgid "New Consultant"
+msgstr "Neuer Berater"
+
+#: manufacturing/templates/consultant_form.html:42
+msgid "Consultant or firm name"
+msgstr "Name des Beraters oder der Firma"
+
+#: manufacturing/templates/consultant_form.html:45
+msgid "Linked Supplier (external)"
+msgstr "Verknüpfter Lieferant (extern)"
+
+#: manufacturing/templates/consultant_form.html:47
+#: manufacturing/templates/eng_tasks_list.html:127
+#: manufacturing/templates/maint_part_detail.html:123
+#: manufacturing/templates/prod_returns_detail.html:102
+#: manufacturing/templates/prod_returns_list.html:117
+#: manufacturing/templates/prod_shipping_detail.html:97
+#: manufacturing/templates/prod_shipping_list.html:112
+#: manufacturing/templates/purch_contract_detail.html:77
+#: manufacturing/templates/purch_contracts_list.html:121
+#: manufacturing/templates/qa_inspection_list.html:116
+#: manufacturing/templates/qa_inspection_list.html:125
+#: manufacturing/templates/qa_inspection_list.html:148
+#: manufacturing/templates/sales_commissions.html:164
+#: manufacturing/templates/sales_commissions.html:214
+msgid "— None —"
+msgstr "— Keine —"
+
+#: manufacturing/templates/consultant_form.html:52
+msgid "Leave blank for internal-style or ad-hoc consultants."
+msgstr "Für interne oder Ad-hoc-Berater leer lassen."
+
+#: manufacturing/templates/consultant_form.html:75
+msgid "Create Consultant"
+msgstr "Berater Erstellen"
+
+#: manufacturing/templates/consultant_invoice_detail.html:7
+#: manufacturing/templates/consultant_invoice_detail.html:57
+#: manufacturing/templates/consultant_invoice_list.html:49
+#: manufacturing/templates/consultant_spend_report.html:80
+msgid "Engagement"
+msgstr "Auftrag"
+
+#: manufacturing/templates/consultant_invoice_detail.html:58
+#: manufacturing/templates/consultant_invoice_list.html:49
+#: manufacturing/templates/consultant_spend_report.html:52
+#: manufacturing/templates/consultant_spend_report.html:80
+#: manufacturing/templates/engagement_detail.html:7
+#: manufacturing/templates/engagement_detail.html:61
+#: manufacturing/templates/engagement_list.html:53
+msgid "Consultant"
+msgstr "Berater"
+
+#: manufacturing/templates/consultant_invoice_detail.html:59
+#: manufacturing/templates/consultant_invoice_list.html:49
+#: manufacturing/templates/cs_surveys_detail.html:70
+#: manufacturing/templates/engagement_detail.html:160
+#: manufacturing/templates/esg_dashboard.html:150
+#: manufacturing/templates/finance_tax_detail.html:104
+#: manufacturing/templates/finance_tax_detail.html:146
+#: manufacturing/templates/finance_tax_list.html:87
+#: manufacturing/templates/finance_tax_list.html:133
+#: manufacturing/templates/payroll_dashboard.html:87
+#: manufacturing/templates/payroll_history.html:37
+#: manufacturing/templates/periods.html:28
+#: manufacturing/templates/periods.html:66
+#: manufacturing/templates/sales_commission_history.html:57
+#: manufacturing/templates/sales_commissions.html:111
+#: manufacturing/templates/sales_commissions.html:158
+#: manufacturing/templates/sales_commissions.html:208
+#: manufacturing/templates/sales_demand.html:91
+#: manufacturing/templates/sales_forecast_detail.html:140
+#: manufacturing/templates/sales_forecast_list.html:139
+#: manufacturing/templates/sales_forecast_list.html:204
+#: manufacturing/templates/sales_performance_reviews.html:74
+#: manufacturing/templates/sales_performance_reviews.html:112
+#: manufacturing/templates/sales_targets.html:75
+#: manufacturing/templates/sales_targets.html:126
+#: manufacturing/templates/sales_targets.html:149
+msgid "Period"
+msgstr "Zeitraum"
+
+#: manufacturing/templates/consultant_invoice_detail.html:61
+#, python-format
+msgid "View AP Invoice #%(id)s"
+msgstr "Kreditorenrechnung Nr. %(id)s Anzeigen"
+
+#: manufacturing/templates/consultant_invoice_detail.html:68
+#: manufacturing/templates/req_detail.html:146
+#: manufacturing/templates/req_detail.html:153
+msgid "Submit for Approval"
+msgstr "Zur Genehmigung Einreichen"
+
+#: manufacturing/templates/consultant_invoice_detail.html:74
+#, python-format
+msgid "Awaiting approval as <strong>%(role)s</strong>."
+msgstr "Warten auf Genehmigung als <strong>%(role)s</strong>."
+
+#: manufacturing/templates/consultant_invoice_detail.html:77
+msgid ""
+"Meaning of signature (e.g. &quot;I approve this invoice for payment&quot;)"
+msgstr "Bedeutung der Unterschrift (z. B. &quot;Ich genehmige diese Rechnung zur Zahlung&quot;)"
+
+#: manufacturing/templates/consultant_invoice_detail.html:85
+msgid ""
+"Submitted — no approval rule is configured for consultant invoices yet, so "
+"nothing is pending.\n"
+"            Add an <a href=\"/approval-rules/new/\">approval rule</a> for "
+"entity type <code>consultant_invoice</code>."
+msgstr "Eingereicht — für Beraterrechnungen ist noch keine Genehmigungsregel konfiguriert, daher steht nichts aus.\n            Fügen Sie eine <a href=\"/approval-rules/new/\">Genehmigungsregel</a> für den Entitätstyp <code>consultant_invoice</code> hinzu."
+
+#: manufacturing/templates/consultant_invoice_detail.html:92
+msgid "Itemized Time"
+msgstr "Detaillierte Zeiten"
+
+#: manufacturing/templates/consultant_invoice_detail.html:94
+#: manufacturing/templates/consultant_spend_report.html:52
+#: manufacturing/templates/consultant_spend_report.html:81
+#: manufacturing/templates/consultant_spend_report.html:108
+#: manufacturing/templates/engagement_detail.html:87
+#: manufacturing/templates/maint_downtime_list.html:79
+#: manufacturing/templates/time_clock_attendance.html:88
+#: manufacturing/templates/time_clock_hours.html:63
+#: manufacturing/templates/time_clock_status.html:91
+msgid "Hours"
+msgstr "Stunden"
+
+#: manufacturing/templates/consultant_invoice_detail.html:94
+#: manufacturing/templates/fixed_asset_list.html:110
+#: manufacturing/templates/it_license_detail.html:86
+#: manufacturing/templates/it_license_list.html:67
+#: manufacturing/templates/maint_downtime_list.html:79
+#: manufacturing/templates/maint_labor_report.html:140
+#: manufacturing/templates/prod_labor_report.html:139
+msgid "Cost"
+msgstr "Kosten"
+
+#: manufacturing/templates/consultant_invoice_detail.html:105
+msgid "No time entries on this invoice."
+msgstr "Keine Zeiteinträge auf dieser Rechnung."
+
+#: manufacturing/templates/consultant_invoice_detail.html:112
+msgid "Itemized Charges"
+msgstr "Detaillierte Kosten"
+
+#: manufacturing/templates/consultant_invoice_detail.html:124
+msgid "No charges on this invoice."
+msgstr "Keine Kosten auf dieser Rechnung."
+
+#: manufacturing/templates/consultant_invoice_detail.html:136
+msgid "Decided By"
+msgstr "Entschieden Von"
+
+#: manufacturing/templates/consultant_invoice_detail.html:136
+msgid "Decided At"
+msgstr "Entschieden Am"
+
+#: manufacturing/templates/consultant_invoice_detail.html:136
+msgid "Meaning of Signature"
+msgstr "Bedeutung der Unterschrift"
+
+#: manufacturing/templates/consultant_invoice_detail.html:148
+msgid "Not yet submitted."
+msgstr "Noch nicht eingereicht."
+
+#: manufacturing/templates/consultant_invoice_list.html:3
+#: manufacturing/templates/consultant_invoice_list.html:33
+msgid "Consultant Invoices"
+msgstr "Beraterrechnungen"
+
+#: manufacturing/templates/consultant_invoice_list.html:39
+#: manufacturing/templates/it_ticket_detail.html:91
+#: manufacturing/templates/it_ticket_list.html:69
+#: manufacturing/templates/portal_rma_list.html:13
+#: manufacturing/templates/time_off_list.html:37
+msgid "Submitted"
+msgstr "Eingereicht"
+
+#: manufacturing/templates/consultant_invoice_list.html:41
+#: manufacturing/templates/consultant_spend_report.html:82
+#: manufacturing/templates/engagement_detail.html:95
+#: manufacturing/templates/engagement_detail.html:129
+#: manufacturing/templates/sales_dashboard_kpis.html:5
+msgid "Invoiced"
+msgstr "Fakturiert"
+
+#: manufacturing/templates/consultant_list.html:10
+msgid "+ New Consultant"
+msgstr "+ Neuer Berater"
+
+#: manufacturing/templates/consultant_list.html:42
+msgid "Search name / specialty…"
+msgstr "Name / Fachgebiet suchen…"
+
+#: manufacturing/templates/consultant_list.html:52
+#: manufacturing/templates/engagement_detail.html:64
+msgid "Default Rate"
+msgstr "Standardsatz"
+
+#: manufacturing/templates/consultant_list.html:60
+#, python-format
+msgid "External — %(name)s"
+msgstr "Extern — %(name)s"
+
+#: manufacturing/templates/consultant_list.html:60
+msgid "External — Linked Supplier"
+msgstr "Extern — Verknüpfter Lieferant"
+
+#: manufacturing/templates/consultant_list.html:61
+#, python-format
+msgid "Internal — %(fn)s %(ln)s"
+msgstr "Intern — %(fn)s %(ln)s"
+
+#: manufacturing/templates/consultant_list.html:62
+msgid "Ad hoc"
+msgstr "Ad hoc"
+
+#: manufacturing/templates/consultant_list.html:65
+#: manufacturing/templates/engagement_detail.html:64
+#, python-format
+msgid "$%(rate)s/hr"
+msgstr "%(rate)s $/Std."
+
+#: manufacturing/templates/consultant_list.html:69
+msgid "No consultants found."
+msgstr "Keine Berater gefunden."
+
+#: manufacturing/templates/consultant_spend_report.html:3
+#: manufacturing/templates/consultant_spend_report.html:32
+msgid "Consultant Spend Report"
+msgstr "Beraterausgabenbericht"
+
+#: manufacturing/templates/consultant_spend_report.html:7
+msgid "⬇ Consultant CSV"
+msgstr "⬇ Berater-CSV"
+
+#: manufacturing/templates/consultant_spend_report.html:8
+msgid "⬇ Engagement CSV"
+msgstr "⬇ Auftrags-CSV"
+
+#: manufacturing/templates/consultant_spend_report.html:36
+#: manufacturing/templates/gl_cash_flow_statement.html:55
+#: manufacturing/templates/gl_income_statement.html:53
+#: manufacturing/templates/maint_labor_report.html:57
+#: manufacturing/templates/maint_oee_report.html:62
+#: manufacturing/templates/prod_labor_report.html:57
+#: manufacturing/templates/sales_reports.html:52
+#: manufacturing/templates/tc_ot_report.html:49
+#: manufacturing/templates/tc_schedule.html:50
+msgid "to"
+msgstr "bis"
+
+#: manufacturing/templates/consultant_spend_report.html:44
+#: manufacturing/templates/tc_ot_report.html:66
+#: manufacturing/templates/tc_ot_report.html:114
+#: manufacturing/templates/tc_schedule.html:78
+msgid "Total Hours"
+msgstr "Gesamtstunden"
+
+#: manufacturing/templates/consultant_spend_report.html:45
+msgid "Total Cost (resolved rates only)"
+msgstr "Gesamtkosten (nur aufgelöste Sätze)"
+
+#: manufacturing/templates/consultant_spend_report.html:49
+msgid "By Consultant"
+msgstr "Nach Berater"
+
+#: manufacturing/templates/consultant_spend_report.html:53
+msgid "Time Cost"
+msgstr "Zeitkosten"
+
+#: manufacturing/templates/consultant_spend_report.html:53
+#: manufacturing/templates/engagement_detail.html:119
+msgid "Charges"
+msgstr "Kosten"
+
+#: manufacturing/templates/consultant_spend_report.html:66
+msgid "No consultant activity in this range."
+msgstr "Keine Beratertätigkeit in diesem Zeitraum."
+
+#: manufacturing/templates/consultant_spend_report.html:71
+msgid ""
+"\"—\" means at least one time entry has no resolvable hourly rate (entry, "
+"engagement, and\n"
+"            consultant defaults are all unset) — cost is withheld rather "
+"than shown as $0."
+msgstr "„—\" bedeutet, dass mindestens ein Zeiteintrag keinen auflösbaren Stundensatz hat (Eintrag, Auftrag und\n            Beraterstandardwerte sind alle nicht festgelegt) — die Kosten werden zurückgehalten statt als 0 $ angezeigt."
+
+#: manufacturing/templates/consultant_spend_report.html:77
+msgid "By Engagement"
+msgstr "Nach Auftrag"
+
+#: manufacturing/templates/consultant_spend_report.html:82
+msgid "Open Balance"
+msgstr "Offener Saldo"
+
+#: manufacturing/templates/consultant_spend_report.html:97
+msgid "No engagements in this range."
+msgstr "Keine Aufträge in diesem Zeitraum."
+
+#: manufacturing/templates/consultant_spend_report.html:104
+msgid "By Department"
+msgstr "Nach Abteilung"
+
+#: manufacturing/templates/consultant_spend_report.html:120
+msgid "No department activity in this range."
+msgstr "Keine Abteilungstätigkeit in diesem Zeitraum."
 
 #: manufacturing/templates/contacts_detail.html:6
 #: manufacturing/templates/contacts_new.html:6
@@ -11971,32 +12440,6 @@ msgstr "Antworten"
 msgid "Avg Score"
 msgstr "Ø Bewertung"
 
-#: manufacturing/templates/cs_surveys_detail.html:70
-#: manufacturing/templates/esg_dashboard.html:150
-#: manufacturing/templates/finance_tax_detail.html:104
-#: manufacturing/templates/finance_tax_detail.html:146
-#: manufacturing/templates/finance_tax_list.html:87
-#: manufacturing/templates/finance_tax_list.html:133
-#: manufacturing/templates/payroll_dashboard.html:87
-#: manufacturing/templates/payroll_history.html:37
-#: manufacturing/templates/periods.html:28
-#: manufacturing/templates/periods.html:66
-#: manufacturing/templates/sales_commission_history.html:57
-#: manufacturing/templates/sales_commissions.html:111
-#: manufacturing/templates/sales_commissions.html:158
-#: manufacturing/templates/sales_commissions.html:208
-#: manufacturing/templates/sales_demand.html:91
-#: manufacturing/templates/sales_forecast_detail.html:140
-#: manufacturing/templates/sales_forecast_list.html:139
-#: manufacturing/templates/sales_forecast_list.html:204
-#: manufacturing/templates/sales_performance_reviews.html:74
-#: manufacturing/templates/sales_performance_reviews.html:112
-#: manufacturing/templates/sales_targets.html:75
-#: manufacturing/templates/sales_targets.html:126
-#: manufacturing/templates/sales_targets.html:149
-msgid "Period"
-msgstr "Zeitraum"
-
 #: manufacturing/templates/cs_surveys_detail.html:79
 msgid "Edit Survey"
 msgstr "Umfrage bearbeiten"
@@ -13524,6 +13967,7 @@ msgstr "Projekt"
 #: manufacturing/templates/eng_ecr_detail.html:149
 #: manufacturing/templates/eng_ecrs.html:70
 #: manufacturing/templates/eng_ecrs.html:109
+#: manufacturing/templates/engagement_detail.html:65
 #: manufacturing/templates/mkt_budget_list.html:83
 #: manufacturing/templates/mkt_budget_list.html:133
 #: manufacturing/templates/po_approvals.html:38
@@ -13864,25 +14308,157 @@ msgstr "Neue Aufgabe"
 msgid "Describe the task"
 msgstr "Beschreiben Sie die Aufgabe"
 
-#: manufacturing/templates/eng_tasks_list.html:127
-#: manufacturing/templates/maint_part_detail.html:123
-#: manufacturing/templates/prod_returns_detail.html:102
-#: manufacturing/templates/prod_returns_list.html:117
-#: manufacturing/templates/prod_shipping_detail.html:97
-#: manufacturing/templates/prod_shipping_list.html:112
-#: manufacturing/templates/purch_contract_detail.html:77
-#: manufacturing/templates/purch_contracts_list.html:121
-#: manufacturing/templates/qa_inspection_list.html:116
-#: manufacturing/templates/qa_inspection_list.html:125
-#: manufacturing/templates/qa_inspection_list.html:148
-#: manufacturing/templates/sales_commissions.html:164
-#: manufacturing/templates/sales_commissions.html:214
-msgid "— None —"
-msgstr "— Keine —"
-
 #: manufacturing/templates/eng_tasks_list.html:159
 msgid "Create Task"
 msgstr "Aufgabe erstellen"
+
+#: manufacturing/templates/engagement_detail.html:63
+msgid "Dates"
+msgstr "Daten"
+
+#: manufacturing/templates/engagement_detail.html:67
+#: manufacturing/templates/engagement_form.html:79
+msgid "Purpose"
+msgstr "Zweck"
+
+#: manufacturing/templates/engagement_detail.html:79
+msgid "Close Engagement"
+msgstr "Auftrag Abschließen"
+
+#: manufacturing/templates/engagement_detail.html:85
+msgid "Time Entries"
+msgstr "Zeiteinträge"
+
+#: manufacturing/templates/engagement_detail.html:94
+msgid "default"
+msgstr "Standard"
+
+#: manufacturing/templates/engagement_detail.html:95
+#: manufacturing/templates/engagement_detail.html:129
+msgid "Unbilled"
+msgstr "Nicht Abgerechnet"
+
+#: manufacturing/templates/engagement_detail.html:98
+msgid "No time entries yet."
+msgstr "Noch keine Zeiteinträge."
+
+#: manufacturing/templates/engagement_detail.html:108
+#: manufacturing/templates/engagement_detail.html:142
+#: manufacturing/templates/gl_journal_detail.html:116
+#: manufacturing/templates/workcenter_calendar.html:96
+msgid "Date *"
+msgstr "Datum *"
+
+#: manufacturing/templates/engagement_detail.html:109
+msgid "Hours *"
+msgstr "Stunden *"
+
+#: manufacturing/templates/engagement_detail.html:110
+msgid "Rate ($/hr)"
+msgstr "Satz ($/Std.)"
+
+#: manufacturing/templates/engagement_detail.html:110
+msgid "Use default"
+msgstr "Standard verwenden"
+
+#: manufacturing/templates/engagement_detail.html:113
+msgid "Add Time Entry"
+msgstr "Zeiteintrag Hinzufügen"
+
+#: manufacturing/templates/engagement_detail.html:132
+msgid "No charges yet."
+msgstr "Noch keine Kosten."
+
+#: manufacturing/templates/engagement_detail.html:144
+msgid "Category *"
+msgstr "Kategorie *"
+
+#: manufacturing/templates/engagement_detail.html:149
+msgid "Amount ($) *"
+msgstr "Betrag ($) *"
+
+#: manufacturing/templates/engagement_detail.html:152
+msgid "Add Charge"
+msgstr "Kosten Hinzufügen"
+
+#: manufacturing/templates/engagement_detail.html:169
+msgid "No invoices cut yet."
+msgstr "Noch keine Rechnungen erstellt."
+
+#: manufacturing/templates/engagement_detail.html:178
+msgid "Period Start *"
+msgstr "Zeitraumbeginn *"
+
+#: manufacturing/templates/engagement_detail.html:179
+msgid "Period End *"
+msgstr "Zeitraumende *"
+
+#: manufacturing/templates/engagement_detail.html:181
+msgid "Cut Invoice for Unbilled Time &amp; Charges in Period"
+msgstr "Rechnung für Nicht Abgerechnete Zeit und Kosten im Zeitraum Erstellen"
+
+#: manufacturing/templates/engagement_detail.html:186
+#, python-format
+msgid "%(counter)s unbilled time entry"
+msgid_plural "%(counter)s unbilled time entries"
+msgstr[0] "%(counter)s nicht abgerechneter Zeiteintrag"
+msgstr[1] "%(counter)s nicht abgerechnete Zeiteinträge"
+
+#: manufacturing/templates/engagement_detail.html:187
+#, python-format
+msgid "%(counter)s unbilled charge"
+msgid_plural "%(counter)s unbilled charges"
+msgstr[0] "%(counter)s nicht abgerechnete Kosten"
+msgstr[1] "%(counter)s nicht abgerechnete Kosten"
+
+#: manufacturing/templates/engagement_detail.html:187
+msgid "on this engagement."
+msgstr "für diesen Auftrag."
+
+#: manufacturing/templates/engagement_form.html:3
+msgid "New Engagement"
+msgstr "Neuer Auftrag"
+
+#: manufacturing/templates/engagement_form.html:31
+msgid "New Consultant Engagement"
+msgstr "Neuer Beraterauftrag"
+
+#: manufacturing/templates/engagement_form.html:38
+msgid "No consultants yet — <a href=\"/consultants/new/\">add one first</a>."
+msgstr "Noch keine Berater — <a href=\"/consultants/new/\">zuerst einen hinzufügen</a>."
+
+#: manufacturing/templates/engagement_form.html:46
+msgid "e.g. Q3 ERP Migration Support"
+msgstr "z. B. ERP-Migrationsunterstützung Q3"
+
+#: manufacturing/templates/engagement_form.html:49
+msgid "Consultant *"
+msgstr "Berater *"
+
+#: manufacturing/templates/engagement_form.html:59
+msgid "— Use my department —"
+msgstr "— Meine Abteilung verwenden —"
+
+#: manufacturing/templates/engagement_form.html:76
+msgid "Used when a time entry doesn't specify its own rate."
+msgstr "Wird verwendet, wenn ein Zeiteintrag keinen eigenen Satz angibt."
+
+#: manufacturing/templates/engagement_form.html:83
+msgid "Create Engagement"
+msgstr "Auftrag Erstellen"
+
+#: manufacturing/templates/engagement_list.html:3
+#: manufacturing/templates/engagement_list.html:36
+msgid "Consultant Engagements"
+msgstr "Beraterverträge"
+
+#: manufacturing/templates/engagement_list.html:9
+msgid "+ New Engagement"
+msgstr "+ Neuer Auftrag"
+
+#: manufacturing/templates/engagement_list.html:68
+msgid "No engagements found."
+msgstr "Keine Aufträge gefunden."
 
 #: manufacturing/templates/esg_dashboard.html:6
 msgid "← Reports"
@@ -15237,13 +15813,6 @@ msgstr "aktuell"
 msgid "Event History"
 msgstr "Ereignisverlauf"
 
-#: manufacturing/templates/fixed_asset_detail.html:171
-#: manufacturing/templates/it_asset_detail.html:255
-#: manufacturing/templates/it_repairs_detail.html:61
-#: manufacturing/templates/it_software_detail.html:53
-msgid "Details"
-msgstr "Details"
-
 #: manufacturing/templates/fixed_asset_detail.html:187
 msgid "No events logged."
 msgstr "Keine Ereignisse protokolliert."
@@ -15368,15 +15937,6 @@ msgstr "Name, Nummer, Lieferant, Standort suchen..."
 #: manufacturing/templates/fixed_asset_list.html:105
 msgid "Asset #"
 msgstr "Anlagen-Nr."
-
-#: manufacturing/templates/fixed_asset_list.html:110
-#: manufacturing/templates/it_license_detail.html:86
-#: manufacturing/templates/it_license_list.html:67
-#: manufacturing/templates/maint_downtime_list.html:79
-#: manufacturing/templates/maint_labor_report.html:140
-#: manufacturing/templates/prod_labor_report.html:139
-msgid "Cost"
-msgstr "Kosten"
 
 #: manufacturing/templates/fixed_asset_list.html:112
 msgid "Dep. Method"
@@ -15561,17 +16121,6 @@ msgstr "Passiva + Eigenkapital Gesamt"
 msgid "Cash Flow Statement (Indirect Method)"
 msgstr "Kapitalflussrechnung (Indirekte Methode)"
 
-#: manufacturing/templates/gl_cash_flow_statement.html:55
-#: manufacturing/templates/gl_income_statement.html:53
-#: manufacturing/templates/maint_labor_report.html:57
-#: manufacturing/templates/maint_oee_report.html:62
-#: manufacturing/templates/prod_labor_report.html:57
-#: manufacturing/templates/sales_reports.html:52
-#: manufacturing/templates/tc_ot_report.html:49
-#: manufacturing/templates/tc_schedule.html:50
-msgid "to"
-msgstr "bis"
-
 #: manufacturing/templates/gl_cash_flow_statement.html:59
 msgid "Operating Activities"
 msgstr "Betriebliche Tätigkeit"
@@ -15752,11 +16301,6 @@ msgstr "Memo"
 #: manufacturing/templates/gl_journal_detail.html:110
 msgid "Journal Details"
 msgstr "Buchungsdetails"
-
-#: manufacturing/templates/gl_journal_detail.html:116
-#: manufacturing/templates/workcenter_calendar.html:96
-msgid "Date *"
-msgstr "Datum *"
 
 #: manufacturing/templates/gl_journal_detail.html:121
 msgid "e.g. JE-001"
@@ -17021,13 +17565,6 @@ msgstr "Was zu tun ist…"
 msgid "Ticket %(num)s"
 msgstr "Ticket %(num)s"
 
-#: manufacturing/templates/it_ticket_detail.html:91
-#: manufacturing/templates/it_ticket_list.html:69
-#: manufacturing/templates/portal_rma_list.html:13
-#: manufacturing/templates/time_off_list.html:37
-msgid "Submitted"
-msgstr "Eingereicht"
-
 #: manufacturing/templates/it_ticket_detail.html:121
 msgid "Change Status"
 msgstr "Status Ändern"
@@ -17628,13 +18165,6 @@ msgstr "Ausfallstunden"
 #: manufacturing/templates/maint_downtime_list.html:57
 msgid "Equipment Downtime"
 msgstr "Anlagenausfallzeit"
-
-#: manufacturing/templates/maint_downtime_list.html:79
-#: manufacturing/templates/time_clock_attendance.html:88
-#: manufacturing/templates/time_clock_hours.html:63
-#: manufacturing/templates/time_clock_status.html:91
-msgid "Hours"
-msgstr "Stunden"
 
 #: manufacturing/templates/maint_downtime_list.html:97
 msgid "No downtime records found."
@@ -22385,11 +22915,6 @@ msgstr "Kommentar"
 msgid "No decisions recorded yet."
 msgstr "Noch keine Entscheidungen erfasst."
 
-#: manufacturing/templates/req_detail.html:146
-#: manufacturing/templates/req_detail.html:153
-msgid "Submit for Approval"
-msgstr "Zur Genehmigung Einreichen"
-
 #: manufacturing/templates/req_detail.html:148
 msgid ""
 "Once submitted, this requisition can no longer be edited and will be routed "
@@ -23266,10 +23791,6 @@ msgstr "Top-Produkte nach Umsatz"
 #: manufacturing/templates/sales_dashboard.html:101
 msgid "Order Status Breakdown"
 msgstr "Auftragsstatus-Aufschlüsselung"
-
-#: manufacturing/templates/sales_dashboard_kpis.html:5
-msgid "Invoiced"
-msgstr "Fakturiert"
 
 #: manufacturing/templates/sales_dashboard_kpis.html:6
 msgid "Total Order Value"
@@ -25163,12 +25684,6 @@ msgstr "Zurücksetzen"
 #: manufacturing/templates/tc_ot_report.html:59
 msgid "My OT"
 msgstr "Meine Überstunden"
-
-#: manufacturing/templates/tc_ot_report.html:66
-#: manufacturing/templates/tc_ot_report.html:114
-#: manufacturing/templates/tc_schedule.html:78
-msgid "Total Hours"
-msgstr "Gesamtstunden"
 
 #: manufacturing/templates/tc_ot_report.html:70
 #: manufacturing/templates/tc_ot_report.html:89

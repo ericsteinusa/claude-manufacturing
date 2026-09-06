@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Consultant Invoices{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Consultant Invoices" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/consultants/" class="btn">Consultants</a>
-<a href="/consultants/engagements/" class="btn">Engagements</a>
-<a href="/consultants/invoices/" class="btn">Invoices</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/consultants/" class="btn">{% trans "Consultants" %}</a>
+<a href="/consultants/engagements/" class="btn">{% trans "Engagements" %}</a>
+<a href="/consultants/invoices/" class="btn">{% trans "Invoices" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -29,23 +30,23 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Consultant Invoices</h2>
+    <h2>{% trans "Consultant Invoices" %}</h2>
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
-            <option value="draft"{% if status_filter == "draft" %} selected{% endif %}>Draft</option>
-            <option value="submitted"{% if status_filter == "submitted" %} selected{% endif %}>Submitted</option>
-            <option value="rejected"{% if status_filter == "rejected" %} selected{% endif %}>Rejected</option>
-            <option value="invoiced"{% if status_filter == "invoiced" %} selected{% endif %}>Invoiced</option>
+            <option value="">{% trans "All Statuses" %}</option>
+            <option value="draft"{% if status_filter == "draft" %} selected{% endif %}>{% trans "Draft" %}</option>
+            <option value="submitted"{% if status_filter == "submitted" %} selected{% endif %}>{% trans "Submitted" %}</option>
+            <option value="rejected"{% if status_filter == "rejected" %} selected{% endif %}>{% trans "Rejected" %}</option>
+            <option value="invoiced"{% if status_filter == "invoiced" %} selected{% endif %}>{% trans "Invoiced" %}</option>
         </select>
-        <button type="submit">Filter</button>
-        <a href="/consultants/invoices/" style="font-size:13px;color:var(--accent);margin-left:4px;">Clear</a>
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/consultants/invoices/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
-            <thead><tr><th>Invoice #</th><th>Engagement</th><th>Consultant</th><th>Period</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Invoice #" %}</th><th>{% trans "Engagement" %}</th><th>{% trans "Consultant" %}</th><th>{% trans "Period" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
             {% for i in rows %}
             <tr>
@@ -56,7 +57,7 @@
                 <td><span class="badge s-{{ i.status }}">{{ i.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No invoices found.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">{% trans "No invoices found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

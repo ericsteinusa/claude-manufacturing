@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ cinv.invoice_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/consultants/invoices/" class="btn">Invoices</a>
-<a href="/consultants/engagements/{{ cinv.engagement_id }}/" class="btn">Engagement</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/consultants/invoices/" class="btn">{% trans "Invoices" %}</a>
+<a href="/consultants/engagements/{{ cinv.engagement_id }}/" class="btn">{% trans "Engagement" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -45,7 +46,7 @@
 
 {% block body %}
 <div class="content">
-<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="lg-wrap">
     <h2>{{ cinv.invoice_number }}
         <span class="badge s-{{ cinv.status }}">{{ cinv.status }}</span>
@@ -53,44 +54,44 @@
 
     <div class="card">
         <div class="detail-grid">
-            <div class="field"><div class="lbl">Engagement</div><div class="val"><a href="/consultants/engagements/{{ cinv.engagement_id }}/">{{ cinv.engagement_number }}</a></div></div>
-            <div class="field"><div class="lbl">Consultant</div><div class="val">{{ cinv.consultant_name }}</div></div>
-            <div class="field"><div class="lbl">Period</div><div class="val">{{ cinv.period_start }} → {{ cinv.period_end }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Engagement" %}</div><div class="val"><a href="/consultants/engagements/{{ cinv.engagement_id }}/">{{ cinv.engagement_number }}</a></div></div>
+            <div class="field"><div class="lbl">{% trans "Consultant" %}</div><div class="val">{{ cinv.consultant_name }}</div></div>
+            <div class="field"><div class="lbl">{% trans "Period" %}</div><div class="val">{{ cinv.period_start }} → {{ cinv.period_end }}</div></div>
             {% if cinv.ap_invoice_id %}
-            <div class="field"><div class="lbl">AP Invoice</div><div class="val"><a href="/ap/{{ cinv.ap_invoice_id }}/">View AP Invoice #{{ cinv.ap_invoice_id }}</a></div></div>
+            <div class="field"><div class="lbl">{% trans "AP Invoice" %}</div><div class="val"><a href="/ap/{{ cinv.ap_invoice_id }}/">{% blocktrans with id=cinv.ap_invoice_id %}View AP Invoice #{{ id }}{% endblocktrans %}</a></div></div>
             {% endif %}
         </div>
 
         {% if cinv.status == 'draft' %}
         <form method="post" action="/consultants/invoices/{{ cinv.id }}/submit/" class="no-print">
             {% csrf_token %}
-            <button type="submit" class="btn-submit">Submit for Approval</button>
+            <button type="submit" class="btn-submit">{% trans "Submit for Approval" %}</button>
         </form>
         {% endif %}
 
         {% if pending_step %}
         <div class="alert alert-warning no-print" style="margin-top:14px;">
-            Awaiting approval as <strong>{{ pending_step.approver_role }}</strong>.
+            {% blocktrans with role=pending_step.approver_role %}Awaiting approval as <strong>{{ role }}</strong>.{% endblocktrans %}
             <form method="post" action="/consultants/invoices/{{ cinv.id }}/decide/" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
                 {% csrf_token %}
-                <input type="text" name="signature_meaning" placeholder="Meaning of signature (e.g. &quot;I approve this invoice for payment&quot;)" required style="flex:1;min-width:220px;padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
-                <input type="password" name="password" placeholder="Re-enter your password" required style="width:170px;padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
-                <button type="submit" name="decision" value="approved" class="btn-submit btn-approve" style="padding:5px 14px;font-size:12px;">Approve</button>
-                <button type="submit" name="decision" value="rejected" class="btn-submit btn-deny" style="padding:5px 14px;font-size:12px;">Reject</button>
+                <input type="text" name="signature_meaning" placeholder="{% trans "Meaning of signature (e.g. &quot;I approve this invoice for payment&quot;)" %}" required style="flex:1;min-width:220px;padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                <input type="password" name="password" placeholder="{% trans "Re-enter your password" %}" required style="width:170px;padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                <button type="submit" name="decision" value="approved" class="btn-submit btn-approve" style="padding:5px 14px;font-size:12px;">{% trans "Approve" %}</button>
+                <button type="submit" name="decision" value="rejected" class="btn-submit btn-deny" style="padding:5px 14px;font-size:12px;">{% trans "Reject" %}</button>
             </form>
         </div>
         {% elif cinv.status == 'submitted' %}
         <div class="alert alert-warning no-print" style="margin-top:14px;">
-            Submitted — no approval rule is configured for consultant invoices yet, so nothing is pending.
-            Add an <a href="/approval-rules/new/">approval rule</a> for entity type <code>consultant_invoice</code>.
+            {% blocktrans %}Submitted — no approval rule is configured for consultant invoices yet, so nothing is pending.
+            Add an <a href="/approval-rules/new/">approval rule</a> for entity type <code>consultant_invoice</code>.{% endblocktrans %}
         </div>
         {% endif %}
     </div>
 
     <div class="card" style="overflow-x:auto;">
-        <h3>Itemized Time</h3>
+        <h3>{% trans "Itemized Time" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Date</th><th>Description</th><th class="metric">Hours</th><th class="metric">Rate</th><th class="metric">Cost</th></tr></thead>
+            <thead><tr><th>{% trans "Date" %}</th><th>{% trans "Description" %}</th><th class="metric">{% trans "Hours" %}</th><th class="metric">{% trans "Rate" %}</th><th class="metric">{% trans "Cost" %}</th></tr></thead>
             <tbody>
             {% for t in lines.time_entries %}
             <tr>
@@ -101,16 +102,16 @@
                 <td class="metric">${{ t.cost|floatformat:2 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">No time entries on this invoice.</td></tr>
+            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">{% trans "No time entries on this invoice." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
     <div class="card" style="overflow-x:auto;">
-        <h3>Itemized Charges</h3>
+        <h3>{% trans "Itemized Charges" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="metric">Amount</th></tr></thead>
+            <thead><tr><th>{% trans "Date" %}</th><th>{% trans "Category" %}</th><th>{% trans "Description" %}</th><th class="metric">{% trans "Amount" %}</th></tr></thead>
             <tbody>
             {% for c in lines.charges %}
             <tr>
@@ -120,19 +121,19 @@
                 <td class="metric">${{ c.amount|floatformat:2 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:var(--text-muted);text-align:center;">No charges on this invoice.</td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);text-align:center;">{% trans "No charges on this invoice." %}</td></tr>
             {% endfor %}
             </tbody>
             <tfoot>
-                <tr class="total-row"><td colspan="3">Total</td><td class="metric">${{ lines.total|floatformat:2 }}</td></tr>
+                <tr class="total-row"><td colspan="3">{% trans "Total" %}</td><td class="metric">${{ lines.total|floatformat:2 }}</td></tr>
             </tfoot>
         </table>
     </div>
 
     <div class="card">
-        <h3>Approval History</h3>
+        <h3>{% trans "Approval History" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Seq</th><th>Approver Role</th><th>Status</th><th>Decided By</th><th>Decided At</th><th>Meaning of Signature</th></tr></thead>
+            <thead><tr><th>{% trans "Seq" %}</th><th>{% trans "Approver Role" %}</th><th>{% trans "Status" %}</th><th>{% trans "Decided By" %}</th><th>{% trans "Decided At" %}</th><th>{% trans "Meaning of Signature" %}</th></tr></thead>
             <tbody>
             {% for s in approval.steps %}
             <tr>
@@ -144,7 +145,7 @@
                 <td>{{ s.signature_meaning|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">Not yet submitted.</td></tr>
+            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">{% trans "Not yet submitted." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

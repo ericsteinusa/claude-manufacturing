@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Consultant Spend Report{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Consultant Spend Report" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/consultants/" class="btn">Consultants</a>
-<a href="/consultants/reports/spend/export/?section=consultant&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">⬇ Consultant CSV</a>
-<a href="/consultants/reports/spend/export/?section=engagement&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">⬇ Engagement CSV</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/consultants/" class="btn">{% trans "Consultants" %}</a>
+<a href="/consultants/reports/spend/export/?section=consultant&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">{% trans "⬇ Consultant CSV" %}</a>
+<a href="/consultants/reports/spend/export/?section=engagement&date_from={{ date_from|urlencode }}&date_to={{ date_to|urlencode }}" class="btn">{% trans "⬇ Engagement CSV" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -28,28 +29,28 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Consultant Spend Report</h2>
+    <h2>{% trans "Consultant Spend Report" %}</h2>
 
     <form method="get" class="date-form">
         <input type="date" name="date_from" value="{{ date_from }}">
-        <span style="font-size:13px;color:var(--text-muted);">to</span>
+        <span style="font-size:13px;color:var(--text-muted);">{% trans "to" %}</span>
         <input type="date" name="date_to" value="{{ date_to }}">
-        <button type="submit">Go</button>
+        <button type="submit">{% trans "Go" %}</button>
     </form>
 
     <div class="rpt-kpis">
-        <div class="rpt-kpi"><div class="num">{{ kpis.consultant_count }}</div><div class="lbl">Consultants</div></div>
-        <div class="rpt-kpi"><div class="num">{{ kpis.engagement_count }}</div><div class="lbl">Engagements</div></div>
-        <div class="rpt-kpi"><div class="num">{{ kpis.total_hours|floatformat:1 }}h</div><div class="lbl">Total Hours</div></div>
-        <div class="rpt-kpi"><div class="num">${{ kpis.total_cost|floatformat:2 }}</div><div class="lbl">Total Cost (resolved rates only)</div></div>
+        <div class="rpt-kpi"><div class="num">{{ kpis.consultant_count }}</div><div class="lbl">{% trans "Consultants" %}</div></div>
+        <div class="rpt-kpi"><div class="num">{{ kpis.engagement_count }}</div><div class="lbl">{% trans "Engagements" %}</div></div>
+        <div class="rpt-kpi"><div class="num">{{ kpis.total_hours|floatformat:1 }}h</div><div class="lbl">{% trans "Total Hours" %}</div></div>
+        <div class="rpt-kpi"><div class="num">${{ kpis.total_cost|floatformat:2 }}</div><div class="lbl">{% trans "Total Cost (resolved rates only)" %}</div></div>
     </div>
 
     <div class="card" style="overflow-x:auto;">
-        <h3>By Consultant</h3>
+        <h3>{% trans "By Consultant" %}</h3>
         <table class="list-table">
             <thead>
-                <tr><th>Consultant</th><th class="num">Engagements</th><th class="num">Hours</th>
-                    <th class="num">Time Cost</th><th class="num">Charges</th><th class="num">Total</th></tr>
+                <tr><th>{% trans "Consultant" %}</th><th class="num">{% trans "Engagements" %}</th><th class="num">{% trans "Hours" %}</th>
+                    <th class="num">{% trans "Time Cost" %}</th><th class="num">{% trans "Charges" %}</th><th class="num">{% trans "Total" %}</th></tr>
             </thead>
             <tbody>
             {% for c in by_consultant %}
@@ -62,23 +63,23 @@
                 <td class="num">{% if c.grand_total != None %}${{ c.grand_total|floatformat:2 }}{% else %}—{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No consultant activity in this range.</td></tr>
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">{% trans "No consultant activity in this range." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
         <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">
-            "—" means at least one time entry has no resolvable hourly rate (entry, engagement, and
-            consultant defaults are all unset) — cost is withheld rather than shown as $0.
+            {% blocktrans %}"—" means at least one time entry has no resolvable hourly rate (entry, engagement, and
+            consultant defaults are all unset) — cost is withheld rather than shown as $0.{% endblocktrans %}
         </p>
     </div>
 
     <div class="card" style="overflow-x:auto;">
-        <h3>By Engagement</h3>
+        <h3>{% trans "By Engagement" %}</h3>
         <table class="list-table">
             <thead>
-                <tr><th>Engagement</th><th>Consultant</th><th>Department</th><th>Status</th>
-                    <th class="num">Hours</th><th class="num">Total</th>
-                    <th class="num">Invoiced</th><th class="num">Open Balance</th></tr>
+                <tr><th>{% trans "Engagement" %}</th><th>{% trans "Consultant" %}</th><th>{% trans "Department" %}</th><th>{% trans "Status" %}</th>
+                    <th class="num">{% trans "Hours" %}</th><th class="num">{% trans "Total" %}</th>
+                    <th class="num">{% trans "Invoiced" %}</th><th class="num">{% trans "Open Balance" %}</th></tr>
             </thead>
             <tbody>
             {% for e in by_engagement %}
@@ -93,18 +94,18 @@
                 <td class="num">${{ e.open_balance|floatformat:2 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No engagements in this range.</td></tr>
+            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">{% trans "No engagements in this range." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
     <div class="card" style="overflow-x:auto;">
-        <h3>By Department</h3>
+        <h3>{% trans "By Department" %}</h3>
         <table class="list-table">
             <thead>
-                <tr><th>Department</th><th class="num">Engagements</th><th class="num">Consultants</th>
-                    <th class="num">Hours</th><th class="num">Total Cost</th></tr>
+                <tr><th>{% trans "Department" %}</th><th class="num">{% trans "Engagements" %}</th><th class="num">{% trans "Consultants" %}</th>
+                    <th class="num">{% trans "Hours" %}</th><th class="num">{% trans "Total Cost" %}</th></tr>
             </thead>
             <tbody>
             {% for d in by_dept %}
@@ -116,7 +117,7 @@
                 <td class="num">{% if d.total_cost != None %}${{ d.total_cost|floatformat:2 }}{% else %}—{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No department activity in this range.</td></tr>
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">{% trans "No department activity in this range." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

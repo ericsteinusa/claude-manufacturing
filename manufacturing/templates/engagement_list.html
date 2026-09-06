@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Consultant Engagements{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Consultant Engagements" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/consultants/" class="btn">Consultants</a>
-<a href="/consultants/engagements/" class="btn">Engagements</a>
-<a href="/consultants/invoices/" class="btn">Invoices</a>
-<a href="/consultants/engagements/new/" class="btn">+ New Engagement</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/consultants/" class="btn">{% trans "Consultants" %}</a>
+<a href="/consultants/engagements/" class="btn">{% trans "Engagements" %}</a>
+<a href="/consultants/invoices/" class="btn">{% trans "Invoices" %}</a>
+<a href="/consultants/engagements/new/" class="btn">{% trans "+ New Engagement" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -32,25 +33,25 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Consultant Engagements</h2>
+    <h2>{% trans "Consultant Engagements" %}</h2>
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <button type="submit">Filter</button>
-        <a href="/consultants/engagements/" style="font-size:13px;color:var(--accent);margin-left:4px;">Clear</a>
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/consultants/engagements/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Engagement #</th><th>Title</th><th>Consultant</th>
-                    <th>Department</th><th>Status</th><th class="metric">Total</th>
+                    <th>{% trans "Engagement #" %}</th><th>{% trans "Title" %}</th><th>{% trans "Consultant" %}</th>
+                    <th>{% trans "Department" %}</th><th>{% trans "Status" %}</th><th class="metric">{% trans "Total" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,7 +65,7 @@
                 <td class="metric">${{ e.grand_total|floatformat:2 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">No engagements found.</td></tr>
+            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">{% trans "No engagements found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

@@ -3038,6 +3038,81 @@ and Dutch (IT's two-level drill-down into Budget & Procurement) — all
 pages return 200 with correctly translated titles and menu-item labels,
 no console or server errors.
 
+Also fully translated: the entire **Consultants** feature
+(`consultant_list.html`, `consultant_detail.html`, `consultant_form
+.html`, `consultant_invoice_list.html`, `consultant_invoice_detail
+.html`, `consultant_spend_report.html`, `engagement_list.html`,
+`engagement_detail.html`, `engagement_form.html` — 9 templates) —
+**the last remaining i18n gap in the entire app**, previously
+documented across every prior pass in this series as deliberately
+excluded by design rather than merely deferred. Closed on explicit
+user request after confirming there was nothing else left (a full
+`{% load i18n %}` sweep of `manufacturing/templates/*.html` turned up
+only these 9 files). Manages external consultants/contractors, their
+engagements (consulting contracts with a scope, rate, and date range),
+and consultant invoices with itemized time/charges and an approval
+workflow — reached from Purchasing/Finance areas. 83 unique strings
+across 5 languages (81 simple + 2 plural). Markup was split across 2
+parallel subagents (Consultant-prefixed templates vs.
+Engagement-prefixed templates); translation of the resulting 83 blank
+strings was done directly by hand rather than delegating, the same
+threshold this series has used throughout (roughly ≤100 new strings →
+hand-translate, more → parallel subagent chunks).
+
+**Trickiest pattern in this batch**: `engagement_detail.html`'s
+unbilled-time/unbilled-charges footer needed the established
+two-independent-counts technique (first used for EDI's upload-success
+message, and `mrp_release.html` before that) — "N unbilled time
+entr(y/ies), M unbilled charge(s) on this engagement." combines two
+separately-pluralized counts in one sentence, split into two
+independent `{% blocktrans count %}` blocks joined by a plain
+`{% trans %}` for the shared tail, since gettext plural forms only
+support one counting variable per block. Verified both the
+zero-count and mixed singular/plural cases render correctly via direct
+`Template().render()` before running `makemessages`.
+
+One `default:"literal english"` fallback bug fixed, continuing the
+class first found on IT's Network Device page:
+`consultant_invoice_detail.html`'s badge showing
+`c.supplier_name|default:"Linked Supplier"` couldn't hold a
+`{% trans %}` inside the filter argument, so it was expanded to an
+explicit `{% if %}/{% else %}` with the fallback branch as its own
+complete `{% blocktrans %}` sentence ("External — Linked Supplier"),
+matching the "each conditional branch is a complete sentence"
+precedent. The `&quot;`-escaped signature-meaning placeholder (`e.g.
+&quot;I approve this invoice for payment&quot;`) reused the exact
+established pattern from `document_detail.html`, needing no additional
+escaping since `&quot;` is already an HTML entity, not a raw quote
+character the template engine would try to re-escape.
+
+Full suite 3486 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check`
+clean on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically, zero placeholder mismatches across both the simple
+and plural entry sets. The auto-merged generic labels this batch
+reused (`Print / Save PDF`, `All Statuses`, `Active`, `Inactive`,
+`Deactivate`, `Activate`, `Rejected`, `Invoiced`) all cross-checked
+semantically compatible with their existing catalog translations — no
+cross-context mistranslation risk. Verified end-to-end against the
+real dev server, in French and German with real sample data: the
+Consultants list (confirmed Internal/External/Ad-hoc badge rendering
+with real supplier/personnel links), a consultant's detail page
+(confirmed the dynamic "External — linked to supplier Acme LLc."
+sentence), an Engagement's detail page (confirmed real time-entry and
+charge line items, an existing invoice row, and the two-count
+pluralized footer with a real "0 entrée de temps non facturée, 0 frais
+non facturé" zero-case), a Consultant Invoice's detail page (confirmed
+itemized time/charges, the GL invoice link, and a real approval-history
+row), the Spend Report (confirmed all three By-Consultant/By-Engagement
+/By-Department tables with real KPI totals and the guillemet-quoted
+"—"-means footnote), and the New Consultant form — all pages return
+200 with correctly translated titles and labels, no console or server
+errors. **This closes out localization coverage for the entire
+application** — every template outside Django's own admin interface
+and every Python-side navigation label (`menus.py`'s `MENU_TREE`,
+closed in the immediately-prior pass) is now translated into Spanish,
+French, German, Portuguese, and Dutch.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
@@ -3593,14 +3668,17 @@ no console or server errors.
   the scoping for free — don't re-query.
 
   **i18n caveat for both:** wrap the new button/link text in `{% trans %}`
-  *only if the template already has `{% load i18n %}`*. Several of these
-  areas are untranslated by design (the whole Consultants feature, the
-  customer/supplier portals, `bom_detail.html`, `supplier_scorecard_detail
-  .html`) — adding a lone translated string to an otherwise-English page
-  creates a half-translated surface for no benefit. Where the tag does
-  apply, `makemessages` merges into the existing `"Print / Save PDF"` /
-  `"Export CSV"` / `"Export Excel"` msgids, which are already translated in
-  all five languages, so no new translation work is needed.
+  *only if the template already has `{% load i18n %}`*. As of the
+  Consultants-feature pass (the last remaining gap, closed after every
+  other area in this app), there are no more untranslated-by-design areas
+  left — the customer/supplier portals, `bom_detail.html`, and
+  `supplier_scorecard_detail.html` were all fully translated in earlier
+  passes despite this note's own stale claim otherwise for a long time (a
+  reminder that a note like this one needs updating the moment the gap it
+  describes closes, not left to rot). Where the tag applies, `makemessages`
+  merges into the existing `"Print / Save PDF"` / `"Export CSV"` /
+  `"Export Excel"` msgids, which are already translated in all five
+  languages, so no new translation work is needed.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to
