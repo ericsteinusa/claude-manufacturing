@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ route.mechanic_name }} — {{ route.route_date }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/routes/" class="btn">Technician Routes</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/routes/" class="btn">{% trans "Technician Routes" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -25,11 +26,11 @@
 <div class="cp-wrap">
     <div class="menu-title">{{ route.mechanic_name }} — {{ route.route_date }}
         {% if route.status == 'completed' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Completed</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Completed" %}</span>
         {% elif route.status == 'in_progress' %}
-        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">In Progress</span>
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{% trans "In Progress" %}</span>
         {% else %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Planned</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Planned" %}</span>
         {% endif %}
     </div>
 
@@ -37,14 +38,14 @@
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="kpi-row">
-        <div class="kpi"><div class="lbl">Stops</div><div class="val">{{ summary.total_stops }}</div></div>
-        <div class="kpi"><div class="lbl">Completed</div><div class="val">{{ summary.completed_stops }} ({{ summary.percent_complete }}%)</div></div>
-        <div class="kpi"><div class="lbl">Est. Minutes</div><div class="val">{{ summary.total_estimated_minutes }}</div></div>
+        <div class="kpi"><div class="lbl">{% trans "Stops" %}</div><div class="val">{{ summary.total_stops }}</div></div>
+        <div class="kpi"><div class="lbl">{% trans "Completed" %}</div><div class="val">{{ summary.completed_stops }} ({{ summary.percent_complete }}%)</div></div>
+        <div class="kpi"><div class="lbl">{% trans "Est. Minutes" %}</div><div class="val">{{ summary.total_estimated_minutes }}</div></div>
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Status</h3>
+        <h3>{% trans "Status" %}</h3>
         <form method="post" style="display:flex;gap:10px;align-items:center;">
             {% csrf_token %}
             <input type="hidden" name="action" value="set_status">
@@ -53,17 +54,17 @@
                 <option value="{{ s }}" {% if s == route.status %}selected{% endif %}>{{ s|title }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="btn">Update Status</button>
+            <button type="submit" class="btn">{% trans "Update Status" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Stops</h3>
+        <h3>{% trans "Stops" %}</h3>
         {% if route.stops %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>#</th><th>Work Order</th><th>Equipment</th><th>Priority</th><th class="num">Est. Min</th><th>Status</th>{% if can_edit %}<th></th>{% endif %}</tr></thead>
+                <thead><tr><th>#</th><th>{% trans "Work Order" %}</th><th>{% trans "Equipment" %}</th><th>{% trans "Priority" %}</th><th class="num">{% trans "Est. Min" %}</th><th>{% trans "Status" %}</th>{% if can_edit %}<th></th>{% endif %}</tr></thead>
                 <tbody>
                     {% for stop in route.stops %}
                     <tr>
@@ -94,7 +95,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="complete_stop">
                                 <input type="hidden" name="stop_id" value="{{ stop.id }}">
-                                <button type="submit" class="btn" style="padding:2px 7px;font-size:11px;">Complete</button>
+                                <button type="submit" class="btn" style="padding:2px 7px;font-size:11px;">{% trans "Complete" %}</button>
                             </form>
                             {% endif %}
                         </td>
@@ -105,19 +106,19 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No stops on this route yet.</div>
+        <div class="empty-state">{% trans "No stops on this route yet." %}</div>
         {% endif %}
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Stop</h3>
+        <h3>{% trans "Add Stop" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_stop">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Open Work Order *</label>
+                    <label>{% trans "Open Work Order *" %}</label>
                     <select name="wo_id" required>
                         {% for wo in open_wos %}
                         <option value="{{ wo.id }}">{{ wo.title }} — {{ wo.equipment }}</option>
@@ -125,15 +126,15 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Est. Minutes</label>
+                    <label>{% trans "Est. Minutes" %}</label>
                     <input type="number" name="estimated_minutes" value="30" min="1">
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans "Optional" %}">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Add Stop</button>
+            <button type="submit" class="btn btn-primary">{% trans "Add Stop" %}</button>
         </form>
     </div>
     {% endif %}

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Asset Performance Management{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Asset Performance Management" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/apm/criticality/" class="btn">Manage Criticality</a>
-<a href="/maint/" class="btn">Maintenance Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/apm/criticality/" class="btn">{% trans "Manage Criticality" %}</a>
+<a href="/maint/" class="btn">{% trans "Maintenance Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -15,16 +16,16 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Asset Performance Management</div>
+    <div class="menu-title">{% trans "Asset Performance Management" %}</div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Ranked worst-first. Health score combines real availability/failure data with criticality —
-        set an asset's criticality to fine-tune its recommendation.
+        {% blocktrans %}Ranked worst-first. Health score combines real availability/failure data with criticality —
+        set an asset's criticality to fine-tune its recommendation.{% endblocktrans %}
     </p>
 
     {% if assets %}
     <div class="erp-table-wrap">
         <table class="erp-table">
-            <thead><tr><th>Equipment</th><th>Criticality</th><th class="num">Availability</th><th class="num">Failures</th><th class="num">Lifecycle Cost</th><th class="num">Health</th><th>Recommendation</th></tr></thead>
+            <thead><tr><th>{% trans "Equipment" %}</th><th>{% trans "Criticality" %}</th><th class="num">{% trans "Availability" %}</th><th class="num">{% trans "Failures" %}</th><th class="num">{% trans "Lifecycle Cost" %}</th><th class="num">{% trans "Health" %}</th><th>{% trans "Recommendation" %}</th></tr></thead>
             <tbody>
                 {% for a in assets %}
                 <tr>
@@ -35,9 +36,9 @@
                     <td class="num">${{ a.lifecycle_cost|floatformat:2 }}</td>
                     <td class="num {% if a.health_score >= 80 %}health-good{% elif a.health_score >= 50 %}health-warn{% else %}health-bad{% endif %}">{{ a.health_score }}</td>
                     <td>
-                        {% if a.recommendation == 'consider_replacement' %}Consider Replacement
-                        {% elif a.recommendation == 'schedule_maintenance' %}Schedule Maintenance
-                        {% else %}Monitor{% endif %}
+                        {% if a.recommendation == 'consider_replacement' %}{% trans "Consider Replacement" %}
+                        {% elif a.recommendation == 'schedule_maintenance' %}{% trans "Schedule Maintenance" %}
+                        {% else %}{% trans "Monitor" %}{% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -45,7 +46,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No assets with criticality ratings or downtime history yet.</div>
+    <div class="empty-state">{% trans "No assets with criticality ratings or downtime history yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

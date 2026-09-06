@@ -2109,6 +2109,84 @@ including the French zero-count singular case) — all pages return 200
 with correctly translated titles, headings, and labels, no console or
 server errors.
 
+Also fully translated: **Asset Performance Management (APM)**,
+**Predictive Maintenance**, and **Technician Routes**
+(`apm_dashboard.html`/`_criticality.html`/`_asset_detail.html`,
+`predictive_maintenance.html`, `technician_route_list.html`/`_new.html`/
+`_detail.html` — 7 templates, the twenty-third "whole feature" pass, and
+the last of Maintenance's own explicitly-deferred exclusions —
+`maint_dashboard.html`'s three links to `/maint/apm/`,
+`/predictive-maintenance/`, and `/maint/routes/` were named as
+deliberately out of scope in the original 16-template Maintenance pass;
+this closes all three at once since they share one health-scoring/
+routing feature set). Marked up by two parallel subagents (APM
+dashboard+asset+criticality vs. Predictive Maintenance+Technician
+Routes), translated by hand afterward — small enough (54 strings, all
+simple, no plurals) to skip delegating the translation step.
+
+**One subagent ran an unrequested, destructive `makemessages` sanity
+check mid-task and caught its own mistake before it could ship**: to
+inspect generated msgids, it ran `manage.py makemessages` with
+`--no-location -e html --extension html`, which reformatted
+`locale/es/LC_MESSAGES/django.po` and stripped ~9,300 lines of
+already-translated content (a destructive flag combination against a
+live, populated catalog — not the project's own established
+`makemessages -l <code> --ignore=...` invocation). The agent noticed
+immediately, ran `git checkout -- locale/es/LC_MESSAGES/django.po` to
+fully revert, and reported the incident transparently in its own
+summary rather than silently moving on. Independently re-verified via
+`git status`/`git diff --stat locale/` before trusting the report — the
+revert was clean, zero residual diff. Worth a standing note distinct
+from every prior agent-trust finding in this file: a background
+subagent given narrow markup-only scope can still reach for a broader
+diagnostic tool than the task calls for; the mitigation isn't "don't
+let agents run shell commands" (the same session's agents have safely
+run `manage.py check`/`render_to_string` dozens of times) but reviewing
+`git status`/`git diff --stat` for *every* file touched by a subagent
+report, not just the files it says it edited on purpose, before moving
+on to the next pipeline step.
+
+Two dotted-lookup blocktrans bindings needed care here, both handled
+correctly: `apm_asset_detail.html`'s Recommendation card interpolates
+`{{ health.criticality }}` (a dotted lookup) inside one of its three
+branches — bound via `{% blocktrans with c=health.criticality %}`; the
+same template's lifecycle-cost line interpolates a *filtered*
+expression, `{{ health.lifecycle_cost|floatformat:2 }}`, which needs
+the identical `with`-binding treatment since a filter isn't a bare
+context name either (`{% blocktrans with cost=health.lifecycle_cost
+|floatformat:2 %}`) — a filtered-value case this file's dotted-lookup
+checklist item hadn't explicitly named before, now added to it.
+Reconfirmed, not new: `technician_route_detail.html`'s page_title
+`{{ route.mechanic_name }} — {{ route.route_date }}` is pure data with
+a literal separator and needs no wrapping at all, matching the
+established "data fields + literal separator" precedent; the template's
+three repeated `{% if x == 'completed' %}Completed{% elif ... %}In
+Progress{% else %}Planned{% endif %}` pill blocks (appearing 3 times
+across `technician_route_list.html`/`_detail.html`) are hardcoded
+template-literal English per branch and need translating, distinct from
+the adjacent raw-enum `{{ s|title }}` status `&lt;select&gt;` options
+sitting right next to them in the same files, which stay bare.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check`
+clean on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically. Grepped the generic single-word labels reused via
+exact-msgid auto-merge (Health, Stops, Recorded, Failures, Monitor,
+Recommendation) for the "Make"-style cross-context mistranslation
+risk — all merges are exclusively within this batch's own 7 files, no
+bug. Two strings ("Technician Routes", "Predictive Maintenance")
+correctly auto-merged with `maint_dashboard.html`'s already-translated
+nav-link text from an earlier pass rather than needing fresh
+translation, confirmed by their absence from this batch's own blank-
+entry list. Verified end-to-end against the real dev server, in French
+with real sample data: the APM Dashboard, Asset Criticality, a real
+route's detail page (confirmed the KPI labels and the "Planifié"
+pill correctly reusing the shared Planned/In-Progress/Completed
+catalog entries), a New Route form, and Predictive Maintenance
+(confirmed the OEE-report link paragraph renders with the embedded
+`<a>` tag intact) — all pages return 200 with correctly translated
+titles and labels, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
