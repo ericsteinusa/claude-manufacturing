@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Predictive Maintenance{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Predictive Maintenance" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/" class="btn">Maintenance Dashboard</a>
+<a href="/maint/" class="btn">{% trans "Maintenance Dashboard" %}</a>
 {% if can_edit %}
-<a href="/predictive-maintenance/sensor-reading/new/" class="btn">Log Sensor Reading</a>
-<a href="/predictive-maintenance/sensor-threshold/" class="btn">Set Thresholds</a>
+<a href="/predictive-maintenance/sensor-reading/new/" class="btn">{% trans "Log Sensor Reading" %}</a>
+<a href="/predictive-maintenance/sensor-threshold/" class="btn">{% trans "Set Thresholds" %}</a>
 {% endif %}
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -35,25 +36,27 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Predictive Maintenance</h2>
+    <h2>{% trans "Predictive Maintenance" %}</h2>
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
+        {% blocktrans %}
         Rolling MTBF is computed from the actual gaps between 'Breakdown' downtime events
         (not the period-aggregate MTBF on the <a href="/maint/oee/">OEE report</a>).
         Failure probability uses an exponential/Poisson-process approximation from the mean interval.
+        {% endblocktrans %}
     </p>
 
     <table class="list-table">
         <thead>
             <tr>
-                <th>Equipment</th>
-                <th class="num">Failures</th>
-                <th class="num">MTBF (days)</th>
-                <th>Last Failure</th>
-                <th class="num">Days Since</th>
-                <th class="num">Alert Threshold</th>
-                <th class="num">30-Day Risk</th>
-                <th>Risk Level</th>
-                <th>Sensor Status</th>
+                <th>{% trans "Equipment" %}</th>
+                <th class="num">{% trans "Failures" %}</th>
+                <th class="num">{% trans "MTBF (days)" %}</th>
+                <th>{% trans "Last Failure" %}</th>
+                <th class="num">{% trans "Days Since" %}</th>
+                <th class="num">{% trans "Alert Threshold" %}</th>
+                <th class="num">{% trans "30-Day Risk" %}</th>
+                <th>{% trans "Risk Level" %}</th>
+                <th>{% trans "Sensor Status" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -61,7 +64,7 @@
         <tr>
             <td><strong>{{ row.equipment }}</strong></td>
             <td class="num">{{ row.failure_count }}</td>
-            <td class="num">{% if row.mtbf_days %}{{ row.mtbf_days }}{% else %}<span style="color:var(--text-muted);">insufficient data</span>{% endif %}</td>
+            <td class="num">{% if row.mtbf_days %}{{ row.mtbf_days }}{% else %}<span style="color:var(--text-muted);">{% trans "insufficient data" %}</span>{% endif %}</td>
             <td>{{ row.last_failure_date|default:"—" }}</td>
             <td class="num">
                 {% if row.days_since_last_failure is not None %}
@@ -79,22 +82,22 @@
             </td>
         </tr>
         {% empty %}
-        <tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No operational equipment found.</td></tr>
+        <tr><td colspan="9" style="text-align:center;color:var(--text-muted);">{% trans "No operational equipment found." %}</td></tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <h3 style="font-size:15px;margin-bottom:10px;">Sensor Readings</h3>
+    <h3 style="font-size:15px;margin-bottom:10px;">{% trans "Sensor Readings" %}</h3>
     <table class="list-table">
         <thead>
             <tr>
-                <th>Equipment</th>
-                <th>Reading Type</th>
-                <th class="num">Latest Value</th>
-                <th class="num">Warning ≥</th>
-                <th class="num">Critical ≥</th>
-                <th>Recorded</th>
-                <th>Status</th>
+                <th>{% trans "Equipment" %}</th>
+                <th>{% trans "Reading Type" %}</th>
+                <th class="num">{% trans "Latest Value" %}</th>
+                <th class="num">{% trans "Warning ≥" %}</th>
+                <th class="num">{% trans "Critical ≥" %}</th>
+                <th>{% trans "Recorded" %}</th>
+                <th>{% trans "Status" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -109,7 +112,7 @@
             <td><span class="pill-sensor {{ a.status }}">{{ a.status }}</span></td>
         </tr>
         {% empty %}
-        <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No sensor readings logged yet.</td></tr>
+        <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">{% trans "No sensor readings logged yet." %}</td></tr>
         {% endfor %}
         </tbody>
     </table>

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Asset Criticality{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Asset Criticality" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/apm/" class="btn">APM Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/apm/" class="btn">{% trans "APM Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -19,17 +20,17 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">Asset Criticality</div>
+    <div class="menu-title">{% trans "Asset Criticality" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Ratings</h3>
+        <h3>{% trans "Ratings" %}</h3>
         {% if ratings %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Equipment</th><th>Criticality</th><th class="num">Replacement Cost</th><th>Notes</th></tr></thead>
+                <thead><tr><th>{% trans "Equipment" %}</th><th>{% trans "Criticality" %}</th><th class="num">{% trans "Replacement Cost" %}</th><th>{% trans "Notes" %}</th></tr></thead>
                 <tbody>
                     {% for r in ratings %}
                     <tr>
@@ -43,22 +44,22 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No criticality ratings set yet.</div>
+        <div class="empty-state">{% trans "No criticality ratings set yet." %}</div>
         {% endif %}
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Set Criticality</h3>
+        <h3>{% trans "Set Criticality" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Equipment *</label>
-                    <input type="text" name="equipment" required placeholder="e.g. CNC-01">
+                    <label>{% trans "Equipment *" %}</label>
+                    <input type="text" name="equipment" required placeholder="{% trans "e.g. CNC-01" %}">
                 </div>
                 <div class="form-row">
-                    <label>Criticality</label>
+                    <label>{% trans "Criticality" %}</label>
                     <select name="criticality">
                         {% for c in criticality_levels %}
                         <option value="{{ c }}">{{ c|title }}</option>
@@ -66,15 +67,15 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Replacement Cost</label>
+                    <label>{% trans "Replacement Cost" %}</label>
                     <input type="number" name="replacement_cost" step="0.01" min="0" value="0">
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans "Optional" %}">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
         </form>
     </div>
     {% endif %}

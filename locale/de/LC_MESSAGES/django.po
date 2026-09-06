@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 00:05+0000\n"
+"POT-Creation-Date: 2026-09-06 00:23+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -253,6 +253,9 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/ai_insights_dashboard.html:7
 #: manufacturing/templates/ap_invoice_detail.html:9
 #: manufacturing/templates/ap_list.html:10
+#: manufacturing/templates/apm_asset_detail.html:7
+#: manufacturing/templates/apm_criticality.html:7
+#: manufacturing/templates/apm_dashboard.html:8
 #: manufacturing/templates/approval_rule_edit.html:7
 #: manufacturing/templates/approval_rule_list.html:6
 #: manufacturing/templates/approval_rule_new.html:7
@@ -449,6 +452,7 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/po_detail.html:12
 #: manufacturing/templates/po_form.html:8
 #: manufacturing/templates/po_list.html:14
+#: manufacturing/templates/predictive_maintenance.html:11
 #: manufacturing/templates/prod_daily_report.html:11
 #: manufacturing/templates/prod_dashboard.html:17
 #: manufacturing/templates/prod_dashboard.html:67
@@ -531,6 +535,9 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/supplier_scorecard_list.html:9
 #: manufacturing/templates/tc_ot_report.html:9
 #: manufacturing/templates/tc_schedule.html:10
+#: manufacturing/templates/technician_route_detail.html:7
+#: manufacturing/templates/technician_route_list.html:7
+#: manufacturing/templates/technician_route_new.html:7
 #: manufacturing/templates/termination_detail.html:10
 #: manufacturing/templates/termination_list.html:10
 #: manufacturing/templates/time_clock_attendance.html:7
@@ -705,6 +712,7 @@ msgstr "Kostenpool"
 #: manufacturing/templates/inventory_list.html:102
 #: manufacturing/templates/rfq_list.html:55
 #: manufacturing/templates/skills_matrix_summary.html:48
+#: manufacturing/templates/technician_route_list.html:46
 #: manufacturing/templates/wms_bin_list.html:60
 #: manufacturing/templates/wms_pick_list_list.html:71
 #: manufacturing/templates/wms_rfid_tag_list.html:68
@@ -757,6 +765,8 @@ msgstr "z. B. pro Rüstvorgang, pro Maschinenstunde"
 #: manufacturing/templates/abc_product_output.html:67
 #: manufacturing/templates/ap_invoice_detail.html:196
 #: manufacturing/templates/ap_invoice_payments_kpis.html:6
+#: manufacturing/templates/apm_criticality.html:33
+#: manufacturing/templates/apm_criticality.html:74
 #: manufacturing/templates/approval_rule_edit.html:76
 #: manufacturing/templates/approval_rule_new.html:71
 #: manufacturing/templates/ar_invoice_detail.html:196
@@ -950,6 +960,7 @@ msgstr "z. B. pro Rüstvorgang, pro Maschinenstunde"
 #: manufacturing/templates/so_form.html:74
 #: manufacturing/templates/spc_log.html:72
 #: manufacturing/templates/supplier_portal_rfqs.html:11
+#: manufacturing/templates/technician_route_detail.html:133
 #: manufacturing/templates/termination_detail.html:46
 #: manufacturing/templates/termination_list.html:141
 #: manufacturing/templates/time_off_form.html:61
@@ -960,6 +971,7 @@ msgid "Notes"
 msgstr "Notizen"
 
 #: manufacturing/templates/abc_activity_new.html:42
+#: manufacturing/templates/apm_criticality.html:75
 #: manufacturing/templates/ats_application_detail.html:80
 #: manufacturing/templates/ats_candidate_detail.html:70
 #: manufacturing/templates/ats_requisition_detail.html:92
@@ -969,6 +981,7 @@ msgstr "Notizen"
 #: manufacturing/templates/qa_ncr_list.html:131
 #: manufacturing/templates/req_detail.html:166
 #: manufacturing/templates/skill_requirements.html:102
+#: manufacturing/templates/technician_route_detail.html:134
 #: manufacturing/templates/webhook_edit.html:54
 msgid "Optional"
 msgstr "Optional"
@@ -1391,6 +1404,7 @@ msgstr "Letzte Buchungen"
 #: manufacturing/templates/sales_quotes.html:67
 #: manufacturing/templates/tc_ot_report.html:87
 #: manufacturing/templates/tc_schedule.html:76
+#: manufacturing/templates/technician_route_list.html:29
 #: manufacturing/templates/time_clock_attendance.html:58
 #: manufacturing/templates/time_clock_hours.html:60
 msgid "Date"
@@ -1713,6 +1727,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/portal_order_detail.html:42
 #: manufacturing/templates/portal_orders.html:11
 #: manufacturing/templates/portal_rma_list.html:13
+#: manufacturing/templates/predictive_maintenance.html:100
 #: manufacturing/templates/prod_daily_report.html:85
 #: manufacturing/templates/prod_dashboard.html:114
 #: manufacturing/templates/prod_delivery_status.html:65
@@ -1801,6 +1816,9 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/supplier_portal_rfqs.html:11
 #: manufacturing/templates/tc_device_form.html:221
 #: manufacturing/templates/tc_device_list.html:45
+#: manufacturing/templates/technician_route_detail.html:48
+#: manufacturing/templates/technician_route_detail.html:67
+#: manufacturing/templates/technician_route_list.html:29
 #: manufacturing/templates/termination_list.html:72
 #: manufacturing/templates/termination_list.html:133
 #: manufacturing/templates/time_clock_attendance.html:89
@@ -2537,6 +2555,197 @@ msgstr "Gesamt Fakturiert"
 #: manufacturing/templates/ar_list_kpis.html:20
 msgid "Total Invoices"
 msgstr "Rechnungen Gesamt"
+
+#: manufacturing/templates/apm_asset_detail.html:3
+#, python-format
+msgid "%(name)s — Asset Health"
+msgstr "%(name)s — Anlagenzustand"
+
+#: manufacturing/templates/apm_asset_detail.html:6
+#: manufacturing/templates/apm_criticality.html:6
+msgid "APM Dashboard"
+msgstr "APM-Dashboard"
+
+#: manufacturing/templates/apm_asset_detail.html:26
+msgid "Health Score"
+msgstr "Gesundheitswert"
+
+#: manufacturing/templates/apm_asset_detail.html:27
+#: manufacturing/templates/apm_criticality.html:33
+#: manufacturing/templates/apm_criticality.html:62
+#: manufacturing/templates/apm_dashboard.html:28
+#: manufacturing/templates/risk_continuity_list.html:73
+#: manufacturing/templates/risk_continuity_list.html:110
+msgid "Criticality"
+msgstr "Kritikalität"
+
+#: manufacturing/templates/apm_asset_detail.html:28
+#: manufacturing/templates/apm_dashboard.html:28
+#: manufacturing/templates/maint_oee_report.html:80
+#: manufacturing/templates/maint_oee_report.html:156
+msgid "Availability"
+msgstr "Verfügbarkeit"
+
+#: manufacturing/templates/apm_asset_detail.html:29
+#: manufacturing/templates/apm_dashboard.html:28
+#: manufacturing/templates/predictive_maintenance.html:52
+msgid "Failures"
+msgstr "Ausfälle"
+
+#: manufacturing/templates/apm_asset_detail.html:33
+#: manufacturing/templates/apm_dashboard.html:28
+msgid "Recommendation"
+msgstr "Empfehlung"
+
+#: manufacturing/templates/apm_asset_detail.html:36
+#, python-format
+msgid ""
+"<strong style=\"color:#c0392b;\">Consider Replacement</strong> — repeated "
+"failures on a\n"
+"            %(c)s-criticality asset are dragging its health score down."
+msgstr "<strong style=\"color:#c0392b;\">Ersatz in Erwägung Ziehen</strong> — wiederholte Ausfälle bei einer Anlage\n            mit Kritikalität %(c)s drücken ihren Gesundheitswert."
+
+#: manufacturing/templates/apm_asset_detail.html:39
+msgid ""
+"<strong style=\"color:#a3720b;\">Schedule Maintenance</strong> — reliability "
+"is trending down; a\n"
+"            proactive PM visit now is cheaper than a breakdown later."
+msgstr "<strong style=\"color:#a3720b;\">Wartung Planen</strong> — die Zuverlässigkeit nimmt ab; ein\n            proaktiver PM-Einsatz jetzt ist günstiger als ein späterer Ausfall."
+
+#: manufacturing/templates/apm_asset_detail.html:42
+msgid ""
+"<strong style=\"color:#1a7f37;\">Monitor</strong> — this asset is performing "
+"within normal range."
+msgstr "<strong style=\"color:#1a7f37;\">Beobachten</strong> — diese Anlage arbeitet im normalen Bereich."
+
+#: manufacturing/templates/apm_asset_detail.html:45
+#, python-format
+msgid "Lifecycle cost (trailing 12 months): $%(cost)s"
+msgstr "Lebenszykluskosten (letzte 12 Monate): $%(cost)s"
+
+#: manufacturing/templates/apm_criticality.html:3
+#: manufacturing/templates/apm_criticality.html:23
+msgid "Asset Criticality"
+msgstr "Anlagenkritikalität"
+
+#: manufacturing/templates/apm_criticality.html:29
+msgid "Ratings"
+msgstr "Bewertungen"
+
+#: manufacturing/templates/apm_criticality.html:33
+#: manufacturing/templates/apm_dashboard.html:28
+#: manufacturing/templates/maint_dashboard.html:7
+#: manufacturing/templates/maint_dashboard.html:129
+#: manufacturing/templates/maint_downtime_list.html:8
+#: manufacturing/templates/maint_downtime_list.html:78
+#: manufacturing/templates/maint_equipment_list.html:3
+#: manufacturing/templates/maint_equipment_list.html:57
+#: manufacturing/templates/maint_labor_report.html:94
+#: manufacturing/templates/maint_schedule_detail.html:89
+#: manufacturing/templates/maint_schedule_list.html:8
+#: manufacturing/templates/maint_schedule_list.html:73
+#: manufacturing/templates/maint_schedule_list.html:108
+#: manufacturing/templates/maint_wo_detail.html:112
+#: manufacturing/templates/maint_wo_list.html:7
+#: manufacturing/templates/maint_wo_list.html:80
+#: manufacturing/templates/maint_wo_list.html:121
+#: manufacturing/templates/predictive_maintenance.html:51
+#: manufacturing/templates/predictive_maintenance.html:94
+#: manufacturing/templates/technician_route_detail.html:67
+msgid "Equipment"
+msgstr "Anlagen"
+
+#: manufacturing/templates/apm_criticality.html:33
+#: manufacturing/templates/apm_criticality.html:70
+msgid "Replacement Cost"
+msgstr "Ersatzkosten"
+
+#: manufacturing/templates/apm_criticality.html:47
+msgid "No criticality ratings set yet."
+msgstr "Noch keine Kritikalitätsbewertungen festgelegt."
+
+#: manufacturing/templates/apm_criticality.html:53
+msgid "Set Criticality"
+msgstr "Kritikalität Festlegen"
+
+#: manufacturing/templates/apm_criticality.html:58
+#: manufacturing/templates/maint_downtime_detail.html:62
+#: manufacturing/templates/maint_downtime_list.html:107
+msgid "Equipment *"
+msgstr "Ausrüstung *"
+
+#: manufacturing/templates/apm_criticality.html:59
+msgid "e.g. CNC-01"
+msgstr "z. B. CNC-01"
+
+#: manufacturing/templates/apm_criticality.html:78
+#: manufacturing/templates/bom_detail.html:96
+#: manufacturing/templates/bom_detail.html:189
+#: manufacturing/templates/employee_employment_dates.html:49
+#: manufacturing/templates/employee_gap_detail.html:99
+#: manufacturing/templates/gl_accounts.html:113
+#: manufacturing/templates/payroll_pay_rates.html:127
+#: manufacturing/templates/people_form.html:122
+#: manufacturing/templates/pers_depts.html:67
+#: manufacturing/templates/pers_depts.html:117
+#: manufacturing/templates/po_detail.html:191
+#: manufacturing/templates/po_form.html:80
+#: manufacturing/templates/sales_commission_plans.html:126
+#: manufacturing/templates/sales_commissions.html:191
+#: manufacturing/templates/sales_order_detail.html:111
+#: manufacturing/templates/sales_targets.html:136
+#: manufacturing/templates/so_form.html:80
+#: manufacturing/templates/wo_form.html:90
+msgid "Save"
+msgstr "Speichern"
+
+#: manufacturing/templates/apm_dashboard.html:3
+#: manufacturing/templates/apm_dashboard.html:19
+msgid "Asset Performance Management"
+msgstr "Anlagenleistungsmanagement"
+
+#: manufacturing/templates/apm_dashboard.html:6
+msgid "Manage Criticality"
+msgstr "Kritikalität Verwalten"
+
+#: manufacturing/templates/apm_dashboard.html:7
+#: manufacturing/templates/maint_dashboard.html:3
+#: manufacturing/templates/maint_dashboard.html:63
+#: manufacturing/templates/predictive_maintenance.html:6
+#: manufacturing/templates/technician_route_list.html:6
+msgid "Maintenance Dashboard"
+msgstr "Instandhaltungs-Dashboard"
+
+#: manufacturing/templates/apm_dashboard.html:21
+msgid ""
+"Ranked worst-first. Health score combines real availability/failure data "
+"with criticality —\n"
+"        set an asset's criticality to fine-tune its recommendation."
+msgstr "Nach dem schlechtesten sortiert. Der Gesundheitswert kombiniert reale Verfügbarkeits-/Ausfalldaten mit der Kritikalität —\n        legen Sie die Kritikalität einer Anlage fest, um ihre Empfehlung zu verfeinern."
+
+#: manufacturing/templates/apm_dashboard.html:28
+msgid "Lifecycle Cost"
+msgstr "Lebenszykluskosten"
+
+#: manufacturing/templates/apm_dashboard.html:28
+msgid "Health"
+msgstr "Zustand"
+
+#: manufacturing/templates/apm_dashboard.html:39
+msgid "Consider Replacement"
+msgstr "Ersatz in Erwägung Ziehen"
+
+#: manufacturing/templates/apm_dashboard.html:40
+msgid "Schedule Maintenance"
+msgstr "Wartung Planen"
+
+#: manufacturing/templates/apm_dashboard.html:41
+msgid "Monitor"
+msgstr "Beobachten"
+
+#: manufacturing/templates/apm_dashboard.html:49
+msgid "No assets with criticality ratings or downtime history yet."
+msgstr "Noch keine Anlagen mit Kritikalitätsbewertungen oder Ausfallhistorie."
 
 #: manufacturing/templates/approval_rule_edit.html:3
 #: manufacturing/templates/approval_rule_edit.html:26
@@ -3406,6 +3615,7 @@ msgstr "Offen"
 #: manufacturing/templates/it_repairs_detail.html:121
 #: manufacturing/templates/it_task_detail.html:42
 #: manufacturing/templates/lot_detail.html:84
+#: manufacturing/templates/technician_route_detail.html:57
 msgid "Update Status"
 msgstr "Status Aktualisieren"
 
@@ -3490,6 +3700,7 @@ msgstr "Titel suchen..."
 #: manufacturing/templates/sales_leads_list.html:70
 #: manufacturing/templates/sales_performance_reviews.html:59
 #: manufacturing/templates/sales_territories.html:62
+#: manufacturing/templates/technician_route_list.html:19
 #: manufacturing/templates/termination_list.html:57
 msgid "All Statuses"
 msgstr "Alle Status"
@@ -4881,26 +5092,6 @@ msgstr "Einheit"
 msgid "Lead Time (days)"
 msgstr "Lieferzeit (Tage)"
 
-#: manufacturing/templates/bom_detail.html:96
-#: manufacturing/templates/bom_detail.html:189
-#: manufacturing/templates/employee_employment_dates.html:49
-#: manufacturing/templates/employee_gap_detail.html:99
-#: manufacturing/templates/gl_accounts.html:113
-#: manufacturing/templates/payroll_pay_rates.html:127
-#: manufacturing/templates/people_form.html:122
-#: manufacturing/templates/pers_depts.html:67
-#: manufacturing/templates/pers_depts.html:117
-#: manufacturing/templates/po_detail.html:191
-#: manufacturing/templates/po_form.html:80
-#: manufacturing/templates/sales_commission_plans.html:126
-#: manufacturing/templates/sales_commissions.html:191
-#: manufacturing/templates/sales_order_detail.html:111
-#: manufacturing/templates/sales_targets.html:136
-#: manufacturing/templates/so_form.html:80
-#: manufacturing/templates/wo_form.html:90
-msgid "Save"
-msgstr "Speichern"
-
 #: manufacturing/templates/bom_detail.html:102
 #: manufacturing/templates/gl_accounts.html:51
 #: manufacturing/templates/inventory_list.html:43
@@ -5346,6 +5537,7 @@ msgstr "Vorlagen"
 #: manufacturing/templates/compliance_checklist_detail.html:25
 #: manufacturing/templates/compliance_checklist_list.html:20
 #: manufacturing/templates/compliance_checklist_list.html:37
+#: manufacturing/templates/technician_route_detail.html:98
 #: manufacturing/work_orders_core.py:36
 msgid "Complete"
 msgstr "Abgeschlossen"
@@ -5705,7 +5897,12 @@ msgid ""
 "        product.amount until it's used — using it credits our inventory and "
 "opens\n"
 "        an AP invoice for the vendor."
-msgstr "Bestand im Eigentum des Lieferanten, gelagert in unserem Lager. Die empfangene Menge berührt\n        product.amount erst bei Verwendung — die Verwendung schreibt unserem Bestand gut und eröffnet\n        eine Kreditorenrechnung für den Lieferanten."
+msgstr ""
+"Bestand im Eigentum des Lieferanten, gelagert in unserem Lager. Die "
+"empfangene Menge berührt\n"
+"        product.amount erst bei Verwendung — die Verwendung schreibt unserem "
+"Bestand gut und eröffnet\n"
+"        eine Kreditorenrechnung für den Lieferanten."
 
 #: manufacturing/templates/consignment_list.html:35
 msgid "Agreement #"
@@ -5762,14 +5959,21 @@ msgid ""
 "        Vendor-owned stock arriving. This does not touch product.amount —\n"
 "        it isn't ours until it's used (see \"Record Usage\").\n"
 "        "
-msgstr "\n        Eingehender Bestand im Eigentum des Lieferanten. Dies berührt product.amount nicht —\n        er gehört uns erst bei Verwendung (siehe „Verwendung Erfassen\").\n        "
+msgstr ""
+"\n"
+"        Eingehender Bestand im Eigentum des Lieferanten. Dies berührt "
+"product.amount nicht —\n"
+"        er gehört uns erst bei Verwendung (siehe „Verwendung Erfassen\").\n"
+"        "
 
 #: manufacturing/templates/consignment_receive.html:25
 #, python-format
 msgid ""
 "Currently on hand (vendor-owned): <b>%(qty)s</b>\n"
 "                %(name)s"
-msgstr "Derzeit auf Lager (im Eigentum des Lieferanten): <b>%(qty)s</b>\n                %(name)s"
+msgstr ""
+"Derzeit auf Lager (im Eigentum des Lieferanten): <b>%(qty)s</b>\n"
+"                %(name)s"
 
 #: manufacturing/templates/consignment_receive.html:31
 #: manufacturing/templates/po_landed_cost_detail.html:31
@@ -5800,14 +6004,23 @@ msgid ""
 "        (product.amount) and opens an AP invoice for the vendor at\n"
 "        $%(cost)s per unit.\n"
 "        "
-msgstr "\n        Markiert Bestand im Eigentum des Lieferanten als verwendet: schreibt unserem eigenen Bestandszähler\n        (product.amount) gut und eröffnet eine Kreditorenrechnung für den Lieferanten zu\n        $%(cost)s pro Einheit.\n        "
+msgstr ""
+"\n"
+"        Markiert Bestand im Eigentum des Lieferanten als verwendet: schreibt "
+"unserem eigenen Bestandszähler\n"
+"        (product.amount) gut und eröffnet eine Kreditorenrechnung für den "
+"Lieferanten zu\n"
+"        $%(cost)s pro Einheit.\n"
+"        "
 
 #: manufacturing/templates/consignment_use.html:27
 #, python-format
 msgid ""
 "On hand (vendor-owned): <b>%(qty)s</b>\n"
 "                %(name)s"
-msgstr "Auf Lager (im Eigentum des Lieferanten): <b>%(qty)s</b>\n                %(name)s"
+msgstr ""
+"Auf Lager (im Eigentum des Lieferanten): <b>%(qty)s</b>\n"
+"                %(name)s"
 
 #: manufacturing/templates/consignment_use.html:33
 msgid "Qty Used"
@@ -6460,6 +6673,10 @@ msgstr "Offene Tickets"
 #: manufacturing/templates/prod_performance_report.html:83
 #: manufacturing/templates/qa_audit_list.html:70
 #: manufacturing/templates/risk_audit_list.html:74
+#: manufacturing/templates/technician_route_detail.html:29
+#: manufacturing/templates/technician_route_detail.html:42
+#: manufacturing/templates/technician_route_list.html:29
+#: manufacturing/templates/technician_route_list.html:39
 msgid "Completed"
 msgstr "Abgeschlossen"
 
@@ -6671,6 +6888,7 @@ msgstr "Tage offen"
 #: manufacturing/templates/sales_leads_detail.html:116
 #: manufacturing/templates/sales_leads_list.html:89
 #: manufacturing/templates/sales_leads_list.html:140
+#: manufacturing/templates/technician_route_detail.html:67
 #: manufacturing/templates/wms_putaway_rule_list.html:35
 #: manufacturing/templates/wms_putaway_rule_list.html:44
 msgid "Priority"
@@ -10961,6 +11179,8 @@ msgstr "Helpdesk-Tickets"
 #: manufacturing/templates/it_task_list.html:88
 #: manufacturing/templates/prod_daily_report.html:64
 #: manufacturing/templates/prod_dashboard_kpis.html:8
+#: manufacturing/templates/technician_route_detail.html:31
+#: manufacturing/templates/technician_route_list.html:41
 msgid "In Progress"
 msgstr "In Bearbeitung"
 
@@ -12058,29 +12278,6 @@ msgstr "Eingangsdatum"
 msgid "Create Lot"
 msgstr "Los Erstellen"
 
-#: manufacturing/templates/maint_dashboard.html:3
-#: manufacturing/templates/maint_dashboard.html:63
-msgid "Maintenance Dashboard"
-msgstr "Instandhaltungs-Dashboard"
-
-#: manufacturing/templates/maint_dashboard.html:7
-#: manufacturing/templates/maint_dashboard.html:129
-#: manufacturing/templates/maint_downtime_list.html:8
-#: manufacturing/templates/maint_downtime_list.html:78
-#: manufacturing/templates/maint_equipment_list.html:3
-#: manufacturing/templates/maint_equipment_list.html:57
-#: manufacturing/templates/maint_labor_report.html:94
-#: manufacturing/templates/maint_schedule_detail.html:89
-#: manufacturing/templates/maint_schedule_list.html:8
-#: manufacturing/templates/maint_schedule_list.html:73
-#: manufacturing/templates/maint_schedule_list.html:108
-#: manufacturing/templates/maint_wo_detail.html:112
-#: manufacturing/templates/maint_wo_list.html:7
-#: manufacturing/templates/maint_wo_list.html:80
-#: manufacturing/templates/maint_wo_list.html:121
-msgid "Equipment"
-msgstr "Anlagen"
-
 #: manufacturing/templates/maint_dashboard.html:8
 #: manufacturing/templates/maint_dashboard.html:133
 #: manufacturing/templates/maint_equipment_list.html:8
@@ -12122,10 +12319,16 @@ msgid "OEE"
 msgstr "OEE"
 
 #: manufacturing/templates/maint_dashboard.html:14
+#: manufacturing/templates/predictive_maintenance.html:3
+#: manufacturing/templates/predictive_maintenance.html:39
 msgid "Predictive Maintenance"
 msgstr "Vorausschauende Wartung"
 
 #: manufacturing/templates/maint_dashboard.html:15
+#: manufacturing/templates/technician_route_detail.html:6
+#: manufacturing/templates/technician_route_list.html:3
+#: manufacturing/templates/technician_route_list.html:15
+#: manufacturing/templates/technician_route_new.html:6
 msgid "Technician Routes"
 msgstr "Technikerrouten"
 
@@ -12240,11 +12443,6 @@ msgstr "Als Behoben Markieren"
 #: manufacturing/templates/maint_downtime_detail.html:56
 msgid "Downtime Details"
 msgstr "Details zur Ausfallzeit"
-
-#: manufacturing/templates/maint_downtime_detail.html:62
-#: manufacturing/templates/maint_downtime_list.html:107
-msgid "Equipment *"
-msgstr "Ausrüstung *"
 
 #: manufacturing/templates/maint_downtime_detail.html:102
 #: manufacturing/templates/maint_downtime_list.html:121
@@ -12527,6 +12725,7 @@ msgid "Labor by Mechanic"
 msgstr "Arbeitszeit nach Mechaniker"
 
 #: manufacturing/templates/maint_labor_report.html:126
+#: manufacturing/templates/technician_route_list.html:29
 msgid "Mechanic"
 msgstr "Mechaniker"
 
@@ -12614,11 +12813,6 @@ msgstr "Gesamt-OEE"
 #, python-format
 msgid "World-class = 85%%"
 msgstr "Weltklasse = 85%%"
-
-#: manufacturing/templates/maint_oee_report.html:80
-#: manufacturing/templates/maint_oee_report.html:156
-msgid "Availability"
-msgstr "Verfügbarkeit"
 
 #: manufacturing/templates/maint_oee_report.html:81
 #, python-format
@@ -13059,6 +13253,8 @@ msgid "Content by Status"
 msgstr "Inhalt nach Status"
 
 #: manufacturing/templates/marketing_dashboard_kpis.html:13
+#: manufacturing/templates/technician_route_detail.html:33
+#: manufacturing/templates/technician_route_list.html:43
 msgid "Planned"
 msgstr "Geplant"
 
@@ -13728,6 +13924,7 @@ msgstr "Alle Kaufen"
 
 #: manufacturing/templates/mrp_plan.html:102
 #: manufacturing/templates/qa_inspection_list.html:123
+#: manufacturing/templates/technician_route_detail.html:67
 #: manufacturing/templates/wo_carbon_detail.html:6
 #: manufacturing/templates/wo_cost_detail.html:6
 msgid "Work Order"
@@ -15320,6 +15517,93 @@ msgstr "Sendungsverfolgung"
 #: manufacturing/templates/portal_shipment_detail.html:45
 msgid "No items recorded."
 msgstr "Keine Artikel erfasst."
+
+#: manufacturing/templates/predictive_maintenance.html:8
+msgid "Log Sensor Reading"
+msgstr "Sensormesswert Erfassen"
+
+#: manufacturing/templates/predictive_maintenance.html:9
+msgid "Set Thresholds"
+msgstr "Schwellenwerte Festlegen"
+
+#: manufacturing/templates/predictive_maintenance.html:41
+msgid ""
+"\n"
+"        Rolling MTBF is computed from the actual gaps between 'Breakdown' "
+"downtime events\n"
+"        (not the period-aggregate MTBF on the <a href=\"/maint/oee/\">OEE "
+"report</a>).\n"
+"        Failure probability uses an exponential/Poisson-process "
+"approximation from the mean interval.\n"
+"        "
+msgstr "\n        Die gleitende MTBF wird aus den tatsächlichen Abständen zwischen 'Ausfall'-Stillstandsereignissen berechnet\n        (nicht der periodenaggregierten MTBF im <a href=\"/maint/oee/\">OEE-Bericht</a>).\n        Die Ausfallwahrscheinlichkeit verwendet eine exponentielle/Poisson-Prozess-Näherung aus dem mittleren Intervall.\n        "
+
+#: manufacturing/templates/predictive_maintenance.html:53
+msgid "MTBF (days)"
+msgstr "MTBF (Tage)"
+
+#: manufacturing/templates/predictive_maintenance.html:54
+msgid "Last Failure"
+msgstr "Letzter Ausfall"
+
+#: manufacturing/templates/predictive_maintenance.html:55
+msgid "Days Since"
+msgstr "Tage Seit"
+
+#: manufacturing/templates/predictive_maintenance.html:56
+msgid "Alert Threshold"
+msgstr "Alarmschwelle"
+
+#: manufacturing/templates/predictive_maintenance.html:57
+msgid "30-Day Risk"
+msgstr "30-Tage-Risiko"
+
+#: manufacturing/templates/predictive_maintenance.html:58
+#: manufacturing/templates/risk_assessment_list.html:74
+#: manufacturing/templates/risk_assessment_list.html:119
+#: manufacturing/templates/risk_dashboard.html:137
+msgid "Risk Level"
+msgstr "Risikostufe"
+
+#: manufacturing/templates/predictive_maintenance.html:59
+msgid "Sensor Status"
+msgstr "Sensorstatus"
+
+#: manufacturing/templates/predictive_maintenance.html:67
+msgid "insufficient data"
+msgstr "unzureichende Daten"
+
+#: manufacturing/templates/predictive_maintenance.html:85
+msgid "No operational equipment found."
+msgstr "Keine betriebsbereiten Anlagen gefunden."
+
+#: manufacturing/templates/predictive_maintenance.html:90
+msgid "Sensor Readings"
+msgstr "Sensormesswerte"
+
+#: manufacturing/templates/predictive_maintenance.html:95
+msgid "Reading Type"
+msgstr "Messwerttyp"
+
+#: manufacturing/templates/predictive_maintenance.html:96
+msgid "Latest Value"
+msgstr "Letzter Wert"
+
+#: manufacturing/templates/predictive_maintenance.html:97
+msgid "Warning ≥"
+msgstr "Warnung ≥"
+
+#: manufacturing/templates/predictive_maintenance.html:98
+msgid "Critical ≥"
+msgstr "Kritisch ≥"
+
+#: manufacturing/templates/predictive_maintenance.html:99
+msgid "Recorded"
+msgstr "Erfasst"
+
+#: manufacturing/templates/predictive_maintenance.html:115
+msgid "No sensor readings logged yet."
+msgstr "Noch keine Sensormesswerte erfasst."
 
 #: manufacturing/templates/prod_daily_report.html:3
 #: manufacturing/templates/prod_daily_report.html:49
@@ -17115,12 +17399,6 @@ msgid "Impact"
 msgstr "Auswirkung"
 
 #: manufacturing/templates/risk_assessment_list.html:74
-#: manufacturing/templates/risk_assessment_list.html:119
-#: manufacturing/templates/risk_dashboard.html:137
-msgid "Risk Level"
-msgstr "Risikostufe"
-
-#: manufacturing/templates/risk_assessment_list.html:74
 msgid "Assessed"
 msgstr "Bewertet"
 
@@ -17202,11 +17480,6 @@ msgstr "Plan / Umfang / Verantwortlichen suchen…"
 #: manufacturing/templates/risk_continuity_list.html:106
 msgid "Scope"
 msgstr "Umfang"
-
-#: manufacturing/templates/risk_continuity_list.html:73
-#: manufacturing/templates/risk_continuity_list.html:110
-msgid "Criticality"
-msgstr "Kritikalität"
 
 #: manufacturing/templates/risk_continuity_list.html:74
 #: manufacturing/templates/risk_continuity_list.html:118
@@ -19004,7 +19277,17 @@ msgid ""
 "        and an actual receipt date; fill rate covers POs that have been "
 "sent.\n"
 "        "
-msgstr "\n        Gesamtpunktzahl = 40%% pünktliche Lieferung + 35%% Mengenerfüllungsrate + 25%% Qualität\n        (100 − Ablehnungsrate), renormiert auf die der drei Kennzahlen, für die der Lieferant\n        Daten hat. Pünktliche Lieferung zählt nur vollständig erhaltene Bestellungen mit einem erwarteten\n        und einem tatsächlichen Eingangsdatum; die Erfüllungsrate umfasst versendete Bestellungen.\n        "
+msgstr ""
+"\n"
+"        Gesamtpunktzahl = 40%% pünktliche Lieferung + 35%% "
+"Mengenerfüllungsrate + 25%% Qualität\n"
+"        (100 − Ablehnungsrate), renormiert auf die der drei Kennzahlen, für "
+"die der Lieferant\n"
+"        Daten hat. Pünktliche Lieferung zählt nur vollständig erhaltene "
+"Bestellungen mit einem erwarteten\n"
+"        und einem tatsächlichen Eingangsdatum; die Erfüllungsrate umfasst "
+"versendete Bestellungen.\n"
+"        "
 
 #: manufacturing/templates/tc_device_form.html:3
 msgid "Add Time Clock"
@@ -19317,6 +19600,59 @@ msgstr "Ø Stunden/Person"
 #: manufacturing/templates/tc_schedule.html:94
 msgid "No clock-in records for this period."
 msgstr "Keine Einstempeldaten für diesen Zeitraum."
+
+#: manufacturing/templates/technician_route_detail.html:41
+#: manufacturing/templates/technician_route_detail.html:63
+#: manufacturing/templates/technician_route_list.html:29
+msgid "Stops"
+msgstr "Stopps"
+
+#: manufacturing/templates/technician_route_detail.html:43
+#: manufacturing/templates/technician_route_detail.html:129
+msgid "Est. Minutes"
+msgstr "Gesch. Minuten"
+
+#: manufacturing/templates/technician_route_detail.html:67
+msgid "Est. Min"
+msgstr "Gesch. Min."
+
+#: manufacturing/templates/technician_route_detail.html:109
+msgid "No stops on this route yet."
+msgstr "Noch keine Stopps auf dieser Route."
+
+#: manufacturing/templates/technician_route_detail.html:115
+#: manufacturing/templates/technician_route_detail.html:137
+msgid "Add Stop"
+msgstr "Stopp Hinzufügen"
+
+#: manufacturing/templates/technician_route_detail.html:121
+msgid "Open Work Order *"
+msgstr "Offener Fertigungsauftrag *"
+
+#: manufacturing/templates/technician_route_list.html:9
+msgid "+ New Route"
+msgstr "+ Neue Route"
+
+#: manufacturing/templates/technician_route_list.html:53
+msgid "No routes yet."
+msgstr "Noch keine Routen."
+
+#: manufacturing/templates/technician_route_new.html:3
+#: manufacturing/templates/technician_route_new.html:21
+msgid "New Route"
+msgstr "Neue Route"
+
+#: manufacturing/templates/technician_route_new.html:29
+msgid "Mechanic *"
+msgstr "Mechaniker *"
+
+#: manufacturing/templates/technician_route_new.html:37
+msgid "Route Date *"
+msgstr "Routendatum *"
+
+#: manufacturing/templates/technician_route_new.html:40
+msgid "Create Route"
+msgstr "Route Erstellen"
 
 #: manufacturing/templates/termination_detail.html:3
 #, python-format
