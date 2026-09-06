@@ -2546,6 +2546,69 @@ for `draft`-status recipes), and the New Recipe form (confirmed the
 label) — all pages return 200 with correctly translated titles and
 labels, no console or server errors.
 
+Also fully translated: the **Discounts & Promotions** feature
+(`promo_list.html`, `promo_detail.html`, `promo_new.html` — 3
+templates, linked from `so_list.html`'s already-translated toolbar
+button — another "translate the link, not yet the target" closure). 23
+unique strings across 5 languages, all simple (no plurals). Small
+enough to translate directly by hand rather than delegating, matching
+the ABC Costing/Auth/Risk Management/Scan/Recipes precedent.
+
+Several `{{ x|default:"literal english" }}` fallbacks needed the
+standard `{% if %}/{% else %}/{% trans %}` expansion, continuing the
+bug class first found on IT's Network Device page —
+`promo.product_name|default:"All products"` and
+`promo.customer_name|default:"All customers"` on the list page — since
+a bare filter argument can't hold a `{% trans %}` call. The list page's
+discount-amount cell ("15% off" / "$10.00 off") needed two separate
+`{% blocktrans with val=... %}` blocks, one per `discount_type` branch,
+each with a bare literal `%`/`$` immediately after the interpolated
+value — `makemessages` auto-escaped the `%` to `%%` in the msgid per
+the established Payroll-pass/Recipes-pass convention, confirmed to
+render as a real single `%` (not doubled) via direct `Template
+().render()` calls in all 5 languages before trusting the browser
+check. The "— All products —"/"— All customers —" placeholder
+`<option>` text (appearing on both the detail and new-record forms)
+is genuine translatable English wrapped in em-dashes, not a
+punctuation-only fallback like this codebase's usual `default:"—"`
+exemption, so it got the standard `{% trans %}` treatment.
+
+**A pre-existing, harmless inconsistency was left as-is rather than
+"fixed" out of scope**: `promo_list.html`'s `page_title` block used a
+bare `&` ("Discounts & Promotions") while its `menu-title`/toolbar
+uses of the same phrase already used the HTML-entity form ("Discounts
+&amp; Promotions") — two different msgids for what reads as the
+same English phrase in a browser. Confirmed this exact bare-vs-entity
+split already existed in the original untranslated source (not
+introduced by this batch's edits), and confirmed via direct DOM
+inspection of the already-shipped `so_list.html`'s identical `&amp;`
+pattern that translators sidestep any double-escaping risk simply by
+translating the entity-form msgid to a natural word ("et"/"y"/"und"
+instead of another literal ampersand) — so both forms render correctly
+independently, just as two separate catalog entries instead of one
+merged entry. Left alone per this series' standing "wrap, don't
+rewrite" convention; not a functional bug.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check` clean
+on all 5 `.po` files (including the two `%%`-escaped discount-amount
+entries), zero fuzzy/blank entries confirmed programmatically, zero
+placeholder (`%(name)s`-style) mismatches between msgid and any of the
+5 languages' translations. The auto-merged generic labels this batch
+reused (Yes, No, Save Changes, Notes, Active, Inactive, Start Date, End
+Date, Name, Product, Customer, Home, Status, Detail) all cross-checked
+semantically compatible with their existing catalog translations — no
+cross-context mistranslation risk. Verified end-to-end against the
+real dev server, in French with real sample data: the Discounts &amp;
+Promotions list page (confirmed the real "10% de remise" discount cell
+and the "Tous les clients" fallback for a promotion with no customer
+restriction), a real promotion's detail page (confirmed the Oui/Non
+Active dropdown and both "— Tous les produits —"/"— Tous les clients
+—" em-dash placeholders), and the New Promotion form (confirmed the
+"p. ex. Soldes d'Été" placeholder and both leave-blank hint labels) —
+all pages return 200 with correctly translated titles and labels, no
+console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

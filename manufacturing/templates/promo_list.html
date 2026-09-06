@@ -1,23 +1,24 @@
 {% extends "base.html" %}
-{% block page_title %}Discounts & Promotions{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Discounts & Promotions" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/price-lists/" class="btn">Price Lists</a>
-<a href="/so/" class="btn">Sales Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/price-lists/" class="btn">{% trans "Price Lists" %}</a>
+<a href="/so/" class="btn">{% trans "Sales Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/promotions/new/" class="btn btn-primary">+ New Promotion</a>
+<a href="/promotions/new/" class="btn btn-primary">+ {% trans "New Promotion" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Discounts &amp; Promotions</div>
+    <div class="menu-title">{% trans "Discounts &amp; Promotions" %}</div>
 
     <form method="get" style="margin-bottom:14px;">
-        <input type="text" name="q" value="{{ q }}" placeholder="Search by name..."
+        <input type="text" name="q" value="{{ q }}" placeholder="{% trans 'Search by name...' %}"
                style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:240px;">
-        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+        <button type="submit" class="btn" style="padding:6px 12px;">{% trans "Search" %}</button>
     </form>
 
     {% if promotions %}
@@ -25,13 +26,13 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Discount</th>
-                    <th>Product</th>
-                    <th>Customer</th>
-                    <th class="num">Min Qty</th>
-                    <th>Window</th>
-                    <th>Status</th>
+                    <th>{% trans "Name" %}</th>
+                    <th>{% trans "Discount" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th class="num">{% trans "Min Qty" %}</th>
+                    <th>{% trans "Window" %}</th>
+                    <th>{% trans "Status" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -41,36 +42,36 @@
                     <td><a href="/promotions/{{ promo.id }}/">{{ promo.name }}</a></td>
                     <td>
                         {% if promo.discount_type == 'percent' %}
-                        {{ promo.discount_value|floatformat:"g" }}% off
+                        {% blocktrans with val=promo.discount_value|floatformat:"g" %}{{ val }}% off{% endblocktrans %}
                         {% else %}
-                        ${{ promo.discount_value|floatformat:2 }} off
+                        {% blocktrans with val=promo.discount_value|floatformat:2 %}${{ val }} off{% endblocktrans %}
                         {% endif %}
                     </td>
-                    <td>{{ promo.product_name|default:"All products" }}</td>
-                    <td>{{ promo.customer_name|default:"All customers" }}</td>
+                    <td>{% if promo.product_name %}{{ promo.product_name }}{% else %}{% trans "All products" %}{% endif %}</td>
+                    <td>{% if promo.customer_name %}{{ promo.customer_name }}{% else %}{% trans "All customers" %}{% endif %}</td>
                     <td class="num">{{ promo.min_qty|floatformat:"g" }}</td>
                     <td>
                         {% if promo.start_date or promo.end_date %}
                         {{ promo.start_date|default:"—" }} → {{ promo.end_date|default:"—" }}
                         {% else %}
-                        Always on
+                        {% trans "Always on" %}
                         {% endif %}
                     </td>
                     <td>
                         {% if promo.is_active %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
                         {% else %}
-                        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Inactive" %}</span>
                         {% endif %}
                     </td>
-                    <td><a href="/promotions/{{ promo.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/promotions/{{ promo.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No promotions yet.</div>
+    <div class="empty-state">{% trans "No promotions yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

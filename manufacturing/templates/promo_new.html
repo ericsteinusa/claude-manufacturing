@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Promotion{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Promotion" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/promotions/" class="btn">Discounts &amp; Promotions</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/promotions/" class="btn">{% trans "Discounts &amp; Promotions" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -18,7 +19,7 @@
 {% block body %}
 <div class="content">
 <div class="promo-wrap">
-    <div class="menu-title">New Promotion</div>
+    <div class="menu-title">{% trans "New Promotion" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -26,12 +27,12 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Name *</label>
-                <input type="text" name="name" required placeholder="e.g. Summer Clearance">
+                <label>{% trans "Name *" %}</label>
+                <input type="text" name="name" required placeholder="{% trans 'e.g. Summer Clearance' %}">
             </div>
             <div class="form-grid-2">
                 <div class="form-row">
-                    <label>Discount Type</label>
+                    <label>{% trans "Discount Type" %}</label>
                     <select name="discount_type">
                         {% for dt in discount_types %}
                         <option value="{{ dt }}">{{ dt|title }}</option>
@@ -39,47 +40,47 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Discount Value</label>
+                    <label>{% trans "Discount Value" %}</label>
                     <input type="number" name="discount_value" step="0.01" min="0" value="0.00">
                 </div>
             </div>
             <div class="form-row">
-                <label>Product (leave blank for all products)</label>
+                <label>{% trans "Product (leave blank for all products)" %}</label>
                 <select name="product_id">
-                    <option value="">— All products —</option>
+                    <option value="">{% trans "— All products —" %}</option>
                     {% for p in products %}
                     <option value="{{ p.id }}">{{ p.product_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Customer (leave blank for all customers)</label>
+                <label>{% trans "Customer (leave blank for all customers)" %}</label>
                 <select name="customer_id">
-                    <option value="">— All customers —</option>
+                    <option value="">{% trans "— All customers —" %}</option>
                     {% for c in customers %}
                     <option value="{{ c.id }}">{{ c.company_name|default:c.last_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Minimum Qty</label>
+                <label>{% trans "Minimum Qty" %}</label>
                 <input type="number" name="min_qty" step="any" min="0" value="1">
             </div>
             <div class="form-grid-2">
                 <div class="form-row">
-                    <label>Start Date (optional)</label>
+                    <label>{% trans "Start Date (optional)" %}</label>
                     <input type="date" name="start_date">
                 </div>
                 <div class="form-row">
-                    <label>End Date (optional)</label>
+                    <label>{% trans "End Date (optional)" %}</label>
                     <input type="date" name="end_date">
                 </div>
             </div>
             <div class="form-row">
-                <label>Notes</label>
-                <input type="text" name="notes" placeholder="Optional notes">
+                <label>{% trans "Notes" %}</label>
+                <input type="text" name="notes" placeholder="{% trans 'Optional notes' %}">
             </div>
-            <button type="submit" class="btn btn-primary">Create Promotion</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Promotion" %}</button>
         </form>
     </div>
 </div>

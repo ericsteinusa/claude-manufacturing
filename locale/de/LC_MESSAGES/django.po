@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 02:15+0000\n"
+"POT-Creation-Date: 2026-09-06 02:28+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -473,6 +473,9 @@ msgstr "ABC- vs. Traditioneller Bericht"
 #: manufacturing/templates/prod_shipping_detail.html:15
 #: manufacturing/templates/prod_shipping_list.html:11
 #: manufacturing/templates/prod_tracking_dashboard.html:11
+#: manufacturing/templates/promo_detail.html:7
+#: manufacturing/templates/promo_list.html:8
+#: manufacturing/templates/promo_new.html:7
 #: manufacturing/templates/purch_contract_detail.html:10
 #: manufacturing/templates/purch_contracts_list.html:12
 #: manufacturing/templates/purch_reports.html:12
@@ -615,6 +618,8 @@ msgstr "Kostentreiberverbrauch nach Produkt"
 #: manufacturing/templates/prod_reports.html:113
 #: manufacturing/templates/prod_schedule.html:68
 #: manufacturing/templates/prod_shipping_detail.html:152
+#: manufacturing/templates/promo_detail.html:64
+#: manufacturing/templates/promo_list.html:31
 #: manufacturing/templates/qa_inspection_detail.html:92
 #: manufacturing/templates/qa_inspection_list.html:80
 #: manufacturing/templates/qa_inspection_list.html:114
@@ -694,6 +699,7 @@ msgid "Activity Cost Pools"
 msgstr "Aktivitätskostenpools"
 
 #: manufacturing/templates/abc_activity_list.html:18
+#: manufacturing/templates/promo_list.html:19
 msgid "Search by name..."
 msgstr "Nach Namen suchen..."
 
@@ -705,6 +711,7 @@ msgstr "Nach Namen suchen..."
 #: manufacturing/templates/cs_list.html:44
 #: manufacturing/templates/data_governance_dashboard.html:41
 #: manufacturing/templates/people_list.html:31
+#: manufacturing/templates/promo_list.html:21
 #: manufacturing/templates/skill_list.html:21
 msgid "Search"
 msgstr "Suchen"
@@ -737,6 +744,7 @@ msgstr "Kostenpool"
 #: manufacturing/templates/costing_valuation_list.html:37
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/inventory_list.html:102
+#: manufacturing/templates/promo_list.html:67
 #: manufacturing/templates/recipe_list.html:47
 #: manufacturing/templates/rfq_list.html:55
 #: manufacturing/templates/sampling_plan_list.html:55
@@ -770,6 +778,7 @@ msgstr "Neuer Aktivitätskostenpool"
 #: manufacturing/templates/maint_mechanics_list.html:100
 #: manufacturing/templates/maint_part_detail.html:47
 #: manufacturing/templates/maint_parts_list.html:106
+#: manufacturing/templates/promo_new.html:30
 #: manufacturing/templates/skill_new.html:29
 #: manufacturing/templates/workcenter_list.html:98
 msgid "Name *"
@@ -949,6 +958,8 @@ msgstr "z. B. pro Rüstvorgang, pro Maschinenstunde"
 #: manufacturing/templates/prod_shipping_detail.html:126
 #: manufacturing/templates/prod_shipping_detail.html:141
 #: manufacturing/templates/prod_shipping_list.html:139
+#: manufacturing/templates/promo_detail.html:95
+#: manufacturing/templates/promo_new.html:80
 #: manufacturing/templates/purch_contract_detail.html:113
 #: manufacturing/templates/purch_contract_detail.html:132
 #: manufacturing/templates/purch_contracts_list.html:157
@@ -1793,6 +1804,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/prod_shipping_list.html:83
 #: manufacturing/templates/prod_shipping_list.html:131
 #: manufacturing/templates/prod_tracking_dashboard.html:76
+#: manufacturing/templates/promo_list.html:35
 #: manufacturing/templates/purch_contract_detail.html:93
 #: manufacturing/templates/purch_contract_detail.html:126
 #: manufacturing/templates/purch_contracts_list.html:86
@@ -2183,6 +2195,7 @@ msgstr "Wechselkurs"
 #: manufacturing/templates/pers_training_detail.html:96
 #: manufacturing/templates/prod_returns_detail.html:135
 #: manufacturing/templates/prod_shipping_detail.html:130
+#: manufacturing/templates/promo_detail.html:100
 #: manufacturing/templates/purch_contract_detail.html:117
 #: manufacturing/templates/qa_audit_detail.html:166
 #: manufacturing/templates/qa_capa_detail.html:153
@@ -2858,6 +2871,9 @@ msgstr "Genehmigungsregeln"
 #: manufacturing/templates/payroll_deductions.html:66
 #: manufacturing/templates/payroll_deductions.html:121
 #: manufacturing/templates/payroll_deductions.html:189
+#: manufacturing/templates/promo_detail.html:25
+#: manufacturing/templates/promo_detail.html:44
+#: manufacturing/templates/promo_list.html:62
 #: manufacturing/templates/recipe_detail.html:25
 #: manufacturing/templates/recipe_list.html:40
 #: manufacturing/templates/retention_policy_edit.html:27
@@ -2887,6 +2903,8 @@ msgstr "Aktiv"
 #: manufacturing/templates/finance_bank_rec_list.html:85
 #: manufacturing/templates/gl_accounts.html:75
 #: manufacturing/templates/payroll_deductions.html:66
+#: manufacturing/templates/promo_detail.html:27
+#: manufacturing/templates/promo_list.html:64
 #: manufacturing/templates/retention_policy_edit.html:27
 #: manufacturing/templates/sales_commission_plans.html:76
 #: manufacturing/templates/sampling_plan_detail.html:74
@@ -2990,6 +3008,7 @@ msgstr "Eskalieren Nach (Stunden) *"
 #: manufacturing/templates/it_software_list.html:130
 #: manufacturing/templates/mkt_ad_list.html:181
 #: manufacturing/templates/mkt_research_list.html:166
+#: manufacturing/templates/promo_new.html:81
 #: manufacturing/templates/sales_commissions.html:238
 #: manufacturing/templates/sampling_plan_new.html:70
 #: manufacturing/templates/workcenter_list.html:116
@@ -3228,6 +3247,8 @@ msgstr "(Kunde auswählen)"
 #: manufacturing/templates/prod_returns_list.html:80
 #: manufacturing/templates/prod_returns_list.html:111
 #: manufacturing/templates/prod_returns_reports.html:82
+#: manufacturing/templates/promo_detail.html:73
+#: manufacturing/templates/promo_list.html:32
 #: manufacturing/templates/sales_contracts_list.html:81
 #: manufacturing/templates/sales_dashboard_kpis.html:15
 #: manufacturing/templates/sales_dashboard_kpis.html:32
@@ -3465,6 +3486,8 @@ msgstr "Name oder E-Mail suchen..."
 #: manufacturing/templates/payroll_deductions.html:83
 #: manufacturing/templates/people_list.html:47
 #: manufacturing/templates/personnel_dashboard.html:122
+#: manufacturing/templates/promo_detail.html:40
+#: manufacturing/templates/promo_list.html:29
 #: manufacturing/templates/recipe_list.html:30
 #: manufacturing/templates/report_builder_list.html:20
 #: manufacturing/templates/skill_list.html:29
@@ -4120,6 +4143,7 @@ msgid "Suppliers"
 msgstr "Lieferanten"
 
 #: manufacturing/templates/base.html:521
+#: manufacturing/templates/promo_list.html:7
 #: manufacturing/templates/sales_dashboard.html:59
 #: manufacturing/templates/sales_orders.html:3
 #: manufacturing/templates/sales_orders.html:44
@@ -5142,6 +5166,7 @@ msgstr "Gesamtmenge (0 lassen, um stattdessen nach Wert zu verfolgen)"
 #: manufacturing/templates/pers_training_detail.html:103
 #: manufacturing/templates/pers_training_list.html:88
 #: manufacturing/templates/pers_training_list.html:138
+#: manufacturing/templates/promo_detail.html:87
 #: manufacturing/templates/purch_contract_detail.html:101
 #: manufacturing/templates/purch_contract_detail.html:127
 #: manufacturing/templates/purch_contracts_list.html:83
@@ -5179,6 +5204,7 @@ msgstr "Startdatum"
 #: manufacturing/templates/pers_training_detail.html:104
 #: manufacturing/templates/pers_training_list.html:89
 #: manufacturing/templates/pers_training_list.html:142
+#: manufacturing/templates/promo_detail.html:91
 #: manufacturing/templates/purch_contract_detail.html:105
 #: manufacturing/templates/purch_contract_detail.html:128
 #: manufacturing/templates/purch_contracts_list.html:84
@@ -8235,6 +8261,7 @@ msgstr "Als Basis festlegen?"
 #: manufacturing/templates/gl_dashboard_kpis.html:58
 #: manufacturing/templates/payroll_deductions.html:64
 #: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/promo_detail.html:47
 #: manufacturing/templates/wms_putaway_rule_list.html:53
 msgid "No"
 msgstr "Nein"
@@ -8253,6 +8280,7 @@ msgstr "Aktiv?"
 #: manufacturing/templates/gl_dashboard_kpis.html:58
 #: manufacturing/templates/payroll_deductions.html:64
 #: manufacturing/templates/payroll_deductions.html:132
+#: manufacturing/templates/promo_detail.html:46
 #: manufacturing/templates/wms_putaway_rule_list.html:53
 msgid "Yes"
 msgstr "Ja"
@@ -16747,6 +16775,119 @@ msgstr "Aktuelle Sendungen"
 msgid "No shipments on record."
 msgstr "Keine Sendungen erfasst."
 
+#: manufacturing/templates/promo_detail.html:6
+#: manufacturing/templates/promo_list.html:16
+#: manufacturing/templates/promo_new.html:6
+#: manufacturing/templates/so_list.html:10
+msgid "Discounts &amp; Promotions"
+msgstr "Rabatte und Aktionen"
+
+#: manufacturing/templates/promo_detail.html:35
+msgid "Promotion Details"
+msgstr "Aktionsdetails"
+
+#: manufacturing/templates/promo_detail.html:51
+#: manufacturing/templates/promo_new.html:35
+msgid "Discount Type"
+msgstr "Rabattart"
+
+#: manufacturing/templates/promo_detail.html:59
+#: manufacturing/templates/promo_new.html:43
+msgid "Discount Value"
+msgstr "Rabattwert"
+
+#: manufacturing/templates/promo_detail.html:66
+#: manufacturing/templates/promo_new.html:50
+msgid "— All products —"
+msgstr "— Alle Produkte —"
+
+#: manufacturing/templates/promo_detail.html:75
+#: manufacturing/templates/promo_new.html:59
+msgid "— All customers —"
+msgstr "— Alle Kunden —"
+
+#: manufacturing/templates/promo_detail.html:82
+#: manufacturing/templates/promo_new.html:66
+msgid "Minimum Qty"
+msgstr "Mindestmenge"
+
+#: manufacturing/templates/promo_list.html:3
+msgid "Discounts & Promotions"
+msgstr "Rabatte und Aktionen"
+
+#: manufacturing/templates/promo_list.html:6
+#: manufacturing/templates/so_list.html:9
+msgid "Price Lists"
+msgstr "Preislisten"
+
+#: manufacturing/templates/promo_list.html:10
+#: manufacturing/templates/promo_new.html:3
+#: manufacturing/templates/promo_new.html:22
+msgid "New Promotion"
+msgstr "Neue Aktion"
+
+#: manufacturing/templates/promo_list.html:30
+msgid "Discount"
+msgstr "Rabatt"
+
+#: manufacturing/templates/promo_list.html:33
+msgid "Min Qty"
+msgstr "Mindestmenge"
+
+#: manufacturing/templates/promo_list.html:34
+msgid "Window"
+msgstr "Zeitraum"
+
+#: manufacturing/templates/promo_list.html:45
+#, python-format
+msgid "%(val)s%% off"
+msgstr "%(val)s%% Rabatt"
+
+#: manufacturing/templates/promo_list.html:47
+#, python-format
+msgid "$%(val)s off"
+msgstr "%(val)s $ Rabatt"
+
+#: manufacturing/templates/promo_list.html:50
+msgid "All products"
+msgstr "Alle Produkte"
+
+#: manufacturing/templates/promo_list.html:51
+msgid "All customers"
+msgstr "Alle Kunden"
+
+#: manufacturing/templates/promo_list.html:57
+msgid "Always on"
+msgstr "Immer aktiv"
+
+#: manufacturing/templates/promo_list.html:74
+msgid "No promotions yet."
+msgstr "Noch keine Aktionen."
+
+#: manufacturing/templates/promo_new.html:31
+msgid "e.g. Summer Clearance"
+msgstr "z. B. Sommerschlussverkauf"
+
+#: manufacturing/templates/promo_new.html:48
+msgid "Product (leave blank for all products)"
+msgstr "Produkt (leer lassen für alle Produkte)"
+
+#: manufacturing/templates/promo_new.html:57
+msgid "Customer (leave blank for all customers)"
+msgstr "Kunde (leer lassen für alle Kunden)"
+
+#: manufacturing/templates/promo_new.html:71
+msgid "Start Date (optional)"
+msgstr "Startdatum (optional)"
+
+#: manufacturing/templates/promo_new.html:75
+msgid "End Date (optional)"
+msgstr "Enddatum (optional)"
+
+#: manufacturing/templates/promo_new.html:83
+msgid "Create Promotion"
+msgstr "Aktion Erstellen"
+
 #: manufacturing/templates/purch_contract_detail.html:3
 #, python-format
 msgid "Contract — %(num)s"
@@ -17476,7 +17617,9 @@ msgstr "Zutat Hinzufügen"
 #: manufacturing/templates/recipe_detail.html:94
 msgid ""
 "Activating this recipe supersedes any other active recipe for this product."
-msgstr "Das Aktivieren dieses Rezepts ersetzt jedes andere aktive Rezept für dieses Produkt."
+msgstr ""
+"Das Aktivieren dieses Rezepts ersetzt jedes andere aktive Rezept für dieses "
+"Produkt."
 
 #: manufacturing/templates/recipe_detail.html:98
 msgid "Activate Recipe"
@@ -19896,14 +20039,6 @@ msgstr "Auftragsnummer"
 #: manufacturing/templates/so_list.html:8
 msgid "New SO"
 msgstr "Neuer Auftrag"
-
-#: manufacturing/templates/so_list.html:9
-msgid "Price Lists"
-msgstr "Preislisten"
-
-#: manufacturing/templates/so_list.html:10
-msgid "Discounts &amp; Promotions"
-msgstr "Rabatte und Aktionen"
 
 #: manufacturing/templates/so_list.html:11
 msgid "ATP Inquiry"
