@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Price List{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Price List" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/price-lists/" class="btn">Price Lists</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/price-lists/" class="btn">{% trans "Price Lists" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="pl-wrap">
-    <div class="menu-title">New Price List</div>
+    <div class="menu-title">{% trans "New Price List" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,11 +26,11 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Name *</label>
-                <input type="text" name="name" required placeholder="e.g. Wholesale 2026">
+                <label>{% trans "Name *" %}</label>
+                <input type="text" name="name" required placeholder="{% trans "e.g. Wholesale 2026" %}">
             </div>
             <div class="form-row">
-                <label>Currency</label>
+                <label>{% trans "Currency" %}</label>
                 <select name="currency">
                     {% for c in currencies %}
                     <option value="{{ c.code }}">{{ c.code }} — {{ c.name }}</option>
@@ -37,18 +38,18 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Effective Date (optional)</label>
+                <label>{% trans "Effective Date (optional)" %}</label>
                 <input type="date" name="effective_date">
             </div>
             <div class="form-row">
-                <label>Expiry Date (optional)</label>
+                <label>{% trans "Expiry Date (optional)" %}</label>
                 <input type="date" name="expiry_date">
             </div>
             <div class="form-row">
-                <label>Notes</label>
-                <input type="text" name="notes" placeholder="Optional notes">
+                <label>{% trans "Notes" %}</label>
+                <input type="text" name="notes" placeholder="{% trans "Optional notes" %}">
             </div>
-            <button type="submit" class="btn btn-primary">Create Price List</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Price List" %}</button>
         </form>
     </div>
 </div>

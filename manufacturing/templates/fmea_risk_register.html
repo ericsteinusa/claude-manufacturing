@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}FMEA Risk Register{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "FMEA Risk Register" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/control-plans/" class="btn">Control Plans</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/control-plans/" class="btn">{% trans "Control Plans" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -15,16 +16,16 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">FMEA Risk Register</div>
+    <div class="menu-title">{% trans "FMEA Risk Register" %}</div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Every characteristic at or above RPN {{ threshold }} on an active control plan, highest risk first.
+        {% blocktrans %}Every characteristic at or above RPN {{ threshold }} on an active control plan, highest risk first.{% endblocktrans %}
     </p>
 
     <form method="get" style="margin-bottom:14px;">
-        <label style="font-size:12px;font-weight:bold;color:#555;margin-right:6px;">Threshold</label>
+        <label style="font-size:12px;font-weight:bold;color:#555;margin-right:6px;">{% trans "Threshold" %}</label>
         <input type="number" name="threshold" value="{{ threshold }}" min="1" max="1000"
                style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:100px;">
-        <button type="submit" class="btn" style="padding:6px 12px;">Apply</button>
+        <button type="submit" class="btn" style="padding:6px 12px;">{% trans "Apply" %}</button>
     </form>
 
     {% if items %}
@@ -32,15 +33,15 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Control Plan</th>
-                    <th>Characteristic</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Control Plan" %}</th>
+                    <th>{% trans "Characteristic" %}</th>
                     <th class="num">S</th>
                     <th class="num">O</th>
                     <th class="num">D</th>
                     <th class="num">RPN</th>
-                    <th>Risk</th>
-                    <th>Recommended Action</th>
+                    <th>{% trans "Risk" %}</th>
+                    <th>{% trans "Recommended Action" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,7 +62,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No items at or above this threshold.</div>
+    <div class="empty-state">{% trans "No items at or above this threshold." %}</div>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Document Control{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Document Control" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/" class="btn">QA Dashboard</a>
-<a href="/eng/" class="btn">Engineering</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/" class="btn">{% trans "QA Dashboard" %}</a>
+<a href="/eng/" class="btn">{% trans "Engineering" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/documents/new/" class="btn btn-primary">+ New Document</a>
+<a href="/documents/new/" class="btn btn-primary">+ {% trans "New Document" %}</a>
 {% endif %}
 {% endblock %}
 
@@ -24,17 +25,17 @@
 {% block body %}
 <div class="content">
 <div class="doc-wrap">
-    <div class="menu-title">Document Control</div>
+    <div class="menu-title">{% trans "Document Control" %}</div>
     <p style="font-size:12px;color:var(--text-muted);max-width:700px;">
-        SOPs, work instructions, drawings, and specs — with revision history, an
+        {% blocktrans %}SOPs, work instructions, drawings, and specs — with revision history, an
         approval workflow, and links to the BOMs, routings, sampling plans, and
-        equipment they govern.
+        equipment they govern.{% endblocktrans %}
     </p>
 
     <div class="toolbar">
         <div class="chip-row">
             <a href="/documents/{% if doc_type %}?doc_type={{ doc_type }}{% endif %}"
-               class="chip {% if not status %}active{% endif %}">All</a>
+               class="chip {% if not status %}active{% endif %}">{% trans "All" %}</a>
             {% for s in statuses %}
             <a href="/documents/?status={{ s }}{% if doc_type %}&doc_type={{ doc_type }}{% endif %}"
                class="chip {% if status == s %}active{% endif %}">{{ s|title }}</a>
@@ -43,13 +44,13 @@
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
             <select name="doc_type" class="type-select" onchange="this.form.submit()">
-                <option value="">All Types</option>
+                <option value="">{% trans "All Types" %}</option>
                 {% for t in doc_types %}
                 <option value="{{ t }}" {% if doc_type == t %}selected{% endif %}>{{ t }}</option>
                 {% endfor %}
             </select>
-            <input class="search-input" type="text" name="q" value="{{ search }}" placeholder="Search title or #…">
-            <button type="submit" class="btn btn-primary" style="padding:5px 14px;">Go</button>
+            <input class="search-input" type="text" name="q" value="{{ search }}" placeholder="{% trans "Search title or #…" %}">
+            <button type="submit" class="btn btn-primary" style="padding:5px 14px;">{% trans "Go" %}</button>
         </form>
     </div>
 
@@ -58,12 +59,12 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Doc #</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Rev</th>
-                    <th>Status</th>
-                    <th>Owner</th>
+                    <th>{% trans "Doc #" %}</th>
+                    <th>{% trans "Title" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Rev" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Owner" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -76,26 +77,26 @@
                     <td>{{ d.current_revision }}</td>
                     <td>
                         {% if d.status == 'draft' %}
-                        <span class="pill pill-draft" style="font-size:11px;padding:2px 8px;">Draft</span>
+                        <span class="pill pill-draft" style="font-size:11px;padding:2px 8px;">{% trans "Draft" %}</span>
                         {% elif d.status == 'in_review' %}
-                        <span class="pill pill-pending" style="font-size:11px;padding:2px 8px;">In Review</span>
+                        <span class="pill pill-pending" style="font-size:11px;padding:2px 8px;">{% trans "In Review" %}</span>
                         {% elif d.status == 'approved' %}
-                        <span class="pill pill-approved" style="font-size:11px;padding:2px 8px;">Approved</span>
+                        <span class="pill pill-approved" style="font-size:11px;padding:2px 8px;">{% trans "Approved" %}</span>
                         {% elif d.status == 'superseded' %}
-                        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">Superseded</span>
+                        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">{% trans "Superseded" %}</span>
                         {% else %}
-                        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">Obsolete</span>
+                        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">{% trans "Obsolete" %}</span>
                         {% endif %}
                     </td>
                     <td>{{ d.owner|default:"—" }}</td>
-                    <td><a href="/documents/{{ d.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/documents/{{ d.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No documents found.</div>
+    <div class="empty-state">{% trans "No documents found." %}</div>
     {% endif %}
 </div>
 </div>

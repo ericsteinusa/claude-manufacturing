@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}{{ product.name }} — Options{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with name=product.name %}{{ name }} — Options{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/cto/products/" class="btn">Configure-to-Order</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/cto/products/" class="btn">{% trans "Configure-to-Order" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -19,7 +20,7 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">{{ product.name }} — Option Groups</div>
+    <div class="menu-title">{% blocktrans with name=product.name %}{{ name }} — Option Groups{% endblocktrans %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -30,7 +31,7 @@
         {% if group.options %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Option</th><th>Component</th><th class="num">Qty</th></tr></thead>
+                <thead><tr><th>{% trans "Option" %}</th><th>{% trans "Component" %}</th><th class="num">{% trans "Qty" %}</th></tr></thead>
                 <tbody>
                     {% for opt in group.options %}
                     <tr>
@@ -43,7 +44,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No options in this group yet.</div>
+        <div class="empty-state">{% trans "No options in this group yet." %}</div>
         {% endif %}
         {% if can_edit %}
         <form method="post" style="margin-top:14px;">
@@ -52,11 +53,11 @@
             <input type="hidden" name="group_id" value="{{ group.id }}">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Option Name *</label>
-                    <input type="text" name="name" required placeholder="e.g. Red">
+                    <label>{% trans "Option Name *" %}</label>
+                    <input type="text" name="name" required placeholder="{% trans "e.g. Red" %}">
                 </div>
                 <div class="form-row">
-                    <label>Component *</label>
+                    <label>{% trans "Component *" %}</label>
                     <select name="component_id" required>
                         {% for c in components %}
                         <option value="{{ c.id }}">{{ c.name }}</option>
@@ -64,11 +65,11 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Qty Required</label>
+                    <label>{% trans "Qty Required" %}</label>
                     <input type="number" name="qty_required" step="0.01" min="0" value="1">
                 </div>
             </div>
-            <button type="submit" class="btn">Add Option</button>
+            <button type="submit" class="btn">{% trans "Add Option" %}</button>
         </form>
         {% endif %}
     </div>
@@ -76,15 +77,15 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Option Group</h3>
+        <h3>{% trans "Add Option Group" %}</h3>
         <form method="post" style="display:flex;gap:10px;align-items:end;">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_group">
             <div class="form-row">
-                <label>Group Name *</label>
-                <input type="text" name="name" required placeholder="e.g. Frame Color">
+                <label>{% trans "Group Name *" %}</label>
+                <input type="text" name="name" required placeholder="{% trans "e.g. Frame Color" %}">
             </div>
-            <button type="submit" class="btn btn-primary">Add Group</button>
+            <button type="submit" class="btn btn-primary">{% trans "Add Group" %}</button>
         </form>
     </div>
     {% endif %}

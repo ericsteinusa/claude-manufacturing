@@ -2750,6 +2750,168 @@ raw doc-type/direction values sitting correctly bare next to translated
 column headers) — all pages return 200 with correctly translated
 titles and labels, no console or server errors.
 
+Also fully translated: a consolidated **long-tail sweep of 37 remaining
+templates across 16 small feature clusters** — the largest single i18n
+pass in this series by template count, done in one batch rather than
+one PR per cluster specifically to avoid the same `locale/*.po` files
+being touched by many divergent branches at once (a real problem hit
+earlier in this series — see the Inventory/BOM/MRP pass's merge-conflict
+note). Clusters: ATP Inquiry (`atp_inquiry.html`), CTP Inquiry
+(`ctp_inquiry.html`), Demand Forecast (`demand_forecast.html`), Budget
+Dashboard (`budget_dashboard.html`), Capacity Planning
+(`capacity_planning.html`), FMEA Risk Register
+(`fmea_risk_register.html`), the generic department drill-down menu
+(`dept_menu.html`), Carbon Footprint + ESG Dashboard (`carbon_detail
+.html`, `esg_dashboard.html`), Configure-to-Order (`cto_product_list
+.html`, `cto_options.html`, `cto_configure.html`), Repetitive
+Manufacturing Schedule (`repetitive_schedule_list/_detail/_new.html`),
+Contacts — the shared Customers/Suppliers template (`contacts_list
+/_detail/_new.html`), Shop Floor Data Entry (`sf_dashboard.html`,
+`sf_entry.html`, `sf_shift_plan.html` — distinct from the
+already-translated `sf_tv.html`/`sf_tv_grid.html` TV-display pair),
+Price Lists (`pl_list/_detail/_new.html`), What-If Scenario Planning
+(`scenario_list/_detail/_new/_run.html`), Document Control
+(`document_list/_detail/_new.html`), and Multi-Entity Companies +
+Intercompany + Consolidated Financials (`company_list/_detail/_new
+.html`, `intercompany_list/_new.html`, `consolidated_financials.html`).
+332 unique strings across 5 languages (330 simple + 2 plural).
+
+**Process departure from every prior pass**: markup was done by 4
+parallel subagents (one per cluster-group, ~9 templates each) using the
+established conventions verbatim; translation of the resulting 330
+blank strings was then done by 5 more parallel subagents (one per
+~66-string chunk, each producing all 5 languages together for
+terminology consistency), rather than by hand — the string count made
+hand-translation impractical for a single-session batch this size. Both
+stages were followed by the usual trust-but-verify review: `git diff`
+on every markup file, and a msgid-set cross-check confirming the 5
+translation chunks' output exactly matched the real blank list (zero
+missing, zero extra) before applying.
+
+**A genuine `msgfmt` fatal error was caught before it could ship,
+distinct from every prior escaping/duplication gotcha in this file**:
+`contacts_list.html`'s search-result count line was marked up as
+`{% blocktrans count counter=contacts|length %}{{ counter }}
+{{ contact_type }}{% plural %}{{ counter }} {{ contact_type_plural }}
+{% endblocktrans %}` — syntactically valid Django, and it even rendered
+fine in isolation — but gettext's plural-form validation requires every
+placeholder used in msgid_plural to be self-consistent, and this msgid
+used `%(contact_type)s` in the singular form while msgid_plural used a
+*different* name, `%(contact_type_plural)s`. `msgfmt --check` correctly
+rejected this as a fatal error ("a format specification for argument
+'contact_type', as in 'msgstr[0]', doesn't exist in 'msgid_plural'")
+across all 5 `.po` files. Root cause: `contact_type`/`contact_type_plural`
+are pre-computed whole words already selected by the Python view (e.g.
+"customer"/"customers") — there was no actual English text being
+pluralized by gettext at all, just two different variables being
+swapped in, so wrapping it in `{% blocktrans count %}` was never
+correct to begin with. Fixed by removing the blocktrans entirely in
+favor of plain `{% if contacts|length == 1 %}{{ contact_type }}
+{% else %}{{ contact_type_plural }}{% endif %}` — no translation tag
+needed since there's no literal text to translate. Worth a standing
+checklist item distinct from the dotted-blocktrans-variable check: if a
+`{% blocktrans count %}`'s singular and plural branches interpolate
+*different* variable names for the same slot (not the same variable
+under a shared `with` binding), that's a sign there's no real
+English-language pluralization happening and the block should probably
+not be a blocktrans at all.
+
+**A second, related bug surfaced only after fixing the first**:
+`contacts_detail.html`'s "Recent Sales Orders"/"Recent Purchase Orders"
+section heading was built as `{% blocktrans %}Recent {{ order_label }}s
+{% endblocktrans %}` — a bare English "s" concatenated directly onto a
+template variable, the same untranslatable-suffix anti-pattern
+documented in the Production/Maintenance passes for `|pluralize`, except
+here there wasn't even a filter, just a literal glued-on letter. Once
+`order_label` itself was properly translated (see below), this produced
+literally broken output in French: "Commande Client" + "s" cannot
+become "Commandes Clients" by string concatenation, since French
+pluralizes by changing the noun itself, not appending a Roman letter.
+Fixed at the Python level (matching precedent) by adding a
+`order_label_plural` context key (`_('Sales Orders')`/`_('Purchase
+Orders')`, wrapped in `gettext_lazy` next to `order_label` itself — see
+below) and simplifying the template to `{% blocktrans with
+lbl=order_label_plural %}Recent {{ lbl }}{% endblocktrans %}` — no
+Python-side pluralization heuristic needed at all, since the caller
+already knows which literal noun to use.
+
+**The real root cause underlying both of the above, and the reason
+`contacts_list.html`/`contacts_detail.html` initially rendered "Suppliers"
+in English even after full template markup**: `contact_type`,
+`contact_type_plural`, and `order_label` were plain Python string
+literals (`contact_type='customer'`, `order_label='Sales Order'`) passed
+as template context from 6 call sites in `views/__init__.py`'s
+`customer_list`/`customer_new`/`customer_detail`/`supplier_list`/
+`supplier_new`/`supplier_detail` — the exact same class of gap as
+`menus.py`'s `DASHBOARD_DEPARTMENTS` and the WO/SO pass's
+`*_STATUS_ACTION_LABELS` before those were wrapped in `gettext_lazy`.
+No template-level `{% trans %}` can ever fix a Python string that's
+already plain text by the time it reaches the template — it has to be
+wrapped at the source. Fixed by adding `from django.utils.translation
+import gettext_lazy as _` to `views/__init__.py` and wrapping all 6
+`contact_type`/`contact_type_plural` call sites plus the 2
+`order_label` sites (with the new `order_label_plural` added alongside).
+Confirmed the module-level `_` import doesn't collide with this same
+file's pre-existing local-scope `_, total_fmt = tc_total_hours(...)`
+unpacking idiom used in two unrelated functions — a local assignment to
+`_` only shadows within that function's own scope, standard Python
+behavior, verified by running the full suite afterward. This is a
+narrower, more surgical version of the still-much-larger, still-open
+`menus.py` `MENU_TREE` gap (hundreds of untranslated Python-string menu
+labels, used by `dept_menu.html` for non-full-access users) — noted
+here but explicitly left out of scope for this pass, since it's a
+separate body of work disproportionate to a template-marking pass.
+
+**One accepted, documented grammatical limitation, not fixed**: French
+is the only one of the 5 target languages whose adjectives fully
+decline by gender, and the "Recent %(lbl)s" msgid's French translation
+("%(lbl)s Récentes") assumed the feminine plural to match "Commandes
+Clients" (Sales Orders) — but "Bons de Commande" (Purchase Orders) is
+masculine, so the Suppliers-side heading renders as "Bons de commande
+Récentes" instead of the grammatically correct "Récents". Confirmed
+Spanish/Portuguese ("recientes"/invariant for gender), German
+("Letzte", plural-invariant in this construction), and Dutch are all
+unaffected, since none of their equivalent adjectives decline by
+gender in this position. Not fixed: doing so correctly would require a
+separate gendered `msgctxt` variant per consumer noun, disproportionate
+to a single cosmetic heading — documented here per this series'
+established practice of naming known limitations rather than silently
+shipping imperfect grammar unremarked.
+
+Full suite 3486 passed (unchanged — template/locale/view-level Python
+string wrapping only, no business logic touched), `manage.py check`
+and `ruff check .` both clean, `msgfmt --check` clean on all 5 `.po`
+files after the plural-mismatch fix, zero fuzzy/blank entries confirmed
+programmatically at every stage of this pass's 3 makemessages
+re-runs (initial 332-entry pass, the 4-entry `contact_type` pass after
+the `gettext_lazy` fix, and the 2-entry `order_label_plural` pass), zero
+placeholder mismatches confirmed across the *entire* catalog (not just
+this batch's new entries — 3988 simple msgid/msgstr pairs checked in
+every language) both as a scoped and an unscoped sweep, and zero
+duplicated-substring corruption signatures found by scanning all 330
+translated values for the class of `msgmerge`-continuation-line bug
+documented earlier in this file. Verified end-to-end against the real
+dev server, in French and German with real sample data, across a
+representative sample spanning most of the 16 clusters: ATP Inquiry, a
+Capacity Planning report (confirmed the "repos"/day-off translation
+against real weekend cells), a real product's Carbon Footprint page,
+a real Document Control record's full revision history and
+linked-records forms, a real subsidiary's Companies list, a real
+Scenario's comparison-run page (confirmed the Make/Buy quantity
+translations and a real single `%` after the doubled-`%%` collapse),
+Price Lists, the Suppliers and Customers contact lists plus a real
+customer's and a real supplier's detail page (confirmed the "Recent
+Sales Orders"/"Recent Purchase Orders" fix renders with correct French
+grammar on the Customers side), the Shop Floor OEE dashboard (confirmed
+the A/P/Q single-letter convention holds), Intercompany Transactions'
+GL account-mapping dropdown, a Repetitive Manufacturing Schedule's
+production log, the FMEA Risk Register (confirmed the S/O/D column
+convention holds), and Consolidated Financials (confirmed the
+"Konzern-" German accounting-statement prefix convention applied
+consistently across Income Statement and Balance Sheet) — all pages
+return 200 with correctly translated titles and labels, no console or
+server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

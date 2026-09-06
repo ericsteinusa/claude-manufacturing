@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Carbon Footprint — {{ product.name }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with name=product.name %}Carbon Footprint — {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/inventory/{{ product.id }}/" class="btn">← Product</a>
-<a href="/costs/{{ product.id }}/" class="btn">Standard Cost</a>
-<a href="/routing/{{ product.id }}/" class="btn">Routing</a>
-<a href="/esg/" class="btn">ESG Dashboard</a>
+<a href="/inventory/{{ product.id }}/" class="btn">{% trans "← Product" %}</a>
+<a href="/costs/{{ product.id }}/" class="btn">{% trans "Standard Cost" %}</a>
+<a href="/routing/{{ product.id }}/" class="btn">{% trans "Routing" %}</a>
+<a href="/esg/" class="btn">{% trans "ESG Dashboard" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -43,82 +44,82 @@
 {% block body %}
 <div class="content">
 <div class="cost-wrap">
-    <h2>Carbon Footprint — {{ product.name }}</h2>
-    <div class="cost-meta">Item type: {{ product.item_type|default:"buy"|upper }}</div>
+    <h2>{% blocktrans with name=product.name %}Carbon Footprint — {{ name }}{% endblocktrans %}</h2>
+    <div class="cost-meta">{% trans "Item type:" %} {{ product.item_type|default:"buy"|upper }}</div>
 
     {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Direct Material Emission Factor</h3>
+        <h3>{% trans "Direct Material Emission Factor" %}</h3>
         <p style="font-size:13px;color:#555;margin-bottom:14px;">
-            kg CO2e per unit of this product, used directly when it's a purchased
-            ("buy") component in another product's rollup.</p>
+            {% blocktrans %}kg CO2e per unit of this product, used directly when it's a purchased
+            ("buy") component in another product's rollup.{% endblocktrans %}</p>
         <form method="post" class="form-row">
             {% csrf_token %}
             <input type="hidden" name="action" value="set_factor">
             <input type="number" step="0.0001" min="0" name="kg_co2e_per_unit"
                 value="{{ product.kg_co2e_per_unit|default:0 }}">
-            <button type="submit" class="btn-roll">Save Factor</button>
+            <button type="submit" class="btn-roll">{% trans "Save Factor" %}</button>
         </form>
     </div>
     {% endif %}
 
     {% if current_carbon %}
     <div class="card">
-        <h3>Current Carbon Footprint
+        <h3>{% trans "Current Carbon Footprint" %}
             <small style="font-weight:normal;color:var(--text-muted);font-size:12px;">
-                — rolled {{ current_carbon.effective_date|default:'' }}
+                {% blocktrans with d=current_carbon.effective_date|default:'' %}— rolled {{ d }}{% endblocktrans %}
             </small>
         </h3>
         <div class="cost-grid" style="margin-bottom:16px;">
             <div class="cost-box">
-                <div class="label">Material (Scope 3)</div>
+                <div class="label">{% trans "Material (Scope 3)" %}</div>
                 <div class="value">{{ current_carbon.material_carbon_kg|floatformat:3 }} kg</div>
             </div>
             <div class="cost-box">
-                <div class="label">Process (Scope 1)</div>
+                <div class="label">{% trans "Process (Scope 1)" %}</div>
                 <div class="value">{{ current_carbon.process_carbon_kg|floatformat:3 }} kg</div>
             </div>
         </div>
         <div class="total-box">
-            <div class="label">Total Carbon Intensity (per unit)</div>
+            <div class="label">{% trans "Total Carbon Intensity (per unit)" %}</div>
             <div class="value">{{ current_carbon.total_carbon_kg|floatformat:3 }} kg CO2e</div>
         </div>
     </div>
     {% else %}
     <div class="card">
-        <p style="color:var(--text-muted);text-align:center;padding:20px;">No carbon footprint on record yet.</p>
+        <p style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No carbon footprint on record yet." %}</p>
     </div>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Roll Carbon Footprint</h3>
+        <h3>{% trans "Roll Carbon Footprint" %}</h3>
         <p style="font-size:13px;color:#555;margin-bottom:14px;">
-            Recalculates material emissions from the Bill of Materials, plus process
-            emissions from routing operations. Saves a new snapshot with timestamp.
+            {% blocktrans %}Recalculates material emissions from the Bill of Materials, plus process
+            emissions from routing operations. Saves a new snapshot with timestamp.{% endblocktrans %}
         </p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="roll">
-            <button type="submit" class="btn-roll">Roll Carbon Footprint</button>
+            <button type="submit" class="btn-roll">{% trans "Roll Carbon Footprint" %}</button>
         </form>
     </div>
     {% endif %}
 
     {% if history %}
     <div class="card">
-        <h3>Carbon History</h3>
+        <h3>{% trans "Carbon History" %}</h3>
         <table class="hist-table">
             <thead>
                 <tr>
-                    <th>Rolled At</th>
-                    <th class="num">Material (kg)</th>
-                    <th class="num">Process (kg)</th>
-                    <th class="num">Total (kg)</th>
-                    <th>By</th>
+                    <th>{% trans "Rolled At" %}</th>
+                    <th class="num">{% trans "Material (kg)" %}</th>
+                    <th class="num">{% trans "Process (kg)" %}</th>
+                    <th class="num">{% trans "Total (kg)" %}</th>
+                    <th>{% trans "By" %}</th>
                 </tr>
             </thead>
             <tbody>

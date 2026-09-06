@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ contact_type_plural|capfirst }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="{{ new_url }}" class="btn btn-primary">+ New {{ contact_type|capfirst }}</a>
+<a href="{{ new_url }}" class="btn btn-primary">+ {% blocktrans with ct=contact_type|capfirst %}New {{ ct }}{% endblocktrans %}</a>
 {% endif %}
 <a href="?export=1{% if search %}&search={{ search|urlencode }}{% endif %}" class="btn">⬇ CSV</a>
 <a href="?export=1{% if search %}&search={{ search|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
@@ -17,11 +18,11 @@
     <form method="get" action="{{ list_url }}" class="filter-bar" style="flex-wrap:wrap;">
         <input type="text" name="search"
                style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:260px;"
-               placeholder="Search by name, company, or email…"
+               placeholder="{% trans "Search by name, company, or email…" %}"
                value="{{ search }}">
-        <button type="submit" class="btn btn-primary" style="padding:5px 14px;font-size:12px;">Search</button>
+        <button type="submit" class="btn btn-primary" style="padding:5px 14px;font-size:12px;">{% trans "Search" %}</button>
         {% if search %}
-        <a href="{{ list_url }}" style="font-size:12px;color:var(--text-muted);">Clear</a>
+        <a href="{{ list_url }}" style="font-size:12px;color:var(--text-muted);">{% trans "Clear" %}</a>
         {% endif %}
     </form>
 
@@ -30,11 +31,11 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Name / Company</th>
-                    <th>Contact</th>
-                    <th>Phone</th>
-                    <th>City, State</th>
-                    <th>Email</th>
+                    <th>{% trans "Name / Company" %}</th>
+                    <th>{% trans "Contact" %}</th>
+                    <th>{% trans "Phone" %}</th>
+                    <th>{% trans "City, State" %}</th>
+                    <th>{% trans "Email" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -60,20 +61,20 @@
                         <a href="mailto:{{ c.email }}">{{ c.email }}</a>
                         {% else %}—{% endif %}
                     </td>
-                    <td><a href="{{ detail_base }}{{ c.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">View</a></td>
+                    <td><a href="{{ detail_base }}{{ c.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "View" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">
-        {{ contacts|length }} {{ contact_type }}{{ contacts|length|pluralize }}
-        {% if search %} matching "{{ search }}"{% endif %}
+        {{ contacts|length }} {% if contacts|length == 1 %}{{ contact_type }}{% else %}{{ contact_type_plural }}{% endif %}
+        {% if search %} {% blocktrans %}matching "{{ search }}"{% endblocktrans %}{% endif %}
     </p>
     {% else %}
     <div class="empty-state">
-        No {{ contact_type_plural }} found{% if search %} matching "{{ search }}"{% endif %}.
-        {% if can_edit %}<a href="{{ new_url }}" style="color:var(--accent);margin-left:6px;">Add one →</a>{% endif %}
+        {% blocktrans %}No {{ contact_type_plural }} found{% endblocktrans %}{% if search %} {% blocktrans %}matching "{{ search }}"{% endblocktrans %}{% endif %}.
+        {% if can_edit %}<a href="{{ new_url }}" style="color:var(--accent);margin-left:6px;">{% trans "Add one" %} →</a>{% endif %}
     </div>
     {% endif %}
 </div>

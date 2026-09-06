@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Repetitive Schedule{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Repetitive Schedule" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/repetitive/" class="btn">Repetitive Manufacturing</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/repetitive/" class="btn">{% trans "Repetitive Manufacturing" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="cp-wrap">
-    <div class="menu-title">New Repetitive Schedule</div>
+    <div class="menu-title">{% trans "New Repetitive Schedule" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,7 +26,7 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Product *</label>
+                <label>{% trans "Product *" %}</label>
                 <select name="product_id" required>
                     {% for p in products %}
                     <option value="{{ p.id }}">{{ p.name }}</option>
@@ -33,7 +34,7 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Workcenter</label>
+                <label>{% trans "Workcenter" %}</label>
                 <select name="workcenter_id">
                     <option value="">—</option>
                     {% for w in workcenters %}
@@ -42,18 +43,18 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Rate / Day *</label>
+                <label>{% trans "Rate / Day *" %}</label>
                 <input type="number" name="rate_per_day" step="0.01" min="0.01" required>
             </div>
             <div class="form-row">
-                <label>Effective Start</label>
+                <label>{% trans "Effective Start" %}</label>
                 <input type="date" name="effective_start">
             </div>
             <div class="form-row">
-                <label>Effective End</label>
+                <label>{% trans "Effective End" %}</label>
                 <input type="date" name="effective_end">
             </div>
-            <button type="submit" class="btn btn-primary">Create Schedule</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Schedule" %}</button>
         </form>
     </div>
 </div>

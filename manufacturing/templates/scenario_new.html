@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Scenario{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Scenario" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/scenarios/" class="btn">Scenarios</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/scenarios/" class="btn">{% trans "Scenarios" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="scenario-wrap">
-    <div class="menu-title">New What-If Scenario</div>
+    <div class="menu-title">{% trans "New What-If Scenario" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,14 +26,14 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Name *</label>
-                <input type="text" name="name" required placeholder="e.g. Holiday Rush + Saturday Shift">
+                <label>{% trans "Name" %} *</label>
+                <input type="text" name="name" required placeholder="{% trans "e.g. Holiday Rush + Saturday Shift" %}">
             </div>
             <div class="form-row">
-                <label>Description</label>
-                <input type="text" name="description" placeholder="Optional description">
+                <label>{% trans "Description" %}</label>
+                <input type="text" name="description" placeholder="{% trans "Optional description" %}">
             </div>
-            <button type="submit" class="btn btn-primary">Create Scenario</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Scenario" %}</button>
         </form>
     </div>
 </div>

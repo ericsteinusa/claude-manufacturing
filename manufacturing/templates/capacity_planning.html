@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Capacity Planning{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Capacity Planning" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/schedule/gantt/" class="btn">Gantt</a>
-<a href="/workcenters/" class="btn">Work Centers</a>
-<a href="/scenarios/" class="btn">What-If Scenarios</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/schedule/gantt/" class="btn">{% trans "Gantt" %}</a>
+<a href="/workcenters/" class="btn">{% trans "Work Centers" %}</a>
+<a href="/scenarios/" class="btn">{% trans "What-If Scenarios" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,31 +39,31 @@
 {% block body %}
 <div class="content">
 <div class="cap-wrap">
-    <h2>Capacity Planning</h2>
-    <p class="sub">Booked vs. available hours per work center per day, bottleneck ranking,
-        and load-leveling suggestions for over-capacity days.</p>
+    <h2>{% trans "Capacity Planning" %}</h2>
+    <p class="sub">{% blocktrans %}Booked vs. available hours per work center per day, bottleneck ranking,
+        and load-leveling suggestions for over-capacity days.{% endblocktrans %}</p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="date-form">
-        <label style="font-size:12px;color:var(--text-muted);">From</label>
+        <label style="font-size:12px;color:var(--text-muted);">{% trans "From" %}</label>
         <input type="date" name="date_from" value="{{ date_from }}">
-        <label style="font-size:12px;color:var(--text-muted);">To</label>
+        <label style="font-size:12px;color:var(--text-muted);">{% trans "To" %}</label>
         <input type="date" name="date_to" value="{{ date_to }}">
-        <button type="submit" class="btn btn-primary" style="padding:5px 14px;">Go</button>
+        <button type="submit" class="btn btn-primary" style="padding:5px 14px;">{% trans "Go" %}</button>
     </form>
 
     <div class="card">
-        <h3>Bottleneck Ranking</h3>
+        <h3>{% trans "Bottleneck Ranking" %}</h3>
         <table class="rank-table">
             <thead>
                 <tr>
-                    <th>Work Center</th>
-                    <th class="num">Utilization</th>
-                    <th class="num">Booked hrs</th>
-                    <th class="num">Available hrs</th>
-                    <th class="num">Over-Capacity Days</th>
+                    <th>{% trans "Work Center" %}</th>
+                    <th class="num">{% trans "Utilization" %}</th>
+                    <th class="num">{% trans "Booked hrs" %}</th>
+                    <th class="num">{% trans "Available hrs" %}</th>
+                    <th class="num">{% trans "Over-Capacity Days" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -79,18 +80,18 @@
                     <td class="num">{{ b.over_capacity_days }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No active work centers.</td></tr>
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">{% trans "No active work centers." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
     <div class="card">
-        <h3>Daily Capacity — Booked / Available Hours</h3>
+        <h3>{% trans "Daily Capacity — Booked / Available Hours" %}</h3>
         <table class="heatmap-table">
             <thead>
                 <tr>
-                    <th class="wc-name">Work Center</th>
+                    <th class="wc-name">{% trans "Work Center" %}</th>
                     {% for d in day_range %}
                     <th>{{ d|slice:"5:" }}</th>
                     {% endfor %}
@@ -103,7 +104,7 @@
                     {% for day in c.days %}
                     <td class="{% if day.available == 0 %}cell-off{% elif day.over_capacity %}cell-over{% elif day.pct >= 80 %}cell-warn{% else %}cell-ok{% endif %}">
                         {% if day.available == 0 and day.booked == 0 %}
-                        off
+                        {% trans "off" %}
                         {% else %}
                         {{ day.booked|floatformat:1 }}/{{ day.available|floatformat:0 }}
                         {% endif %}
@@ -111,24 +112,24 @@
                     {% endfor %}
                 </tr>
                 {% empty %}
-                <tr><td style="text-align:center;color:var(--text-muted);">No active work centers.</td></tr>
+                <tr><td style="text-align:center;color:var(--text-muted);">{% trans "No active work centers." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
     <div class="card">
-        <h3>Load-Leveling Suggestions</h3>
+        <h3>{% trans "Load-Leveling Suggestions" %}</h3>
         {% if suggestions %}
         <table class="sugg-table">
             <thead>
                 <tr>
-                    <th>Work Center</th>
-                    <th>Over-Capacity Date</th>
-                    <th class="num">Over By (hrs)</th>
-                    <th>Operation</th>
+                    <th>{% trans "Work Center" %}</th>
+                    <th>{% trans "Over-Capacity Date" %}</th>
+                    <th class="num">{% trans "Over By (hrs)" %}</th>
+                    <th>{% trans "Operation" %}</th>
                     <th>WO</th>
-                    <th>Suggestion</th>
+                    <th>{% trans "Suggestion" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -142,9 +143,9 @@
                     <td>{{ s.wo_number }}</td>
                     <td>
                         {% if s.delay_to_date %}
-                        Delay to {{ s.delay_to_date }} ({{ s.delay_days }} day{{ s.delay_days|pluralize }})
+                        {% blocktrans count counter=s.delay_days with dt=s.delay_to_date %}Delay to {{ dt }} ({{ counter }} day){% plural %}Delay to {{ dt }} ({{ counter }} days){% endblocktrans %}
                         {% else %}
-                        <span style="color:var(--text-muted);">no slack found nearby</span>
+                        <span style="color:var(--text-muted);">{% trans "no slack found nearby" %}</span>
                         {% endif %}
                     </td>
                     <td>
@@ -153,7 +154,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="op_id" value="{{ s.op_id }}">
                             <input type="hidden" name="delay_days" value="{{ s.delay_days }}">
-                            <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Apply</button>
+                            <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Apply" %}</button>
                         </form>
                         {% endif %}
                     </td>
@@ -162,7 +163,7 @@
             </tbody>
         </table>
         {% else %}
-        <p style="color:var(--text-muted);font-size:13px;">No over-capacity days in this window.</p>
+        <p style="color:var(--text-muted);font-size:13px;">{% trans "No over-capacity days in this window." %}</p>
         {% endif %}
     </div>
 </div>

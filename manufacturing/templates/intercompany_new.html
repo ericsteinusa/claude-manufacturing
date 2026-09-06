@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}New Intercompany Transaction{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Intercompany Transaction" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/intercompany/" class="btn">← Back</a>
+<a href="/intercompany/" class="btn">← {% trans "Back" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">New Intercompany Transaction</div>
+    <div class="menu-title">{% trans "New Intercompany Transaction" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if notice %}<div class="alert alert-warning">{{ notice }}</div>{% endif %}
@@ -17,7 +18,7 @@
             <form method="post" action="">
                 {% csrf_token %}
                 <div class="form-row">
-                    <label>From Company (billing entity)</label>
+                    <label>{% trans "From Company (billing entity)" %}</label>
                     <select name="from_company_id" required>
                         {% for c in companies %}
                         <option value="{{ c.id }}">{{ c.name }}</option>
@@ -25,7 +26,7 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>To Company (billed entity)</label>
+                    <label>{% trans "To Company (billed entity)" %}</label>
                     <select name="to_company_id" required>
                         {% for c in companies %}
                         <option value="{{ c.id }}">{{ c.name }}</option>
@@ -33,20 +34,20 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <input type="text" name="description" required>
                 </div>
                 <div class="form-row">
-                    <label>Amount</label>
+                    <label>{% trans "Amount" %}</label>
                     <input type="number" name="amount" min="0.01" step="0.01" required>
                 </div>
                 <div class="form-row">
-                    <label>Transaction Date</label>
+                    <label>{% trans "Transaction Date" %}</label>
                     <input type="date" name="transaction_date" required>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn">Record Transaction</button>
-                    <a href="/intercompany/" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn">{% trans "Record Transaction" %}</button>
+                    <a href="/intercompany/" class="btn btn-cancel">{% trans "Cancel" %}</a>
                 </div>
             </form>
         </div>

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}ATP Inquiry{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "ATP Inquiry" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/so/" class="btn">← Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/so/" class="btn">← {% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -23,7 +24,7 @@
 {% block body %}
 <div class="content">
 <div class="atp-wrap">
-    <div class="menu-title">Available-to-Promise Inquiry</div>
+    <div class="menu-title">{% trans "Available-to-Promise Inquiry" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -31,23 +32,23 @@
         <form method="post" action="/atp/">
             {% csrf_token %}
             <div class="form-row">
-                <label>Product</label>
+                <label>{% trans "Product" %}</label>
                 <select name="product_id">
-                    <option value="">(select)</option>
+                    <option value="">{% trans "(select)" %}</option>
                     {% for p in products %}
                     <option value="{{ p.id }}"{% if form.product_id == p.id|stringformat:"s" %} selected{% endif %}>{{ p.product_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Qty</label>
+                <label>{% trans "Qty" %}</label>
                 <input type="number" name="qty" min="1" value="{{ form.qty }}">
             </div>
             <div class="form-row">
-                <label>Requested Date</label>
+                <label>{% trans "Requested Date" %}</label>
                 <input type="date" name="requested_date" value="{{ form.requested_date }}">
             </div>
-            <button type="submit" class="btn btn-primary">Check ATP</button>
+            <button type="submit" class="btn btn-primary">{% trans "Check ATP" %}</button>
         </form>
     </div>
 
@@ -55,17 +56,17 @@
     <div class="card atp-result">
         <h3>{{ result.product_name }}</h3>
         <div class="verdict {% if result.sufficient %}yes{% else %}no{% endif %}">
-            {% if result.sufficient %}Yes — sufficient{% else %}No — insufficient{% endif %}
+            {% if result.sufficient %}{% trans "Yes — sufficient" %}{% else %}{% trans "No — insufficient" %}{% endif %}
         </div>
         <div class="atp-meta">
-            <div><b>On hand:</b> {{ result.on_hand|floatformat:0 }}</div>
-            <div><b>Committed (confirmed SOs):</b> {{ result.committed_qty|floatformat:0 }}</div>
-            <div><b>Open PO receipts by {{ result.requested_date }}:</b> {{ result.open_po_qty|floatformat:0 }}</div>
-            <div><b>ATP qty:</b> {{ result.atp_qty|floatformat:0 }}</div>
+            <div><b>{% trans "On hand:" %}</b> {{ result.on_hand|floatformat:0 }}</div>
+            <div><b>{% trans "Committed (confirmed SOs):" %}</b> {{ result.committed_qty|floatformat:0 }}</div>
+            <div><b>{% blocktrans with rd=result.requested_date %}Open PO receipts by {{ rd }}:{% endblocktrans %}</b> {{ result.open_po_qty|floatformat:0 }}</div>
+            <div><b>{% trans "ATP qty:" %}</b> {{ result.atp_qty|floatformat:0 }}</div>
             {% if not result.sufficient %}
-            <div style="grid-column:1/-1;"><b>Earliest available:</b>
+            <div style="grid-column:1/-1;"><b>{% trans "Earliest available:" %}</b>
                 {% if result.earliest_available_date %}{{ result.earliest_available_date }}
-                {% else %}Not available within 90 days{% endif %}</div>
+                {% else %}{% trans "Not available within 90 days" %}{% endif %}</div>
             {% endif %}
         </div>
     </div>
