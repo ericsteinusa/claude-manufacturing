@@ -139,21 +139,33 @@ def receive_scan(request):
             # Scan a PO to start the session
             if raw.upper().startswith("PO-") or raw.upper().startswith("RCV-"):
                 prefix = "PO-" if raw.upper().startswith("PO-") else "RCV-"
-                po_number = raw[len(prefix):].upper()
-                row = conn.execute(
-                    "SELECT id FROM purchase_order WHERE po_number = %s",
-                    [po_number]
-                ).fetchone()
+                # A printed PO-/RCV- label encodes the tag plus the *full*
+                # po_number, which in this schema already carries its own
+                # leading prefix (e.g. "PO-2026-0001", "SMPL-PO-1") — so
+                # stripping just the tag recovers it. But a user who types
+                # or scans the bare po_number as shown elsewhere in the app
+                # (e.g. "PO-2026-0001") never had that extra tag to strip.
+                # Try both so either input matches.
+                stripped = raw[len(prefix):].upper()
+                row = None
+                for candidate in (stripped, raw.upper()):
+                    row = conn.execute(
+                        "SELECT id, po_number FROM purchase_order WHERE po_number = %s",
+                        [candidate]
+                    ).fetchone()
+                    if row:
+                        break
                 if row:
                     request.session["receive_po_id"] = row["id"]
-                    ctx["success"] = f"PO {po_number} loaded — scan parts to receive."
+                    ctx["success"] = f"PO {row['po_number']} loaded — scan parts to receive."
                 else:
-                    ctx["error"] = f"PO not found: {po_number}"
+                    ctx["error"] = f"PO not found: {raw}"
             # Scan a part to receive it
             elif raw.upper().startswith("PART-") and po_id:
                 sku = raw[5:].upper()
                 matched = [i for i in items
                            if str(i.get("sku") or "").upper() == sku
+                           or str(i.get("product_id") or "").upper() == sku
                            or str(i.get("description") or "").upper() == sku]
                 if matched:
                     item = matched[0]
