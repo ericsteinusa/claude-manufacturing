@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block page_title %}{{ partner.partner_name|default:"Trading Partner" }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if partner.partner_name %}{{ partner.partner_name }}{% else %}{% trans "Trading Partner" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/edi/partners/" class="btn">← Back</a>
+<a href="/edi/partners/" class="btn">← {% trans "Back" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -22,21 +23,21 @@
 <div class="content">
     <div class="po-wrap">
         <div class="po-card">
-            <h2 style="margin-top:0;">{{ partner.partner_name|default:"Trading Partner" }}</h2>
+            <h2 style="margin-top:0;">{% if partner.partner_name %}{{ partner.partner_name }}{% else %}{% trans "Trading Partner" %}{% endif %}</h2>
             <div class="po-meta">
-                <div><b>Customer:</b> {{ partner.company_name|default:partner.first_name }} {{ partner.last_name|default:"" }}</div>
-                <div><b>Status:</b> {% if partner.is_active %}Active{% else %}Inactive{% endif %}</div>
-                <div><b>ISA Sender ID:</b> {{ partner.isa_sender_id|default:"—" }}</div>
-                <div><b>ISA Receiver ID:</b> {{ partner.isa_receiver_id|default:"—" }}</div>
+                <div><b>{% trans "Customer:" %}</b> {{ partner.company_name|default:partner.first_name }} {{ partner.last_name|default:"" }}</div>
+                <div><b>{% trans "Status:" %}</b> {% if partner.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}</div>
+                <div><b>{% trans "ISA Sender ID:" %}</b> {{ partner.isa_sender_id|default:"—" }}</div>
+                <div><b>{% trans "ISA Receiver ID:" %}</b> {{ partner.isa_receiver_id|default:"—" }}</div>
             </div>
         </div>
 
         <div class="po-card">
-            <div class="card-title">Item Cross-Reference (partner part number → our product)</div>
+            <div class="card-title">{% trans "Item Cross-Reference (partner part number → our product)" %}</div>
             <p style="font-size:12px;color:#555;">
-                Our products have no SKU/code field, so this mapping is what lets an inbound
+                {% blocktrans %}Our products have no SKU/code field, so this mapping is what lets an inbound
                 EDI 850's PO1 line (carrying the partner's own part number) resolve to one of
-                our products. Unmapped lines still import — just without a linked product.</p>
+                our products. Unmapped lines still import — just without a linked product.{% endblocktrans %}</p>
 
             {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -44,24 +45,24 @@
             <form method="post" action="" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin-bottom:14px;">
                 {% csrf_token %}
                 <div>
-                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">Partner Item #</label>
+                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">{% trans "Partner Item #" %}</label>
                     <input type="text" name="partner_item_number" required>
                 </div>
                 <div>
-                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">Our Product</label>
+                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">{% trans "Our Product" %}</label>
                     <select name="product_id" required>
                         {% for p in products %}
                         <option value="{{ p.id }}">{{ p.product_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-sm">Add Mapping</button>
+                <button type="submit" class="btn btn-sm">{% trans "Add Mapping" %}</button>
             </form>
             {% endif %}
 
             {% if xrefs %}
             <table class="list-table">
-                <thead><tr><th>Partner Item #</th><th>Our Product</th></tr></thead>
+                <thead><tr><th>{% trans "Partner Item #" %}</th><th>{% trans "Our Product" %}</th></tr></thead>
                 <tbody>
                 {% for x in xrefs %}
                 <tr>
@@ -72,7 +73,7 @@
                 </tbody>
             </table>
             {% else %}
-            <p style="font-size:13px;color:#666;">No item mappings yet.</p>
+            <p style="font-size:13px;color:#666;">{% trans "No item mappings yet." %}</p>
             {% endif %}
         </div>
     </div>

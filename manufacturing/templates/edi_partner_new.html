@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}New EDI Trading Partner{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New EDI Trading Partner" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/edi/partners/" class="btn">← Back</a>
+<a href="/edi/partners/" class="btn">← {% trans "Back" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">New EDI Trading Partner</div>
+    <div class="menu-title">{% trans "New EDI Trading Partner" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -16,29 +17,29 @@
             <form method="post" action="">
                 {% csrf_token %}
                 <div class="form-row">
-                    <label>Customer</label>
+                    <label>{% trans "Customer" %}</label>
                     <select name="customer_id" required>
-                        <option value="">(select)</option>
+                        <option value="">{% trans "(select)" %}</option>
                         {% for c in customers %}
                         <option value="{{ c.id }}">{{ c.label }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Partner Name</label>
+                    <label>{% trans "Partner Name" %}</label>
                     <input type="text" name="partner_name">
                 </div>
                 <div class="form-row">
-                    <label>ISA Sender ID</label>
+                    <label>{% trans "ISA Sender ID" %}</label>
                     <input type="text" name="isa_sender_id" maxlength="15">
                 </div>
                 <div class="form-row">
-                    <label>ISA Receiver ID</label>
+                    <label>{% trans "ISA Receiver ID" %}</label>
                     <input type="text" name="isa_receiver_id" maxlength="15">
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn">Create Trading Partner</button>
-                    <a href="/edi/partners/" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn">{% trans "Create Trading Partner" %}</button>
+                    <a href="/edi/partners/" class="btn btn-cancel">{% trans "Cancel" %}</a>
                 </div>
             </form>
         </div>

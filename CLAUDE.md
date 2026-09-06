@@ -2688,6 +2688,68 @@ already-documented `psycopg2.errors.InternalError_: tuple concurrently
 updated` autoreload race occurred mid-verification, unrelated to this
 batch's changes, resolved by restarting the preview server).
 
+Also fully translated: the **EDI (Electronic Data Interchange)**
+feature (`edi_partner_list.html`, `edi_partner_detail.html`,
+`edi_partner_new.html`, `edi_850_upload.html`,
+`edi_transaction_log_list.html` — 5 templates, linked from
+`so_list.html`'s already-translated "EDI" toolbar button and reachable
+from Accounting's/Production's 810/856 download links too — another
+"translate the link, not yet the target" closure). 25 unique strings
+across 5 languages (23 simple + 2 plural). Small enough to translate
+directly by hand rather than delegating, matching the ABC
+Costing/Auth/Risk Management/Scan/Recipes/Promotions/e-Commerce
+precedent. The "EDI 850"/"EDI 855"/"EDI 810"/"EDI 856" document-type
+codes stay untranslated literals (same treatment as the barcode
+prefixes in the Scan pass), including the raw `l.doc_type` enum
+rendered with a literal "EDI " prefix in the transaction log.
+
+**The trickiest single string in this series' history**: the EDI 850
+upload success message combines an embedded dynamic link, a pluralized
+line count, and an *optional* pluralized "N unmapped" suffix, all in
+one sentence — "Created `<a href="/so/{{ id }}/">`{{ num }}`</a>` with
+{{ count }} line(s)[, {{ count }} unmapped]." Split into two
+independent `{% blocktrans count %}` blocks rather than one combined
+block, since gettext plural forms only support a single counting
+variable per block (the same two-independent-counts technique
+`mrp_release.html` established for "Released N WO(s) and M PO(s)",
+here applied to a *conditional* second count rather than an
+always-present one) — the first block handles "Created `<a>`...`</a>`
+with N line(s)" (embedding the link via a plain `id`/`num` `with`
+binding, the same pattern established in the Sales/Consignment/
+e-Commerce passes for links inside `blocktrans`), the second,
+independently pluralized block handles the optional ", N unmapped"
+tail, wrapped in its own `{% if %}`. Verified both the singular
+("1 line.") and plural-with-unmapped ("3 lines, 2 unmapped.") render
+paths directly via `Template().render()` before ever touching
+`makemessages`, confirming the link renders correctly inside the
+pluralized block in both forms.
+
+Full suite 3486 passed (+11 from the separately-merged barcode-scan
+bugfix PRs #265/#266, unrelated to this i18n-only batch — confirmed by
+diffing `tests/` against the pre-EDI-batch commit before trusting the
+new count), `manage.py check` and `ruff check .` both clean,
+`msgfmt --check` clean on all 5 `.po` files, zero fuzzy/blank entries
+confirmed programmatically, zero placeholder (`%(id)s`/`%(num)s`/
+`%(counter)s`-style) mismatches between msgid and any of the 5
+languages' translations, checked across both the simple and plural
+entry sets. The auto-merged generic labels this batch reused
+(Customer, Customer:, Status:, Active, Inactive, Manage, Our Product,
+Add Mapping, No item mappings yet., Back, Home, Cancel) all
+cross-checked semantically compatible with their existing catalog
+translations — the "Our Product"/"Add Mapping"/"No item mappings yet."
+reuse from the e-Commerce Connections pass in particular confirms this
+codebase's cross-reference-mapping vocabulary is now shared cleanly
+across both features. Verified end-to-end against the real dev server,
+in French with real sample data: the EDI Trading Partners list
+(confirmed a real partner row with ISA sender/receiver IDs), a real
+partner's detail page (confirmed the Item Cross-Reference card with an
+actual mapped part number → product row), the New Trading Partner
+form, the Import EDI 850 upload form, and the Transaction Log
+(confirmed 5 real log rows spanning EDI 850/855/856/810 with untranslated
+raw doc-type/direction values sitting correctly bare next to translated
+column headers) — all pages return 200 with correctly translated
+titles and labels, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
