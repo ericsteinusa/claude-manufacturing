@@ -249,22 +249,31 @@ versions in `package.json`/`package-lock.json` drift behind what
 `expo export --platform web` (done in PR #90, and again in PR #96).
 
 ## Localization (i18n)
-Closes COMPETITIVE_GAP_ANALYSIS.md §6.11 — deliberately partial, matching this
-project's other honestly-scoped gap closures (mobile offline support, RFID,
-predictive maintenance) rather than claiming full coverage. Real, working
+Closes COMPETITIVE_GAP_ANALYSIS.md §6.11 (and its §9.4/§10.5/§11 follow-ups)
+— **now complete**, unlike this project's other honestly-scoped *partial*
+gap closures (mobile offline support, RFID, predictive maintenance): every
+template in `manufacturing/templates/` (474/474) plus `menus.py`'s
+`MENU_TREE` (the Python-side department drill-down menu, which never
+counted toward the template metric since it isn't one) load i18n and
+translate cleanly into six languages with zero fuzzy/untranslated entries
+in any of them, confirmed via `msgfmt --statistics`. This section's history
+below is preserved as a chronological log of how coverage was built up from
+one department at a time to that 100% endpoint — read it as a build order
+and a catalog of every escaping/pluralization/fuzzy-matching gotcha hit
+along the way, not as a description of current scope. Real, working
 infrastructure: `django.middleware.locale.LocaleMiddleware` (positioned after
 `SessionMiddleware`, before `CommonMiddleware`, per Django's own requirement),
 `LANGUAGES`/`LOCALE_PATHS` in `manufacture/settings.py`, and a language
 switcher (`<select>` posting to Django's built-in `set_language` view, wired
-at `/i18n/` in `manufacture/urls.py`) in `base.html`'s top bar. Four languages
-are wired up: English (default), Spanish, French, German
-(`locale/{es,fr,de}/LC_MESSAGES/django.po`, all real translations, not
-placeholder text — added after the original Spanish-only pass to close the
-localization-breadth gap flagged in COMPETITIVE_GAP_ANALYSIS.md §9's
-comparison against MRPeasy, which ships more languages than a single-language
-pass would have). Translation coverage is the app's core navigation shell,
-main landing page, two department dashboards, and both remaining htmx
-live-refresh templates so far — `base.html` (sidebar: all 11 section headers
+at `/i18n/` in `manufacture/urls.py`) in `base.html`'s top bar, plus
+`base_card.html` (login/register/password/MFA) and both customer/supplier
+portal base templates. Six languages are wired up: English (default),
+Spanish, French, German, Portuguese, Dutch
+(`locale/{es,fr,de,pt,nl}/LC_MESSAGES/django.po`, all real translations, not
+placeholder or machine-translated text throughout). The initial pass's
+translation coverage was the app's core navigation shell, main landing
+page, two department dashboards, and both remaining htmx live-refresh
+templates — `base.html` (sidebar: all 11 section headers
 + all ~37 nav links; top bar: notifications, password, 2FA, logout),
 `home.html` (the login page), `dashboard.html` (the post-login main
 dashboard: KPI labels, chart titles, the pending-PO-approvals banner using a

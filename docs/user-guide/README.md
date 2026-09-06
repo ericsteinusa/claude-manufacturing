@@ -9,6 +9,10 @@ used by employees at their desks. If you're looking for the mobile
 companion app, see [`mobile/AGENTS.md`](../../mobile/AGENTS.md) and the
 "Mobile app" section of the project's [`CLAUDE.md`](../../CLAUDE.md).
 
+The app is available in six languages (English, Spanish, French, German,
+Portuguese, Dutch) — see [Getting Started](00-getting-started.md#language)
+for how to switch.
+
 ## Contents
 
 1. [Getting Started](00-getting-started.md) — signing in, navigation, roles

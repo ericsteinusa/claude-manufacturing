@@ -23,6 +23,16 @@ Other account pages you may need:
   current password and a new one.
 - **Log Out** (`/logout/`) — ends your session.
 
+## Language
+
+The app is available in six languages: **English, Spanish, French, German,
+Portuguese, and Dutch**. A language dropdown appears in the top-right of the
+sign-in page, and in the top bar of every page once you're signed in —
+picking a language reloads the page in that language immediately, and it
+stays selected for the rest of your session. Every screen in the app is
+translated, including the customer and supplier self-service portals
+(each with their own language switcher in their own header).
+
 ## Where you land after signing in
 
 - If you're a **President** or **Vice President**, you land on the
