@@ -2268,6 +2268,71 @@ and a real plan's detail page (confirmed all seven form labels) — all
 pages return 200 with correctly translated titles and labels, no
 console or server errors.
 
+Also fully translated: **Work Centers** and **Routing**
+(`workcenter_list.html`, `workcenter_calendar.html`, `routing_detail
+.html` — 3 templates, the twenty-fifth "whole feature" pass, and the
+highest-visibility "translate the link, not yet the target" closure in
+this series so far — `base.html`'s core sidebar itself links to
+`workcenter_list` under Production's "🏭 Postes de travail" entry,
+already translated since the very first i18n pass, but every page
+behind it was still English-only). Marked up by two parallel subagents
+(Work Center list+calendar vs. Routing detail), translated by hand
+afterward — small enough (43 strings: 42 simple + 1 plural) to skip
+delegating the translation step.
+
+**Introduced a genuinely new pattern for this series: day-of-week
+abbreviations.** `workcenter_list.html` uses a compact 2-letter form
+(Mo/Tu/We/Th/Fr/Sa/Su) in a read-only calendar-summary cell *and* a
+3-letter form (Mon/Tue/Wed/Thu/Fri/Sat/Sun) in its own Add-form
+checkboxes — two genuinely different strings needing two separate sets
+of `{% trans %}` tags, not one shared set; `workcenter_calendar.html`
+reuses only the 3-letter form. Translated each with the target
+language's own natural weekday abbreviation convention rather than a
+literal transliteration of the English letter count — German and Dutch
+both use 2-letter abbreviations as their *natural* form (Mo/Di/Mi/Do/
+Fr/Sa/So and Ma/Di/Wo/Do/Vr/Za/Zo respectively), so their "3-letter
+slot" translations are identical to their "2-letter slot" ones by
+design, not a translation gap; Portuguese's 2-letter slot uses ad hoc
+two-character codes (Sg/Te/Qa/Qi/Sx/Sb/Do) since Portuguese has no
+standard super-short weekday abbreviation the way Spanish/French/
+German do, while its 3-letter slot uses the real standard Portuguese
+abbreviations (Seg/Ter/Qua/Qui/Sex/Sáb/Dom). Verified end-to-end in
+French rather than by translation-table inspection alone: fetched a
+real workcenter's list row (confirmed "Lu Ma Me Je Ve" for its 2-letter
+weekday summary) and that same workcenter's calendar page (confirmed
+"Lun/Mar/Mer/Jeu/Ven/Sam/Dim" for its 3-letter checkbox labels) side by
+side, so the two forms are confirmed genuinely distinct in the
+rendered UI, not just in the source `.po` file.
+
+`routing_detail.html` combined three tricky patterns already
+established elsewhere in this series, cleanly handled together in one
+file for the first time: a dynamic title (`Routing — {{ product.name
+}}`), a `{{ x }}...{{ x|pluralize }}` conversion to `{% blocktrans
+count %}`, and a `{% blocktrans with %}`-bound acronym sentence ("SKU:
+{{ sku }}") where the acronym itself (SKU) stays literal in every
+language per the established NCR/CAPA/PO precedent. Both subagents
+correctly avoided running `manage.py makemessages` themselves, having
+been explicitly told not to after the APM batch's prior incident —
+confirmed via `git status`/`git diff --stat locale/` showing zero
+changes before either markup-only diff was trusted.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check`
+clean on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically. Grepped the short/generic labels reused via
+exact-msgid auto-merge (Seq, Operation, Work Center) for the
+"Make"-style cross-context mistranslation risk — all three merged with
+`wo_detail.html`'s and `control_plan_detail.html`'s existing uses of
+the identical concepts (a routing/operation sequence number, an
+operation name, a work center), semantically compatible, no bug.
+Verified end-to-end against the real dev server, in French with real
+sample data: the Work Centers list (confirmed both weekday-abbreviation
+forms as described above), a real workcenter's Calendar page (confirmed
+the dynamic "{name} — Calendrier" title), and a real product's Routing
+page (confirmed the dynamic "Gamme — {name}" title, the "3 opérations"
+plural, and all 5 table headers) — all pages return 200 with correctly
+translated titles and labels, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

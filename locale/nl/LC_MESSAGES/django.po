@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 00:37+0000\n"
+"POT-Creation-Date: 2026-09-06 00:54+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -555,6 +555,8 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/wo_detail.html:12
 #: manufacturing/templates/wo_form.html:8
 #: manufacturing/templates/wo_list.html:11
+#: manufacturing/templates/workcenter_calendar.html:8
+#: manufacturing/templates/workcenter_list.html:8
 #: manufacturing/templates/workforce_analytics.html:8
 msgid "Home"
 msgstr "Start"
@@ -605,6 +607,7 @@ msgstr "Costdriververbruik per Product"
 #: manufacturing/templates/qa_inspection_list.html:114
 #: manufacturing/templates/qa_ncr_list.html:87
 #: manufacturing/templates/reports_dashboard.html:199
+#: manufacturing/templates/routing_detail.html:6
 #: manufacturing/templates/sales_demand.html:149
 #: manufacturing/templates/sales_order_detail.html:121
 #: manufacturing/templates/sales_order_detail.html:170
@@ -641,9 +644,11 @@ msgstr "Driverhoeveelheid"
 #: manufacturing/templates/payroll_deductions.html:141
 #: manufacturing/templates/po_detail.html:202
 #: manufacturing/templates/rfq_detail.html:57
+#: manufacturing/templates/routing_detail.html:82
 #: manufacturing/templates/skill_requirements.html:54
 #: manufacturing/templates/so_detail.html:220
 #: manufacturing/templates/wms_transfer_detail.html:53
+#: manufacturing/templates/workcenter_calendar.html:81
 msgid "Remove"
 msgstr "Verwijderen"
 
@@ -749,6 +754,7 @@ msgstr "Nieuwe Activiteitskostenpool"
 #: manufacturing/templates/maint_part_detail.html:47
 #: manufacturing/templates/maint_parts_list.html:106
 #: manufacturing/templates/skill_new.html:29
+#: manufacturing/templates/workcenter_list.html:98
 msgid "Name *"
 msgstr "Naam *"
 
@@ -943,6 +949,8 @@ msgstr "bijv. per omstelling, per machine-uur"
 #: manufacturing/templates/risk_continuity_list.html:134
 #: manufacturing/templates/risk_insurance_list.html:138
 #: manufacturing/templates/risk_kri_list.html:133
+#: manufacturing/templates/routing_detail.html:63
+#: manufacturing/templates/routing_detail.html:121
 #: manufacturing/templates/sales_commission_history.html:62
 #: manufacturing/templates/sales_commissions.html:116
 #: manufacturing/templates/sales_commissions.html:187
@@ -976,6 +984,9 @@ msgstr "bijv. per omstelling, per machine-uur"
 #: manufacturing/templates/wms_transfer_new.html:30
 #: manufacturing/templates/wo_detail.html:159
 #: manufacturing/templates/wo_form.html:84
+#: manufacturing/templates/workcenter_calendar.html:68
+#: manufacturing/templates/workcenter_calendar.html:104
+#: manufacturing/templates/workcenter_list.html:115
 msgid "Notes"
 msgstr "Notities"
 
@@ -989,6 +1000,7 @@ msgstr "Notities"
 #: manufacturing/templates/employee_gap_detail.html:96
 #: manufacturing/templates/qa_ncr_list.html:131
 #: manufacturing/templates/req_detail.html:166
+#: manufacturing/templates/routing_detail.html:122
 #: manufacturing/templates/skill_requirements.html:102
 #: manufacturing/templates/technician_route_detail.html:134
 #: manufacturing/templates/webhook_edit.html:54
@@ -1417,6 +1429,7 @@ msgstr "Recente Journaalposten"
 #: manufacturing/templates/technician_route_list.html:29
 #: manufacturing/templates/time_clock_attendance.html:58
 #: manufacturing/templates/time_clock_hours.html:60
+#: manufacturing/templates/workcenter_calendar.html:68
 msgid "Date"
 msgstr "Datum"
 
@@ -1853,6 +1866,7 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/wo_form.html:67
 #: manufacturing/templates/wo_form.html:72
 #: manufacturing/templates/wo_list.html:37
+#: manufacturing/templates/workcenter_list.html:59
 msgid "Status"
 msgstr "Status"
 
@@ -2826,6 +2840,7 @@ msgstr "Goedkeuringsregels"
 #: manufacturing/templates/wms_putaway_rule_list.html:44
 #: manufacturing/templates/wms_rfid_reader_list.html:47
 #: manufacturing/templates/wms_warehouse_list.html:36
+#: manufacturing/templates/workcenter_list.html:73
 #: manufacturing/templates/workforce_analytics.html:57
 msgid "Active"
 msgstr "Actief"
@@ -2849,6 +2864,7 @@ msgstr "Actief"
 #: manufacturing/templates/wms_bin_list.html:59
 #: manufacturing/templates/wms_rfid_reader_list.html:47
 #: manufacturing/templates/wms_warehouse_list.html:36
+#: manufacturing/templates/workcenter_list.html:75
 msgid "Inactive"
 msgstr "Inactief"
 
@@ -2895,6 +2911,8 @@ msgstr "Entiteitstype *"
 #: manufacturing/templates/termination_list.html:71
 #: manufacturing/templates/time_clock_attendance.html:85
 #: manufacturing/templates/user_roles.html:22
+#: manufacturing/templates/workcenter_list.html:56
+#: manufacturing/templates/workcenter_list.html:102
 #: manufacturing/templates/workforce_analytics.html:57
 #: manufacturing/templates/workforce_analytics.html:91
 msgid "Department"
@@ -2941,6 +2959,7 @@ msgstr "Escaleren Na (uur) *"
 #: manufacturing/templates/mkt_research_list.html:166
 #: manufacturing/templates/sales_commissions.html:238
 #: manufacturing/templates/sampling_plan_new.html:70
+#: manufacturing/templates/workcenter_list.html:116
 msgid "Optional notes"
 msgstr "Optionele notities"
 
@@ -3039,6 +3058,7 @@ msgstr "Goedkeurende Rol"
 
 #: manufacturing/templates/approval_rule_list.html:43
 #: manufacturing/templates/control_plan_detail.html:64
+#: manufacturing/templates/routing_detail.html:59
 #: manufacturing/templates/wms_pick_list_detail.html:37
 #: manufacturing/templates/wo_detail.html:225
 msgid "Seq"
@@ -3416,6 +3436,7 @@ msgstr "Zoeken op naam of e-mail..."
 #: manufacturing/templates/wms_bin_new.html:27
 #: manufacturing/templates/wms_warehouse_list.html:21
 #: manufacturing/templates/wms_warehouse_list.html:29
+#: manufacturing/templates/workcenter_list.html:55
 msgid "Name"
 msgstr "Naam"
 
@@ -4017,6 +4038,10 @@ msgid "MRP"
 msgstr "MRP"
 
 #: manufacturing/templates/base.html:508
+#: manufacturing/templates/routing_detail.html:7
+#: manufacturing/templates/workcenter_calendar.html:6
+#: manufacturing/templates/workcenter_list.html:3
+#: manufacturing/templates/workcenter_list.html:46
 msgid "Work Centers"
 msgstr "Werkcentra"
 
@@ -5390,7 +5415,9 @@ msgstr "Wacht op uw goedkeuring als <strong>%(role)s</strong>."
 #: manufacturing/templates/cc_detail.html:46
 msgid ""
 "Meaning of signature (e.g. &quot;I approve this count as accurate&quot;)"
-msgstr "Betekenis van de handtekening (bijv. &quot;ik keur deze telling als juist goed&quot;)"
+msgstr ""
+"Betekenis van de handtekening (bijv. &quot;ik keur deze telling als juist "
+"goed&quot;)"
 
 #: manufacturing/templates/cc_detail.html:47
 msgid "Re-enter your password"
@@ -5511,7 +5538,13 @@ msgid ""
 "Snapshots each matching product's current on-hand quantity into a\n"
 "        count sheet. ABC class is computed on the fly by extended value\n"
 "        (on-hand × unit cost) — top 20%% = A, next 30%% = B, remainder = C."
-msgstr "Legt de huidige voorraadhoeveelheid van elk overeenkomend product vast in een\n        telblad. De ABC-klasse wordt on-the-fly berekend op basis van de uitgebreide waarde\n        (voorraad × eenheidsprijs) — top 20%% = A, volgende 30%% = B, rest = C."
+msgstr ""
+"Legt de huidige voorraadhoeveelheid van elk overeenkomend product vast in "
+"een\n"
+"        telblad. De ABC-klasse wordt on-the-fly berekend op basis van de "
+"uitgebreide waarde\n"
+"        (voorraad × eenheidsprijs) — top 20%% = A, volgende 30%% = B, rest = "
+"C."
 
 #: manufacturing/templates/change_password.html:4
 #: manufacturing/templates/change_password.html:7
@@ -10611,6 +10644,7 @@ msgid "Journal Details"
 msgstr "Journaalpostgegevens"
 
 #: manufacturing/templates/gl_journal_detail.html:116
+#: manufacturing/templates/workcenter_calendar.html:96
 msgid "Date *"
 msgstr "Datum *"
 
@@ -16171,10 +16205,13 @@ msgid "List View"
 msgstr "Lijstweergave"
 
 #: manufacturing/templates/prod_schedule_gantt.html:8
+#: manufacturing/templates/workcenter_list.html:6
 msgid "Gantt"
 msgstr "Gantt"
 
 #: manufacturing/templates/prod_schedule_gantt.html:9
+#: manufacturing/templates/workcenter_calendar.html:7
+#: manufacturing/templates/workcenter_list.html:7
 msgid "Capacity Planning"
 msgstr "Capaciteitsplanning"
 
@@ -17853,6 +17890,73 @@ msgstr "Mitigatie"
 msgid "Create Risk"
 msgstr "Risico Aanmaken"
 
+#: manufacturing/templates/routing_detail.html:3
+#: manufacturing/templates/routing_detail.html:45
+#, python-format
+msgid "Routing — %(name)s"
+msgstr "Routing — %(name)s"
+
+#: manufacturing/templates/routing_detail.html:47
+#, python-format
+msgid "SKU: %(sku)s"
+msgstr "SKU: %(sku)s"
+
+#: manufacturing/templates/routing_detail.html:48
+#, python-format
+msgid "%(counter)s operation"
+msgid_plural "%(counter)s operations"
+msgstr[0] "%(counter)s bewerking"
+msgstr[1] "%(counter)s bewerkingen"
+
+#: manufacturing/templates/routing_detail.html:49
+msgid "View Cost Roll"
+msgstr "Kostenoverzicht Bekijken"
+
+#: manufacturing/templates/routing_detail.html:60
+#: manufacturing/templates/wo_detail.html:226
+msgid "Operation"
+msgstr "Bewerking"
+
+#: manufacturing/templates/routing_detail.html:61
+#: manufacturing/templates/routing_detail.html:108
+#: manufacturing/templates/wo_detail.html:227
+msgid "Work Center"
+msgstr "Werkplek"
+
+#: manufacturing/templates/routing_detail.html:62
+#: manufacturing/templates/routing_detail.html:117
+msgid "Std Hours"
+msgstr "Standaarduren"
+
+#: manufacturing/templates/routing_detail.html:82
+msgid "Remove this step?"
+msgstr "Deze stap verwijderen?"
+
+#: manufacturing/templates/routing_detail.html:89
+msgid "No routing steps defined yet."
+msgstr "Nog geen routingstappen gedefinieerd."
+
+#: manufacturing/templates/routing_detail.html:98
+msgid "Add Operation"
+msgstr "Bewerking Toevoegen"
+
+#: manufacturing/templates/routing_detail.html:104
+msgid "Operation Name *"
+msgstr "Bewerkingsnaam *"
+
+#: manufacturing/templates/routing_detail.html:105
+msgid "e.g. Weld Frame"
+msgstr "bijv. Frame Lassen"
+
+#: manufacturing/templates/routing_detail.html:110
+#: manufacturing/templates/user_roles.html:36
+msgid "-- none --"
+msgstr "-- geen --"
+
+#: manufacturing/templates/routing_detail.html:125
+msgid "+ Add Step"
+msgstr "+ Stap Toevoegen"
+
 #: manufacturing/templates/sales_coaching.html:3
 msgid "Coaching Notes"
 msgstr "Coachingnotities"
@@ -18888,7 +18992,12 @@ msgid ""
 "        sample size and accept/reject numbers from the lot quantity. A plan "
 "with neither\n"
 "        set is a general-purpose plan usable for any inspection."
-msgstr "Koppel een plan aan een product of leverancier zodat de ingangscontrole automatisch\n        de steekproefgrootte en accepteer-/afkeurgetallen kan berekenen op basis van de partijhoeveelheid. Een plan zonder\n        beide is een algemeen plan dat voor elke inspectie bruikbaar is."
+msgstr ""
+"Koppel een plan aan een product of leverancier zodat de ingangscontrole "
+"automatisch\n"
+"        de steekproefgrootte en accepteer-/afkeurgetallen kan berekenen op "
+"basis van de partijhoeveelheid. Een plan zonder\n"
+"        beide is een algemeen plan dat voor elke inspectie bruikbaar is."
 
 #: manufacturing/templates/sampling_plan_list.html:32
 #, python-format
@@ -20052,10 +20161,6 @@ msgstr "Huidige Rol"
 msgid "Assign Role"
 msgstr "Rol Toewijzen"
 
-#: manufacturing/templates/user_roles.html:36
-msgid "-- none --"
-msgstr "-- geen --"
-
 #: manufacturing/templates/user_roles.html:48
 msgid "No users found."
 msgstr "Geen gebruikers gevonden."
@@ -21150,14 +21255,6 @@ msgstr "Materiaal Toevoegen"
 msgid "Progress: %(done)s / %(total)s steps complete"
 msgstr "Voortgang: %(done)s / %(total)s stappen voltooid"
 
-#: manufacturing/templates/wo_detail.html:226
-msgid "Operation"
-msgstr "Bewerking"
-
-#: manufacturing/templates/wo_detail.html:227
-msgid "Work Center"
-msgstr "Werkplek"
-
 #: manufacturing/templates/wo_detail.html:228
 msgid "Std hrs"
 msgstr "Std. Uur"
@@ -21238,6 +21335,150 @@ msgstr "Geen werkorders met die status."
 #: manufacturing/templates/wo_list.html:69
 msgid "No work orders."
 msgstr "Geen werkorders."
+
+#: manufacturing/templates/workcenter_calendar.html:3
+#: manufacturing/templates/workcenter_calendar.html:36
+#, python-format
+msgid "%(name)s — Calendar"
+msgstr "%(name)s — Kalender"
+
+#: manufacturing/templates/workcenter_calendar.html:42
+#: manufacturing/templates/workcenter_list.html:119
+msgid "Working Days"
+msgstr "Werkdagen"
+
+#: manufacturing/templates/workcenter_calendar.html:47
+#: manufacturing/templates/workcenter_list.html:120
+msgid "Mon"
+msgstr "Ma"
+
+#: manufacturing/templates/workcenter_calendar.html:48
+#: manufacturing/templates/workcenter_list.html:121
+msgid "Tue"
+msgstr "Di"
+
+#: manufacturing/templates/workcenter_calendar.html:49
+#: manufacturing/templates/workcenter_list.html:122
+msgid "Wed"
+msgstr "Wo"
+
+#: manufacturing/templates/workcenter_calendar.html:50
+#: manufacturing/templates/workcenter_list.html:123
+msgid "Thu"
+msgstr "Do"
+
+#: manufacturing/templates/workcenter_calendar.html:51
+#: manufacturing/templates/workcenter_list.html:124
+msgid "Fri"
+msgstr "Vr"
+
+#: manufacturing/templates/workcenter_calendar.html:52
+#: manufacturing/templates/workcenter_list.html:125
+msgid "Sat"
+msgstr "Za"
+
+#: manufacturing/templates/workcenter_calendar.html:53
+#: manufacturing/templates/workcenter_list.html:126
+msgid "Sun"
+msgstr "Zo"
+
+#: manufacturing/templates/workcenter_calendar.html:55
+msgid "Save Working Days"
+msgstr "Werkdagen Opslaan"
+
+#: manufacturing/templates/workcenter_calendar.html:60
+msgid "Calendar Exceptions"
+msgstr "Kalenderuitzonderingen"
+
+#: manufacturing/templates/workcenter_calendar.html:62
+msgid ""
+"One-off overrides for a specific date — a holiday closure (0 hours) or an\n"
+"            overtime day (a custom hour value), regardless of the working-"
+"days pattern above."
+msgstr "Eenmalige uitzonderingen voor een specifieke datum — een feestdagsluiting (0 uur) of een\n            overwerkdag (een aangepaste urenwaarde), ongeacht het bovenstaande werkdagenpatroon."
+
+#: manufacturing/templates/workcenter_calendar.html:68
+msgid "Hours Available"
+msgstr "Beschikbare Uren"
+
+#: manufacturing/templates/workcenter_calendar.html:89
+msgid "No exceptions on file."
+msgstr "Geen uitzonderingen geregistreerd."
+
+#: manufacturing/templates/workcenter_calendar.html:100
+msgid "Hours Available (0 = closed)"
+msgstr "Beschikbare Uren (0 = gesloten)"
+
+#: manufacturing/templates/workcenter_calendar.html:105
+msgid "e.g. Christmas Day"
+msgstr "bijv. Eerste Kerstdag"
+
+#: manufacturing/templates/workcenter_calendar.html:107
+msgid "+ Add Exception"
+msgstr "+ Uitzondering Toevoegen"
+
+#: manufacturing/templates/workcenter_list.html:57
+#: manufacturing/templates/workcenter_list.html:106
+msgid "Capacity (hrs/day)"
+msgstr "Capaciteit (u/dag)"
+
+#: manufacturing/templates/workcenter_list.html:58
+#: manufacturing/templates/workcenter_list.html:110
+msgid "Labor Rate ($/hr)"
+msgstr "Arbeidstarief ($/u)"
+
+#: manufacturing/templates/workcenter_list.html:60
+#: manufacturing/templates/workcenter_list.html:81
+msgid "Calendar"
+msgstr "Kalender"
+
+#: manufacturing/templates/workcenter_list.html:79
+msgid "Mo"
+msgstr "Ma"
+
+#: manufacturing/templates/workcenter_list.html:79
+msgid "Tu"
+msgstr "Di"
+
+#: manufacturing/templates/workcenter_list.html:79
+msgid "We"
+msgstr "Wo"
+
+#: manufacturing/templates/workcenter_list.html:79
+msgid "Th"
+msgstr "Do"
+
+#: manufacturing/templates/workcenter_list.html:79
+msgid "Fr"
+msgstr "Vr"
+
+#: manufacturing/templates/workcenter_list.html:79
+msgid "Sa"
+msgstr "Za"
+
+#: manufacturing/templates/workcenter_list.html:79
+msgid "Su"
+msgstr "Zo"
+
+#: manufacturing/templates/workcenter_list.html:84
+msgid "No work centers yet."
+msgstr "Nog geen werkplekken."
+
+#: manufacturing/templates/workcenter_list.html:92
+msgid "Add Work Center"
+msgstr "Werkplek Toevoegen"
+
+#: manufacturing/templates/workcenter_list.html:99
+msgid "e.g. Assembly Line 1"
+msgstr "bijv. Assemblagelijn 1"
+
+#: manufacturing/templates/workcenter_list.html:103
+msgid "e.g. production"
+msgstr "bijv. productie"
+
+#: manufacturing/templates/workcenter_list.html:128
+msgid "+ Add Work Center"
+msgstr "+ Werkplek Toevoegen"
 
 #: manufacturing/templates/workforce_analytics.html:29
 msgid ""

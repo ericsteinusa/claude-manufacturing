@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Work Centers{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Work Centers" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/schedule/gantt/" class="btn">Gantt</a>
-<a href="/prod/schedule/capacity/" class="btn">Capacity Planning</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/schedule/gantt/" class="btn">{% trans "Gantt" %}</a>
+<a href="/prod/schedule/capacity/" class="btn">{% trans "Capacity Planning" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 <a href="?export=1" class="btn">⬇ CSV</a>
 <a href="?export=1&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
@@ -42,7 +43,7 @@
 {% block body %}
 <div class="content">
 <div class="wc-wrap">
-    <h2>Work Centers</h2>
+    <h2>{% trans "Work Centers" %}</h2>
 
     {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
@@ -51,12 +52,12 @@
         <table class="wc-table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Department</th>
-                    <th class="num">Capacity (hrs/day)</th>
-                    <th class="num">Labor Rate ($/hr)</th>
-                    <th>Status</th>
-                    <th>Calendar</th>
+                    <th>{% trans "Name" %}</th>
+                    <th>{% trans "Department" %}</th>
+                    <th class="num">{% trans "Capacity (hrs/day)" %}</th>
+                    <th class="num">{% trans "Labor Rate ($/hr)" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Calendar" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -69,18 +70,18 @@
                     <td style="text-align:right">{{ wc.labor_rate|floatformat:2 }}</td>
                     <td>
                         {% if wc.is_active %}
-                        <span class="badge-active">Active</span>
+                        <span class="badge-active">{% trans "Active" %}</span>
                         {% else %}
-                        <span class="badge-inactive">Inactive</span>
+                        <span class="badge-inactive">{% trans "Inactive" %}</span>
                         {% endif %}
                     </td>
                     <td style="font-size:12px;color:#555;">
-                        {% if wc.works_mon %}Mo {% endif %}{% if wc.works_tue %}Tu {% endif %}{% if wc.works_wed %}We {% endif %}{% if wc.works_thu %}Th {% endif %}{% if wc.works_fri %}Fr {% endif %}{% if wc.works_sat %}Sa {% endif %}{% if wc.works_sun %}Su{% endif %}
+                        {% if wc.works_mon %}{% trans "Mo" %} {% endif %}{% if wc.works_tue %}{% trans "Tu" %} {% endif %}{% if wc.works_wed %}{% trans "We" %} {% endif %}{% if wc.works_thu %}{% trans "Th" %} {% endif %}{% if wc.works_fri %}{% trans "Fr" %} {% endif %}{% if wc.works_sat %}{% trans "Sa" %} {% endif %}{% if wc.works_sun %}{% trans "Su" %}{% endif %}
                     </td>
-                    <td><a href="/workcenters/{{ wc.id }}/calendar/" class="btn" style="padding:3px 10px;font-size:12px;">Calendar</a></td>
+                    <td><a href="/workcenters/{{ wc.id }}/calendar/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Calendar" %}</a></td>
                 </tr>
             {% empty %}
-                <tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:20px;">No work centers yet.</td></tr>
+                <tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No work centers yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -88,43 +89,43 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Work Center</h3>
+        <h3>{% trans "Add Work Center" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="create">
             <div class="form-grid">
                 <div class="field">
-                    <label>Name *</label>
-                    <input type="text" name="name" required placeholder="e.g. Assembly Line 1">
+                    <label>{% trans "Name *" %}</label>
+                    <input type="text" name="name" required placeholder="{% trans "e.g. Assembly Line 1" %}">
                 </div>
                 <div class="field">
-                    <label>Department</label>
-                    <input type="text" name="dept" placeholder="e.g. production">
+                    <label>{% trans "Department" %}</label>
+                    <input type="text" name="dept" placeholder="{% trans "e.g. production" %}">
                 </div>
                 <div class="field">
-                    <label>Capacity (hrs/day)</label>
+                    <label>{% trans "Capacity (hrs/day)" %}</label>
                     <input type="number" name="capacity" step="0.5" value="8" min="0">
                 </div>
                 <div class="field">
-                    <label>Labor Rate ($/hr)</label>
+                    <label>{% trans "Labor Rate ($/hr)" %}</label>
                     <input type="number" name="labor_rate" step="0.01" value="0" min="0">
                 </div>
             </div>
             <div class="field">
-                <label>Notes</label>
-                <input type="text" name="notes" placeholder="Optional notes">
+                <label>{% trans "Notes" %}</label>
+                <input type="text" name="notes" placeholder="{% trans "Optional notes" %}">
             </div>
             <div class="field">
-                <label>Working Days</label>
-                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_mon" value="1" checked style="width:auto;"> Mon</label>
-                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_tue" value="1" checked style="width:auto;"> Tue</label>
-                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_wed" value="1" checked style="width:auto;"> Wed</label>
-                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_thu" value="1" checked style="width:auto;"> Thu</label>
-                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_fri" value="1" checked style="width:auto;"> Fri</label>
-                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_sat" value="1" style="width:auto;"> Sat</label>
-                <label style="display:inline;font-weight:normal;"><input type="checkbox" name="works_sun" value="1" style="width:auto;"> Sun</label>
+                <label>{% trans "Working Days" %}</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_mon" value="1" checked style="width:auto;"> {% trans "Mon" %}</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_tue" value="1" checked style="width:auto;"> {% trans "Tue" %}</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_wed" value="1" checked style="width:auto;"> {% trans "Wed" %}</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_thu" value="1" checked style="width:auto;"> {% trans "Thu" %}</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_fri" value="1" checked style="width:auto;"> {% trans "Fri" %}</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_sat" value="1" style="width:auto;"> {% trans "Sat" %}</label>
+                <label style="display:inline;font-weight:normal;"><input type="checkbox" name="works_sun" value="1" style="width:auto;"> {% trans "Sun" %}</label>
             </div>
-            <button type="submit" class="btn-sm">+ Add Work Center</button>
+            <button type="submit" class="btn-sm">{% trans "+ Add Work Center" %}</button>
         </form>
     </div>
     {% endif %}
