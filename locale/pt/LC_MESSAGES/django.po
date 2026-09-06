@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 01:09+0000\n"
+"POT-Creation-Date: 2026-09-06 01:27+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
@@ -130,6 +130,7 @@ msgstr "Produção"
 
 #: manufacturing/menus.py:1697 manufacturing/templates/base.html:530
 #: manufacturing/templates/base.html:532 manufacturing/templates/cc_list.html:6
+#: manufacturing/templates/costing_valuation_list.html:6
 #: manufacturing/templates/inventory_list.html:3
 #: manufacturing/templates/inventory_list.html:17
 #: manufacturing/templates/prod_dashboard.html:16
@@ -590,6 +591,8 @@ msgstr "Consumo de Direcionador por Produto"
 #: manufacturing/templates/consignment_list.html:37
 #: manufacturing/templates/consignment_new.html:30
 #: manufacturing/templates/control_plan_list.html:24
+#: manufacturing/templates/costing_product_detail.html:6
+#: manufacturing/templates/costing_valuation_list.html:22
 #: manufacturing/templates/inventory_list.html:65
 #: manufacturing/templates/lot_list.html:65
 #: manufacturing/templates/mrp_home.html:60
@@ -724,6 +727,7 @@ msgstr "Pool de Custos"
 #: manufacturing/templates/compliance_checklist_list.html:42
 #: manufacturing/templates/compliance_template_list.html:34
 #: manufacturing/templates/control_plan_list.html:45
+#: manufacturing/templates/costing_valuation_list.html:37
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/inventory_list.html:102
 #: manufacturing/templates/rfq_list.html:55
@@ -1404,6 +1408,7 @@ msgstr "Lançamentos Contabilísticos Recentes"
 #: manufacturing/templates/batch_record_detail.html:61
 #: manufacturing/templates/consignment_detail.html:83
 #: manufacturing/templates/consignment_detail.html:106
+#: manufacturing/templates/costing_product_detail.html:158
 #: manufacturing/templates/credit_account_detail.html:133
 #: manufacturing/templates/credit_account_detail.html:172
 #: manufacturing/templates/credit_collections_detail.html:62
@@ -1448,6 +1453,10 @@ msgstr "Data"
 #: manufacturing/templates/consignment_detail.html:106
 #: manufacturing/templates/consignment_receive.html:35
 #: manufacturing/templates/consignment_use.html:37
+#: manufacturing/templates/costing_product_detail.html:107
+#: manufacturing/templates/costing_product_detail.html:118
+#: manufacturing/templates/costing_product_detail.html:136
+#: manufacturing/templates/costing_product_detail.html:159
 #: manufacturing/templates/finance_dashboard_kpis.html:56
 #: manufacturing/templates/finance_tax_detail.html:148
 #: manufacturing/templates/gl_dashboard_kpis.html:46
@@ -2280,6 +2289,8 @@ msgstr "Montante ($)"
 #: manufacturing/templates/ap_invoice_payments_kpis.html:5
 #: manufacturing/templates/ar_invoice_detail.html:186
 #: manufacturing/templates/ar_invoice_payments_kpis.html:5
+#: manufacturing/templates/costing_product_detail.html:158
+#: manufacturing/templates/costing_valuation_list.html:22
 #: manufacturing/templates/payroll_deductions.html:121
 #: manufacturing/templates/payroll_deductions.html:179
 #: manufacturing/templates/po_detail.html:231
@@ -3224,6 +3235,7 @@ msgid "Customer:"
 msgstr "Cliente:"
 
 #: manufacturing/templates/ar_list.html:65
+#: manufacturing/templates/costing_product_detail.html:135
 #: manufacturing/templates/lot_detail.html:75
 #: manufacturing/templates/lot_list.html:68
 #: manufacturing/templates/po_detail.html:168
@@ -4427,7 +4439,10 @@ msgid ""
 "Only completed work orders have an as-built story worth recording. "
 "Materials, cost, and\n"
 "            quality inspections are snapshotted at generation time."
-msgstr "Somente ordens de trabalho concluídas têm um histórico de fabricação que vale a pena registrar. Materiais, custo e\n            inspeções de qualidade são capturados no momento da geração."
+msgstr ""
+"Somente ordens de trabalho concluídas têm um histórico de fabricação que "
+"vale a pena registrar. Materiais, custo e\n"
+"            inspeções de qualidade são capturados no momento da geração."
 
 #: manufacturing/templates/batch_record_list.html:35
 msgid "Completed Work Order *"
@@ -4464,6 +4479,9 @@ msgstr "Ordem de Trabalho"
 #: manufacturing/templates/bom_detail.html:231
 #: manufacturing/templates/consignment_detail.html:83
 #: manufacturing/templates/consignment_detail.html:105
+#: manufacturing/templates/costing_product_detail.html:105
+#: manufacturing/templates/costing_product_detail.html:117
+#: manufacturing/templates/costing_product_detail.html:158
 #: manufacturing/templates/inventory_detail.html:127
 #: manufacturing/templates/inventory_detail.html:229
 #: manufacturing/templates/lot_list.html:66
@@ -4499,6 +4517,7 @@ msgid "Qty"
 msgstr "Qtd."
 
 #: manufacturing/templates/batch_record_list.html:57
+#: manufacturing/templates/costing_product_detail.html:159
 #: manufacturing/templates/fixed_asset_list.html:65
 #: manufacturing/templates/maint_labor_report.html:129
 #: manufacturing/templates/prod_labor_report.html:128
@@ -5017,6 +5036,7 @@ msgstr "Validade"
 
 #: manufacturing/templates/blanket_po_list.html:33
 #: manufacturing/templates/consignment_detail.html:106
+#: manufacturing/templates/cost_detail.html:111
 #: manufacturing/templates/cs_reports_kpis.html:41
 #: manufacturing/templates/finance_budget_detail.html:135
 #: manufacturing/templates/marketing_dashboard_kpis.html:5
@@ -6263,6 +6283,8 @@ msgstr "Uso (Propriedade Transferida, Faturado ao Fornecedor)"
 
 #: manufacturing/templates/consignment_detail.html:105
 #: manufacturing/templates/consignment_list.html:38
+#: manufacturing/templates/costing_product_detail.html:106
+#: manufacturing/templates/costing_product_detail.html:135
 #: manufacturing/templates/inventory_detail.html:212
 #: manufacturing/templates/inventory_list.html:71
 #: manufacturing/templates/maint_parts_list.html:78
@@ -6364,6 +6386,7 @@ msgstr ""
 "                %(name)s"
 
 #: manufacturing/templates/consignment_receive.html:31
+#: manufacturing/templates/costing_product_detail.html:135
 #: manufacturing/templates/po_landed_cost_detail.html:31
 #: manufacturing/templates/po_landed_cost_new.html:51
 #: manufacturing/templates/supplier_portal_po_detail.html:52
@@ -6551,6 +6574,239 @@ msgstr "ex.: Plano de Controle do Conjunto do Quadro"
 #: manufacturing/templates/control_plan_new.html:44
 msgid "Create Control Plan"
 msgstr "Criar Plano de Controle"
+
+#: manufacturing/templates/cost_detail.html:3
+#: manufacturing/templates/cost_detail.html:45
+#, python-format
+msgid "Standard Cost — %(name)s"
+msgstr "Custo Padrão — %(name)s"
+
+#: manufacturing/templates/cost_detail.html:6
+msgid "← Product"
+msgstr "← Produto"
+
+#: manufacturing/templates/cost_detail.html:7
+msgid "Routing"
+msgstr "Roteiro"
+
+#: manufacturing/templates/cost_detail.html:8
+msgid "Carbon Footprint"
+msgstr "Pegada de Carbono"
+
+#: manufacturing/templates/cost_detail.html:9
+#: manufacturing/templates/inventory_detail.html:9
+msgid "FIFO/LIFO/Avg Valuation"
+msgstr "Valorização FIFO/LIFO/Média"
+
+#: manufacturing/templates/cost_detail.html:47
+#: manufacturing/templates/routing_detail.html:47
+#, python-format
+msgid "SKU: %(sku)s"
+msgstr "SKU: %(sku)s"
+
+#: manufacturing/templates/cost_detail.html:48
+#, python-format
+msgid "Cost type: %(ct)s"
+msgstr "Tipo de custo: %(ct)s"
+
+#: manufacturing/templates/cost_detail.html:56
+msgid "Current Standard Cost"
+msgstr "Custo Padrão Atual"
+
+#: manufacturing/templates/cost_detail.html:58
+#, python-format
+msgid "— rolled %(dt)s"
+msgstr "— calculado %(dt)s"
+
+#: manufacturing/templates/cost_detail.html:63
+#: manufacturing/templates/cost_detail.html:108
+#: manufacturing/templates/qa_supplier_list.html:84
+msgid "Material"
+msgstr "Material"
+
+#: manufacturing/templates/cost_detail.html:67
+#: manufacturing/templates/cost_detail.html:109
+msgid "Labor"
+msgstr "Mão de Obra"
+
+#: manufacturing/templates/cost_detail.html:71
+#: manufacturing/templates/cost_detail.html:110
+msgid "Overhead"
+msgstr "Custos Indiretos"
+
+#: manufacturing/templates/cost_detail.html:76
+msgid "Total Standard Cost"
+msgstr "Custo Padrão Total"
+
+#: manufacturing/templates/cost_detail.html:82
+msgid "No standard cost on record yet."
+msgstr "Ainda não há um custo padrão registrado."
+
+#: manufacturing/templates/cost_detail.html:88
+msgid "Roll Standard Cost"
+msgstr "Calcular Custo Padrão"
+
+#: manufacturing/templates/cost_detail.html:90
+msgid ""
+"Recalculates material cost from the Bill of Materials, plus labor cost from\n"
+"            routing operations. Saves a new snapshot with timestamp."
+msgstr "Recalcula o custo de material a partir da Lista de Materiais, mais o custo de mão de obra das\n            operações de roteiro. Salva um novo snapshot com carimbo de data/hora."
+
+#: manufacturing/templates/cost_detail.html:96
+msgid "Roll Cost"
+msgstr "Calcular Custo"
+
+#: manufacturing/templates/cost_detail.html:103
+msgid "Cost History"
+msgstr "Histórico de Custos"
+
+#: manufacturing/templates/cost_detail.html:107
+msgid "Rolled At"
+msgstr "Calculado em"
+
+#: manufacturing/templates/cost_detail.html:112
+#: manufacturing/templates/fixed_asset_detail.html:172
+#: manufacturing/templates/gl_dashboard_kpis.html:47
+#: manufacturing/templates/inventory_detail.html:232
+#: manufacturing/templates/it_asset_detail.html:256
+#: manufacturing/templates/spc_list.html:117
+#: manufacturing/templates/spc_log.html:101
+msgid "By"
+msgstr "Por"
+
+#: manufacturing/templates/costing_product_detail.html:3
+#: manufacturing/templates/costing_product_detail.html:43
+#, python-format
+msgid "Cost Valuation — %(name)s"
+msgstr "Valoração de Custos — %(name)s"
+
+#: manufacturing/templates/costing_product_detail.html:7
+msgid "Standard Cost"
+msgstr "Custo Padrão"
+
+#: manufacturing/templates/costing_product_detail.html:8
+msgid "All Valuations"
+msgstr "Todas as Valorações"
+
+#: manufacturing/templates/costing_product_detail.html:44
+#, python-format
+msgid "Item type: %(it)s · On-hand (product.amount): %(amt)s"
+msgstr "Tipo de item: %(it)s · Em estoque (product.amount): %(amt)s"
+
+#: manufacturing/templates/costing_product_detail.html:51
+msgid "Costing Method"
+msgstr "Método de Custeio"
+
+#: manufacturing/templates/costing_product_detail.html:53
+msgid ""
+"Defaults to <strong>standard</strong> (today's single purchase-price\n"
+"            behavior, unchanged). Switching to fifo / lifo / average starts\n"
+"            tracking discrete cost layers per receipt below — it never "
+"touches\n"
+"            the standard-cost roll on the \"Standard Cost\" page, the two "
+"are\n"
+"            independent, alternative valuation methods."
+msgstr "Usa por padrão <strong>standard</strong> (o comportamento atual de preço de compra único,\n            inalterado). Mudar para fifo / lifo / average começa a\n            rastrear camadas de custo discretas por recebimento abaixo — isso nunca afeta\n            o cálculo do custo padrão na página \"Standard Cost\", os dois são\n            métodos de valoração independentes e alternativos."
+
+#: manufacturing/templates/costing_product_detail.html:67
+msgid "Save Method"
+msgstr "Salvar Método"
+
+#: manufacturing/templates/costing_product_detail.html:73
+msgid "Current Valuation"
+msgstr "Valoração Atual"
+
+#: manufacturing/templates/costing_product_detail.html:76
+#: manufacturing/templates/costing_valuation_list.html:22
+msgid "Layer Qty Remaining"
+msgstr "Quantidade Restante em Camadas"
+
+#: manufacturing/templates/costing_product_detail.html:80
+#: manufacturing/templates/costing_valuation_list.html:23
+msgid "Avg Unit Cost"
+msgstr "Custo Unitário Médio"
+
+#: manufacturing/templates/costing_product_detail.html:85
+msgid "Total Layer Value"
+msgstr "Valor Total das Camadas"
+
+#: manufacturing/templates/costing_product_detail.html:90
+#, python-format
+msgid ""
+"⚠ Layer-tracked qty (%(layer_qty)s) differs from\n"
+"            product.amount (%(prod_amt)s) — some receipts/issues for this\n"
+"            product were recorded through a path that doesn't create/consume "
+"cost layers\n"
+"            (WMS, cycle count, manual adjustment, etc.). Use the forms below "
+"going forward to\n"
+"            keep the two in sync."
+msgstr "⚠ A quantidade rastreada por camadas (%(layer_qty)s) difere de\n            product.amount (%(prod_amt)s) — alguns recebimentos/saídas deste\n            produto foram registrados por um caminho que não cria/consome camadas de custo\n            (WMS, contagem cíclica, ajuste manual, etc.). Use os formulários abaixo daqui em diante para\n            manter os dois sincronizados."
+
+#: manufacturing/templates/costing_product_detail.html:101
+msgid "Record Costed Receipt"
+msgstr "Registrar Recebimento Custeado"
+
+#: manufacturing/templates/costing_product_detail.html:108
+#: manufacturing/templates/po_detail.html:169
+#: manufacturing/templates/wms_receive.html:58
+#: manufacturing/templates/wms_transfer_detail.html:65
+msgid "Receive"
+msgstr "Receber"
+
+#: manufacturing/templates/costing_product_detail.html:113
+msgid "Record Costed Issue"
+msgstr "Registrar Saída Custeada"
+
+#: manufacturing/templates/costing_product_detail.html:119
+#: manufacturing/templates/cs_dashboard_kpis.html:37
+msgid "Issue"
+msgstr "Problema"
+
+#: manufacturing/templates/costing_product_detail.html:125
+msgid ""
+"Set a FIFO/LIFO/Average costing method above to record costed receipts and "
+"issues."
+msgstr "Defina um método de custeio FIFO/LIFO/Média acima para registrar recebimentos e saídas custeados."
+
+#: manufacturing/templates/costing_product_detail.html:132
+msgid "Cost Layers (remaining qty > 0)"
+msgstr "Camadas de Custo (quantidade restante > 0)"
+
+#: manufacturing/templates/costing_product_detail.html:136
+msgid "Qty Remaining"
+msgstr "Quantidade Restante"
+
+#: manufacturing/templates/costing_product_detail.html:155
+msgid "COGS History"
+msgstr "Histórico de COGS"
+
+#: manufacturing/templates/costing_product_detail.html:159
+msgid "Shortfall"
+msgstr "Déficit"
+
+#: manufacturing/templates/costing_valuation_list.html:3
+msgid "Inventory Valuation (FIFO/LIFO/Avg)"
+msgstr "Valoração de Estoque (FIFO/LIFO/Média)"
+
+#: manufacturing/templates/costing_valuation_list.html:11
+msgid "Inventory Valuation"
+msgstr "Valoração de Estoque"
+
+#: manufacturing/templates/costing_valuation_list.html:13
+msgid ""
+"Products currently opted into FIFO / LIFO / Weighted-Average costing.\n"
+"    Every other product still uses the single standard purchase-price cost\n"
+"    field, unchanged. Set a product's method from its own valuation page."
+msgstr "Produtos atualmente configurados com custeio FIFO / LIFO / Média Ponderada.\n    Todos os outros produtos ainda usam o campo de custo de preço de compra único\n    padrão, inalterado. Defina o método de um produto em sua própria página de valoração."
+
+#: manufacturing/templates/costing_valuation_list.html:24
+#: manufacturing/templates/purch_reports.html:69
+msgid "Total Value"
+msgstr "Valor Total"
+
+#: manufacturing/templates/costing_valuation_list.html:44
+msgid "No products are on a FIFO/LIFO/Average costing method yet."
+msgstr "Ainda não há produtos com um método de custeio FIFO/LIFO/Média."
 
 #: manufacturing/templates/credit_account_detail.html:3
 #, python-format
@@ -7097,10 +7353,6 @@ msgstr "Chamados Recentes"
 #: manufacturing/templates/cs_returns_list.html:77
 msgid "ID"
 msgstr "ID"
-
-#: manufacturing/templates/cs_dashboard_kpis.html:37
-msgid "Issue"
-msgstr "Problema"
 
 #: manufacturing/templates/cs_dashboard_kpis.html:52
 #: manufacturing/templates/cs_detail.html:71
@@ -10217,15 +10469,6 @@ msgstr "Evento"
 msgid "Details"
 msgstr "Detalhes"
 
-#: manufacturing/templates/fixed_asset_detail.html:172
-#: manufacturing/templates/gl_dashboard_kpis.html:47
-#: manufacturing/templates/inventory_detail.html:232
-#: manufacturing/templates/it_asset_detail.html:256
-#: manufacturing/templates/spc_list.html:117
-#: manufacturing/templates/spc_log.html:101
-msgid "By"
-msgstr "Por"
-
 #: manufacturing/templates/fixed_asset_detail.html:187
 msgid "No events logged."
 msgstr "Nenhum evento registrado."
@@ -11039,10 +11282,6 @@ msgstr "%(name)s — Inventário"
 #: manufacturing/templates/wo_detail.html:13
 msgid "Print Label"
 msgstr "Imprimir Etiqueta"
-
-#: manufacturing/templates/inventory_detail.html:9
-msgid "FIFO/LIFO/Avg Valuation"
-msgstr "Valorização FIFO/LIFO/Média"
 
 #: manufacturing/templates/inventory_detail.html:102
 msgid "Below Reorder"
@@ -15279,12 +15518,6 @@ msgstr "Cancelar este PO?"
 msgid "Unit Price"
 msgstr "Preço Unitário"
 
-#: manufacturing/templates/po_detail.html:169
-#: manufacturing/templates/wms_receive.html:58
-#: manufacturing/templates/wms_transfer_detail.html:65
-msgid "Receive"
-msgstr "Receber"
-
 #: manufacturing/templates/po_detail.html:170
 #: manufacturing/templates/portal_order_detail.html:19
 #: manufacturing/templates/req_detail.html:83
@@ -16476,10 +16709,6 @@ msgstr "Principais Fornecedores por Nº de POs"
 msgid "POs"
 msgstr "POs"
 
-#: manufacturing/templates/purch_reports.html:69
-msgid "Total Value"
-msgstr "Valor Total"
-
 #: manufacturing/templates/purch_reports.html:87
 msgid "POs by Month (Last 6 Months)"
 msgstr "POs por Mês (Últimos 6 Meses)"
@@ -17112,10 +17341,6 @@ msgstr "PPM"
 #: manufacturing/templates/qa_supplier_list.html:85
 msgid "Last Audit"
 msgstr "Última Auditoria"
-
-#: manufacturing/templates/qa_supplier_list.html:84
-msgid "Material"
-msgstr "Material"
 
 #: manufacturing/templates/qa_supplier_list.html:101
 msgid "No supplier quality records found."
@@ -18019,11 +18244,6 @@ msgstr "Criar Risco"
 #, python-format
 msgid "Routing — %(name)s"
 msgstr "Roteiro — %(name)s"
-
-#: manufacturing/templates/routing_detail.html:47
-#, python-format
-msgid "SKU: %(sku)s"
-msgstr "SKU: %(sku)s"
 
 #: manufacturing/templates/routing_detail.html:48
 #, python-format
@@ -19149,7 +19369,11 @@ msgstr "Criar Plano de Amostragem"
 msgid ""
 "Manual entry — this codebase has no real IoT/sensor hardware connectivity;\n"
 "                use this to simulate or log readings taken by a technician."
-msgstr "Entrada manual — esta aplicação não possui conectividade real com hardware IoT/sensores;\n                use isto para simular ou registrar leituras feitas por um técnico."
+msgstr ""
+"Entrada manual — esta aplicação não possui conectividade real com hardware "
+"IoT/sensores;\n"
+"                use isto para simular ou registrar leituras feitas por um "
+"técnico."
 
 #: manufacturing/templates/sensor_reading_new.html:45
 msgid "e.g. mm/s, °F"
