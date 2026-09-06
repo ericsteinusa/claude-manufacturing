@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Receive Goods — Scan Session{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Receive Goods — Scan Session" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/scan/" class="btn">Scanner</a>
-<a href="/scan/receive/" class="btn">Receive Goods</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/scan/" class="btn">{% trans "Scanner" %}</a>
+<a href="/scan/receive/" class="btn">{% trans "Receive Goods" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -24,7 +25,7 @@
 {% block body %}
 <div class="content">
   <div class="scan-card">
-    <div class="menu-title" style="margin-bottom:8px;">Receive Goods</div>
+    <div class="menu-title" style="margin-bottom:8px;">{% trans "Receive Goods" %}</div>
 
     {% if error %}<div class="alert alert-danger" style="margin-bottom:12px;">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success" style="margin-bottom:12px;">{{ success }}</div>{% endif %}
@@ -35,9 +36,9 @@
       <input type="hidden" name="action" value="scan">
       <div class="scan-input-row">
         <input class="scan-input" type="text" name="q"
-               placeholder="{% if po %}Scan PART- barcode…{% else %}Scan PO- or RCV- barcode to begin…{% endif %}"
+               placeholder="{% if po %}{% trans 'Scan PART- barcode…' %}{% else %}{% trans 'Scan PO- or RCV- barcode to begin…' %}{% endif %}"
                autofocus autocomplete="off" spellcheck="false">
-        <button type="submit" class="btn btn-primary">Scan</button>
+        <button type="submit" class="btn btn-primary">{% trans "Scan" %}</button>
       </div>
     </form>
 
@@ -51,7 +52,7 @@
         <form method="post" style="display:inline;">
           {% csrf_token %}
           <input type="hidden" name="action" value="clear">
-          <button type="submit" class="btn btn-cancel" style="font-size:11px;padding:3px 10px;">Clear Session</button>
+          <button type="submit" class="btn btn-cancel" style="font-size:11px;padding:3px 10px;">{% trans "Clear Session" %}</button>
         </form>
       </div>
     </div>
@@ -60,11 +61,11 @@
       <table class="erp-table">
         <thead>
           <tr>
-            <th>Description</th>
-            <th>SKU</th>
-            <th style="text-align:right;">Ordered</th>
-            <th style="text-align:right;">Received</th>
-            <th>Status</th>
+            <th>{% trans "Description" %}</th>
+            <th>{% trans "SKU" %}</th>
+            <th style="text-align:right;">{% trans "Ordered" %}</th>
+            <th style="text-align:right;">{% trans "Received" %}</th>
+            <th>{% trans "Status" %}</th>
           </tr>
         </thead>
         <tbody>
@@ -77,30 +78,30 @@
             <td style="text-align:right;">{{ item.qty_received|default:0 }}</td>
             <td>
               {% if item.qty_received >= item.qty_ordered and item.qty_ordered %}
-                <span class="pill pill-ok rcv-done">Complete</span>
+                <span class="pill pill-ok rcv-done">{% trans "Complete" %}</span>
               {% elif item.qty_received > 0 %}
-                <span class="pill pill-warn rcv-partial">Partial</span>
+                <span class="pill pill-warn rcv-partial">{% trans "Partial" %}</span>
               {% else %}
-                <span class="pill rcv-open">Pending</span>
+                <span class="pill rcv-open">{% trans "Pending" %}</span>
               {% endif %}
             </td>
           </tr>
           {% endwith %}
           {% empty %}
-          <tr><td colspan="5" class="empty-state">No items on this PO.</td></tr>
+          <tr><td colspan="5" class="empty-state">{% trans "No items on this PO." %}</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
     <div style="margin-top:14px;">
-      <a href="/po/{{ po.id }}/" class="btn">View Full PO</a>
-      <a href="/label/receiving/{{ po.id }}/" target="_blank" class="btn">Print Receiving Label</a>
+      <a href="/po/{{ po.id }}/" class="btn">{% trans "View Full PO" %}</a>
+      <a href="/label/receiving/{{ po.id }}/" target="_blank" class="btn">{% trans "Print Receiving Label" %}</a>
     </div>
 
     {% else %}
     <div style="color:var(--text-muted);font-size:13px;margin-top:8px;">
-      Scan a <strong>PO-</strong> or <strong>RCV-</strong> barcode to load a purchase order, then scan each part to mark it received.
+      {% blocktrans %}Scan a <strong>PO-</strong> or <strong>RCV-</strong> barcode to load a purchase order, then scan each part to mark it received.{% endblocktrans %}
     </div>
     {% endif %}
   </div>

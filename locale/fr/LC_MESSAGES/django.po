@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 01:27+0000\n"
+"POT-Creation-Date: 2026-09-06 02:00+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -530,6 +530,8 @@ msgstr "Rapport ABC vs. Traditionnel"
 #: manufacturing/templates/sampling_plan_detail.html:8
 #: manufacturing/templates/sampling_plan_list.html:11
 #: manufacturing/templates/sampling_plan_new.html:7
+#: manufacturing/templates/scan_home.html:8
+#: manufacturing/templates/scan_receive.html:8
 #: manufacturing/templates/skill_list.html:8
 #: manufacturing/templates/skill_new.html:7
 #: manufacturing/templates/skill_requirements.html:8
@@ -1535,6 +1537,7 @@ msgstr "Référence"
 #: manufacturing/templates/sales_quotes.html:66
 #: manufacturing/templates/sales_quotes.html:114
 #: manufacturing/templates/sales_quotes.html:139
+#: manufacturing/templates/scan_receive.html:64
 #: manufacturing/templates/skill_list.html:31
 #: manufacturing/templates/skill_new.html:37
 #: manufacturing/templates/so_detail.html:195
@@ -1849,6 +1852,7 @@ msgstr "Total Débit"
 #: manufacturing/templates/sales_territory_performance.html:40
 #: manufacturing/templates/sampling_plan_detail.html:71
 #: manufacturing/templates/sampling_plan_list.html:36
+#: manufacturing/templates/scan_receive.html:68
 #: manufacturing/templates/so_form.html:57
 #: manufacturing/templates/so_form.html:62
 #: manufacturing/templates/so_list.html:44
@@ -3240,6 +3244,7 @@ msgstr "Client :"
 #: manufacturing/templates/lot_detail.html:75
 #: manufacturing/templates/lot_list.html:68
 #: manufacturing/templates/po_detail.html:168
+#: manufacturing/templates/scan_receive.html:67
 #: manufacturing/templates/wms_receive.html:33
 msgid "Received"
 msgstr "Reçu"
@@ -4468,6 +4473,7 @@ msgstr "N° de Dossier"
 #: manufacturing/templates/batch_record_list.html:57
 #: manufacturing/templates/mrp_plan.html:102
 #: manufacturing/templates/qa_inspection_list.html:123
+#: manufacturing/templates/scan_home.html:65
 #: manufacturing/templates/technician_route_detail.html:67
 #: manufacturing/templates/wo_carbon_detail.html:6
 #: manufacturing/templates/wo_cost_detail.html:6
@@ -5813,6 +5819,7 @@ msgstr "Échec"
 #: manufacturing/templates/legal_dashboard.html:79
 #: manufacturing/templates/prod_tracking_dashboard.html:50
 #: manufacturing/templates/sales_commissions.html:70
+#: manufacturing/templates/scan_receive.html:85
 msgid "Pending"
 msgstr "En attente"
 
@@ -5952,6 +5959,7 @@ msgstr "Modèles"
 #: manufacturing/templates/compliance_checklist_detail.html:25
 #: manufacturing/templates/compliance_checklist_list.html:20
 #: manufacturing/templates/compliance_checklist_list.html:37
+#: manufacturing/templates/scan_receive.html:81
 #: manufacturing/templates/technician_route_detail.html:98
 #: manufacturing/work_orders_core.py:36
 msgid "Complete"
@@ -6653,7 +6661,10 @@ msgstr "Calculer le Coût Standard"
 msgid ""
 "Recalculates material cost from the Bill of Materials, plus labor cost from\n"
 "            routing operations. Saves a new snapshot with timestamp."
-msgstr "Recalcule le coût matière à partir de la Nomenclature, plus le coût de main-d'œuvre des\n            opérations de gamme. Enregistre un nouvel instantané horodaté."
+msgstr ""
+"Recalcule le coût matière à partir de la Nomenclature, plus le coût de main-"
+"d'œuvre des\n"
+"            opérations de gamme. Enregistre un nouvel instantané horodaté."
 
 #: manufacturing/templates/cost_detail.html:96
 msgid "Roll Cost"
@@ -6709,7 +6720,15 @@ msgid ""
 "            the standard-cost roll on the \"Standard Cost\" page, the two "
 "are\n"
 "            independent, alternative valuation methods."
-msgstr "Utilise par défaut <strong>standard</strong> (le comportement actuel à prix d'achat unique,\n            inchangé). Passer à fifo / lifo / average commence à\n            suivre des couches de coût distinctes par réception ci-dessous — cela ne touche jamais\n            le calcul du coût standard de la page \"Standard Cost\", les deux sont\n            des méthodes de valorisation indépendantes et alternatives."
+msgstr ""
+"Utilise par défaut <strong>standard</strong> (le comportement actuel à prix "
+"d'achat unique,\n"
+"            inchangé). Passer à fifo / lifo / average commence à\n"
+"            suivre des couches de coût distinctes par réception ci-dessous — "
+"cela ne touche jamais\n"
+"            le calcul du coût standard de la page \"Standard Cost\", les "
+"deux sont\n"
+"            des méthodes de valorisation indépendantes et alternatives."
 
 #: manufacturing/templates/costing_product_detail.html:67
 msgid "Save Method"
@@ -6743,7 +6762,15 @@ msgid ""
 "            (WMS, cycle count, manual adjustment, etc.). Use the forms below "
 "going forward to\n"
 "            keep the two in sync."
-msgstr "⚠ La quantité suivie par couches (%(layer_qty)s) diffère de\n            product.amount (%(prod_amt)s) — certaines réceptions/sorties pour ce\n            produit ont été enregistrées via un chemin qui ne crée/consomme pas de couches de coût\n            (WMS, inventaire tournant, ajustement manuel, etc.). Utilisez désormais les formulaires ci-dessous pour\n            garder les deux synchronisés."
+msgstr ""
+"⚠ La quantité suivie par couches (%(layer_qty)s) diffère de\n"
+"            product.amount (%(prod_amt)s) — certaines réceptions/sorties "
+"pour ce\n"
+"            produit ont été enregistrées via un chemin qui ne crée/consomme "
+"pas de couches de coût\n"
+"            (WMS, inventaire tournant, ajustement manuel, etc.). Utilisez "
+"désormais les formulaires ci-dessous pour\n"
+"            garder les deux synchronisés."
 
 #: manufacturing/templates/costing_product_detail.html:101
 msgid "Record Costed Receipt"
@@ -6769,7 +6796,9 @@ msgstr "Problème"
 msgid ""
 "Set a FIFO/LIFO/Average costing method above to record costed receipts and "
 "issues."
-msgstr "Définissez une méthode de valorisation FIFO/LIFO/Moyenne ci-dessus pour enregistrer des réceptions et sorties valorisées."
+msgstr ""
+"Définissez une méthode de valorisation FIFO/LIFO/Moyenne ci-dessus pour "
+"enregistrer des réceptions et sorties valorisées."
 
 #: manufacturing/templates/costing_product_detail.html:132
 msgid "Cost Layers (remaining qty > 0)"
@@ -6800,7 +6829,13 @@ msgid ""
 "Products currently opted into FIFO / LIFO / Weighted-Average costing.\n"
 "    Every other product still uses the single standard purchase-price cost\n"
 "    field, unchanged. Set a product's method from its own valuation page."
-msgstr "Produits actuellement configurés avec la valorisation FIFO / LIFO / Moyenne Pondérée.\n    Tous les autres produits utilisent toujours le champ de coût à prix d'achat unique\n    standard, inchangé. Définissez la méthode d'un produit depuis sa propre page de valorisation."
+msgstr ""
+"Produits actuellement configurés avec la valorisation FIFO / LIFO / Moyenne "
+"Pondérée.\n"
+"    Tous les autres produits utilisent toujours le champ de coût à prix "
+"d'achat unique\n"
+"    standard, inchangé. Définissez la méthode d'un produit depuis sa propre "
+"page de valorisation."
 
 #: manufacturing/templates/costing_valuation_list.html:24
 #: manufacturing/templates/purch_reports.html:69
@@ -6809,7 +6844,8 @@ msgstr "Valeur Totale"
 
 #: manufacturing/templates/costing_valuation_list.html:44
 msgid "No products are on a FIFO/LIFO/Average costing method yet."
-msgstr "Aucun produit n'utilise encore une méthode de valorisation FIFO/LIFO/Moyenne."
+msgstr ""
+"Aucun produit n'utilise encore une méthode de valorisation FIFO/LIFO/Moyenne."
 
 #: manufacturing/templates/credit_account_detail.html:3
 #, python-format
@@ -11420,6 +11456,7 @@ msgstr "Rechercher des produits…"
 #: manufacturing/templates/qa_ncr_list.html:78
 #: manufacturing/templates/qa_supplier_list.html:76
 #: manufacturing/templates/sales_reports.html:54
+#: manufacturing/templates/scan_home.html:59
 #: manufacturing/templates/wms_bin_list.html:34
 msgid "Go"
 msgstr "Aller"
@@ -15472,6 +15509,7 @@ msgid "No purchase orders are currently awaiting approval."
 msgstr "Aucun bon de commande n'est actuellement en attente d'approbation."
 
 #: manufacturing/templates/po_detail.html:14
+#: manufacturing/templates/scan_receive.html:99
 msgid "Print Receiving Label"
 msgstr "Imprimer l'Étiquette de Réception"
 
@@ -19383,6 +19421,119 @@ msgstr "p. ex. 2,5"
 msgid "Create Sampling Plan"
 msgstr "Créer un Plan d'Échantillonnage"
 
+#: manufacturing/templates/scan_home.html:3
+msgid "Barcode Scanner"
+msgstr "Scanner de Code-Barres"
+
+#: manufacturing/templates/scan_home.html:6
+#: manufacturing/templates/scan_receive.html:6
+msgid "Scanner"
+msgstr "Scanner"
+
+#: manufacturing/templates/scan_home.html:7
+#: manufacturing/templates/scan_receive.html:7
+#: manufacturing/templates/scan_receive.html:28
+msgid "Receive Goods"
+msgstr "Réceptionner les Marchandises"
+
+#: manufacturing/templates/scan_home.html:48
+msgid "Barcode Lookup"
+msgstr "Recherche par Code-Barres"
+
+#: manufacturing/templates/scan_home.html:49
+msgid "Scan any barcode or type a code to jump to the record."
+msgstr "Scannez n'importe quel code-barres ou saisissez un code pour accéder directement à l'enregistrement."
+
+#: manufacturing/templates/scan_home.html:57
+msgid "Scan or type barcode…"
+msgstr "Scannez ou saisissez le code-barres…"
+
+#: manufacturing/templates/scan_home.html:65
+msgid "e.g. WO-2024-001"
+msgstr "p. ex. WO-2024-001"
+
+#: manufacturing/templates/scan_home.html:66
+msgid "Part / Inventory"
+msgstr "Pièce / Inventaire"
+
+#: manufacturing/templates/scan_home.html:66
+msgid "e.g. PART-SKU123"
+msgstr "p. ex. PART-SKU123"
+
+#: manufacturing/templates/scan_home.html:67
+msgid "Purchase Order"
+msgstr "Bon de Commande"
+
+#: manufacturing/templates/scan_home.html:67
+msgid "e.g. PO-2024-001"
+msgstr "p. ex. PO-2024-001"
+
+#: manufacturing/templates/scan_home.html:68
+msgid "Receiving"
+msgstr "Réception"
+
+#: manufacturing/templates/scan_home.html:68
+msgid "e.g. RCV-2024-001"
+msgstr "p. ex. RCV-2024-001"
+
+#: manufacturing/templates/scan_home.html:69
+msgid "IT Asset"
+msgstr "Actif Informatique"
+
+#: manufacturing/templates/scan_home.html:69
+msgid "e.g. ASSET-TAG001"
+msgstr "p. ex. ASSET-TAG001"
+
+#: manufacturing/templates/scan_receive.html:3
+msgid "Receive Goods — Scan Session"
+msgstr "Réceptionner les Marchandises — Session de Scan"
+
+#: manufacturing/templates/scan_receive.html:39
+msgid "Scan PART- barcode…"
+msgstr "Scannez le code-barres PART-…"
+
+#: manufacturing/templates/scan_receive.html:39
+msgid "Scan PO- or RCV- barcode to begin…"
+msgstr "Scannez un code-barres PO- ou RCV- pour commencer…"
+
+#: manufacturing/templates/scan_receive.html:41
+msgid "Scan"
+msgstr "Scanner"
+
+#: manufacturing/templates/scan_receive.html:55
+msgid "Clear Session"
+msgstr "Effacer la Session"
+
+#: manufacturing/templates/scan_receive.html:65
+msgid "SKU"
+msgstr "SKU"
+
+#: manufacturing/templates/scan_receive.html:66
+#: manufacturing/templates/wms_pick_list_detail.html:37
+#: manufacturing/templates/wms_receive.html:33
+msgid "Ordered"
+msgstr "Commandé"
+
+#: manufacturing/templates/scan_receive.html:83
+#: manufacturing/templates/tc_device_form.html:230
+#: manufacturing/templates/tc_device_list.html:65
+msgid "Partial"
+msgstr "Partiel"
+
+#: manufacturing/templates/scan_receive.html:91
+msgid "No items on this PO."
+msgstr "Aucun article sur ce bon de commande."
+
+#: manufacturing/templates/scan_receive.html:98
+msgid "View Full PO"
+msgstr "Voir le Bon de Commande Complet"
+
+#: manufacturing/templates/scan_receive.html:104
+msgid ""
+"Scan a <strong>PO-</strong> or <strong>RCV-</strong> barcode to load a "
+"purchase order, then scan each part to mark it received."
+msgstr "Scannez un code-barres <strong>PO-</strong> ou <strong>RCV-</strong> pour charger un bon de commande, puis scannez chaque pièce pour la marquer comme reçue."
+
 #: manufacturing/templates/sensor_reading_new.html:18
 msgid ""
 "Manual entry — this codebase has no real IoT/sensor hardware connectivity;\n"
@@ -20197,11 +20348,6 @@ msgstr "Message"
 msgid "Error"
 msgstr "Erreur"
 
-#: manufacturing/templates/tc_device_form.html:230
-#: manufacturing/templates/tc_device_list.html:65
-msgid "Partial"
-msgstr "Partiel"
-
 #: manufacturing/templates/tc_device_form.html:239
 msgid "No sync history yet. Click \"Poll Now\" to test the connection."
 msgstr ""
@@ -20945,11 +21091,6 @@ msgstr "Liste de Prélèvement %(num)s"
 #: manufacturing/templates/wms_pick_list_detail.html:6
 msgid "Back to Pick Lists"
 msgstr "Retour aux Listes de Prélèvement"
-
-#: manufacturing/templates/wms_pick_list_detail.html:37
-#: manufacturing/templates/wms_receive.html:33
-msgid "Ordered"
-msgstr "Commandé"
 
 #: manufacturing/templates/wms_pick_list_detail.html:37
 msgid "Picked"
