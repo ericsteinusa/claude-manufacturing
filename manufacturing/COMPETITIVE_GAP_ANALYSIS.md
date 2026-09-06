@@ -5142,3 +5142,75 @@ It did not re-verify the ten vendors' current public positioning — §9.4's com
 carried forward unchanged and are now a week old. If any vendor verdict is load-bearing for a
 decision, re-check it rather than relying on this section. This pass corrected *this app's* side of
 the comparison only, which is the side that had demonstrably drifted.
+
+## Section 11: 2026-09-06 Update — Localization Template Coverage Closes to 100%
+
+§10.5 named "the untranslated 45% of templates" as half of the one remaining localization gap.
+That half is now closed. This was a single continuous push (not a fresh audit like Sections 8–10)
+that finished marking every template still outstanding at the end of §10, including a batch of
+16 small long-tail feature clusters swept in one PR to avoid `locale/*.po` merge conflicts across
+parallel branches, `menus.py`'s `MENU_TREE` (the Python-side department drill-down menu used by
+non-full-access users — a data structure, not a template, so it never counted toward the
+474-template denominator despite being a genuine remaining translation gap), and finally the
+Consultants feature, which every prior pass in this series had documented as excluded **by
+design** rather than merely not-yet-done — closed only after an explicit ask-first check, since
+silently reversing a documented design decision isn't this kind of pass's call to make.
+
+### 11.1 Top-line stats (measured 2026-09-06)
+
+| Metric | §10.1 (2026-09-05) | Now | How measured |
+|---|---|---|---|
+| Django web templates | 474 | 474 | `ls manufacturing/templates/*.html \| wc -l` |
+| Templates with `{% load i18n %}` | 259 | **474 (100%)** | `grep -l '{% load i18n %}' manufacturing/templates/*.html \| wc -l` |
+| Translated messages per language | 2,438 | **4,735** | `msgfmt --statistics locale/<lang>/LC_MESSAGES/django.po` |
+| Fuzzy / untranslated messages | 0 | **0** (unchanged) | same command |
+| Automated test files | 108 | **109** | `ls tests/*.py \| wc -l` |
+| Automated tests passing | 3,475 | **3,486** | `pytest tests/ -q` |
+| htmx live-refresh templates | 24 | 24 (unchanged) | `grep -l "hx-trigger" manufacturing/templates/*.html \| wc -l` |
+
+The template-marking metric nearly doubled (259 → 474) while the language count held at 6
+(en/es/fr/de/pt/nl) — this pass extended *depth* of the existing six languages to full coverage,
+not breadth to a seventh. Message volume almost exactly doubled too (2,438 → 4,735 per language),
+consistent with roughly doubling the fraction of the app actually wrapped in `{% trans %}`/
+`{% blocktrans %}`. Zero fuzzy and zero untranslated held throughout — the same
+strip-fuzzy-and-replace discipline documented in every prior pass in this series continued
+without exception, including through the two largest single batches this series has done (a
+16-cluster/37-template/332-string long-tail sweep, and a 486-string pass over `menus.py`'s
+`MENU_TREE`).
+
+### 11.2 Corrected §10.5 localization framing
+
+| Claim | §10.5 said | Now |
+|---|---|---|
+| Templates marked | 259 of 474 (55%) | **474 of 474 (100%)** |
+| Remaining template gap | "the untranslated 45% of templates" | **none — every template in `manufacturing/templates/` loads i18n** |
+| Python-side navigation labels | not previously scored as its own line item | `menus.py`'s `MENU_TREE` (642 strings backing the non-full-access drill-down menu) now also fully wrapped in `gettext_lazy` and translated — this was a real gap the template-count metric couldn't see, since it lives in a `.py` file, not a `.html` file |
+| Consultants feature | undocumented in this series' running tally (was out of scope by design) | now fully translated; this closes the last area any prior pass had explicitly carved out |
+
+### 11.3 Revised remaining gaps
+
+With §10.5's template-coverage half closed, **exactly one dimension remains genuinely open**,
+narrower than either of §10.5's two:
+
+- **Localization language breadth.** 6 languages against MRPeasy's 13+. This is now a pure
+  "add more languages" question, not a completeness or quality question — every one of the 6
+  already-supported languages covers 100% of templates with zero fuzzy or untranslated entries.
+  Extending to a 7th+ language is a large but mechanical and well-understood lift at this point
+  (the pipeline — mark up, `makemessages`, strip fuzzy, translate, `msgfmt --check`,
+  `compilemessages`, verify — is now exercised across dozens of prior batches) — reasonable to
+  leave unscheduled unless a specific market requires it, same call §6.11 originally made about
+  starting localization at all.
+- **Frontend modernity**, carried forward unchanged from §10.5 — 24 of 474 templates live-refresh,
+  a full SPA rewrite still judged disproportionate for this codebase's size.
+
+Both §9.4's originally-named gaps have now been narrowed to the point that neither reads as a
+product deficiency for this app's actual competitive lane (single-site, English-first-market SMB
+buyers comparing against Fishbowl/JobBOSS²/MRPeasy) — they're now genuinely elective scope
+decisions, not gaps the product suffers for lacking.
+
+### 11.4 What this pass did not do
+
+Same scope discipline as §10.6: this did not re-verify the ten named vendors' current public
+positioning, which is now carried forward unchanged from §9.4 and is several weeks old. It also
+did not add a 7th language — extending breadth remains the one open item named in §11.3, not
+something this pass attempted.
