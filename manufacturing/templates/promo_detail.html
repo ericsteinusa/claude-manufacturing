@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ promotion.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/promotions/" class="btn">Discounts &amp; Promotions</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/promotions/" class="btn">{% trans "Discounts &amp; Promotions" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -21,9 +22,9 @@
 <div class="promo-wrap">
     <div class="menu-title">{{ promotion.name }}
         {% if promotion.is_active %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
         {% else %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Inactive" %}</span>
         {% endif %}
     </div>
 
@@ -31,23 +32,23 @@
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Promotion Details</h3>
+        <h3>{% trans "Promotion Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Name</label>
+                    <label>{% trans "Name" %}</label>
                     <input type="text" name="name" value="{{ promotion.name }}" required {% if not can_edit %}disabled{% endif %}>
                 </div>
                 <div class="form-row">
-                    <label>Active</label>
+                    <label>{% trans "Active" %}</label>
                     <select name="is_active" {% if not can_edit %}disabled{% endif %}>
-                        <option value="1" {% if promotion.is_active %}selected{% endif %}>Yes</option>
-                        <option value="0" {% if not promotion.is_active %}selected{% endif %}>No</option>
+                        <option value="1" {% if promotion.is_active %}selected{% endif %}>{% trans "Yes" %}</option>
+                        <option value="0" {% if not promotion.is_active %}selected{% endif %}>{% trans "No" %}</option>
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Discount Type</label>
+                    <label>{% trans "Discount Type" %}</label>
                     <select name="discount_type" {% if not can_edit %}disabled{% endif %}>
                         {% for dt in discount_types %}
                         <option value="{{ dt }}" {% if dt == promotion.discount_type %}selected{% endif %}>{{ dt|title }}</option>
@@ -55,48 +56,48 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Discount Value</label>
+                    <label>{% trans "Discount Value" %}</label>
                     <input type="number" name="discount_value" step="0.01" min="0"
                            value="{{ promotion.discount_value|floatformat:2 }}" {% if not can_edit %}disabled{% endif %}>
                 </div>
                 <div class="form-row">
-                    <label>Product</label>
+                    <label>{% trans "Product" %}</label>
                     <select name="product_id" {% if not can_edit %}disabled{% endif %}>
-                        <option value="">— All products —</option>
+                        <option value="">{% trans "— All products —" %}</option>
                         {% for p in products %}
                         <option value="{{ p.id }}" {% if p.id == promotion.product_id %}selected{% endif %}>{{ p.product_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Customer</label>
+                    <label>{% trans "Customer" %}</label>
                     <select name="customer_id" {% if not can_edit %}disabled{% endif %}>
-                        <option value="">— All customers —</option>
+                        <option value="">{% trans "— All customers —" %}</option>
                         {% for c in customers %}
                         <option value="{{ c.id }}" {% if c.id == promotion.customer_id %}selected{% endif %}>{{ c.company_name|default:c.last_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Minimum Qty</label>
+                    <label>{% trans "Minimum Qty" %}</label>
                     <input type="number" name="min_qty" step="any" min="0"
                            value="{{ promotion.min_qty|floatformat:'g' }}" {% if not can_edit %}disabled{% endif %}>
                 </div>
                 <div class="form-row">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date" value="{{ promotion.start_date|default:'' }}" {% if not can_edit %}disabled{% endif %}>
                 </div>
                 <div class="form-row">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date" value="{{ promotion.end_date|default:'' }}" {% if not can_edit %}disabled{% endif %}>
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <input type="text" name="notes" value="{{ promotion.notes|default:'' }}" {% if not can_edit %}disabled{% endif %}>
                 </div>
             </div>
             {% if can_edit %}
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
             {% endif %}
         </form>
     </div>
