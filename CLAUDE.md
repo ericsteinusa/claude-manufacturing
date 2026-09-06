@@ -2187,6 +2187,87 @@ catalog entries), a New Route form, and Predictive Maintenance
 `<a>` tag intact) — all pages return 200 with correctly translated
 titles and labels, no console or server errors.
 
+Also fully translated: **Cycle Counts** and **Sampling Plans**
+(`cc_list.html`/`_detail.html`/`_new.html`, `sampling_plan_list.html`/
+`_detail.html`/`_new.html` — 6 templates, the twenty-fourth "whole
+feature" pass, and two more "translate the link, not yet the target"
+closures — Inventory's "Cycle Counts" nav link (`inventory_dashboard
+.html`, `inventory_list.html`) and QA's inspection-page hint linking to
+"the Sampling Plans page" (`qa_inspection_list.html`/`_detail.html`)
+were both already translated, but neither destination had been touched).
+Marked up by two parallel subagents (Cycle Count vs. Sampling Plan),
+translated by hand afterward — small enough (35 strings, all simple, no
+plurals) to skip delegating the translation step.
+
+**`cc_detail.html` needed the most involved `{% blocktrans %}` work in
+this series' "translate the link" passes so far**: a "Grouped by
+{enum}: {value} — created {date} by {user}" line binding four separate
+variables in one block (`gb=cc.group_by|capfirst` — a *filtered*
+expression, `gv`, `dt=cc.created_at|date:"Y-m-d H:i"`, `by`), correctly
+translating only the connecting words ("Grouped by"/"created"/"by")
+while leaving the `gb` enum value itself as a bare interpolation; a
+signature-meaning placeholder containing HTML-entity-escaped quotes
+(`&quot;...&quot;`, not raw `"` characters) that needed single-quoted
+`{% trans '...' %}` nesting; and a "Variance found — awaiting
+approval{% if approval.steps %} from {role}{% endif %}." sentence
+needing the established conditional-suffix split pattern, with the
+role name bound but not translated (it's a person's role-enum value,
+same treatment as `pending_step.approver_role` elsewhere on the same
+page). Both subagents correctly avoided running `manage.py
+makemessages` themselves this time — explicitly instructed not to,
+after the previous APM batch's incident — confirmed via `git status`/
+`git diff --stat locale/` showing zero changes before either subagent's
+markup-only diff was trusted.
+
+**`cc_new.html`'s "Make / Buy" grouping-option label was wrapped as one
+complete phrase in a single `{% trans %}` call, deliberately not split
+into separate "Make" and "Buy" translations** — both subagents were
+told explicitly to do this, since a bare standalone "Make" already
+exists in the catalog from the Inventory/BOM/MRP pass's `msgctxt
+"item_type"` fix, and reusing that entry (or its untagged pre-fix
+sibling) here would have risked reintroducing the same class of
+cross-context mistranslation bug. Confirmed correct on review: the
+compound phrase is a distinct msgid from bare "Make", no collision.
+
+**A real translation-quality bug was caught during browser
+verification, not template review**: "Bin Location" was translated
+fresh in this pass, but French rendered as "Emplacement de
+l'Emplacement" (literally "Location of the Location") because the
+translation was composed without cross-checking this app's own
+already-established "Bin" → "Emplacement" glossary entry from earlier
+passes. Caught by inspecting the live rendered `&lt;select&gt;` options
+in the browser, not by any syntax/blank/fuzzy check (a grammatically
+garbled but non-empty translation passes every automated check in this
+file's pipeline). Fixed by reusing the exact existing "Bin" translation
+for all 5 languages (es "Ubicación", fr "Emplacement", pt
+"Localização", nl "Locatie" — German's fresh "Lagerplatz" already
+matched by coincidence) rather than composing a new, longer phrase —
+since in this app's terminology "Bin" and "Bin Location" mean the same
+warehouse-location concept. Worth a standing checklist item distinct
+from the "Make"-style cross-context check (which catches *wrong*
+reuse of an existing term): before translating a *new* compound label
+containing an already-established shorter term as a substring (here,
+"Bin" inside "Bin Location"), check whether the established term's
+exact translation should just be reused verbatim rather than
+independently re-translated, since composing a fresh translation for
+the longer phrase can accidentally duplicate a word the shorter term's
+translation already covers.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check`
+clean on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically both before and after the Bin Location fix. Verified
+end-to-end against the real dev server, in French with real sample
+data: Cycle Counts list + a real count's detail page (confirmed the
+four-variable "Groupé par Bin : SAMPLE — créé le ... par ..." sentence
+renders correctly with the raw `Bin` enum left untranslated, and the
+corrected "Emplacement" column header), a New Cycle Count form
+(confirmed the "Fabriquer / Acheter" grouping option and the ABC-class
+explanatory paragraph's real single `%` signs), Sampling Plans list,
+and a real plan's detail page (confirmed all seven form labels) — all
+pages return 200 with correctly translated titles and labels, no
+console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ cc.count_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/inventory/cycle-counts/" class="btn">Cycle Counts</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/inventory/cycle-counts/" class="btn">{% trans "Cycle Counts" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -18,17 +19,17 @@
 <div class="cc-wrap">
     <div class="menu-title">{{ cc.count_number }}
         {% if cc.status == 'posted' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Posted</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Posted" %}</span>
         {% elif cc.status == 'rejected' %}
-        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Rejected</span>
+        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{% trans "Rejected" %}</span>
         {% elif cc.status == 'submitted' %}
-        <span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">Pending Approval</span>
+        <span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{% trans "Pending Approval" %}</span>
         {% else %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Open</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Open" %}</span>
         {% endif %}
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">
-        Grouped by {{ cc.group_by|capfirst }}: {{ cc.group_value }} — created {{ cc.created_at|date:"Y-m-d H:i" }} by {{ cc.created_by }}
+        {% blocktrans with gb=cc.group_by|capfirst gv=cc.group_value dt=cc.created_at|date:"Y-m-d H:i" by=cc.created_by %}Grouped by {{ gb }}: {{ gv }} — created {{ dt }} by {{ by }}{% endblocktrans %}
     </p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
@@ -37,21 +38,21 @@
     {% if cc.status == 'submitted' %}
         {% if pending_step %}
         <div class="alert alert-warning" style="margin-bottom:16px;">
-            Awaiting your approval as <strong>{{ pending_step.approver_role }}</strong>.
+            {% blocktrans with role=pending_step.approver_role %}Awaiting your approval as <strong>{{ role }}</strong>.{% endblocktrans %}
             <form method="post" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="decide">
                 <input type="hidden" name="step_id" value="{{ pending_step.id }}">
-                <input type="text" name="signature_meaning" placeholder="Meaning of signature (e.g. &quot;I approve this count as accurate&quot;)" required style="flex:1;min-width:220px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
-                <input type="password" name="password" placeholder="Re-enter your password" required style="width:170px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
-                <button type="submit" name="decision" value="approved" class="btn btn-primary" style="padding:4px 12px;font-size:12px;">Approve</button>
-                <button type="submit" name="decision" value="rejected" class="btn" style="padding:4px 12px;font-size:12px;">Reject</button>
+                <input type="text" name="signature_meaning" placeholder="{% trans 'Meaning of signature (e.g. &quot;I approve this count as accurate&quot;)' %}" required style="flex:1;min-width:220px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                <input type="password" name="password" placeholder="{% trans 'Re-enter your password' %}" required style="width:170px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                <button type="submit" name="decision" value="approved" class="btn btn-primary" style="padding:4px 12px;font-size:12px;">{% trans "Approve" %}</button>
+                <button type="submit" name="decision" value="rejected" class="btn" style="padding:4px 12px;font-size:12px;">{% trans "Reject" %}</button>
             </form>
         </div>
         {% else %}
         <div class="alert alert-warning" style="margin-bottom:16px;">
-            Variance found — awaiting approval
-            {% if approval.steps %} from <strong>{{ approval.steps.0.approver_role }}</strong>{% endif %}.
+            {% blocktrans %}Variance found — awaiting approval{% endblocktrans %}
+            {% if approval.steps %}{% blocktrans with role=approval.steps.0.approver_role %} from <strong>{{ role }}</strong>{% endblocktrans %}{% endif %}.
         </div>
         {% endif %}
     {% endif %}
@@ -63,11 +64,11 @@
             <table class="erp-table">
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th>Bin</th>
-                        <th class="num">System Qty</th>
-                        <th class="num">Counted Qty</th>
-                        <th class="num">Variance</th>
+                        <th>{% trans "Product" %}</th>
+                        <th>{% trans "Bin" %}</th>
+                        <th class="num">{% trans "System Qty" %}</th>
+                        <th class="num">{% trans "Counted Qty" %}</th>
+                        <th class="num">{% trans "Variance" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,7 +104,7 @@
         </div>
 
         {% if cc.status == 'open' and can_edit %}
-        <button type="submit" class="btn btn-primary" style="margin-top:14px;">Submit Counts</button>
+        <button type="submit" class="btn btn-primary" style="margin-top:14px;">{% trans "Submit Counts" %}</button>
         {% endif %}
     </form>
 </div>

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New Sampling Plan{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New Sampling Plan" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sampling-plans/" class="btn">Sampling Plans</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sampling-plans/" class="btn">{% trans "Sampling Plans" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,7 +18,7 @@
 {% block body %}
 <div class="content">
 <div class="sp-wrap">
-    <div class="menu-title">New Sampling Plan</div>
+    <div class="menu-title">{% trans "New Sampling Plan" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -25,13 +26,13 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
-                <label>Plan Name *</label>
-                <input type="text" name="plan_name" required placeholder="e.g. Standard Incoming — Fasteners">
+                <label>{% trans "Plan Name *" %}</label>
+                <input type="text" name="plan_name" required placeholder="{% trans "e.g. Standard Incoming — Fasteners" %}">
             </div>
             <div class="form-row">
-                <label>AQL % *</label>
+                <label>{% trans "AQL % *" %}</label>
                 <input type="number" name="aql_value" step="0.01" min="0" required
-                       list="common-aql-values" placeholder="e.g. 2.5">
+                       list="common-aql-values" placeholder="{% trans "e.g. 2.5" %}">
                 <datalist id="common-aql-values">
                     {% for v in common_aql_values %}
                     <option value="{{ v }}">
@@ -39,7 +40,7 @@
                 </datalist>
             </div>
             <div class="form-row">
-                <label>Inspection Level</label>
+                <label>{% trans "Inspection Level" %}</label>
                 <select name="inspection_level">
                     {% for lvl in inspection_levels %}
                     <option value="{{ lvl }}"{% if lvl == 'II' %} selected{% endif %}>{{ lvl }}</option>
@@ -47,28 +48,28 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Product (optional)</label>
+                <label>{% trans "Product (optional)" %}</label>
                 <select name="product_id">
-                    <option value="">— Any product —</option>
+                    <option value="">{% trans "— Any product —" %}</option>
                     {% for p in products %}
                     <option value="{{ p.id }}">{{ p.product_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Supplier (optional)</label>
+                <label>{% trans "Supplier (optional)" %}</label>
                 <select name="supplier_id">
-                    <option value="">— Any supplier —</option>
+                    <option value="">{% trans "— Any supplier —" %}</option>
                     {% for s in suppliers %}
                     <option value="{{ s.id }}">{{ s.company_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-row">
-                <label>Notes</label>
-                <input type="text" name="notes" placeholder="Optional notes">
+                <label>{% trans "Notes" %}</label>
+                <input type="text" name="notes" placeholder="{% trans "Optional notes" %}">
             </div>
-            <button type="submit" class="btn btn-primary">Create Sampling Plan</button>
+            <button type="submit" class="btn btn-primary">{% trans "Create Sampling Plan" %}</button>
         </form>
     </div>
 </div>

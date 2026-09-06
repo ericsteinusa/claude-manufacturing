@@ -1,25 +1,26 @@
 {% extends "base.html" %}
-{% block page_title %}Sampling Plans{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Sampling Plans" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/inspections/" class="btn">Incoming Inspection</a>
-<a href="/qa/control-plans/" class="btn">Control Plans</a>
-<a href="/qa/coa/" class="btn">Certificates of Analysis</a>
-<a href="/qa/compliance/templates/" class="btn">Compliance Templates</a>
-<a href="/qa/" class="btn">QA Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/inspections/" class="btn">{% trans "Incoming Inspection" %}</a>
+<a href="/qa/control-plans/" class="btn">{% trans "Control Plans" %}</a>
+<a href="/qa/coa/" class="btn">{% trans "Certificates of Analysis" %}</a>
+<a href="/qa/compliance/templates/" class="btn">{% trans "Compliance Templates" %}</a>
+<a href="/qa/" class="btn">{% trans "QA Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/sampling-plans/new/" class="btn btn-primary">+ New Sampling Plan</a>
+<a href="/sampling-plans/new/" class="btn btn-primary">+ {% trans "New Sampling Plan" %}</a>
 {% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Sampling Plans (ISO 2859-1 AQL)</div>
+    <div class="menu-title">{% trans "Sampling Plans" %} (ISO 2859-1 AQL)</div>
     <p style="font-size:12px;color:var(--text-muted);max-width:700px;">
-        Attach a plan to a product or supplier so incoming inspection can auto-calculate
+        {% blocktrans %}Attach a plan to a product or supplier so incoming inspection can auto-calculate
         sample size and accept/reject numbers from the lot quantity. A plan with neither
-        set is a general-purpose plan usable for any inspection.
+        set is a general-purpose plan usable for any inspection.{% endblocktrans %}
     </p>
 
     {% if plans %}
@@ -27,12 +28,12 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Plan Name</th>
-                    <th>AQL %</th>
-                    <th>Inspection Level</th>
-                    <th>Product</th>
-                    <th>Supplier</th>
-                    <th>Status</th>
+                    <th>{% trans "Plan Name" %}</th>
+                    <th>{% trans "AQL %" %}</th>
+                    <th>{% trans "Inspection Level" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th>{% trans "Status" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -46,19 +47,19 @@
                     <td>{{ p.supplier_name|default:"—" }}</td>
                     <td>
                         {% if p.is_active %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Active" %}</span>
                         {% else %}
-                        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Inactive" %}</span>
                         {% endif %}
                     </td>
-                    <td><a href="/sampling-plans/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/sampling-plans/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No sampling plans yet.</div>
+    <div class="empty-state">{% trans "No sampling plans yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}
