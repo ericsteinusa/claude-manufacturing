@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 02:00+0000\n"
+"POT-Creation-Date: 2026-09-06 02:15+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
@@ -488,6 +488,9 @@ msgstr "Relatório ABC vs. Tradicional"
 #: manufacturing/templates/qa_reports.html:13
 #: manufacturing/templates/qa_supplier_detail.html:8
 #: manufacturing/templates/qa_supplier_list.html:9
+#: manufacturing/templates/recipe_detail.html:7
+#: manufacturing/templates/recipe_list.html:8
+#: manufacturing/templates/recipe_new.html:7
 #: manufacturing/templates/report_builder_list.html:8
 #: manufacturing/templates/reports_dashboard.html:11
 #: manufacturing/templates/req_detail.html:8
@@ -615,6 +618,7 @@ msgstr "Consumo de Direcionador por Produto"
 #: manufacturing/templates/qa_inspection_list.html:80
 #: manufacturing/templates/qa_inspection_list.html:114
 #: manufacturing/templates/qa_ncr_list.html:87
+#: manufacturing/templates/recipe_list.html:30
 #: manufacturing/templates/reports_dashboard.html:199
 #: manufacturing/templates/routing_detail.html:6
 #: manufacturing/templates/sales_demand.html:149
@@ -732,6 +736,7 @@ msgstr "Pool de Custos"
 #: manufacturing/templates/costing_valuation_list.html:37
 #: manufacturing/templates/ess_time_off.html:63
 #: manufacturing/templates/inventory_list.html:102
+#: manufacturing/templates/recipe_list.html:47
 #: manufacturing/templates/rfq_list.html:55
 #: manufacturing/templates/sampling_plan_list.html:55
 #: manufacturing/templates/skills_matrix_summary.html:48
@@ -1803,6 +1808,7 @@ msgstr "Total a Débito"
 #: manufacturing/templates/qa_supplier_detail.html:107
 #: manufacturing/templates/qa_supplier_list.html:85
 #: manufacturing/templates/qa_supplier_list.html:134
+#: manufacturing/templates/recipe_list.html:30
 #: manufacturing/templates/req_list.html:83
 #: manufacturing/templates/rfq_list.html:32
 #: manufacturing/templates/risk_assessment_list.html:74
@@ -1908,6 +1914,8 @@ msgstr "Contabilizado"
 #: manufacturing/templates/legal_dashboard.html:67
 #: manufacturing/templates/marketing_dashboard_kpis.html:41
 #: manufacturing/templates/purchasing_dashboard_kpis.html:12
+#: manufacturing/templates/recipe_detail.html:29
+#: manufacturing/templates/recipe_list.html:44
 msgid "Draft"
 msgstr "Rascunho"
 
@@ -2852,6 +2860,8 @@ msgstr "Regras de Aprovação"
 #: manufacturing/templates/payroll_deductions.html:66
 #: manufacturing/templates/payroll_deductions.html:121
 #: manufacturing/templates/payroll_deductions.html:189
+#: manufacturing/templates/recipe_detail.html:25
+#: manufacturing/templates/recipe_list.html:40
 #: manufacturing/templates/retention_policy_edit.html:27
 #: manufacturing/templates/sales_commission_plans.html:63
 #: manufacturing/templates/sales_commission_plans.html:76
@@ -3011,6 +3021,7 @@ msgstr "Desativar"
 
 #: manufacturing/templates/approval_rule_edit.html:90
 #: manufacturing/templates/currency_list.html:105
+#: manufacturing/templates/recipe_detail.html:93
 #: manufacturing/templates/retention_policy_edit.html:54
 #: manufacturing/templates/webhook_edit.html:86
 msgid "Activate"
@@ -3455,6 +3466,7 @@ msgstr "Pesquisar nome ou e-mail..."
 #: manufacturing/templates/payroll_deductions.html:83
 #: manufacturing/templates/people_list.html:47
 #: manufacturing/templates/personnel_dashboard.html:122
+#: manufacturing/templates/recipe_list.html:30
 #: manufacturing/templates/report_builder_list.html:20
 #: manufacturing/templates/skill_list.html:29
 #: manufacturing/templates/tc_device_list.html:40
@@ -3777,6 +3789,7 @@ msgstr "Pesquisar cargo..."
 #: manufacturing/templates/prod_schedule.html:53
 #: manufacturing/templates/prod_shipping_list.html:64
 #: manufacturing/templates/purch_contracts_list.html:65
+#: manufacturing/templates/recipe_list.html:20
 #: manufacturing/templates/req_list.html:67
 #: manufacturing/templates/risk_assessment_list.html:59
 #: manufacturing/templates/risk_audit_list.html:59
@@ -4377,6 +4390,8 @@ msgstr "Materiais Consumidos"
 #: manufacturing/templates/batch_record_detail.html:43
 #: manufacturing/templates/bom_detail.html:118
 #: manufacturing/templates/bom_explode.html:55
+#: manufacturing/templates/recipe_detail.html:44
+#: manufacturing/templates/recipe_detail.html:119
 msgid "Component"
 msgstr "Componente"
 
@@ -4432,6 +4447,7 @@ msgstr "Nenhuma inspeção de qualidade vinculada a esta ordem de trabalho."
 
 #: manufacturing/templates/batch_record_list.html:6
 #: manufacturing/templates/prod_dashboard.html:55
+#: manufacturing/templates/recipe_list.html:7
 msgid "Production Dashboard"
 msgstr "Painel de Produção"
 
@@ -5362,6 +5378,9 @@ msgstr "Tipo de Item"
 #: manufacturing/templates/inventory_detail.html:209
 #: manufacturing/templates/inventory_list.html:67
 #: manufacturing/templates/inventory_new.html:55
+#: manufacturing/templates/recipe_detail.html:44
+#: manufacturing/templates/recipe_detail.html:78
+#: manufacturing/templates/recipe_detail.html:119
 msgid "UOM"
 msgstr "UM"
 
@@ -5435,6 +5454,7 @@ msgid "Add Component"
 msgstr "Adicionar Componente"
 
 #: manufacturing/templates/bom_detail.html:220
+#: manufacturing/templates/recipe_detail.html:66
 msgid "Component *"
 msgstr "Componente *"
 
@@ -5505,6 +5525,7 @@ msgid "Recalculate"
 msgstr "Recalcular"
 
 #: manufacturing/templates/bom_explode.html:57
+#: manufacturing/templates/recipe_detail.html:119
 #: manufacturing/templates/wms_wave_detail.html:26
 msgid "Qty Needed"
 msgstr "Qtd. Necessária"
@@ -6473,12 +6494,15 @@ msgid "Risk Register"
 msgstr "Registro de Riscos"
 
 #: manufacturing/templates/control_plan_detail.html:28
+#: manufacturing/templates/recipe_detail.html:23
 #, python-format
 msgid "%(name)s (%(product)s, Rev %(rev)s)"
 msgstr "%(name)s (%(product)s, Rev. %(rev)s)"
 
 #: manufacturing/templates/control_plan_detail.html:32
 #: manufacturing/templates/control_plan_list.html:40
+#: manufacturing/templates/recipe_detail.html:27
+#: manufacturing/templates/recipe_list.html:42
 msgid "Superseded"
 msgstr "Substituído"
 
@@ -6563,6 +6587,8 @@ msgstr "Novo Plano de Controle"
 
 #: manufacturing/templates/control_plan_list.html:25
 #: manufacturing/templates/control_plan_new.html:41
+#: manufacturing/templates/recipe_list.html:30
+#: manufacturing/templates/recipe_new.html:41
 msgid "Revision"
 msgstr "Revisão"
 
@@ -6572,6 +6598,7 @@ msgstr "Nenhum plano de controle ainda."
 
 #: manufacturing/templates/control_plan_new.html:29
 #: manufacturing/templates/lot_new.html:41
+#: manufacturing/templates/recipe_new.html:29
 msgid "Product *"
 msgstr "Produto *"
 
@@ -8630,6 +8657,7 @@ msgstr "Normas"
 #: manufacturing/templates/prod_dashboard.html:11
 #: manufacturing/templates/prod_dashboard.html:62
 #: manufacturing/templates/prod_schedule.html:11
+#: manufacturing/templates/recipe_list.html:6
 msgid "BOM"
 msgstr "BOM"
 
@@ -16268,6 +16296,9 @@ msgid "Configure-to-Order"
 msgstr "Configurar sob Encomenda"
 
 #: manufacturing/templates/prod_dashboard.html:13
+#: manufacturing/templates/recipe_detail.html:6
+#: manufacturing/templates/recipe_list.html:3
+#: manufacturing/templates/recipe_new.html:6
 msgid "Recipes"
 msgstr "Receitas"
 
@@ -17399,6 +17430,107 @@ msgstr "Data da Última Auditoria"
 #: manufacturing/templates/sales_commissions.html:241
 msgid "Add Record"
 msgstr "Adicionar Registro"
+
+#: manufacturing/templates/recipe_detail.html:33
+#, python-format
+msgid "Batch size: %(size)s %(uom)s · Yield: %(pct)s%%"
+msgstr "Tamanho do lote: %(size)s %(uom)s · Rendimento: %(pct)s%%"
+
+#: manufacturing/templates/recipe_detail.html:40
+msgid "Ingredients"
+msgstr "Ingredientes"
+
+#: manufacturing/templates/recipe_detail.html:44
+msgid "Qty / Batch"
+msgstr "Qtd. / Lote"
+
+#: manufacturing/templates/recipe_detail.html:57
+msgid "No ingredients added yet."
+msgstr "Ainda não há ingredientes adicionados."
+
+#: manufacturing/templates/recipe_detail.html:74
+msgid "Qty / Batch *"
+msgstr "Qtd. / Lote *"
+
+#: manufacturing/templates/recipe_detail.html:82
+msgid "Sequence"
+msgstr "Sequência"
+
+#: manufacturing/templates/recipe_detail.html:86
+msgid "Add Ingredient"
+msgstr "Adicionar Ingrediente"
+
+#: manufacturing/templates/recipe_detail.html:94
+msgid ""
+"Activating this recipe supersedes any other active recipe for this product."
+msgstr "Ativar esta receita substitui qualquer outra receita ativa para este produto."
+
+#: manufacturing/templates/recipe_detail.html:98
+msgid "Activate Recipe"
+msgstr "Ativar Receita"
+
+#: manufacturing/templates/recipe_detail.html:105
+msgid "Scale / Release a Batch"
+msgstr "Dimensionar / Liberar um Lote"
+
+#: manufacturing/templates/recipe_detail.html:110
+msgid "Target Qty"
+msgstr "Qtd. Alvo"
+
+#: manufacturing/templates/recipe_detail.html:113
+msgid "Preview Scaled Ingredients"
+msgstr "Pré-visualizar Ingredientes Dimensionados"
+
+#: manufacturing/templates/recipe_detail.html:134
+msgid "Release Qty *"
+msgstr "Qtd. a Liberar *"
+
+#: manufacturing/templates/recipe_detail.html:137
+msgid "Release Batch Work Order"
+msgstr "Liberar Ordem de Fabricação do Lote"
+
+#: manufacturing/templates/recipe_list.html:10
+#: manufacturing/templates/recipe_new.html:3
+#: manufacturing/templates/recipe_new.html:21
+msgid "New Recipe"
+msgstr "Nova Receita"
+
+#: manufacturing/templates/recipe_list.html:16
+msgid "Recipes / Formulas"
+msgstr "Receitas / Fórmulas"
+
+#: manufacturing/templates/recipe_list.html:30
+msgid "Batch Size"
+msgstr "Tamanho do Lote"
+
+#: manufacturing/templates/recipe_list.html:54
+msgid "No recipes yet."
+msgstr "Ainda não há receitas."
+
+#: manufacturing/templates/recipe_new.html:37
+msgid "Recipe Name *"
+msgstr "Nome da Receita *"
+
+#: manufacturing/templates/recipe_new.html:38
+msgid "e.g. Syrup Base"
+msgstr "ex.: Base de Xarope"
+
+#: manufacturing/templates/recipe_new.html:45
+msgid "Batch Size *"
+msgstr "Tamanho do Lote *"
+
+#: manufacturing/templates/recipe_new.html:49
+msgid "Batch UOM"
+msgstr "UM do Lote"
+
+#: manufacturing/templates/recipe_new.html:53
+#, python-format
+msgid "Yield %%"
+msgstr "Rendimento %%"
+
+#: manufacturing/templates/recipe_new.html:56
+msgid "Create Recipe"
+msgstr "Criar Receita"
 
 #: manufacturing/templates/register.html:4
 msgid "Register New User"
@@ -19423,7 +19555,9 @@ msgstr "Busca por Código de Barras"
 
 #: manufacturing/templates/scan_home.html:49
 msgid "Scan any barcode or type a code to jump to the record."
-msgstr "Leia qualquer código de barras ou digite um código para ir direto ao registro."
+msgstr ""
+"Leia qualquer código de barras ou digite um código para ir direto ao "
+"registro."
 
 #: manufacturing/templates/scan_home.html:57
 msgid "Scan or type barcode…"
@@ -19513,7 +19647,10 @@ msgstr "Ver Pedido de Compra Completo"
 msgid ""
 "Scan a <strong>PO-</strong> or <strong>RCV-</strong> barcode to load a "
 "purchase order, then scan each part to mark it received."
-msgstr "Leia um código de barras <strong>PO-</strong> ou <strong>RCV-</strong> para carregar um pedido de compra, depois leia cada peça para marcá-la como recebida."
+msgstr ""
+"Leia um código de barras <strong>PO-</strong> ou <strong>RCV-</strong> para "
+"carregar um pedido de compra, depois leia cada peça para marcá-la como "
+"recebida."
 
 #: manufacturing/templates/sensor_reading_new.html:18
 msgid ""

@@ -2491,6 +2491,61 @@ out of scope for this pass since fixing it means auditing every
 f-string in `_barcode.py`, not a template-marking change) — no console
 or server errors.
 
+Also fully translated: the **Recipes / Formulas** feature
+(`recipe_list.html`, `recipe_detail.html`, `recipe_new.html` — 3
+templates, linked from `prod_dashboard.html`'s already-translated
+"Recipes" toolbar button — another "translate the link, not yet the
+target" closure). 24 unique strings across 5 languages, all simple (no
+plurals). Small enough to translate directly by hand rather than
+delegating, matching the ABC Costing/Auth/Risk Management/Scan
+precedent. Status values (`draft`/`active`/`superseded`) driving the
+`{% if %}` branches stay bare per the standard raw-enum convention, but
+the pill *labels* shown to the user (Draft/Active/Superseded) and the
+status-filter dropdown's raw `{{ s|title }}` display both needed
+separate handling — the pill labels are literal template text and were
+wrapped, while the dropdown's raw enum display was deliberately left
+bare, matching the identical dropdown pattern already established
+elsewhere (e.g. Cycle Count/QA status filters).
+
+The recipe detail page's dynamic heading — `{{ recipe.name }}
+({{ recipe.product_name }}, Rev {{ recipe.revision }})` — needed a
+`{% blocktrans with %}` binding all three values; its resulting msgid
+(`%(name)s (%(product)s, Rev %(rev)s)`) auto-merged with an
+already-correct existing translation elsewhere in the app using the
+same "Rev" formatting convention, confirmed compatible before trusting
+the merge (the standing "Make"-style cross-context check). The
+"Batch size: {{ size }} {{ uom }} · Yield: {{ pct }}%" line and the New
+Recipe form's "Yield %" label both contain a bare literal `%`
+immediately after a value — `makemessages` auto-escaped both to `%%` in
+the `.po` msgid per the established Payroll-pass convention, and both
+were confirmed to render as a real single `%` (not a doubled `%%`) via
+direct `Template().render()` calls in all 5 languages before trusting
+the browser check, continuing the runtime-verification habit
+established after the WO/SO pass's double-escape bug.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check` clean
+on all 5 `.po` files (including the two `%%`-escaped entries), zero
+fuzzy/blank entries confirmed programmatically, zero placeholder
+(`%(name)s`-style) mismatches between msgid and any of the 5 languages'
+translations. The auto-merged generic labels this batch reused
+(Component, UOM, Product, Revision, Name, Status, Detail, Qty Needed)
+all cross-checked semantically compatible with their existing catalog
+translations — no cross-context mistranslation risk. Verified
+end-to-end against the real dev server, in German and French with real
+sample data: the Recipes list page (confirmed both the Draft/Active
+pill translations and the untranslated raw-enum status filter
+dropdown), an active recipe's detail page (confirmed the dynamic
+"Paint Batch CORRECTNESS-CHECK (Paint Can, Rev. A)" title, the real
+single `%` in "Ausbeute: 95,0%"/"Rendement : 95,0%", the Ingredients
+table with a real component row, and the Scale/Release a Batch
+section), a draft recipe's detail page (confirmed the empty-ingredients
+state, the Add Ingredient form, and the Activate card, all only shown
+for `draft`-status recipes), and the New Recipe form (confirmed the
+"z. B. Sirupbasis" placeholder and the real single `%` in the "Yield %"
+label) — all pages return 200 with correctly translated titles and
+labels, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
