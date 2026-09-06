@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Standard Cost — {{ product.name }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with name=product.name %}Standard Cost — {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/inventory/{{ product.id }}/" class="btn">← Product</a>
-<a href="/routing/{{ product.id }}/" class="btn">Routing</a>
-<a href="/carbon/{{ product.id }}/" class="btn">Carbon Footprint</a>
-<a href="/inventory/{{ product.id }}/valuation/" class="btn">FIFO/LIFO/Avg Valuation</a>
+<a href="/inventory/{{ product.id }}/" class="btn">{% trans "← Product" %}</a>
+<a href="/routing/{{ product.id }}/" class="btn">{% trans "Routing" %}</a>
+<a href="/carbon/{{ product.id }}/" class="btn">{% trans "Carbon Footprint" %}</a>
+<a href="/inventory/{{ product.id }}/valuation/" class="btn">{% trans "FIFO/LIFO/Avg Valuation" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -41,10 +42,10 @@
 {% block body %}
 <div class="content">
 <div class="cost-wrap">
-    <h2>Standard Cost — {{ product.name }}</h2>
+    <h2>{% blocktrans with name=product.name %}Standard Cost — {{ name }}{% endblocktrans %}</h2>
     <div class="cost-meta">
-        {% if product.sku %}SKU: {{ product.sku }} &nbsp;·&nbsp;{% endif %}
-        Cost type: {{ product.make_or_buy|upper }}
+        {% if product.sku %}{% blocktrans with sku=product.sku %}SKU: {{ sku }}{% endblocktrans %} &nbsp;·&nbsp;{% endif %}
+        {% blocktrans with ct=product.make_or_buy|upper %}Cost type: {{ ct }}{% endblocktrans %}
     </div>
 
     {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
@@ -52,63 +53,63 @@
 
     {% if current_cost %}
     <div class="card">
-        <h3>Current Standard Cost
+        <h3>{% trans "Current Standard Cost" %}
             <small style="font-weight:normal;color:var(--text-muted);font-size:12px;">
-                — rolled {{ current_cost.rolled_at|default:'' }}
+                {% blocktrans with dt=current_cost.rolled_at|default:'' %}— rolled {{ dt }}{% endblocktrans %}
             </small>
         </h3>
         <div class="cost-grid" style="margin-bottom:16px;">
             <div class="cost-box">
-                <div class="label">Material</div>
+                <div class="label">{% trans "Material" %}</div>
                 <div class="value">${{ current_cost.std_material_cost|floatformat:2 }}</div>
             </div>
             <div class="cost-box">
-                <div class="label">Labor</div>
+                <div class="label">{% trans "Labor" %}</div>
                 <div class="value">${{ current_cost.std_labor_cost|floatformat:2 }}</div>
             </div>
             <div class="cost-box">
-                <div class="label">Overhead</div>
+                <div class="label">{% trans "Overhead" %}</div>
                 <div class="value">${{ current_cost.std_overhead_cost|floatformat:2 }}</div>
             </div>
         </div>
         <div class="total-box">
-            <div class="label">Total Standard Cost</div>
+            <div class="label">{% trans "Total Standard Cost" %}</div>
             <div class="value">${{ current_cost.total_std_cost|floatformat:2 }}</div>
         </div>
     </div>
     {% else %}
     <div class="card">
-        <p style="color:var(--text-muted);text-align:center;padding:20px;">No standard cost on record yet.</p>
+        <p style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No standard cost on record yet." %}</p>
     </div>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Roll Standard Cost</h3>
+        <h3>{% trans "Roll Standard Cost" %}</h3>
         <p style="font-size:13px;color:#555;margin-bottom:14px;">
-            Recalculates material cost from the Bill of Materials, plus labor cost from
-            routing operations. Saves a new snapshot with timestamp.
+            {% blocktrans %}Recalculates material cost from the Bill of Materials, plus labor cost from
+            routing operations. Saves a new snapshot with timestamp.{% endblocktrans %}
         </p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="roll">
-            <button type="submit" class="btn-roll">Roll Cost</button>
+            <button type="submit" class="btn-roll">{% trans "Roll Cost" %}</button>
         </form>
     </div>
     {% endif %}
 
     {% if history %}
     <div class="card">
-        <h3>Cost History</h3>
+        <h3>{% trans "Cost History" %}</h3>
         <table class="hist-table">
             <thead>
                 <tr>
-                    <th>Rolled At</th>
-                    <th class="num">Material</th>
-                    <th class="num">Labor</th>
-                    <th class="num">Overhead</th>
-                    <th class="num">Total</th>
-                    <th>By</th>
+                    <th>{% trans "Rolled At" %}</th>
+                    <th class="num">{% trans "Material" %}</th>
+                    <th class="num">{% trans "Labor" %}</th>
+                    <th class="num">{% trans "Overhead" %}</th>
+                    <th class="num">{% trans "Total" %}</th>
+                    <th>{% trans "By" %}</th>
                 </tr>
             </thead>
             <tbody>

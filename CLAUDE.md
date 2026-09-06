@@ -2370,6 +2370,66 @@ Reading, and Set Sensor Thresholds (confirmed both correctly reuse the
 for their page titles) — all pages return 200 with correctly translated
 titles and labels, no console or server errors.
 
+Also fully translated: the **Costing** feature (`cost_detail.html`,
+`costing_product_detail.html`, `costing_valuation_list.html` — 3
+templates, another "translate the link, not yet the target" closure:
+linked from `routing_detail.html`'s "View Cost Roll" button, translated
+in the immediately-prior Workcenter/Routing pass, but never itself
+touched). Marked up by two parallel subagents (Cost Detail + Valuation
+List vs. the larger Product Valuation Detail page), reviewed and
+translated by hand afterward — small enough (39 strings, all simple, no
+plurals) to skip delegating the translation step, matching the
+ABC Costing/Auth/Risk Management/Cycle-Count-Sampling-Plan/Sensor-Batch
+precedent.
+
+**A new kind of intentional-literal-text exception, distinct from every
+prior "leave this untranslated" case in this file**: `costing_
+valuation_list.html`'s table has a column header that reads, verbatim,
+`product.amount` — not a normal English phrase but a raw Python/DB
+attribute reference. Initially suspected as a leftover display bug (a
+header that should probably read "On Hand"), this was confirmed
+intentional by cross-referencing `costing_product_detail.html`, which
+uses the identical literal phrase twice more, inline in prose ("On-hand
+(product.amount): ...", "...differs from product.amount (...) — some
+receipts/issues for this product were recorded through a path that
+doesn't create/consume cost layers..."). The whole Costing feature is
+about reconciling a raw DB field (`product.amount`) against a
+separately cost-layer-tracked quantity, so showing the literal field
+name is deliberate technical clarity for the target audience (this
+page's likely users already think in terms of the underlying schema),
+not a mistake — unlike every previous acronym-preservation case (NCR,
+CAPA, MRP, BOM, OEE, RMA, FMEA, WMS, COGS, etc.), this isn't a
+recognized industry term, it's a literal code identifier shown to the
+user on purpose. Left completely untouched, unwrapped, in all three
+occurrences across both files — neither wrapped in its own `{% trans
+%}` nor "fixed" into a friendlier label. Both subagents' diffs
+confirmed this was followed correctly before any translation work
+began.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check` clean
+on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically, zero placeholder (`%(name)s`-style) mismatches
+between msgid and any of the 5 languages' translations (checked
+programmatically for this batch's 39 new strings), and the auto-merged
+generic labels this batch reused (Product, Method, Qty, Unit Cost,
+Reference, Received, Date, Total Cost, Detail, Inventory) all
+cross-checked semantically compatible with their existing catalog
+translations — no "Make"-style cross-context mistranslation risk this
+time. Verified end-to-end against the real dev server, in French and
+German with real sample data: the Standard Cost page for a real
+Make-type product (confirmed the dynamic "Coût Standard — Road Bike"
+title, the two-piece "Coût Standard Actuel — calculé" heading split,
+and the full Cost History table with real rolled-cost rows in both
+languages), the Cost Valuation detail page for a product with drift
+between its layer-tracked quantity and `product.amount` (confirmed the
+⚠ drift-warning sentence renders correctly with both interpolated
+values and the literal "product.amount" text intact), and the
+Inventory Valuation list page (confirmed the "product.amount" column
+header survives literally next to fully-translated sibling headers,
+with a real FIFO-method product row) — all pages return 200 with
+correctly translated titles and labels, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

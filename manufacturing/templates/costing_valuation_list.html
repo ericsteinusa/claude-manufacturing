@@ -1,26 +1,27 @@
 {% extends "base.html" %}
-{% block page_title %}Inventory Valuation (FIFO/LIFO/Avg){% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Inventory Valuation (FIFO/LIFO/Avg)" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/inventory/" class="btn">Inventory</a>
+<a href="/inventory/" class="btn">{% trans "Inventory" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-<div class="menu-title">Inventory Valuation</div>
+<div class="menu-title">{% trans "Inventory Valuation" %}</div>
 <p style="font-size:12px;color:var(--text-muted);max-width:700px;">
-    Products currently opted into FIFO / LIFO / Weighted-Average costing.
+    {% blocktrans %}Products currently opted into FIFO / LIFO / Weighted-Average costing.
     Every other product still uses the single standard purchase-price cost
-    field, unchanged. Set a product's method from its own valuation page.
+    field, unchanged. Set a product's method from its own valuation page.{% endblocktrans %}
 </p>
 
 {% if valuations %}
 <div class="erp-table-wrap">
     <table class="erp-table">
         <thead>
-            <tr><th>Product</th><th>Method</th><th class="num">Layer Qty Remaining</th>
-                <th class="num">product.amount</th><th class="num">Avg Unit Cost</th>
-                <th class="num">Total Value</th><th></th></tr>
+            <tr><th>{% trans "Product" %}</th><th>{% trans "Method" %}</th><th class="num">{% trans "Layer Qty Remaining" %}</th>
+                <th class="num">product.amount</th><th class="num">{% trans "Avg Unit Cost" %}</th>
+                <th class="num">{% trans "Total Value" %}</th><th></th></tr>
         </thead>
         <tbody>
             {% for v in valuations %}
@@ -33,14 +34,14 @@
                 </td>
                 <td class="num">${{ v.avg_unit_cost|floatformat:4 }}</td>
                 <td class="num"><strong>${{ v.total_value|floatformat:2 }}</strong></td>
-                <td><a href="/inventory/{{ v.product_id }}/valuation/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                <td><a href="/inventory/{{ v.product_id }}/valuation/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% else %}
-<div class="empty-state">No products are on a FIFO/LIFO/Average costing method yet.</div>
+<div class="empty-state">{% trans "No products are on a FIFO/LIFO/Average costing method yet." %}</div>
 {% endif %}
 </div>
 {% endblock %}
