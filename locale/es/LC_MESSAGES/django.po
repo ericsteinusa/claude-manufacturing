@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 17:24+0000\n"
+"POT-Creation-Date: 2026-09-06 19:17+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
@@ -61,28 +61,2442 @@ msgstr "En Reparto"
 msgid "Delivered"
 msgstr "Entregado"
 
-#: manufacturing/menus.py:1689 manufacturing/templates/acct_dashboard.html:6
-#: manufacturing/templates/base.html:540
-#: manufacturing/templates/budget_dashboard.html:39
-msgid "Accounting"
-msgstr "Contabilidad"
+#: manufacturing/menus.py:13
+msgid "Time Clock Menu"
+msgstr "Menú de Control Horario"
 
-#: manufacturing/menus.py:1690 manufacturing/templates/base.html:527
-#: manufacturing/templates/cs_dashboard.html:3
-#: manufacturing/templates/reports_dashboard.html:223
-msgid "Customer Service"
-msgstr "Atención al cliente"
+#: manufacturing/menus.py:15 manufacturing/menus.py:16
+msgid "Clock In/Out"
+msgstr "Entrada/Salida"
 
-#: manufacturing/menus.py:1691 manufacturing/templates/base.html:569
-#: manufacturing/templates/base.html:571
-#: manufacturing/templates/document_list.html:7
-msgid "Engineering"
-msgstr "Ingeniería"
+#: manufacturing/menus.py:18
+msgid "Record Clock In"
+msgstr "Registrar Entrada"
 
-#: manufacturing/menus.py:1692
-msgid "Information Tech"
-msgstr "Tecnología de la Información"
+#: manufacturing/menus.py:19
+msgid "Record Clock Out"
+msgstr "Registrar Salida"
 
+#: manufacturing/menus.py:20 manufacturing/templates/time_clock_status.html:64
+msgid "Current Status"
+msgstr "Estado actual"
+
+#: manufacturing/menus.py:23 manufacturing/menus.py:24
+msgid "View Hours"
+msgstr "Ver Horas"
+
+#: manufacturing/menus.py:26
+msgid "Today's Hours"
+msgstr "Horas de Hoy"
+
+#: manufacturing/menus.py:27
+msgid "Weekly Hours"
+msgstr "Horas Semanales"
+
+#: manufacturing/menus.py:28
+msgid "Monthly Hours"
+msgstr "Horas Mensuales"
+
+#: manufacturing/menus.py:29
+msgid "Pay Period Hours"
+msgstr "Horas del Período de Pago"
+
+#: manufacturing/menus.py:32 manufacturing/menus.py:33
+msgid "Time Off Requests"
+msgstr "Solicitudes de Ausencia"
+
+#: manufacturing/menus.py:35 manufacturing/templates/mkt_budget_list.html:153
+#: manufacturing/templates/time_off_form.html:65
+msgid "Submit Request"
+msgstr "Enviar solicitud"
+
+#: manufacturing/menus.py:36 manufacturing/menus.py:457
+msgid "Pending Requests"
+msgstr "Solicitudes Pendientes"
+
+#: manufacturing/menus.py:37
+msgid "Approved Requests"
+msgstr "Solicitudes Aprobadas"
+
+#: manufacturing/menus.py:38
+msgid "Request History"
+msgstr "Historial de Solicitudes"
+
+#: manufacturing/menus.py:41 manufacturing/menus.py:42
+msgid "Schedules"
+msgstr "Horarios"
+
+#: manufacturing/menus.py:44
+msgid "My Schedule"
+msgstr "Mi Horario"
+
+#: manufacturing/menus.py:45
+msgid "Upcoming Shifts"
+msgstr "Próximos Turnos"
+
+#: manufacturing/menus.py:46 manufacturing/menus.py:314
+#: manufacturing/menus.py:384
+msgid "Schedule Calendar"
+msgstr "Calendario de Horarios"
+
+#: manufacturing/menus.py:47
+msgid "Swap Requests"
+msgstr "Solicitudes de Cambio de Turno"
+
+#: manufacturing/menus.py:50 manufacturing/menus.py:51
+#: manufacturing/templates/tc_ot_report.html:45
+msgid "Overtime Reports"
+msgstr "Informes de horas extra"
+
+#: manufacturing/menus.py:53
+msgid "Current Period OT"
+msgstr "HE del Periodo Actual"
+
+#: manufacturing/menus.py:54
+msgid "Historical OT"
+msgstr "HE Histórico"
+
+#: manufacturing/menus.py:55
+msgid "OT by Employee"
+msgstr "HE por Empleado"
+
+#: manufacturing/menus.py:56
+msgid "OT Approval"
+msgstr "Aprobación de HE"
+
+#: manufacturing/menus.py:59 manufacturing/menus.py:60
+msgid "Attendance Reports"
+msgstr "Informes de Asistencia"
+
+#: manufacturing/menus.py:62
+#: manufacturing/templates/time_clock_attendance.html:3
+#: manufacturing/templates/time_clock_attendance.html:54
+msgid "Daily Attendance"
+msgstr "Asistencia diaria"
+
+#: manufacturing/menus.py:63 manufacturing/menus.py:1148
+#: manufacturing/menus.py:1199 manufacturing/menus.py:1265
+#: manufacturing/menus.py:1388
+msgid "Monthly Summary"
+msgstr "Resumen Mensual"
+
+#: manufacturing/menus.py:64
+msgid "Tardiness Report"
+msgstr "Informe de Tardanzas"
+
+#: manufacturing/menus.py:65
+msgid "Absence Report"
+msgstr "Informe de Ausencias"
+
+#: manufacturing/menus.py:68 manufacturing/menus.py:69
+msgid "Shift Management"
+msgstr "Gestión de Turnos"
+
+#: manufacturing/menus.py:71
+msgid "View Shifts"
+msgstr "Ver Turnos"
+
+#: manufacturing/menus.py:72
+msgid "Assign Employees"
+msgstr "Asignar Empleados"
+
+#: manufacturing/menus.py:73
+msgid "Shift Templates"
+msgstr "Plantillas de Turno"
+
+#: manufacturing/menus.py:74
+msgid "Swap Management"
+msgstr "Gestión de Cambios de Turno"
+
+#: manufacturing/menus.py:81
+msgid "Maintenance Menu"
+msgstr "Menú de Mantenimiento"
+
+#: manufacturing/menus.py:83 manufacturing/menus.py:84
+#: manufacturing/menus.py:290 manufacturing/menus.py:291
+#: manufacturing/templates/base.html:499
+#: manufacturing/templates/maint_dashboard.html:6
+#: manufacturing/templates/maint_dashboard.html:125
+#: manufacturing/templates/maint_downtime_list.html:7
+#: manufacturing/templates/maint_equipment_list.html:7
+#: manufacturing/templates/maint_inspection_list.html:7
+#: manufacturing/templates/maint_labor_report.html:73
+#: manufacturing/templates/maint_mechanics_list.html:7
+#: manufacturing/templates/maint_parts_list.html:7
+#: manufacturing/templates/maint_schedule_list.html:7
+#: manufacturing/templates/mrp_release.html:7
+#: manufacturing/templates/prod_daily_report.html:10
+#: manufacturing/templates/prod_dashboard.html:6
+#: manufacturing/templates/prod_dashboard.html:58
+#: manufacturing/templates/prod_labor_report.html:73
+#: manufacturing/templates/prod_performance_report.html:10
+#: manufacturing/templates/prod_reports.html:8
+#: manufacturing/templates/prod_schedule.html:8
+#: manufacturing/templates/prod_schedule_gantt.html:10
+#: manufacturing/templates/prod_shipping_list.html:8
+#: manufacturing/templates/reports_dashboard.html:168
+#: manufacturing/templates/wo_list.html:4
+#: manufacturing/templates/wo_list.html:16
+msgid "Work Orders"
+msgstr "Órdenes de trabajo"
+
+#: manufacturing/menus.py:86 manufacturing/menus.py:293
+#: manufacturing/templates/maint_wo_list.html:154
+msgid "Create Work Order"
+msgstr "Crear Orden de Trabajo"
+
+#: manufacturing/menus.py:87 manufacturing/menus.py:294
+#: manufacturing/templates/dashboard_kpis.html:12
+#: manufacturing/templates/maint_dashboard_kpis.html:5
+msgid "Open Work Orders"
+msgstr "Órdenes de trabajo abiertas"
+
+#: manufacturing/menus.py:88 manufacturing/menus.py:295
+#: manufacturing/menus.py:458 manufacturing/menus.py:698
+#: manufacturing/menus.py:1454 manufacturing/templates/cto_configure.html:24
+#: manufacturing/templates/it_dashboard_kpis.html:9
+#: manufacturing/templates/it_task_list.html:88
+#: manufacturing/templates/prod_daily_report.html:64
+#: manufacturing/templates/prod_dashboard_kpis.html:8
+#: manufacturing/templates/technician_route_detail.html:31
+#: manufacturing/templates/technician_route_list.html:41
+msgid "In Progress"
+msgstr "En progreso"
+
+#: manufacturing/menus.py:89 manufacturing/menus.py:296
+#: manufacturing/templates/cs_dashboard_kpis.html:8
+#: manufacturing/templates/cs_list.html:25
+#: manufacturing/templates/cs_reports_kpis.html:13
+#: manufacturing/templates/cs_reports_kpis.html:43
+#: manufacturing/templates/eng_dashboard_kpis.html:5
+#: manufacturing/templates/finance_audit_detail.html:112
+#: manufacturing/templates/finance_audit_list.html:89
+#: manufacturing/templates/it_repairs_list.html:71
+#: manufacturing/templates/it_task_list.html:87
+#: manufacturing/templates/legal_compliance_list.html:85
+#: manufacturing/templates/legal_dashboard.html:83
+#: manufacturing/templates/maint_inspection_list.html:79
+#: manufacturing/templates/mkt_analytics.html:143
+#: manufacturing/templates/offboarding_list.html:74
+#: manufacturing/templates/prod_performance_report.html:60
+#: manufacturing/templates/prod_performance_report.html:83
+#: manufacturing/templates/qa_audit_list.html:70
+#: manufacturing/templates/repetitive_schedule_detail.html:88
+#: manufacturing/templates/risk_audit_list.html:74
+#: manufacturing/templates/technician_route_detail.html:29
+#: manufacturing/templates/technician_route_detail.html:42
+#: manufacturing/templates/technician_route_list.html:29
+#: manufacturing/templates/technician_route_list.html:39
+msgid "Completed"
+msgstr "Completado"
+
+#: manufacturing/menus.py:92 manufacturing/menus.py:93
+msgid "Maintenance Schedule"
+msgstr "Programa de Mantenimiento"
+
+#: manufacturing/menus.py:95 manufacturing/menus.py:311
+msgid "Daily Schedule"
+msgstr "Programa Diario"
+
+#: manufacturing/menus.py:96 manufacturing/menus.py:312
+#: manufacturing/menus.py:383
+msgid "Weekly Schedule"
+msgstr "Programa Semanal"
+
+#: manufacturing/menus.py:97 manufacturing/menus.py:313
+msgid "Monthly Schedule"
+msgstr "Programa Mensual"
+
+#: manufacturing/menus.py:98
+msgid "Annual Plan"
+msgstr "Plan Anual"
+
+#: manufacturing/menus.py:101 manufacturing/menus.py:102
+msgid "Equipment Maintenance"
+msgstr "Mantenimiento de Equipos"
+
+#: manufacturing/menus.py:104 manufacturing/menus.py:331
+msgid "Equipment List"
+msgstr "Lista de Equipos"
+
+#: manufacturing/menus.py:105
+msgid "Maintenance History"
+msgstr "Historial de Mantenimiento"
+
+#: manufacturing/menus.py:106
+msgid "Service Records"
+msgstr "Registros de Servicio"
+
+#: manufacturing/menus.py:107 manufacturing/menus.py:328
+#: manufacturing/menus.py:329
+msgid "Equipment Status"
+msgstr "Estado de Equipos"
+
+#: manufacturing/menus.py:110 manufacturing/menus.py:111
+msgid "Parts Inventory"
+msgstr "Inventario de Repuestos"
+
+#: manufacturing/menus.py:113
+msgid "View Inventory"
+msgstr "Ver Inventario"
+
+#: manufacturing/menus.py:114
+msgid "Parts Request"
+msgstr "Solicitud de Repuestos"
+
+#: manufacturing/menus.py:115
+msgid "Reorder List"
+msgstr "Lista de Reposición"
+
+#: manufacturing/menus.py:116
+msgid "Parts History"
+msgstr "Historial de Repuestos"
+
+#: manufacturing/menus.py:119 manufacturing/menus.py:120
+#: manufacturing/menus.py:1144 manufacturing/menus.py:1145
+msgid "Maintenance Reports"
+msgstr "Informes de Mantenimiento"
+
+#: manufacturing/menus.py:122 manufacturing/menus.py:418
+#: manufacturing/menus.py:636 manufacturing/menus.py:1147
+#: manufacturing/templates/prod_daily_report.html:8
+#: manufacturing/templates/prod_performance_report.html:8
+msgid "Daily Report"
+msgstr "Informe Diario"
+
+#: manufacturing/menus.py:123
+msgid "Weekly Report"
+msgstr "Informe Semanal"
+
+#: manufacturing/menus.py:124 manufacturing/menus.py:420
+#: manufacturing/menus.py:1140 manufacturing/menus.py:1311
+msgid "Cost Analysis"
+msgstr "Análisis de Costos"
+
+#: manufacturing/menus.py:125
+msgid "Downtime Report"
+msgstr "Informe de Tiempo de Inactividad"
+
+#: manufacturing/menus.py:128 manufacturing/menus.py:129
+#: manufacturing/templates/maint_inspection_list.html:3
+#: manufacturing/templates/maint_inspection_list.html:57
+msgid "Safety Inspections"
+msgstr "Inspecciones de Seguridad"
+
+#: manufacturing/menus.py:131
+#: manufacturing/templates/maint_inspection_list.html:104
+msgid "Schedule Inspection"
+msgstr "Programar Inspección"
+
+#: manufacturing/menus.py:132
+msgid "Inspection Checklist"
+msgstr "Lista de Verificación de Inspección"
+
+#: manufacturing/menus.py:133 manufacturing/menus.py:340
+#: manufacturing/templates/qa_dashboard.html:61
+msgid "Inspection Results"
+msgstr "Resultados de Inspección"
+
+#: manufacturing/menus.py:134 manufacturing/menus.py:819
+#: manufacturing/menus.py:1433 manufacturing/menus.py:1450
+#: manufacturing/menus.py:1451 manufacturing/templates/qa_dashboard.html:77
+msgid "Corrective Actions"
+msgstr "Acciones Correctivas"
+
+#: manufacturing/menus.py:137 manufacturing/menus.py:138
+msgid "Preventive Maintenance"
+msgstr "Mantenimiento Preventivo"
+
+#: manufacturing/menus.py:140 manufacturing/templates/maint_dashboard.html:8
+#: manufacturing/templates/maint_dashboard.html:133
+#: manufacturing/templates/maint_equipment_list.html:8
+#: manufacturing/templates/maint_schedule_list.html:3
+#: manufacturing/templates/maint_wo_list.html:8
+msgid "PM Schedule"
+msgstr "Programa de mantenimiento preventivo"
+
+#: manufacturing/menus.py:141
+msgid "PM Checklists"
+msgstr "Listas de Verificación PM"
+
+#: manufacturing/menus.py:142
+msgid "PM History"
+msgstr "Historial PM"
+
+#: manufacturing/menus.py:143
+msgid "PM Reports"
+msgstr "Informes PM"
+
+#: manufacturing/menus.py:150 manufacturing/menus.py:1167
+#: manufacturing/menus.py:1207
+msgid "Marketing Menu"
+msgstr "Menú de Marketing"
+
+#: manufacturing/menus.py:152 manufacturing/menus.py:153
+#: manufacturing/templates/marketing_dashboard.html:7
+#: manufacturing/templates/marketing_dashboard.html:52
+#: manufacturing/templates/marketing_dashboard_kpis.html:2
+#: manufacturing/templates/mkt_ad_detail.html:7
+#: manufacturing/templates/mkt_ad_list.html:7
+#: manufacturing/templates/mkt_analytics.html:7
+#: manufacturing/templates/mkt_analytics.html:53
+#: manufacturing/templates/mkt_analytics.html:140
+#: manufacturing/templates/mkt_budget_list.html:7
+#: manufacturing/templates/mkt_campaign_detail.html:7
+#: manufacturing/templates/mkt_campaign_list.html:3
+#: manufacturing/templates/mkt_campaign_list.html:7
+#: manufacturing/templates/mkt_campaign_list.html:59
+#: manufacturing/templates/mkt_content_detail.html:7
+#: manufacturing/templates/mkt_content_list.html:7
+#: manufacturing/templates/mkt_lead_detail.html:7
+#: manufacturing/templates/mkt_lead_list.html:7
+#: manufacturing/templates/mkt_research_detail.html:8
+#: manufacturing/templates/mkt_research_list.html:7
+msgid "Campaigns"
+msgstr "Campañas"
+
+#: manufacturing/menus.py:155
+msgid "Active Campaigns"
+msgstr "Campañas Activas"
+
+#: manufacturing/menus.py:156
+msgid "Create Campaign"
+msgstr "Crear Campaña"
+
+#: manufacturing/menus.py:157
+msgid "Campaign Calendar"
+msgstr "Calendario de Campañas"
+
+#: manufacturing/menus.py:158
+msgid "Campaign Results"
+msgstr "Resultados de Campañas"
+
+#: manufacturing/menus.py:161 manufacturing/menus.py:162
+#: manufacturing/templates/mkt_research_list.html:3
+#: manufacturing/templates/mkt_research_list.html:61
+msgid "Market Research"
+msgstr "Investigación de mercado"
+
+#: manufacturing/menus.py:164
+msgid "Research Projects"
+msgstr "Proyectos de Investigación"
+
+#: manufacturing/menus.py:165
+msgid "Competitor Analysis"
+msgstr "Análisis de la Competencia"
+
+#: manufacturing/menus.py:166
+msgid "Survey Management"
+msgstr "Gestión de Encuestas"
+
+#: manufacturing/menus.py:167
+msgid "Market Trends"
+msgstr "Tendencias del Mercado"
+
+#: manufacturing/menus.py:170 manufacturing/menus.py:171
+#: manufacturing/templates/marketing_dashboard.html:9
+#: manufacturing/templates/marketing_dashboard.html:55
+#: manufacturing/templates/mkt_ad_detail.html:8
+#: manufacturing/templates/mkt_ad_list.html:3
+#: manufacturing/templates/mkt_ad_list.html:9
+#: manufacturing/templates/mkt_ad_list.html:64
+#: manufacturing/templates/mkt_analytics.html:9
+#: manufacturing/templates/mkt_analytics.html:154
+#: manufacturing/templates/mkt_budget_list.html:9
+#: manufacturing/templates/mkt_research_list.html:9
+msgid "Advertising"
+msgstr "Publicidad"
+
+#: manufacturing/menus.py:173
+msgid "Ad Management"
+msgstr "Gestión de Anuncios"
+
+#: manufacturing/menus.py:174
+msgid "Ad Budget"
+msgstr "Presupuesto de Anuncios"
+
+#: manufacturing/menus.py:175
+msgid "Ad Performance"
+msgstr "Rendimiento de Anuncios"
+
+#: manufacturing/menus.py:176
+msgid "Ad Calendar"
+msgstr "Calendario de Anuncios"
+
+#: manufacturing/menus.py:179 manufacturing/menus.py:180
+#: manufacturing/templates/marketing_dashboard.html:11
+#: manufacturing/templates/marketing_dashboard.html:57
+#: manufacturing/templates/mkt_ad_detail.html:9
+#: manufacturing/templates/mkt_ad_list.html:11
+#: manufacturing/templates/mkt_analytics.html:11
+#: manufacturing/templates/mkt_budget_list.html:11
+#: manufacturing/templates/mkt_research_list.html:11
+msgid "Analytics"
+msgstr "Análisis"
+
+#: manufacturing/menus.py:182
+msgid "Website Analytics"
+msgstr "Análisis del Sitio Web"
+
+#: manufacturing/menus.py:183
+msgid "Campaign Analytics"
+msgstr "Análisis de Campañas"
+
+#: manufacturing/menus.py:184
+msgid "Sales Analytics"
+msgstr "Análisis de Ventas"
+
+#: manufacturing/menus.py:185 manufacturing/menus.py:513
+#: manufacturing/menus.py:799 manufacturing/menus.py:855
+#: manufacturing/menus.py:1049
+#: manufacturing/templates/report_builder_list.html:3
+#: manufacturing/templates/report_builder_list.html:13
+#: manufacturing/templates/reports_dashboard.html:8
+msgid "Custom Reports"
+msgstr "Informes personalizados"
+
+#: manufacturing/menus.py:188 manufacturing/menus.py:189
+msgid "Content Management"
+msgstr "Gestión de Contenido"
+
+#: manufacturing/menus.py:191
+msgid "Content Calendar"
+msgstr "Calendario de Contenido"
+
+#: manufacturing/menus.py:192
+msgid "Blog Posts"
+msgstr "Publicaciones del Blog"
+
+#: manufacturing/menus.py:193
+msgid "Marketing Materials"
+msgstr "Materiales de Marketing"
+
+#: manufacturing/menus.py:194
+msgid "Content Archive"
+msgstr "Archivo de Contenido"
+
+#: manufacturing/menus.py:197 manufacturing/menus.py:198
+msgid "Social Media"
+msgstr "Redes Sociales"
+
+#: manufacturing/menus.py:200
+msgid "Post Management"
+msgstr "Gestión de Publicaciones"
+
+#: manufacturing/menus.py:201
+msgid "Social Calendar"
+msgstr "Calendario Social"
+
+#: manufacturing/menus.py:202
+msgid "Engagement Reports"
+msgstr "Informes de Interacción"
+
+#: manufacturing/menus.py:203
+msgid "Account Management"
+msgstr "Gestión de Cuentas"
+
+#: manufacturing/menus.py:206 manufacturing/menus.py:207
+msgid "Email Marketing"
+msgstr "Marketing por Email"
+
+#: manufacturing/menus.py:209
+msgid "Email Campaigns"
+msgstr "Campañas de Email"
+
+#: manufacturing/menus.py:210
+msgid "Subscriber Lists"
+msgstr "Listas de Suscriptores"
+
+#: manufacturing/menus.py:211
+msgid "Email Templates"
+msgstr "Plantillas de Email"
+
+#: manufacturing/menus.py:212
+msgid "Email Analytics"
+msgstr "Análisis de Email"
+
+#: manufacturing/menus.py:219 manufacturing/menus.py:1515
+#: manufacturing/menus.py:1566
+msgid "Sales Menu"
+msgstr "Menú de Ventas"
+
+#: manufacturing/menus.py:221 manufacturing/menus.py:222
+#: manufacturing/templates/base.html:521 manufacturing/templates/pl_list.html:7
+#: manufacturing/templates/promo_list.html:7
+#: manufacturing/templates/sales_dashboard.html:59
+#: manufacturing/templates/sales_orders.html:3
+#: manufacturing/templates/sales_orders.html:44
+#: manufacturing/templates/so_list.html:4
+#: manufacturing/templates/so_list.html:22 manufacturing/views/__init__.py:4437
+msgid "Sales Orders"
+msgstr "Pedidos de venta"
+
+#: manufacturing/menus.py:224 manufacturing/templates/sales_dashboard.html:60
+#: manufacturing/templates/sales_order_detail.html:4
+msgid "New Order"
+msgstr "Nuevo Pedido"
+
+#: manufacturing/menus.py:225 manufacturing/templates/portal_home.html:9
+msgid "Open Orders"
+msgstr "Pedidos Abiertos"
+
+#: manufacturing/menus.py:226
+msgid "Order History"
+msgstr "Historial de Pedidos"
+
+#: manufacturing/menus.py:227
+msgid "Order Status"
+msgstr "Estado del Pedido"
+
+#: manufacturing/menus.py:230 manufacturing/menus.py:231
+#: manufacturing/menus.py:606 manufacturing/menus.py:607
+msgid "Customer Accounts"
+msgstr "Cuentas de Clientes"
+
+#: manufacturing/menus.py:233 manufacturing/menus.py:609
+msgid "Account List"
+msgstr "Lista de Cuentas"
+
+#: manufacturing/menus.py:234 manufacturing/menus.py:610
+msgid "New Account"
+msgstr "Nueva Cuenta"
+
+#: manufacturing/menus.py:235 manufacturing/menus.py:611
+msgid "Account Details"
+msgstr "Detalles de la Cuenta"
+
+#: manufacturing/menus.py:236 manufacturing/menus.py:612
+msgid "Account History"
+msgstr "Historial de la Cuenta"
+
+#: manufacturing/menus.py:239 manufacturing/menus.py:240
+#: manufacturing/templates/sales_reports.html:3
+#: manufacturing/templates/sales_reports.html:42
+msgid "Sales Reports"
+msgstr "Informes de Ventas"
+
+#: manufacturing/menus.py:242
+msgid "Daily Sales"
+msgstr "Ventas Diarias"
+
+#: manufacturing/menus.py:243
+msgid "Monthly Sales"
+msgstr "Ventas Mensuales"
+
+#: manufacturing/menus.py:244
+msgid "Annual Report"
+msgstr "Informe Anual"
+
+#: manufacturing/menus.py:245
+msgid "Sales by Rep"
+msgstr "Ventas por Representante"
+
+#: manufacturing/menus.py:248 manufacturing/menus.py:249
+#: manufacturing/templates/sales_contracts_detail.html:8
+#: manufacturing/templates/sales_contracts_list.html:8
+#: manufacturing/templates/sales_dashboard.html:7
+#: manufacturing/templates/sales_dashboard.html:61
+#: manufacturing/templates/sales_leads_detail.html:8
+#: manufacturing/templates/sales_leads_list.html:8
+#: manufacturing/templates/sales_orders.html:7
+#: manufacturing/templates/sales_targets.html:8
+msgid "Quotes"
+msgstr "Cotizaciones"
+
+#: manufacturing/menus.py:251 manufacturing/templates/sales_quotes.html:145
+msgid "Create Quote"
+msgstr "Crear Cotización"
+
+#: manufacturing/menus.py:252
+msgid "Active Quotes"
+msgstr "Cotizaciones Activas"
+
+#: manufacturing/menus.py:253
+msgid "Quote History"
+msgstr "Historial de Cotizaciones"
+
+#: manufacturing/menus.py:254
+msgid "Convert to Order"
+msgstr "Convertir en Pedido"
+
+#: manufacturing/menus.py:257 manufacturing/menus.py:258
+#: manufacturing/templates/sales_leads_list.html:3
+msgid "Leads & Opportunities"
+msgstr "Prospectos y Oportunidades"
+
+#: manufacturing/menus.py:260 manufacturing/templates/mkt_lead_list.html:116
+#: manufacturing/templates/sales_leads_list.html:115
+msgid "New Lead"
+msgstr "Nuevo cliente potencial"
+
+#: manufacturing/menus.py:261
+msgid "Active Leads"
+msgstr "Clientes Potenciales Activos"
+
+#: manufacturing/menus.py:262
+msgid "Opportunities Pipeline"
+msgstr "Pipeline de Oportunidades"
+
+#: manufacturing/menus.py:263
+msgid "Lead Reports"
+msgstr "Informes de Clientes Potenciales"
+
+#: manufacturing/menus.py:266 manufacturing/menus.py:267
+#: manufacturing/menus.py:1630
+#: manufacturing/templates/legal_compliance_detail.html:7
+#: manufacturing/templates/legal_compliance_list.html:7
+#: manufacturing/templates/legal_contract_detail.html:7
+#: manufacturing/templates/legal_contract_list.html:3
+#: manufacturing/templates/legal_contract_list.html:7
+#: manufacturing/templates/legal_contract_list.html:61
+#: manufacturing/templates/legal_dashboard.html:46
+#: manufacturing/templates/legal_dashboard.html:56
+#: manufacturing/templates/legal_employment_list.html:7
+#: manufacturing/templates/legal_governance_list.html:7
+#: manufacturing/templates/legal_ip_list.html:7
+#: manufacturing/templates/legal_litigation_detail.html:7
+#: manufacturing/templates/legal_litigation_list.html:7
+#: manufacturing/templates/purch_contract_detail.html:7
+#: manufacturing/templates/purch_contracts_list.html:7
+#: manufacturing/templates/purch_reports.html:8
+#: manufacturing/templates/purchasing_dashboard.html:8
+#: manufacturing/templates/req_list.html:8
+#: manufacturing/templates/sales_contracts_detail.html:10
+#: manufacturing/templates/sales_contracts_list.html:10
+#: manufacturing/templates/sales_dashboard.html:9
+#: manufacturing/templates/sales_dashboard.html:63
+#: manufacturing/templates/sales_leads_detail.html:10
+#: manufacturing/templates/sales_leads_list.html:10
+msgid "Contracts"
+msgstr "Contratos"
+
+#: manufacturing/menus.py:269 manufacturing/menus.py:759
+#: manufacturing/menus.py:1084 manufacturing/menus.py:1395
+msgid "Active Contracts"
+msgstr "Contratos Activos"
+
+#: manufacturing/menus.py:270
+#: manufacturing/templates/legal_contract_list.html:168
+#: manufacturing/templates/purch_contracts_list.html:161
+#: manufacturing/templates/sales_contracts_list.html:157
+msgid "Create Contract"
+msgstr "Crear contrato"
+
+#: manufacturing/menus.py:271 manufacturing/menus.py:761
+#: manufacturing/menus.py:1085
+msgid "Contract Renewals"
+msgstr "Renovaciones de Contratos"
+
+#: manufacturing/menus.py:272 manufacturing/menus.py:762
+#: manufacturing/menus.py:1087 manufacturing/menus.py:1399
+msgid "Contract Archive"
+msgstr "Archivo de Contratos"
+
+#: manufacturing/menus.py:275 manufacturing/menus.py:276
+msgid "Sales Forecasting"
+msgstr "Previsión de Ventas"
+
+#: manufacturing/menus.py:278
+msgid "Current Forecast"
+msgstr "Previsión Actual"
+
+#: manufacturing/menus.py:279
+msgid "Forecast by Rep"
+msgstr "Previsión por Representante"
+
+#: manufacturing/menus.py:280
+msgid "Forecast by Product"
+msgstr "Previsión por Producto"
+
+#: manufacturing/menus.py:281
+msgid "Forecast Reports"
+msgstr "Informes de Previsión"
+
+#: manufacturing/menus.py:288
+msgid "Production Menu"
+msgstr "Menú de Producción"
+
+#: manufacturing/menus.py:299 manufacturing/templates/mrp_home.html:3
+#: manufacturing/templates/prod_dashboard.html:63
+msgid "MRP Planning"
+msgstr "Planificación MRP"
+
+#: manufacturing/menus.py:300 manufacturing/templates/mrp_home.html:44
+msgid "Material Requirements Planning"
+msgstr "Planificación de Requerimientos de Materiales"
+
+#: manufacturing/menus.py:302 manufacturing/templates/mrp_safety_stock.html:6
+msgid "MRP Home"
+msgstr "Inicio de MRP"
+
+#: manufacturing/menus.py:303 manufacturing/templates/mrp_home.html:101
+msgid "Run MRP Plan"
+msgstr "Ejecutar Plan MRP"
+
+#: manufacturing/menus.py:304
+msgid "View Demand"
+msgstr "Ver Demanda"
+
+#: manufacturing/menus.py:305
+msgid "MRP Reports"
+msgstr "Informes MRP"
+
+#: manufacturing/menus.py:308 manufacturing/menus.py:309
+#: manufacturing/templates/prod_dashboard.html:60
+#: manufacturing/templates/prod_schedule.html:3
+#: manufacturing/templates/prod_schedule.html:45
+msgid "Production Schedule"
+msgstr "Programa de producción"
+
+#: manufacturing/menus.py:315
+msgid "Gantt Chart"
+msgstr "Diagrama de Gantt"
+
+#: manufacturing/menus.py:318 manufacturing/menus.py:319
+#: manufacturing/menus.py:1697 manufacturing/templates/base.html:530
+#: manufacturing/templates/base.html:532 manufacturing/templates/cc_list.html:6
+#: manufacturing/templates/costing_valuation_list.html:6
+#: manufacturing/templates/inventory_list.html:3
+#: manufacturing/templates/inventory_list.html:17
+#: manufacturing/templates/prod_dashboard.html:16
+#: manufacturing/templates/prod_dashboard.html:64
+#: manufacturing/templates/prod_reports.html:11
+#: manufacturing/templates/purchasing_dashboard.html:14
+#: manufacturing/templates/purchasing_dashboard.html:60
+msgid "Inventory"
+msgstr "Inventario"
+
+#: manufacturing/menus.py:321
+msgid "Raw Materials"
+msgstr "Materias Primas"
+
+#: manufacturing/menus.py:322
+msgid "Finished Goods"
+msgstr "Productos Terminados"
+
+#: manufacturing/menus.py:323
+msgid "WIP Inventory"
+msgstr "Inventario WIP"
+
+#: manufacturing/menus.py:324
+msgid "Inventory Reports"
+msgstr "Informes de Inventario"
+
+#: manufacturing/menus.py:325 manufacturing/templates/cost_detail.html:9
+#: manufacturing/templates/inventory_detail.html:9
+msgid "FIFO/LIFO/Avg Valuation"
+msgstr "Valoración FIFO/LIFO/Promedio"
+
+#: manufacturing/menus.py:332
+msgid "Status Dashboard"
+msgstr "Panel de Estado"
+
+#: manufacturing/menus.py:333 manufacturing/templates/maint_oee_report.html:7
+msgid "Downtime Log"
+msgstr "Registro de Inactividad"
+
+#: manufacturing/menus.py:334
+msgid "Maintenance Requests"
+msgstr "Solicitudes de Mantenimiento"
+
+#: manufacturing/menus.py:337 manufacturing/menus.py:338
+msgid "Quality Control"
+msgstr "Control de Calidad"
+
+#: manufacturing/menus.py:341
+msgid "Non-Conformances"
+msgstr "No Conformidades"
+
+#: manufacturing/menus.py:342
+msgid "QC Reports"
+msgstr "Informes QC"
+
+#: manufacturing/menus.py:343
+msgid "Reject Analysis"
+msgstr "Análisis de Rechazos"
+
+#: manufacturing/menus.py:346 manufacturing/menus.py:347
+#: manufacturing/menus.py:1282 manufacturing/menus.py:1283
+#: manufacturing/templates/prod_dashboard.html:66
+#: manufacturing/templates/prod_reports.html:3
+#: manufacturing/templates/prod_reports.html:42
+#: manufacturing/templates/prod_returns_reports.html:9
+msgid "Production Reports"
+msgstr "Informes de producción"
+
+#: manufacturing/menus.py:349 manufacturing/menus.py:1285
+msgid "Daily Production"
+msgstr "Producción Diaria"
+
+#: manufacturing/menus.py:350 manufacturing/menus.py:419
+#: manufacturing/menus.py:511 manufacturing/menus.py:637
+#: manufacturing/menus.py:900 manufacturing/menus.py:1287
+#: manufacturing/menus.py:1463
+msgid "Weekly Summary"
+msgstr "Resumen Semanal"
+
+#: manufacturing/menus.py:351
+msgid "Efficiency Report"
+msgstr "Informe de Eficiencia"
+
+#: manufacturing/menus.py:352
+msgid "Scrap Report"
+msgstr "Informe de Desperdicio"
+
+#: manufacturing/menus.py:355 manufacturing/menus.py:356
+msgid "Labor Tracking"
+msgstr "Seguimiento de Mano de Obra"
+
+#: manufacturing/menus.py:358
+msgid "Current Labor"
+msgstr "Mano de Obra Actual"
+
+#: manufacturing/menus.py:359
+msgid "Labor by Shift"
+msgstr "Mano de Obra por Turno"
+
+#: manufacturing/menus.py:360
+msgid "Labor by Job"
+msgstr "Mano de Obra por Trabajo"
+
+#: manufacturing/menus.py:361
+msgid "Labor Reports"
+msgstr "Informes de Mano de Obra"
+
+#: manufacturing/menus.py:368
+msgid "Shipping Department"
+msgstr "Departamento de Envíos"
+
+#: manufacturing/menus.py:370 manufacturing/menus.py:371
+msgid "Shipment Orders"
+msgstr "Órdenes de Envío"
+
+#: manufacturing/menus.py:373
+#: manufacturing/templates/prod_shipping_list.html:105
+msgid "New Shipment"
+msgstr "Nuevo Envío"
+
+#: manufacturing/menus.py:374
+msgid "Pending Shipments"
+msgstr "Envíos Pendientes"
+
+#: manufacturing/menus.py:375
+msgid "Shipped Orders"
+msgstr "Pedidos Enviados"
+
+#: manufacturing/menus.py:376
+msgid "Delivery Confirmation"
+msgstr "Confirmación de Entrega"
+
+#: manufacturing/menus.py:379 manufacturing/menus.py:380
+msgid "Shipping Schedule"
+msgstr "Programación de Envíos"
+
+#: manufacturing/menus.py:382
+msgid "Today's Schedule"
+msgstr "Programación de Hoy"
+
+#: manufacturing/menus.py:385
+msgid "Rush Orders"
+msgstr "Pedidos Urgentes"
+
+#: manufacturing/menus.py:388 manufacturing/menus.py:389
+#: manufacturing/menus.py:747 manufacturing/menus.py:748
+#: manufacturing/templates/scan_home.html:68
+msgid "Receiving"
+msgstr "Recepción"
+
+#: manufacturing/menus.py:391
+msgid "Inbound Shipments"
+msgstr "Envíos Entrantes"
+
+#: manufacturing/menus.py:392 manufacturing/menus.py:751
+msgid "Receive Items"
+msgstr "Recibir Artículos"
+
+#: manufacturing/menus.py:393
+msgid "Receiving Reports"
+msgstr "Informes de Recepción"
+
+#: manufacturing/menus.py:394 manufacturing/menus.py:752
+msgid "Discrepancy Reports"
+msgstr "Informes de Discrepancias"
+
+#: manufacturing/menus.py:397 manufacturing/menus.py:398
+msgid "Carrier Management"
+msgstr "Gestión de Transportistas"
+
+#: manufacturing/menus.py:400
+msgid "Carrier List"
+msgstr "Lista de Transportistas"
+
+#: manufacturing/menus.py:401
+msgid "Carrier Rates"
+msgstr "Tarifas de Transportistas"
+
+#: manufacturing/menus.py:402 manufacturing/menus.py:560
+msgid "Performance Reports"
+msgstr "Informes de Rendimiento"
+
+#: manufacturing/menus.py:403
+msgid "Carrier Contracts"
+msgstr "Contratos de Transportistas"
+
+#: manufacturing/menus.py:406 manufacturing/menus.py:407
+#: manufacturing/templates/portal_shipment_detail.html:19
+#: manufacturing/templates/prod_delivery_status.html:8
+#: manufacturing/templates/prod_tracking_dashboard.html:8
+msgid "Tracking"
+msgstr "Seguimiento"
+
+#: manufacturing/menus.py:409
+msgid "Track Shipment"
+msgstr "Rastrear Envío"
+
+#: manufacturing/menus.py:410
+#: manufacturing/templates/prod_tracking_dashboard.html:3
+#: manufacturing/templates/prod_tracking_dashboard.html:41
+msgid "Tracking Dashboard"
+msgstr "Panel de Seguimiento"
+
+#: manufacturing/menus.py:411
+#: manufacturing/templates/prod_delivery_status.html:3
+#: manufacturing/templates/prod_delivery_status.html:9
+#: manufacturing/templates/prod_delivery_status.html:42
+#: manufacturing/templates/prod_tracking_dashboard.html:9
+msgid "Delivery Status"
+msgstr "Estado de Entrega"
+
+#: manufacturing/menus.py:412
+msgid "Exception Reports"
+msgstr "Informes de Excepciones"
+
+#: manufacturing/menus.py:415 manufacturing/menus.py:416
+msgid "Shipping Reports"
+msgstr "Informes de Envíos"
+
+#: manufacturing/menus.py:421
+#: manufacturing/templates/prod_performance_report.html:3
+#: manufacturing/templates/prod_performance_report.html:41
+msgid "Performance Report"
+msgstr "Informe de Rendimiento"
+
+#: manufacturing/menus.py:424 manufacturing/menus.py:425
+msgid "Returns Processing"
+msgstr "Procesamiento de Devoluciones"
+
+#: manufacturing/menus.py:427 manufacturing/menus.py:618
+#: manufacturing/templates/cs_returns_list.html:104
+#: manufacturing/templates/portal_home.html:69
+msgid "New Return"
+msgstr "Nueva devolución"
+
+#: manufacturing/menus.py:428 manufacturing/menus.py:619
+msgid "Pending Returns"
+msgstr "Devoluciones Pendientes"
+
+#: manufacturing/menus.py:429
+msgid "Return History"
+msgstr "Historial de Devoluciones"
+
+#: manufacturing/menus.py:430
+msgid "Return Reports"
+msgstr "Informes de Devoluciones"
+
+#: manufacturing/menus.py:433 manufacturing/menus.py:434
+msgid "Warehouse Management"
+msgstr "Gestión de Almacén"
+
+#: manufacturing/menus.py:436 manufacturing/templates/wms_bin_list.html:6
+#: manufacturing/templates/wms_transfer_list.html:7
+#: manufacturing/templates/wms_warehouse_list.html:3
+#: manufacturing/templates/wms_warehouse_list.html:12
+msgid "Warehouses"
+msgstr "Almacenes"
+
+#: manufacturing/menus.py:437 manufacturing/templates/wms_bin_list.html:3
+#: manufacturing/templates/wms_bin_list.html:20
+#: manufacturing/templates/wms_pick_list_list.html:6
+#: manufacturing/templates/wms_putaway_rule_list.html:6
+#: manufacturing/templates/wms_receive.html:6
+#: manufacturing/templates/wms_rfid_reader_list.html:6
+#: manufacturing/templates/wms_rfid_tag_list.html:6
+#: manufacturing/templates/wms_transfer_list.html:6
+#: manufacturing/templates/wms_warehouse_list.html:6
+#: manufacturing/templates/wms_wave_list.html:7
+msgid "Bin Master"
+msgstr "Maestro de Ubicaciones"
+
+#: manufacturing/menus.py:438 manufacturing/templates/wms_bin_list.html:9
+#: manufacturing/templates/wms_putaway_rule_list.html:3
+#: manufacturing/templates/wms_putaway_rule_list.html:12
+#: manufacturing/templates/wms_receive.html:7
+msgid "Put-Away Rules"
+msgstr "Reglas de Ubicación"
+
+#: manufacturing/menus.py:439 manufacturing/templates/wms_bin_list.html:7
+#: manufacturing/templates/wms_pick_list_list.html:3
+#: manufacturing/templates/wms_pick_list_list.html:20
+#: manufacturing/templates/wms_pick_list_list.html:53
+#: manufacturing/templates/wms_wave_list.html:6
+msgid "Pick Lists"
+msgstr "Listas de Picking"
+
+#: manufacturing/menus.py:440 manufacturing/templates/wms_bin_list.html:8
+#: manufacturing/templates/wms_pick_list_list.html:8
+#: manufacturing/templates/wms_wave_list.html:3
+#: manufacturing/templates/wms_wave_list.html:19
+msgid "Wave Picking"
+msgstr "Picking por Oleadas"
+
+#: manufacturing/menus.py:441 manufacturing/templates/wms_pack_station.html:3
+#: manufacturing/templates/wms_pack_station.html:14
+#: manufacturing/templates/wms_pick_list_detail.html:8
+msgid "Pack Station"
+msgstr "Estación de Empaque"
+
+#: manufacturing/menus.py:442 manufacturing/templates/wms_transfer_list.html:3
+#: manufacturing/templates/wms_transfer_list.html:20
+msgid "Warehouse Transfers"
+msgstr "Transferencias entre Almacenes"
+
+#: manufacturing/menus.py:443
+#: manufacturing/templates/wms_rfid_reader_list.html:3
+#: manufacturing/templates/wms_rfid_reader_list.html:12
+#: manufacturing/templates/wms_rfid_tag_list.html:7
+msgid "RFID Readers"
+msgstr "Lectores RFID"
+
+#: manufacturing/menus.py:444
+#: manufacturing/templates/wms_rfid_reader_list.html:7
+#: manufacturing/templates/wms_rfid_tag_list.html:3
+#: manufacturing/templates/wms_rfid_tag_list.html:19
+msgid "RFID Tags"
+msgstr "Etiquetas RFID"
+
+#: manufacturing/menus.py:451 manufacturing/menus.py:522
+msgid "QA Laboratory Menu"
+msgstr "Menú del Laboratorio de QA"
+
+#: manufacturing/menus.py:453 manufacturing/menus.py:454
+msgid "Test Requests"
+msgstr "Solicitudes de Prueba"
+
+#: manufacturing/menus.py:456 manufacturing/templates/time_off_list.html:8
+msgid "New Request"
+msgstr "Nueva Solicitud"
+
+#: manufacturing/menus.py:459
+msgid "Completed Tests"
+msgstr "Pruebas Completadas"
+
+#: manufacturing/menus.py:462 manufacturing/menus.py:463
+msgid "Lab Results"
+msgstr "Resultados de Laboratorio"
+
+#: manufacturing/menus.py:465
+msgid "Recent Results"
+msgstr "Resultados Recientes"
+
+#: manufacturing/menus.py:466
+msgid "Search Results"
+msgstr "Resultados de Búsqueda"
+
+#: manufacturing/menus.py:467
+msgid "Failed Tests"
+msgstr "Pruebas Fallidas"
+
+#: manufacturing/menus.py:468
+msgid "Result Reports"
+msgstr "Informes de Resultados"
+
+#: manufacturing/menus.py:471 manufacturing/menus.py:472
+msgid "Inspection Reports"
+msgstr "Informes de Inspección"
+
+#: manufacturing/menus.py:474
+msgid "Create Report"
+msgstr "Crear Informe"
+
+#: manufacturing/menus.py:475
+msgid "Pending Reports"
+msgstr "Informes Pendientes"
+
+#: manufacturing/menus.py:476
+msgid "Report Archive"
+msgstr "Archivo de Informes"
+
+#: manufacturing/menus.py:477
+msgid "Report Summary"
+msgstr "Resumen de Informe"
+
+#: manufacturing/menus.py:480 manufacturing/menus.py:481
+#: manufacturing/templates/qa_dashboard.html:73
+msgid "Non-Conformance"
+msgstr "No Conformidad"
+
+#: manufacturing/menus.py:483 manufacturing/templates/qa_ncr_list.html:109
+msgid "New NCR"
+msgstr "Nuevo NCR"
+
+#: manufacturing/menus.py:484 manufacturing/templates/dashboard_kpis.html:22
+#: manufacturing/templates/qa_dashboard_kpis.html:5
+#: manufacturing/templates/qa_reports.html:52
+msgid "Open NCRs"
+msgstr "NCR abiertas"
+
+#: manufacturing/menus.py:485
+msgid "NCR History"
+msgstr "Historial de NCR"
+
+#: manufacturing/menus.py:486
+msgid "NCR Reports"
+msgstr "Informes de NCR"
+
+#: manufacturing/menus.py:489 manufacturing/menus.py:490
+msgid "Calibration"
+msgstr "Calibración"
+
+#: manufacturing/menus.py:492
+msgid "Calibration Schedule"
+msgstr "Programación de Calibración"
+
+#: manufacturing/menus.py:493
+msgid "Calibration Records"
+msgstr "Registros de Calibración"
+
+#: manufacturing/menus.py:494
+msgid "Overdue Items"
+msgstr "Artículos Vencidos"
+
+#: manufacturing/menus.py:495
+msgid "Calibration Reports"
+msgstr "Informes de Calibración"
+
+#: manufacturing/menus.py:498 manufacturing/menus.py:499
+msgid "Sample Management"
+msgstr "Gestión de Muestras"
+
+#: manufacturing/menus.py:501
+msgid "Receive Sample"
+msgstr "Recibir Muestra"
+
+#: manufacturing/menus.py:502
+msgid "Sample Tracking"
+msgstr "Seguimiento de Muestras"
+
+#: manufacturing/menus.py:503
+msgid "Sample Disposal"
+msgstr "Eliminación de Muestras"
+
+#: manufacturing/menus.py:504
+msgid "Sample Reports"
+msgstr "Informes de Muestras"
+
+#: manufacturing/menus.py:507 manufacturing/menus.py:508
+msgid "Lab Reports"
+msgstr "Informes de Laboratorio"
+
+#: manufacturing/menus.py:510
+msgid "Daily Reports"
+msgstr "Informes Diarios"
+
+#: manufacturing/menus.py:512 manufacturing/menus.py:1464
+msgid "Monthly Report"
+msgstr "Informe Mensual"
+
+#: manufacturing/menus.py:520 manufacturing/menus.py:1425
+#: manufacturing/menus.py:1506
+msgid "Quality Assurance Menu"
+msgstr "Menú de Aseguramiento de Calidad"
+
+#: manufacturing/menus.py:527 manufacturing/menus.py:1216
+#: manufacturing/menus.py:1271
+msgid "Personnel Menu"
+msgstr "Menú de Personal"
+
+#: manufacturing/menus.py:529
+msgid "Personnel CRM"
+msgstr "CRM de Personal"
+
+#: manufacturing/menus.py:530
+msgid "Registration Form"
+msgstr "Formulario de Registro"
+
+#: manufacturing/menus.py:531
+msgid "Update Password"
+msgstr "Actualizar Contraseña"
+
+#: manufacturing/menus.py:532
+msgid "Display Department"
+msgstr "Mostrar Departamento"
+
+#: manufacturing/menus.py:533
+msgid "Dept Entry"
+msgstr "Entrada de Departamento"
+
+#: manufacturing/menus.py:534
+msgid "Dept Sub Entry"
+msgstr "Subentrada de Departamento"
+
+#: manufacturing/menus.py:535 manufacturing/templates/base.html:560
+#: manufacturing/templates/personnel_dashboard.html:19
+#: manufacturing/templates/personnel_dashboard.html:61
+#: manufacturing/templates/tc_ot_report.html:6
+#: manufacturing/templates/tc_schedule.html:6
+#: manufacturing/templates/time_clock_status.html:3
+#: manufacturing/templates/time_clock_status.html:57
+msgid "Time Clock"
+msgstr "Reloj de asistencia"
+
+#: manufacturing/menus.py:536 manufacturing/menus.py:537
+msgid "Employee Records"
+msgstr "Registros de Empleados"
+
+#: manufacturing/menus.py:539 manufacturing/menus.py:567
+msgid "View Records"
+msgstr "Ver Registros"
+
+#: manufacturing/menus.py:540 manufacturing/templates/people_form.html:4
+#: manufacturing/templates/people_form.html:39
+#: manufacturing/templates/people_list.html:8
+#: manufacturing/templates/personnel_dashboard.html:7
+#: manufacturing/templates/personnel_dashboard.html:53
+msgid "New Employee"
+msgstr "Nuevo Empleado"
+
+#: manufacturing/menus.py:541
+msgid "Update Record"
+msgstr "Actualizar Registro"
+
+#: manufacturing/menus.py:542
+msgid "Employment History"
+msgstr "Historial Laboral"
+
+#: manufacturing/menus.py:545 manufacturing/menus.py:546
+#: manufacturing/templates/benefit_plan_detail.html:6
+#: manufacturing/templates/benefit_plan_new.html:6
+#: manufacturing/templates/benefits_dashboard.html:3
+#: manufacturing/templates/employee_benefits.html:6
+#: manufacturing/templates/people_detail.html:9
+#: manufacturing/templates/personnel_dashboard.html:12
+#: manufacturing/templates/personnel_dashboard.html:57
+msgid "Benefits"
+msgstr "Beneficios"
+
+#: manufacturing/menus.py:548
+msgid "Benefits Enrollment"
+msgstr "Inscripción de Beneficios"
+
+#: manufacturing/menus.py:549
+msgid "Benefits Summary"
+msgstr "Resumen de Beneficios"
+
+#: manufacturing/menus.py:550
+msgid "COBRA Management"
+msgstr "Gestión de COBRA"
+
+#: manufacturing/menus.py:551
+msgid "Benefits Reports"
+msgstr "Informes de Beneficios"
+
+#: manufacturing/menus.py:554 manufacturing/menus.py:555
+#: manufacturing/menus.py:1558 manufacturing/templates/pers_reviews_list.html:3
+#: manufacturing/templates/pers_reviews_list.html:58
+#: manufacturing/templates/personnel_dashboard.html:55
+#: manufacturing/templates/sales_performance_reviews.html:3
+#: manufacturing/templates/sales_performance_reviews.html:51
+msgid "Performance Reviews"
+msgstr "Evaluaciones de Desempeño"
+
+#: manufacturing/menus.py:557
+#: manufacturing/templates/pers_reviews_list.html:106
+#: manufacturing/templates/pers_reviews_list.html:157
+#: manufacturing/templates/sales_performance_reviews.html:99
+#: manufacturing/templates/sales_performance_reviews.html:144
+msgid "Schedule Review"
+msgstr "Programar Evaluación"
+
+#: manufacturing/menus.py:558 manufacturing/templates/eng_dashboard.html:59
+#: manufacturing/templates/ess_home.html:56
+msgid "Pending Reviews"
+msgstr "Revisiones pendientes"
+
+#: manufacturing/menus.py:559
+msgid "Review History"
+msgstr "Historial de Evaluaciones"
+
+#: manufacturing/menus.py:563 manufacturing/menus.py:564
+msgid "Disciplinary Records"
+msgstr "Registros Disciplinarios"
+
+#: manufacturing/menus.py:566
+msgid "New Record"
+msgstr "Nuevo Registro"
+
+#: manufacturing/menus.py:568
+msgid "Record History"
+msgstr "Historial de Registros"
+
+#: manufacturing/menus.py:569
+msgid "Disciplinary Reports"
+msgstr "Informes Disciplinarios"
+
+#: manufacturing/menus.py:572 manufacturing/menus.py:573
+msgid "Training & Development"
+msgstr "Formación y Desarrollo"
+
+#: manufacturing/menus.py:575
+msgid "Training Calendar"
+msgstr "Calendario de Formación"
+
+#: manufacturing/menus.py:576
+msgid "Training Records"
+msgstr "Registros de Formación"
+
+#: manufacturing/menus.py:577
+msgid "Course Management"
+msgstr "Gestión de Cursos"
+
+#: manufacturing/menus.py:578
+msgid "Certification Tracking"
+msgstr "Seguimiento de Certificaciones"
+
+#: manufacturing/menus.py:581 manufacturing/menus.py:582
+msgid "Onboarding"
+msgstr "Incorporación"
+
+#: manufacturing/menus.py:584
+msgid "New Hire Checklist"
+msgstr "Checklist de Incorporación"
+
+#: manufacturing/menus.py:585
+msgid "Onboarding Status"
+msgstr "Estado de Incorporación"
+
+#: manufacturing/menus.py:586
+msgid "Document Collection"
+msgstr "Recopilación de Documentos"
+
+#: manufacturing/menus.py:587
+msgid "Onboarding Reports"
+msgstr "Informes de Incorporación"
+
+#: manufacturing/menus.py:594 manufacturing/menus.py:894
+#: manufacturing/menus.py:946
+msgid "Customer Service Menu"
+msgstr "Menú de Servicio al Cliente"
+
+#: manufacturing/menus.py:596
+msgid "Customer Entry Screen"
+msgstr "Pantalla de Alta de Cliente"
+
+#: manufacturing/menus.py:597 manufacturing/menus.py:598
+#: manufacturing/menus.py:662 manufacturing/templates/cs_dashboard_kpis.html:4
+msgid "Open Tickets"
+msgstr "Tickets abiertos"
+
+#: manufacturing/menus.py:600
+msgid "View All Tickets"
+msgstr "Ver Todos los Tickets"
+
+#: manufacturing/menus.py:601
+msgid "My Tickets"
+msgstr "Mis Tickets"
+
+#: manufacturing/menus.py:602
+msgid "High Priority"
+msgstr "Alta Prioridad"
+
+#: manufacturing/menus.py:603
+msgid "Ticket Search"
+msgstr "Búsqueda de Tickets"
+
+#: manufacturing/menus.py:615 manufacturing/menus.py:616
+#: manufacturing/templates/cs_returns_list.html:3
+msgid "Returns & Refunds"
+msgstr "Devoluciones y reembolsos"
+
+#: manufacturing/menus.py:620
+msgid "Refund Processing"
+msgstr "Procesamiento de Reembolsos"
+
+#: manufacturing/menus.py:621
+#: manufacturing/templates/prod_returns_detail.html:8
+#: manufacturing/templates/prod_returns_list.html:9
+#: manufacturing/templates/prod_returns_reports.html:3
+#: manufacturing/templates/prod_returns_reports.html:8
+#: manufacturing/templates/prod_returns_reports.html:38
+msgid "Returns Reports"
+msgstr "Informes de Devoluciones"
+
+#: manufacturing/menus.py:624 manufacturing/menus.py:625
+#: manufacturing/templates/cs_dashboard.html:11
+#: manufacturing/templates/cs_dashboard.html:49
+#: manufacturing/templates/cs_kb_detail.html:9
+#: manufacturing/templates/cs_kb_list.html:3
+#: manufacturing/templates/cs_kb_list.html:9
+#: manufacturing/templates/cs_kb_list.html:54
+#: manufacturing/templates/cs_returns_detail.html:9
+#: manufacturing/templates/cs_returns_list.html:9
+#: manufacturing/templates/cs_surveys_detail.html:9
+#: manufacturing/templates/cs_surveys_list.html:9
+msgid "Knowledge Base"
+msgstr "Base de conocimientos"
+
+#: manufacturing/menus.py:627
+msgid "Browse Articles"
+msgstr "Explorar Artículos"
+
+#: manufacturing/menus.py:628 manufacturing/templates/cs_kb_list.html:151
+msgid "Create Article"
+msgstr "Crear artículo"
+
+#: manufacturing/menus.py:629
+msgid "Article Management"
+msgstr "Gestión de Artículos"
+
+#: manufacturing/menus.py:630
+msgid "Search Knowledge Base"
+msgstr "Buscar en la Base de Conocimientos"
+
+#: manufacturing/menus.py:633 manufacturing/menus.py:634
+msgid "Service Reports"
+msgstr "Informes de Servicio"
+
+#: manufacturing/menus.py:638
+msgid "Resolution Reports"
+msgstr "Informes de Resolución"
+
+#: manufacturing/menus.py:639 manufacturing/menus.py:919
+#: manufacturing/menus.py:920
+msgid "Customer Satisfaction"
+msgstr "Satisfacción del Cliente"
+
+#: manufacturing/menus.py:642 manufacturing/menus.py:643
+#: manufacturing/templates/cs_surveys_list.html:3
+msgid "Surveys & Feedback"
+msgstr "Encuestas y comentarios"
+
+#: manufacturing/menus.py:645
+msgid "Active Surveys"
+msgstr "Encuestas Activas"
+
+#: manufacturing/menus.py:646 manufacturing/templates/cs_surveys_list.html:147
+msgid "Create Survey"
+msgstr "Crear encuesta"
+
+#: manufacturing/menus.py:647
+msgid "Survey Results"
+msgstr "Resultados de Encuestas"
+
+#: manufacturing/menus.py:648
+msgid "Feedback Reports"
+msgstr "Informes de Comentarios"
+
+#: manufacturing/menus.py:655 manufacturing/menus.py:1069
+#: manufacturing/menus.py:1111
+msgid "IT Technician"
+msgstr "Técnico de TI"
+
+#: manufacturing/menus.py:657 manufacturing/templates/it_task_list.html:3
+#: manufacturing/templates/it_task_list.html:35
+msgid "IT Tasks"
+msgstr "Tareas de TI"
+
+#: manufacturing/menus.py:658 manufacturing/menus.py:659
+#: manufacturing/templates/it_dashboard_kpis.html:2
+msgid "Help Desk Tickets"
+msgstr "Tickets de Soporte"
+
+#: manufacturing/menus.py:661 manufacturing/templates/cs_dashboard.html:7
+#: manufacturing/templates/cs_dashboard.html:44
+#: manufacturing/templates/cs_detail.html:7
+#: manufacturing/templates/cs_escalations.html:7
+#: manufacturing/templates/cs_list.html:6
+#: manufacturing/templates/it_ticket_list.html:104
+msgid "New Ticket"
+msgstr "Nuevo ticket"
+
+#: manufacturing/menus.py:663
+msgid "My Assigned Tickets"
+msgstr "Mis Tickets Asignados"
+
+#: manufacturing/menus.py:664
+msgid "Ticket History"
+msgstr "Historial de Tickets"
+
+#: manufacturing/menus.py:667 manufacturing/menus.py:668
+msgid "Asset Management"
+msgstr "Gestión de Activos"
+
+#: manufacturing/menus.py:670 manufacturing/templates/it_dashboard.html:30
+msgid "Asset Inventory"
+msgstr "Inventario de Activos"
+
+#: manufacturing/menus.py:671 manufacturing/templates/it_asset_list.html:100
+msgid "New Asset"
+msgstr "Nuevo Activo"
+
+#: manufacturing/menus.py:672
+msgid "Asset History"
+msgstr "Historial de Activos"
+
+#: manufacturing/menus.py:673 manufacturing/templates/qa_ncr_detail.html:140
+#: manufacturing/templates/qa_ncr_list.html:138
+msgid "Disposition"
+msgstr "Disposición"
+
+#: manufacturing/menus.py:676 manufacturing/menus.py:677
+msgid "Network Status"
+msgstr "Estado de la Red"
+
+#: manufacturing/menus.py:679
+msgid "Network Dashboard"
+msgstr "Panel de Red"
+
+#: manufacturing/menus.py:680
+msgid "Bandwidth Monitor"
+msgstr "Monitor de Ancho de Banda"
+
+#: manufacturing/menus.py:681
+msgid "Network Map"
+msgstr "Mapa de Red"
+
+#: manufacturing/menus.py:682
+msgid "Incident Log"
+msgstr "Registro de Incidentes"
+
+#: manufacturing/menus.py:685 manufacturing/menus.py:686
+msgid "Software Installations"
+msgstr "Instalaciones de Software"
+
+#: manufacturing/menus.py:688
+msgid "Pending Installs"
+msgstr "Instalaciones Pendientes"
+
+#: manufacturing/menus.py:689 manufacturing/templates/it_software_list.html:3
+#: manufacturing/templates/it_software_list.html:35
+msgid "Software Inventory"
+msgstr "Inventario de Software"
+
+#: manufacturing/menus.py:690 manufacturing/templates/it_license_list.html:3
+msgid "License Management"
+msgstr "Gestión de Licencias"
+
+#: manufacturing/menus.py:691
+msgid "Installation History"
+msgstr "Historial de Instalaciones"
+
+#: manufacturing/menus.py:694 manufacturing/menus.py:695
+#: manufacturing/templates/it_repairs_list.html:3
+#: manufacturing/templates/it_repairs_list.html:35
+msgid "Hardware Repairs"
+msgstr "Reparaciones de Hardware"
+
+#: manufacturing/menus.py:697 manufacturing/templates/it_repairs_list.html:112
+msgid "New Repair Request"
+msgstr "Nueva Solicitud de Reparación"
+
+#: manufacturing/menus.py:699
+msgid "Completed Repairs"
+msgstr "Reparaciones Completadas"
+
+#: manufacturing/menus.py:700
+msgid "Repair History"
+msgstr "Historial de Reparaciones"
+
+#: manufacturing/menus.py:703 manufacturing/menus.py:704
+msgid "User Account Management"
+msgstr "Gestión de Cuentas de Usuario"
+
+#: manufacturing/menus.py:706
+msgid "Create Account"
+msgstr "Crear Cuenta"
+
+#: manufacturing/menus.py:707 manufacturing/templates/forgot_password.html:4
+#: manufacturing/templates/forgot_password_reset.html:38
+msgid "Reset Password"
+msgstr "Restablecer Contraseña"
+
+#: manufacturing/menus.py:708
+msgid "Account Status"
+msgstr "Estado de la Cuenta"
+
+#: manufacturing/menus.py:709
+msgid "Account Audit"
+msgstr "Auditoría de Cuentas"
+
+#: manufacturing/menus.py:716 manufacturing/menus.py:1340
+#: manufacturing/menus.py:1416
+msgid "Purchasing Menu"
+msgstr "Menú de Compras"
+
+#: manufacturing/menus.py:718
+msgid "Product Entry"
+msgstr "Alta de Producto"
+
+#: manufacturing/menus.py:719
+msgid "Supplier Entry"
+msgstr "Alta de Proveedor"
+
+#: manufacturing/menus.py:720 manufacturing/menus.py:721
+#: manufacturing/templates/base.html:513
+#: manufacturing/templates/base_supplier_portal.html:144
+#: manufacturing/templates/mrp_release.html:8
+#: manufacturing/templates/po_approvals.html:6
+#: manufacturing/templates/po_list.html:4
+#: manufacturing/templates/po_list.html:19
+#: manufacturing/templates/purch_contract_detail.html:9
+#: manufacturing/templates/purch_contracts_list.html:10
+#: manufacturing/templates/purch_reports.html:10
+#: manufacturing/templates/purchasing_dashboard.html:6
+#: manufacturing/templates/purchasing_dashboard.html:53
+#: manufacturing/templates/reports_dashboard.html:144
+#: manufacturing/templates/req_list.html:7
+#: manufacturing/templates/rfq_list.html:6
+#: manufacturing/templates/supplier_portal_home.html:27
+#: manufacturing/templates/supplier_portal_pos.html:3
+#: manufacturing/templates/supplier_portal_pos.html:4
+#: manufacturing/templates/supplier_scorecard_list.html:8
+#: manufacturing/views/__init__.py:4555
+msgid "Purchase Orders"
+msgstr "Órdenes de compra"
+
+#: manufacturing/menus.py:723 manufacturing/templates/po_list.html:8
+#: manufacturing/templates/purchasing_dashboard.html:7
+#: manufacturing/templates/purchasing_dashboard.html:54
+msgid "New PO"
+msgstr "Nueva OC"
+
+#: manufacturing/menus.py:724 manufacturing/templates/dashboard_kpis.html:17
+#: manufacturing/templates/purchasing_dashboard_kpis.html:4
+msgid "Open POs"
+msgstr "OC abiertas"
+
+#: manufacturing/menus.py:725
+msgid "PO Status"
+msgstr "Estado de PO"
+
+#: manufacturing/menus.py:726
+msgid "PO History"
+msgstr "Historial de PO"
+
+#: manufacturing/menus.py:729 manufacturing/menus.py:730
+#: manufacturing/menus.py:1366 manufacturing/menus.py:1367
+msgid "Vendor Management"
+msgstr "Gestión de Proveedores"
+
+#: manufacturing/menus.py:732 manufacturing/menus.py:1369
+msgid "Vendor List"
+msgstr "Lista de Proveedores"
+
+#: manufacturing/menus.py:733
+msgid "New Vendor"
+msgstr "Nuevo Proveedor"
+
+#: manufacturing/menus.py:734 manufacturing/menus.py:1086
+#: manufacturing/menus.py:1373
+msgid "Vendor Performance"
+msgstr "Desempeño de Proveedores"
+
+#: manufacturing/menus.py:735 manufacturing/menus.py:1081
+#: manufacturing/menus.py:1082
+#: manufacturing/templates/purch_contracts_list.html:3
+#: manufacturing/templates/purch_contracts_list.html:58
+#: manufacturing/templates/purchasing_dashboard.html:56
+msgid "Vendor Contracts"
+msgstr "Contratos de Proveedores"
+
+#: manufacturing/menus.py:738 manufacturing/menus.py:739
+msgid "Purchase Reports"
+msgstr "Informes de Compras"
+
+#: manufacturing/menus.py:741
+msgid "Spending Summary"
+msgstr "Resumen de Gastos"
+
+#: manufacturing/menus.py:742
+msgid "PO Reports"
+msgstr "Informes de PO"
+
+#: manufacturing/menus.py:743 manufacturing/menus.py:807
+#: manufacturing/menus.py:844 manufacturing/menus.py:980
+#: manufacturing/menus.py:1138 manufacturing/menus.py:1174
+#: manufacturing/menus.py:1312 manufacturing/menus.py:1359
+#: manufacturing/menus.py:1578 manufacturing/menus.py:1587
+msgid "Budget vs. Actual"
+msgstr "Presupuesto vs. Real"
+
+#: manufacturing/menus.py:744
+msgid "Category Reports"
+msgstr "Informes por Categoría"
+
+#: manufacturing/menus.py:750
+msgid "Pending Receipts"
+msgstr "Recepciones Pendientes"
+
+#: manufacturing/menus.py:753
+msgid "Receiving History"
+msgstr "Historial de Recepciones"
+
+#: manufacturing/menus.py:756 manufacturing/menus.py:757
+#: manufacturing/menus.py:1392 manufacturing/menus.py:1393
+#: manufacturing/menus.py:1621
+msgid "Contract Management"
+msgstr "Gestión de Contratos"
+
+#: manufacturing/menus.py:760
+#: manufacturing/templates/legal_contract_list.html:119
+#: manufacturing/templates/purch_contracts_list.html:110
+#: manufacturing/templates/sales_contracts_list.html:112
+msgid "New Contract"
+msgstr "Nuevo contrato"
+
+#: manufacturing/menus.py:765 manufacturing/menus.py:766
+#: manufacturing/templates/ats_candidate_list.html:7
+#: manufacturing/templates/ats_dashboard.html:7
+#: manufacturing/templates/ats_requisition_detail.html:6
+#: manufacturing/templates/ats_requisition_new.html:6
+#: manufacturing/templates/purch_contracts_list.html:9
+#: manufacturing/templates/purch_reports.html:9
+#: manufacturing/templates/purchasing_dashboard.html:10
+#: manufacturing/templates/req_detail.html:7
+#: manufacturing/templates/req_list.html:10
+msgid "Requisitions"
+msgstr "Requisiciones"
+
+#: manufacturing/menus.py:768 manufacturing/templates/ats_dashboard.html:6
+#: manufacturing/templates/ats_requisition_list.html:10
+#: manufacturing/templates/ats_requisition_new.html:3
+#: manufacturing/templates/ats_requisition_new.html:21
+#: manufacturing/templates/req_list.html:106
+msgid "New Requisition"
+msgstr "Nueva Requisición"
+
+#: manufacturing/menus.py:769 manufacturing/menus.py:871
+#: manufacturing/menus.py:1029 manufacturing/templates/cc_detail.html:26
+#: manufacturing/templates/cc_list.html:21
+#: manufacturing/templates/cc_list.html:49
+#: manufacturing/templates/purchasing_dashboard.html:55
+#: manufacturing/templates/purchasing_dashboard_kpis.html:8
+msgid "Pending Approval"
+msgstr "Pendiente de Aprobación"
+
+#: manufacturing/menus.py:770
+msgid "Approved Requisitions"
+msgstr "Requisiciones Aprobadas"
+
+#: manufacturing/menus.py:772
+msgid "Requisition History"
+msgstr "Historial de Requisiciones"
+
+#: manufacturing/menus.py:781
+msgid "Accounting Main Menu"
+msgstr "Menú Principal de Contabilidad"
+
+#: manufacturing/menus.py:783 manufacturing/menus.py:787
+#: manufacturing/templates/acct_dashboard.html:7
+#: manufacturing/templates/acct_dashboard.html:23
+#: manufacturing/templates/acct_dashboard_kpis.html:2
+#: manufacturing/templates/ap_list.html:3
+#: manufacturing/templates/ap_list.html:26
+#: manufacturing/templates/ar_list.html:6 manufacturing/templates/base.html:543
+#: manufacturing/templates/finance_dashboard.html:7
+#: manufacturing/templates/finance_dashboard.html:59
+#: manufacturing/templates/finance_dashboard_kpis.html:2
+#: manufacturing/templates/gl_dashboard_kpis.html:4
+msgid "Accounts Payable"
+msgstr "Cuentas por pagar"
+
+#: manufacturing/menus.py:784 manufacturing/menus.py:785
+msgid "Accounting Manager"
+msgstr "Gerente de Contabilidad"
+
+#: manufacturing/menus.py:788 manufacturing/menus.py:826
+#: manufacturing/templates/acct_dashboard.html:8
+#: manufacturing/templates/acct_dashboard.html:24
+#: manufacturing/templates/acct_dashboard_kpis.html:18
+#: manufacturing/templates/ap_list.html:6
+#: manufacturing/templates/ar_list.html:3
+#: manufacturing/templates/ar_list.html:26
+#: manufacturing/templates/base.html:546
+#: manufacturing/templates/finance_dashboard.html:8
+#: manufacturing/templates/finance_dashboard.html:60
+#: manufacturing/templates/finance_dashboard_kpis.html:18
+#: manufacturing/templates/gl_dashboard_kpis.html:16
+#: manufacturing/templates/sales_dashboard.html:68
+msgid "Accounts Receivable"
+msgstr "Cuentas por cobrar"
+
+#: manufacturing/menus.py:789 manufacturing/menus.py:827
+#: manufacturing/templates/credit_dashboard.html:3
+#: manufacturing/templates/credit_dashboard.html:48
+msgid "Credit Department"
+msgstr "Departamento de crédito"
+
+#: manufacturing/menus.py:790 manufacturing/menus.py:828
+#: manufacturing/templates/payroll_dashboard.html:39
+msgid "Payroll Department"
+msgstr "Departamento de Nómina"
+
+#: manufacturing/menus.py:791 manufacturing/menus.py:792
+#: manufacturing/menus.py:849 manufacturing/menus.py:850
+#: manufacturing/menus.py:1604
+msgid "Financial Reports"
+msgstr "Informes Financieros"
+
+#: manufacturing/menus.py:794 manufacturing/menus.py:852
+#: manufacturing/templates/acct_dashboard.html:29
+#: manufacturing/templates/finance_dashboard.html:57
+#: manufacturing/templates/gl_cash_flow_statement.html:7
+#: manufacturing/templates/gl_dashboard_kpis.html:36
+#: manufacturing/templates/gl_income_statement.html:3
+#: manufacturing/templates/gl_income_statement.html:40
+#: manufacturing/templates/gl_income_statement.html:52
+msgid "Income Statement"
+msgstr "Estado de Resultados"
+
+#: manufacturing/menus.py:796 manufacturing/menus.py:853
+#: manufacturing/templates/acct_dashboard.html:30
+#: manufacturing/templates/finance_dashboard.html:58
+#: manufacturing/templates/gl_balance_sheet.html:3
+#: manufacturing/templates/gl_balance_sheet.html:41
+#: manufacturing/templates/gl_balance_sheet.html:52
+#: manufacturing/templates/gl_cash_flow_statement.html:8
+#: manufacturing/templates/gl_dashboard.html:10
+#: manufacturing/templates/gl_dashboard_kpis.html:37
+#: manufacturing/templates/gl_income_statement.html:8
+#: manufacturing/templates/gl_trial_balance.html:8
+msgid "Balance Sheet"
+msgstr "Balance General"
+
+#: manufacturing/menus.py:798 manufacturing/menus.py:854
+#: manufacturing/templates/finance_dashboard.html:13
+#: manufacturing/templates/finance_dashboard_kpis.html:34
+msgid "Cash Flow"
+msgstr "Flujo de Efectivo"
+
+#: manufacturing/menus.py:803 manufacturing/menus.py:804
+#: manufacturing/menus.py:840 manufacturing/menus.py:841
+#: manufacturing/menus.py:975 manufacturing/menus.py:976
+#: manufacturing/menus.py:1133 manufacturing/menus.py:1134
+#: manufacturing/menus.py:1306 manufacturing/menus.py:1307
+#: manufacturing/menus.py:1354 manufacturing/menus.py:1355
+#: manufacturing/menus.py:1571 manufacturing/menus.py:1701
+msgid "Budget Management"
+msgstr "Gestión de Presupuesto"
+
+#: manufacturing/menus.py:806 manufacturing/menus.py:843
+msgid "Budget Planning"
+msgstr "Planificación Presupuestaria"
+
+#: manufacturing/menus.py:809 manufacturing/menus.py:845
+msgid "Budget Amendments"
+msgstr "Modificaciones Presupuestarias"
+
+#: manufacturing/menus.py:811 manufacturing/menus.py:846
+#: manufacturing/menus.py:1314 manufacturing/menus.py:1363
+msgid "Budget Reports"
+msgstr "Informes de Presupuesto"
+
+#: manufacturing/menus.py:814 manufacturing/menus.py:815
+#: manufacturing/menus.py:1426 manufacturing/menus.py:1427
+msgid "Audit Management"
+msgstr "Gestión de Auditorías"
+
+#: manufacturing/menus.py:817 manufacturing/menus.py:1429
+msgid "Audit Schedule"
+msgstr "Calendario de Auditorías"
+
+#: manufacturing/menus.py:818 manufacturing/menus.py:1432
+msgid "Audit Findings"
+msgstr "Hallazgos de Auditoría"
+
+#: manufacturing/menus.py:821
+msgid "Audit Reports"
+msgstr "Informes de Auditoría"
+
+#: manufacturing/menus.py:829 manufacturing/templates/acct_dashboard.html:9
+#: manufacturing/templates/acct_dashboard.html:25
+#: manufacturing/templates/ap_list.html:7
+#: manufacturing/templates/ar_list.html:7 manufacturing/templates/base.html:549
+#: manufacturing/templates/finance_dashboard.html:6
+#: manufacturing/templates/gl_dashboard.html:3
+#: manufacturing/templates/gl_dashboard.html:44
+msgid "General Ledger"
+msgstr "Libro mayor"
+
+#: manufacturing/menus.py:830 manufacturing/menus.py:831
+msgid "Multi-Entity"
+msgstr "Multi-Entidad"
+
+#: manufacturing/menus.py:833 manufacturing/templates/company_list.html:3
+#: manufacturing/templates/company_list.html:15
+#: manufacturing/templates/consolidated_financials.html:6
+#: manufacturing/templates/intercompany_list.html:6
+msgid "Companies"
+msgstr "Empresas"
+
+#: manufacturing/menus.py:834 manufacturing/templates/intercompany_list.html:3
+#: manufacturing/templates/intercompany_list.html:22
+msgid "Intercompany Transactions"
+msgstr "Transacciones Intercompañía"
+
+#: manufacturing/menus.py:836 manufacturing/templates/company_list.html:9
+#: manufacturing/templates/consolidated_financials.html:3
+#: manufacturing/templates/consolidated_financials.html:41
+#: manufacturing/templates/intercompany_list.html:8
+msgid "Consolidated Financials"
+msgstr "Estados Financieros Consolidados"
+
+#: manufacturing/menus.py:858 manufacturing/menus.py:859
+msgid "Tax Management"
+msgstr "Gestión Fiscal"
+
+#: manufacturing/menus.py:861
+msgid "Tax Calendar"
+msgstr "Calendario Fiscal"
+
+#: manufacturing/menus.py:862
+msgid "Tax Filing"
+msgstr "Declaración de Impuestos"
+
+#: manufacturing/menus.py:863
+msgid "Tax Payments"
+msgstr "Pagos de Impuestos"
+
+#: manufacturing/menus.py:864
+msgid "Tax Reports"
+msgstr "Informes Fiscales"
+
+#: manufacturing/menus.py:867 manufacturing/menus.py:868
+msgid "Expense Reports"
+msgstr "Informes de Gastos"
+
+#: manufacturing/menus.py:870
+msgid "Submit Expense"
+msgstr "Enviar Gasto"
+
+#: manufacturing/menus.py:872
+msgid "Approved Expenses"
+msgstr "Gastos Aprobados"
+
+#: manufacturing/menus.py:873
+msgid "Expense Summary"
+msgstr "Resumen de Gastos"
+
+#: manufacturing/menus.py:876 manufacturing/menus.py:877
+#: manufacturing/templates/acct_dashboard.html:33
+#: manufacturing/templates/finance_bank_rec_list.html:3
+#: manufacturing/templates/finance_dashboard.html:63
+msgid "Bank Reconciliation"
+msgstr "Conciliación Bancaria"
+
+#: manufacturing/menus.py:879
+msgid "Reconcile Account"
+msgstr "Conciliar Cuenta"
+
+#: manufacturing/menus.py:880
+msgid "Pending Items"
+msgstr "Elementos Pendientes"
+
+#: manufacturing/menus.py:881
+msgid "Reconciliation History"
+msgstr "Historial de Conciliación"
+
+#: manufacturing/menus.py:883
+msgid "Bank Reports"
+msgstr "Informes Bancarios"
+
+#: manufacturing/menus.py:889
+msgid "Customer Service Main Menu"
+msgstr "Menú Principal de Servicio al Cliente"
+
+#: manufacturing/menus.py:891 manufacturing/menus.py:892
+msgid "CS Manager Menu"
+msgstr "Menú de Gerente de CS"
+
+#: manufacturing/menus.py:895 manufacturing/menus.py:896
+msgid "Ticket Reports"
+msgstr "Informes de Tickets"
+
+#: manufacturing/menus.py:898
+msgid "Daily Ticket Report"
+msgstr "Informe Diario de Tickets"
+
+#: manufacturing/menus.py:901
+msgid "Resolution Analysis"
+msgstr "Análisis de Resolución"
+
+#: manufacturing/menus.py:903
+msgid "SLA Reports"
+msgstr "Informes de SLA"
+
+#: manufacturing/menus.py:906 manufacturing/menus.py:907
+msgid "Staff Management"
+msgstr "Gestión de Personal"
+
+#: manufacturing/menus.py:909
+msgid "Staff Schedule"
+msgstr "Horario de Personal"
+
+#: manufacturing/menus.py:911
+msgid "Performance Metrics"
+msgstr "Métricas de Desempeño"
+
+#: manufacturing/menus.py:913
+msgid "Staff Training"
+msgstr "Capacitación de Personal"
+
+#: manufacturing/menus.py:915
+msgid "Staff Reports"
+msgstr "Informes de Personal"
+
+#: manufacturing/menus.py:922
+msgid "CSAT Survey Results"
+msgstr "Resultados de Encuesta CSAT"
+
+#: manufacturing/menus.py:924
+msgid "NPS Reports"
+msgstr "Informes de NPS"
+
+#: manufacturing/menus.py:925
+msgid "Satisfaction Trends"
+msgstr "Tendencias de Satisfacción"
+
+#: manufacturing/menus.py:927 manufacturing/templates/cs_list.html:9
+#: manufacturing/templates/cs_plans.html:57
+#: manufacturing/templates/cs_reports.html:8
+msgid "Improvement Plans"
+msgstr "Planes de mejora"
+
+#: manufacturing/menus.py:931 manufacturing/menus.py:932
+#: manufacturing/templates/cs_dashboard.html:8
+#: manufacturing/templates/cs_dashboard.html:45
+#: manufacturing/templates/cs_list.html:7
+#: manufacturing/templates/cs_reports.html:7
+msgid "Escalations"
+msgstr "Escalamientos"
+
+#: manufacturing/menus.py:934
+msgid "Active Escalations"
+msgstr "Escalaciones Activas"
+
+#: manufacturing/menus.py:936
+msgid "Escalation History"
+msgstr "Historial de Escalaciones"
+
+#: manufacturing/menus.py:938
+msgid "Escalation Reports"
+msgstr "Informes de Escalaciones"
+
+#: manufacturing/menus.py:940 manufacturing/menus.py:1488
+msgid "Resolution Tracking"
+msgstr "Seguimiento de Resolución"
+
+#: manufacturing/menus.py:950
+msgid "Engineering Main Menu"
+msgstr "Menú Principal de Ingeniería"
+
+#: manufacturing/menus.py:952 manufacturing/menus.py:953
+msgid "Engineering Manager"
+msgstr "Gerente de Ingeniería"
+
+#: manufacturing/menus.py:955 manufacturing/menus.py:997
+msgid "Engineers"
+msgstr "Ingenieros"
+
+#: manufacturing/menus.py:956 manufacturing/menus.py:957
+msgid "Project Approvals"
+msgstr "Aprobaciones de Proyectos"
+
+#: manufacturing/menus.py:959 manufacturing/menus.py:1124
+#: manufacturing/menus.py:1182 manufacturing/menus.py:1344
+msgid "Pending Approvals"
+msgstr "Aprobaciones Pendientes"
+
+#: manufacturing/menus.py:960
+msgid "Approved Projects"
+msgstr "Proyectos Aprobados"
+
+#: manufacturing/menus.py:961
+msgid "Rejected Projects"
+msgstr "Proyectos Rechazados"
+
+#: manufacturing/menus.py:962 manufacturing/menus.py:1129
+#: manufacturing/menus.py:1188 manufacturing/menus.py:1350
+#: manufacturing/templates/req_detail.html:123
+msgid "Approval History"
+msgstr "Historial de Aprobación"
+
+#: manufacturing/menus.py:965 manufacturing/menus.py:966
+#: manufacturing/menus.py:1293 manufacturing/menus.py:1294
+msgid "Resource Management"
+msgstr "Gestión de Recursos"
+
+#: manufacturing/menus.py:968 manufacturing/menus.py:1096
+#: manufacturing/menus.py:1296
+msgid "Resource Allocation"
+msgstr "Asignación de Recursos"
+
+#: manufacturing/menus.py:969 manufacturing/menus.py:1298
+#: manufacturing/templates/capacity_planning.html:3
+#: manufacturing/templates/capacity_planning.html:42
+#: manufacturing/templates/prod_schedule_gantt.html:9
+#: manufacturing/templates/scenario_list.html:6
+#: manufacturing/templates/workcenter_calendar.html:7
+#: manufacturing/templates/workcenter_list.html:7
+msgid "Capacity Planning"
+msgstr "Planificación de Capacidad"
+
+#: manufacturing/menus.py:970 manufacturing/menus.py:1300
+msgid "Resource Reports"
+msgstr "Informes de Recursos"
+
+#: manufacturing/menus.py:971
+msgid "Availability Calendar"
+msgstr "Calendario de Disponibilidad"
+
+#: manufacturing/menus.py:978
+msgid "Engineering Budget"
+msgstr "Presupuesto de Ingeniería"
+
+#: manufacturing/menus.py:982 manufacturing/menus.py:1152
+msgid "Cost Reports"
+msgstr "Informes de Costos"
+
+#: manufacturing/menus.py:983 manufacturing/menus.py:1141
+#: manufacturing/menus.py:1176
+msgid "Budget Requests"
+msgstr "Solicitudes de Presupuesto"
+
+#: manufacturing/menus.py:986 manufacturing/menus.py:987
+#: manufacturing/menus.py:1043 manufacturing/menus.py:1044
+#: manufacturing/templates/eng_reports.html:3
+#: manufacturing/templates/eng_reports.html:50
+msgid "Engineering Reports"
+msgstr "Informes de ingeniería"
+
+#: manufacturing/menus.py:989 manufacturing/menus.py:1046
+msgid "Project Status"
+msgstr "Estado del Proyecto"
+
+#: manufacturing/menus.py:990
+msgid "Resource Utilization"
+msgstr "Utilización de Recursos"
+
+#: manufacturing/menus.py:991 manufacturing/menus.py:1201
+#: manufacturing/menus.py:1290 manufacturing/menus.py:1465
+msgid "KPI Dashboard"
+msgstr "Panel de KPI"
+
+#: manufacturing/menus.py:992
+msgid "Monthly Reports"
+msgstr "Informes Mensuales"
+
+#: manufacturing/menus.py:998 manufacturing/menus.py:999
+msgid "Project Management"
+msgstr "Gestión de Proyectos"
+
+#: manufacturing/menus.py:1001 manufacturing/menus.py:1093
+#: manufacturing/templates/eng_dashboard.html:61
+#: manufacturing/templates/eng_dashboard_kpis.html:3
+msgid "Active Projects"
+msgstr "Proyectos activos"
+
+#: manufacturing/menus.py:1002 manufacturing/templates/eng_dashboard.html:63
+#: manufacturing/templates/eng_project_detail.html:3
+#: manufacturing/templates/eng_project_detail.html:67
+#: manufacturing/templates/eng_projects.html:95
+msgid "New Project"
+msgstr "Nuevo proyecto"
+
+#: manufacturing/menus.py:1003
+msgid "Project Timeline"
+msgstr "Cronograma del Proyecto"
+
+#: manufacturing/menus.py:1004 manufacturing/menus.py:1095
+msgid "Project Reports"
+msgstr "Informes de Proyectos"
+
+#: manufacturing/menus.py:1007 manufacturing/menus.py:1008
+msgid "Design Documents"
+msgstr "Documentos de Diseño"
+
+#: manufacturing/menus.py:1010 manufacturing/menus.py:1497
+msgid "Document Library"
+msgstr "Biblioteca de Documentos"
+
+#: manufacturing/menus.py:1011 manufacturing/menus.py:1498
+#: manufacturing/templates/document_list.html:10
+#: manufacturing/templates/document_new.html:3
+#: manufacturing/templates/document_new.html:21
+msgid "New Document"
+msgstr "Nuevo Documento"
+
+#: manufacturing/menus.py:1012 manufacturing/menus.py:1499
+msgid "Document Review"
+msgstr "Revisión de Documentos"
+
+#: manufacturing/menus.py:1013
+msgid "Archive"
+msgstr "Archivo"
+
+#: manufacturing/menus.py:1016 manufacturing/menus.py:1017
+#: manufacturing/templates/base.html:502
+#: manufacturing/templates/bom_list.html:3
+#: manufacturing/templates/bom_list.html:14
+#: manufacturing/templates/eng_dashboard.html:60
+msgid "Bill of Materials"
+msgstr "Lista de materiales"
+
+#: manufacturing/menus.py:1019
+msgid "BOM List"
+msgstr "Lista de BOM"
+
+#: manufacturing/menus.py:1020
+msgid "Create BOM"
+msgstr "Crear BOM"
+
+#: manufacturing/menus.py:1021
+msgid "BOM Revision"
+msgstr "Revisión de BOM"
+
+#: manufacturing/menus.py:1022
+msgid "BOM Reports"
+msgstr "Informes de BOM"
+
+#: manufacturing/menus.py:1025 manufacturing/menus.py:1026
+msgid "Change Orders"
+msgstr "Órdenes de Cambio"
+
+#: manufacturing/menus.py:1028
+msgid "New Change Order"
+msgstr "Nueva Orden de Cambio"
+
+#: manufacturing/menus.py:1030
+msgid "Approved Changes"
+msgstr "Cambios Aprobados"
+
+#: manufacturing/menus.py:1031
+msgid "Change History"
+msgstr "Historial de Cambios"
+
+#: manufacturing/menus.py:1034 manufacturing/menus.py:1035
+msgid "Test & Validation"
+msgstr "Pruebas y Validación"
+
+#: manufacturing/menus.py:1037
+msgid "Test Plans"
+msgstr "Planes de Prueba"
+
+#: manufacturing/menus.py:1038
+msgid "Test Results"
+msgstr "Resultados de Prueba"
+
+#: manufacturing/menus.py:1039
+msgid "Validation Reports"
+msgstr "Informes de Validación"
+
+#: manufacturing/menus.py:1040
+msgid "Issue Tracking"
+msgstr "Seguimiento de Incidencias"
+
+#: manufacturing/menus.py:1047
+msgid "Design Review"
+msgstr "Revisión de Diseño"
+
+#: manufacturing/menus.py:1048
+msgid "Resource Report"
+msgstr "Informe de Recursos"
+
+#: manufacturing/menus.py:1052 manufacturing/menus.py:1053
+msgid "Standards & Compliance"
+msgstr "Normas y Cumplimiento"
+
+#: manufacturing/menus.py:1055
+msgid "Standards Library"
+msgstr "Biblioteca de Normas"
+
+#: manufacturing/menus.py:1056
+msgid "Compliance Checklist"
+msgstr "Lista de Verificación de Cumplimiento"
+
+#: manufacturing/menus.py:1057
+msgid "Audit Results"
+msgstr "Resultados de Auditoría"
+
+#: manufacturing/menus.py:1058
+msgid "Regulatory Updates"
+msgstr "Actualizaciones Normativas"
+
+#: manufacturing/menus.py:1064
+msgid "Information Technology Main Menu"
+msgstr "Menú Principal de Tecnología de la Información"
+
+#: manufacturing/menus.py:1066 manufacturing/menus.py:1067
+msgid "IT Manager"
+msgstr "Gerente de TI"
+
+#: manufacturing/menus.py:1070 manufacturing/menus.py:1071
+msgid "Budget & Procurement"
+msgstr "Presupuesto y Adquisiciones"
+
+#: manufacturing/menus.py:1073
+msgid "IT Budget"
+msgstr "Presupuesto de TI"
+
+#: manufacturing/menus.py:1074
+msgid "Hardware Procurement"
+msgstr "Adquisición de Hardware"
+
+#: manufacturing/menus.py:1076
+msgid "Software Licensing"
+msgstr "Licenciamiento de Software"
+
+#: manufacturing/menus.py:1077
+msgid "Procurement Reports"
+msgstr "Informes de Adquisiciones"
+
+#: manufacturing/menus.py:1090 manufacturing/menus.py:1091
+msgid "IT Projects"
+msgstr "Proyectos de TI"
+
+#: manufacturing/menus.py:1094
+msgid "Project Pipeline"
+msgstr "Cartera de Proyectos"
+
+#: manufacturing/menus.py:1099 manufacturing/menus.py:1100
+msgid "Security Management"
+msgstr "Gestión de Seguridad"
+
+#: manufacturing/menus.py:1102
+msgid "Security Dashboard"
+msgstr "Panel de Seguridad"
+
+#: manufacturing/menus.py:1103
+msgid "Incident Reports"
+msgstr "Informes de Incidentes"
+
+#: manufacturing/menus.py:1104
+msgid "Vulnerability Management"
+msgstr "Gestión de Vulnerabilidades"
+
+#: manufacturing/menus.py:1106 manufacturing/menus.py:1263
+#: manufacturing/menus.py:1444
+msgid "Compliance Reports"
+msgstr "Informes de Cumplimiento"
+
+#: manufacturing/menus.py:1115
+msgid "Maintenance Main Menu"
+msgstr "Menú Principal de Mantenimiento"
+
+#: manufacturing/menus.py:1117 manufacturing/menus.py:1118
+msgid "Maintenance Manager"
+msgstr "Gerente de Mantenimiento"
+
+#: manufacturing/menus.py:1120 manufacturing/menus.py:1157
 #: manufacturing/menus.py:1693 manufacturing/templates/base.html:579
 #: manufacturing/templates/base.html:581
 #: manufacturing/templates/dashboard_kpis.html:29
@@ -90,30 +2504,184 @@ msgstr "Tecnología de la Información"
 msgid "Maintenance"
 msgstr "Mantenimiento"
 
-#: manufacturing/menus.py:1694 manufacturing/templates/base.html:592
-#: manufacturing/templates/marketing_dashboard.html:6
-#: manufacturing/templates/mkt_ad_detail.html:6
-#: manufacturing/templates/mkt_ad_list.html:6
-#: manufacturing/templates/mkt_analytics.html:6
-#: manufacturing/templates/mkt_budget_list.html:6
-#: manufacturing/templates/mkt_research_detail.html:6
-#: manufacturing/templates/mkt_research_list.html:6
-msgid "Marketing"
-msgstr "Marketing"
+#: manufacturing/menus.py:1121 manufacturing/menus.py:1122
+msgid "Work Order Approvals"
+msgstr "Aprobaciones de Órdenes de Trabajo"
 
-#: manufacturing/menus.py:1695 manufacturing/templates/base.html:557
-#: manufacturing/templates/exit_interview_list.html:6
-#: manufacturing/templates/offboarding_list.html:6
-#: manufacturing/templates/pers_depts.html:6
-#: manufacturing/templates/pers_review_detail.html:6
-#: manufacturing/templates/pers_reviews_list.html:6
-#: manufacturing/templates/pers_training_detail.html:6
-#: manufacturing/templates/pers_training_list.html:6
-#: manufacturing/templates/termination_detail.html:6
-#: manufacturing/templates/termination_list.html:6
-msgid "Personnel"
-msgstr "Personal"
+#: manufacturing/menus.py:1126
+msgid "Approved Work Orders"
+msgstr "Órdenes de Trabajo Aprobadas"
 
+#: manufacturing/menus.py:1128
+#: manufacturing/templates/ats_application_detail.html:29
+#: manufacturing/templates/cc_detail.html:24
+#: manufacturing/templates/cc_list.html:23
+#: manufacturing/templates/cc_list.html:47
+msgid "Rejected"
+msgstr "Rechazado"
+
+#: manufacturing/menus.py:1136
+msgid "Maintenance Budget"
+msgstr "Presupuesto de Mantenimiento"
+
+#: manufacturing/menus.py:1150
+msgid "Equipment Reports"
+msgstr "Informes de Equipos"
+
+#: manufacturing/menus.py:1158 manufacturing/templates/maint_dashboard.html:14
+#: manufacturing/templates/predictive_maintenance.html:3
+#: manufacturing/templates/predictive_maintenance.html:39
+msgid "Predictive Maintenance"
+msgstr "Mantenimiento predictivo"
+
+#: manufacturing/menus.py:1162
+msgid "Marketing Main Menu"
+msgstr "Menú Principal de Marketing"
+
+#: manufacturing/menus.py:1164 manufacturing/menus.py:1165
+msgid "Marketing Manager Menu"
+msgstr "Menú del Gerente de Marketing"
+
+#: manufacturing/menus.py:1168 manufacturing/menus.py:1169
+#: manufacturing/templates/mkt_budget_list.html:3
+#: manufacturing/templates/mkt_budget_list.html:56
+msgid "Marketing Budget"
+msgstr "Presupuesto de marketing"
+
+#: manufacturing/menus.py:1171
+msgid "Budget Overview"
+msgstr "Resumen del Presupuesto"
+
+#: manufacturing/menus.py:1172
+msgid "Budget by Campaign"
+msgstr "Presupuesto por Campaña"
+
+#: manufacturing/menus.py:1179 manufacturing/menus.py:1180
+msgid "Campaign Approvals"
+msgstr "Aprobaciones de Campañas"
+
+#: manufacturing/menus.py:1184
+msgid "Approved Campaigns"
+msgstr "Campañas Aprobadas"
+
+#: manufacturing/menus.py:1186
+msgid "Campaign Archive"
+msgstr "Archivo de Campañas"
+
+#: manufacturing/menus.py:1192 manufacturing/menus.py:1193
+msgid "Marketing Reports"
+msgstr "Informes de Marketing"
+
+#: manufacturing/menus.py:1195
+msgid "Campaign Performance"
+msgstr "Rendimiento de Campañas"
+
+#: manufacturing/menus.py:1197
+msgid "ROI Reports"
+msgstr "Informes de ROI"
+
+#: manufacturing/menus.py:1211
+msgid "Personnel Main Menu"
+msgstr "Menú Principal de Personal"
+
+#: manufacturing/menus.py:1213 manufacturing/menus.py:1214
+msgid "Personnel Manager Menu"
+msgstr "Menú del Gerente de Personal"
+
+#: manufacturing/menus.py:1217 manufacturing/menus.py:1218
+msgid "Hiring & Recruitment"
+msgstr "Contratación y Reclutamiento"
+
+#: manufacturing/menus.py:1220
+msgid "Open Positions"
+msgstr "Vacantes"
+
+#: manufacturing/menus.py:1222
+msgid "Applicant Tracking"
+msgstr "Seguimiento de Candidatos"
+
+#: manufacturing/menus.py:1224
+msgid "Interview Schedule"
+msgstr "Calendario de Entrevistas"
+
+#: manufacturing/menus.py:1226
+msgid "Offer Management"
+msgstr "Gestión de Ofertas"
+
+#: manufacturing/menus.py:1230 manufacturing/menus.py:1231
+#: manufacturing/templates/exit_interview_list.html:7
+#: manufacturing/templates/offboarding_list.html:7
+#: manufacturing/templates/personnel_dashboard.html:15
+#: manufacturing/templates/termination_detail.html:7
+#: manufacturing/templates/termination_list.html:3
+#: manufacturing/templates/termination_list.html:7
+msgid "Terminations"
+msgstr "Despidos"
+
+#: manufacturing/menus.py:1233 manufacturing/templates/termination_list.html:51
+msgid "Termination Process"
+msgstr "Proceso de Terminación"
+
+#: manufacturing/menus.py:1235
+#: manufacturing/templates/exit_interview_list.html:3
+#: manufacturing/templates/exit_interview_list.html:8
+#: manufacturing/templates/exit_interview_list.html:45
+#: manufacturing/templates/offboarding_list.html:8
+#: manufacturing/templates/personnel_dashboard.html:16
+#: manufacturing/templates/termination_detail.html:8
+#: manufacturing/templates/termination_list.html:8
+msgid "Exit Interviews"
+msgstr "Entrevistas de Salida"
+
+#: manufacturing/menus.py:1237
+msgid "Final Pay Processing"
+msgstr "Procesamiento de Pago Final"
+
+#: manufacturing/menus.py:1239 manufacturing/templates/offboarding_list.html:53
+msgid "Offboarding Checklist"
+msgstr "Lista de Verificación de Baja"
+
+#: manufacturing/menus.py:1243 manufacturing/menus.py:1244
+msgid "Salary Management"
+msgstr "Gestión Salarial"
+
+#: manufacturing/menus.py:1246
+msgid "Salary Review"
+msgstr "Revisión Salarial"
+
+#: manufacturing/menus.py:1248
+msgid "Salary Adjustments"
+msgstr "Ajustes Salariales"
+
+#: manufacturing/menus.py:1250
+msgid "Compensation Reports"
+msgstr "Informes de Compensación"
+
+#: manufacturing/menus.py:1252
+msgid "Pay Grades"
+msgstr "Grados Salariales"
+
+#: manufacturing/menus.py:1256 manufacturing/menus.py:1257
+msgid "HR Reports"
+msgstr "Informes de RR. HH."
+
+#: manufacturing/menus.py:1259
+msgid "Headcount Report"
+msgstr "Informe de Plantilla"
+
+#: manufacturing/menus.py:1261
+msgid "Turnover Report"
+msgstr "Informe de Rotación"
+
+#: manufacturing/menus.py:1275
+msgid "Production Main Menu"
+msgstr "Menú Principal de Producción"
+
+#: manufacturing/menus.py:1277 manufacturing/menus.py:1278
+msgid "Production Manager"
+msgstr "Gerente de Producción"
+
+#: manufacturing/menus.py:1280 manufacturing/menus.py:1319
 #: manufacturing/menus.py:1696 manufacturing/templates/dashboard_kpis.html:14
 #: manufacturing/templates/prod_daily_report.html:6
 #: manufacturing/templates/prod_dashboard.html:3
@@ -132,56 +2700,567 @@ msgstr "Personal"
 msgid "Production"
 msgstr "Producción"
 
-#: manufacturing/menus.py:1697 manufacturing/templates/base.html:530
-#: manufacturing/templates/base.html:532 manufacturing/templates/cc_list.html:6
-#: manufacturing/templates/costing_valuation_list.html:6
-#: manufacturing/templates/inventory_list.html:3
-#: manufacturing/templates/inventory_list.html:17
-#: manufacturing/templates/prod_dashboard.html:16
-#: manufacturing/templates/prod_dashboard.html:64
-#: manufacturing/templates/prod_reports.html:11
-#: manufacturing/templates/purchasing_dashboard.html:14
-#: manufacturing/templates/purchasing_dashboard.html:60
-msgid "Inventory"
-msgstr "Inventario"
+#: manufacturing/menus.py:1281 manufacturing/menus.py:1320
+#: manufacturing/templates/prod_dashboard.html:8
+#: manufacturing/templates/prod_dashboard.html:61
+#: manufacturing/templates/prod_delivery_status.html:7
+#: manufacturing/templates/prod_reports.html:10
+#: manufacturing/templates/prod_returns_list.html:7
+#: manufacturing/templates/prod_schedule.html:10
+#: manufacturing/templates/prod_shipping_detail.html:7
+#: manufacturing/templates/prod_shipping_list.html:3
+#: manufacturing/templates/prod_shipping_list.html:9
+#: manufacturing/templates/prod_shipping_list.html:57
+#: manufacturing/templates/prod_tracking_dashboard.html:7
+msgid "Shipping"
+msgstr "Envíos"
 
-#: manufacturing/menus.py:1698 manufacturing/templates/dashboard_kpis.html:19
-#: manufacturing/templates/purch_contract_detail.html:6
-#: manufacturing/templates/purch_contracts_list.html:6
-#: manufacturing/templates/purch_reports.html:6
-#: manufacturing/templates/req_detail.html:6
-#: manufacturing/templates/req_list.html:6
-msgid "Purchasing"
-msgstr "Compras"
+#: manufacturing/menus.py:1288
+msgid "Efficiency Reports"
+msgstr "Informes de Eficiencia"
 
-#: manufacturing/menus.py:1699 manufacturing/templates/base.html:576
-msgid "Quality Assurance"
-msgstr "Aseguramiento de calidad"
+#: manufacturing/menus.py:1302
+msgid "Workforce Planning"
+msgstr "Planificación de la Fuerza Laboral"
 
-#: manufacturing/menus.py:1700 manufacturing/templates/base.html:519
-msgid "Sales"
-msgstr "Ventas"
+#: manufacturing/menus.py:1309
+msgid "Production Budget"
+msgstr "Presupuesto de Producción"
 
-#: manufacturing/menus.py:1701
-msgid "Budget Management"
-msgstr "Gestión de Presupuesto"
+#: manufacturing/menus.py:1321 manufacturing/menus.py:1322
+msgid "Shop Floor"
+msgstr "Planta de Producción"
 
-#: manufacturing/menus.py:1702 manufacturing/templates/base.html:538
-#: manufacturing/templates/budget_dashboard.html:7
-#: manufacturing/templates/dashboard_kpis.html:39
-msgid "Finance"
-msgstr "Finanzas"
+#: manufacturing/menus.py:1324
+msgid "Production/Downtime Entry"
+msgstr "Registro de Producción/Paradas"
 
-#: manufacturing/menus.py:1703 manufacturing/templates/base.html:589
-#: manufacturing/templates/risk_dashboard.html:13
-msgid "Legal"
-msgstr "Legal"
+#: manufacturing/menus.py:1326 manufacturing/templates/sf_dashboard.html:7
+#: manufacturing/templates/sf_entry.html:7
+#: manufacturing/templates/sf_shift_plan.html:3
+msgid "Shift Plan"
+msgstr "Plan de Turno"
 
-#: manufacturing/menus.py:1704 manufacturing/templates/legal_dashboard.html:52
-msgid "Risk Management"
-msgstr "Gestión de riesgos"
+#: manufacturing/menus.py:1327 manufacturing/templates/sf_dashboard.html:3
+#: manufacturing/templates/sf_dashboard.html:42
+msgid "Live OEE Dashboard"
+msgstr "Panel OEE en Vivo"
 
-#: manufacturing/menus.py:1705
+#: manufacturing/menus.py:1329
+msgid "Shop Floor TV Display"
+msgstr "Pantalla TV de Planta"
+
+#: manufacturing/menus.py:1335
+msgid "Purchasing Main Menu"
+msgstr "Menú Principal de Compras"
+
+#: manufacturing/menus.py:1337 manufacturing/menus.py:1338
+msgid "Purchasing Manager Menu"
+msgstr "Menú del Gerente de Compras"
+
+#: manufacturing/menus.py:1341 manufacturing/menus.py:1342
+#: manufacturing/templates/dashboard.html:14
+msgid "PO Approvals"
+msgstr "Aprobaciones de OC"
+
+#: manufacturing/menus.py:1346
+msgid "Approved POs"
+msgstr "POs Aprobadas"
+
+#: manufacturing/menus.py:1348
+msgid "Rejected POs"
+msgstr "POs Rechazadas"
+
+#: manufacturing/menus.py:1357
+msgid "Purchasing Budget"
+msgstr "Presupuesto de Compras"
+
+#: manufacturing/menus.py:1361
+msgid "Spending Analysis"
+msgstr "Análisis de Gastos"
+
+#: manufacturing/menus.py:1371
+msgid "Vendor Evaluation"
+msgstr "Evaluación de Proveedores"
+
+#: manufacturing/menus.py:1375
+msgid "Approved Vendors"
+msgstr "Proveedores Aprobados"
+
+#: manufacturing/menus.py:1379 manufacturing/menus.py:1380
+#: manufacturing/templates/purch_reports.html:3
+#: manufacturing/templates/purch_reports.html:46
+#: manufacturing/templates/purchasing_dashboard.html:57
+msgid "Purchasing Reports"
+msgstr "Informes de Compras"
+
+#: manufacturing/menus.py:1382
+msgid "Spending Report"
+msgstr "Informe de Gastos"
+
+#: manufacturing/menus.py:1384
+msgid "Vendor Report"
+msgstr "Informe de Proveedores"
+
+#: manufacturing/menus.py:1386
+msgid "Category Analysis"
+msgstr "Análisis por Categoría"
+
+#: manufacturing/menus.py:1397
+msgid "Pending Renewals"
+msgstr "Renovaciones Pendientes"
+
+#: manufacturing/menus.py:1401
+msgid "Contract Reports"
+msgstr "Informes de Contratos"
+
+#: manufacturing/menus.py:1405 manufacturing/menus.py:1406
+msgid "Consultant Management"
+msgstr "Gestión de Consultores"
+
+#: manufacturing/menus.py:1408
+#: manufacturing/templates/purchasing_dashboard.html:12
+#: manufacturing/templates/purchasing_dashboard.html:59
+msgid "Consultants"
+msgstr "Consultores"
+
+#: manufacturing/menus.py:1409
+msgid "Engagements"
+msgstr "Encargos"
+
+#: manufacturing/menus.py:1410 manufacturing/templates/base_portal.html:156
+#: manufacturing/templates/base_supplier_portal.html:145
+#: manufacturing/templates/supplier_portal_invoices.html:3
+#: manufacturing/templates/supplier_portal_invoices.html:4
+msgid "Invoices"
+msgstr "Facturas"
+
+#: manufacturing/menus.py:1411
+msgid "Spend Report"
+msgstr "Informe de Gastos"
+
+#: manufacturing/menus.py:1420
+msgid "Quality Assurance Main Menu"
+msgstr "Menú Principal de Aseguramiento de la Calidad"
+
+#: manufacturing/menus.py:1422 manufacturing/menus.py:1423
+msgid "QA Manager Menu"
+msgstr "Menú de Gerente de QA"
+
+#: manufacturing/menus.py:1431
+#: manufacturing/templates/qa_dashboard_kpis.html:13
+msgid "Active Audits"
+msgstr "Auditorías Activas"
+
+#: manufacturing/menus.py:1437 manufacturing/menus.py:1438
+#: manufacturing/menus.py:1631
+#: manufacturing/templates/legal_compliance_detail.html:8
+#: manufacturing/templates/legal_compliance_list.html:3
+#: manufacturing/templates/legal_compliance_list.html:8
+#: manufacturing/templates/legal_contract_detail.html:8
+#: manufacturing/templates/legal_contract_list.html:8
+#: manufacturing/templates/legal_dashboard.html:47
+#: manufacturing/templates/legal_dashboard.html:72
+#: manufacturing/templates/legal_employment_list.html:8
+#: manufacturing/templates/legal_governance_list.html:8
+#: manufacturing/templates/legal_ip_list.html:8
+#: manufacturing/templates/legal_litigation_detail.html:8
+#: manufacturing/templates/legal_litigation_list.html:8
+#: manufacturing/templates/risk_dashboard.html:44
+msgid "Compliance"
+msgstr "Cumplimiento"
+
+#: manufacturing/menus.py:1440
+msgid "Compliance Dashboard"
+msgstr "Panel de Cumplimiento"
+
+#: manufacturing/menus.py:1442
+msgid "Regulatory Requirements"
+msgstr "Requisitos Regulatorios"
+
+#: manufacturing/menus.py:1446
+msgid "Non-Compliance Issues"
+msgstr "Problemas de Incumplimiento"
+
+#: manufacturing/menus.py:1453
+msgid "Open CARs"
+msgstr "CARs Abiertos"
+
+#: manufacturing/menus.py:1455
+msgid "Closed CARs"
+msgstr "CARs Cerrados"
+
+#: manufacturing/menus.py:1456
+msgid "CAR Reports"
+msgstr "Informes de CAR"
+
+#: manufacturing/menus.py:1459 manufacturing/menus.py:1460
+#: manufacturing/templates/qa_reports.html:3
+msgid "QA Reports"
+msgstr "Informes de Calidad"
+
+#: manufacturing/menus.py:1462
+msgid "Daily QA Report"
+msgstr "Informe Diario de QA"
+
+#: manufacturing/menus.py:1468 manufacturing/menus.py:1469
+#: manufacturing/templates/qa_dashboard.html:10
+#: manufacturing/templates/qa_dashboard.html:89
+#: manufacturing/templates/qa_dashboard_kpis.html:25
+#: manufacturing/templates/qa_reports.html:12
+#: manufacturing/templates/qa_supplier_list.html:3
+#: manufacturing/templates/qa_supplier_list.html:61
+msgid "Supplier Quality"
+msgstr "Calidad de Proveedores"
+
+#: manufacturing/menus.py:1471
+#: manufacturing/templates/supplier_scorecard_list.html:3
+#: manufacturing/templates/supplier_scorecard_list.html:36
+msgid "Supplier Scorecards"
+msgstr "Evaluaciones de Proveedores"
+
+#: manufacturing/menus.py:1473
+#: manufacturing/templates/sampling_plan_detail.html:7
+#: manufacturing/templates/sampling_plan_list.html:6
+msgid "Incoming Inspection"
+msgstr "Inspección de Entrada"
+
+#: manufacturing/menus.py:1475
+#: manufacturing/templates/qa_inspection_list.html:9
+#: manufacturing/templates/sampling_plan_detail.html:6
+#: manufacturing/templates/sampling_plan_list.html:3
+#: manufacturing/templates/sampling_plan_list.html:19
+#: manufacturing/templates/sampling_plan_new.html:6
+msgid "Sampling Plans"
+msgstr "Planes de Muestreo"
+
+#: manufacturing/menus.py:1477
+msgid "Supplier Audits"
+msgstr "Auditorías de Proveedores"
+
+#: manufacturing/menus.py:1479
+msgid "Supplier Reports"
+msgstr "Informes de Proveedores"
+
+#: manufacturing/menus.py:1483 manufacturing/menus.py:1484
+msgid "Customer Complaints"
+msgstr "Quejas de Clientes"
+
+#: manufacturing/menus.py:1486
+msgid "New Complaint"
+msgstr "Nueva Queja"
+
+#: manufacturing/menus.py:1487
+msgid "Open Complaints"
+msgstr "Quejas Abiertas"
+
+#: manufacturing/menus.py:1490
+msgid "Complaint Reports"
+msgstr "Informes de Quejas"
+
+#: manufacturing/menus.py:1494 manufacturing/menus.py:1495
+#: manufacturing/templates/document_detail.html:6
+#: manufacturing/templates/document_list.html:3
+#: manufacturing/templates/document_list.html:28
+#: manufacturing/templates/document_new.html:6
+msgid "Document Control"
+msgstr "Control de Documentos"
+
+#: manufacturing/menus.py:1501 manufacturing/templates/document_detail.html:158
+msgid "Revision History"
+msgstr "Historial de Revisiones"
+
+#: manufacturing/menus.py:1510
+msgid "Sales Main Menu"
+msgstr "Menú Principal de Ventas"
+
+#: manufacturing/menus.py:1512 manufacturing/menus.py:1513
+msgid "Sales Manager Menu"
+msgstr "Menú de Gerente de Ventas"
+
+#: manufacturing/menus.py:1516 manufacturing/menus.py:1517
+#: manufacturing/templates/sales_targets.html:3
+msgid "Sales Targets"
+msgstr "Objetivos de Venta"
+
+#: manufacturing/menus.py:1519
+msgid "Set Targets"
+msgstr "Establecer Objetivos"
+
+#: manufacturing/menus.py:1520
+msgid "Target vs. Actual"
+msgstr "Objetivo vs. Real"
+
+#: manufacturing/menus.py:1522
+msgid "Target by Rep"
+msgstr "Objetivo por Representante"
+
+#: manufacturing/menus.py:1523
+msgid "Target Reports"
+msgstr "Informes de Objetivos"
+
+#: manufacturing/menus.py:1527 manufacturing/menus.py:1528
+#: manufacturing/templates/sales_territories.html:3
+#: manufacturing/templates/sales_territories.html:55
+msgid "Territory Management"
+msgstr "Gestión de Territorios"
+
+#: manufacturing/menus.py:1530
+msgid "Territory Map"
+msgstr "Mapa de Territorios"
+
+#: manufacturing/menus.py:1531
+msgid "Territory Assignments"
+msgstr "Asignaciones de Territorios"
+
+#: manufacturing/menus.py:1533
+#: manufacturing/templates/sales_territory_performance.html:3
+#: manufacturing/templates/sales_territory_performance.html:31
+msgid "Territory Performance"
+msgstr "Desempeño de Territorios"
+
+#: manufacturing/menus.py:1535
+msgid "Territory Reports"
+msgstr "Informes de Territorios"
+
+#: manufacturing/menus.py:1539 manufacturing/menus.py:1540
+#: manufacturing/templates/sales_commissions.html:3
+#: manufacturing/templates/sales_commissions.html:62
+msgid "Commission Tracking"
+msgstr "Seguimiento de Comisiones"
+
+#: manufacturing/menus.py:1542
+msgid "Commission Calculator"
+msgstr "Calculadora de Comisiones"
+
+#: manufacturing/menus.py:1544
+msgid "Commission Reports"
+msgstr "Informes de Comisiones"
+
+#: manufacturing/menus.py:1546
+#: manufacturing/templates/ap_invoice_detail.html:162
+#: manufacturing/templates/ar_invoice_detail.html:162
+#: manufacturing/templates/portal_invoice_detail.html:28
+#: manufacturing/templates/sales_commission_history.html:8
+#: manufacturing/templates/sales_commission_plans.html:8
+#: manufacturing/templates/sales_commissions.html:8
+msgid "Payment History"
+msgstr "Historial de Pagos"
+
+#: manufacturing/menus.py:1548
+#: manufacturing/templates/sales_commission_plans.html:3
+#: manufacturing/templates/sales_commission_plans.html:50
+msgid "Commission Plans"
+msgstr "Planes de Comisión"
+
+#: manufacturing/menus.py:1552 manufacturing/menus.py:1553
+msgid "Staff Performance"
+msgstr "Desempeño del Personal"
+
+#: manufacturing/menus.py:1555
+msgid "Performance Dashboard"
+msgstr "Panel de Desempeño"
+
+#: manufacturing/menus.py:1557
+msgid "Rep Rankings"
+msgstr "Clasificación de Representantes"
+
+#: manufacturing/menus.py:1560 manufacturing/templates/sales_coaching.html:3
+msgid "Coaching Notes"
+msgstr "Notas de Coaching"
+
+#: manufacturing/menus.py:1567 manufacturing/templates/demand_forecast.html:3
+#: manufacturing/templates/demand_forecast.html:41
+#: manufacturing/templates/mrp_home.html:99
+#: manufacturing/templates/sales_demand.html:8
+msgid "AI Demand Forecast"
+msgstr "Pronóstico de Demanda IA"
+
+#: manufacturing/menus.py:1573 manufacturing/menus.py:1574
+msgid "Budget Manager"
+msgstr "Gerente de Presupuesto"
+
+#: manufacturing/menus.py:1576 manufacturing/menus.py:1585
+#: manufacturing/templates/acct_dashboard.html:10
+#: manufacturing/templates/acct_dashboard.html:31
+#: manufacturing/templates/budget_dashboard.html:6
+#: manufacturing/templates/finance_audit_detail.html:7
+#: manufacturing/templates/finance_audit_list.html:7
+#: manufacturing/templates/finance_bank_rec_detail.html:7
+#: manufacturing/templates/finance_bank_rec_list.html:7
+#: manufacturing/templates/finance_budget_detail.html:7
+#: manufacturing/templates/finance_budget_list.html:3
+#: manufacturing/templates/finance_budget_list.html:7
+#: manufacturing/templates/finance_budget_list.html:57
+#: manufacturing/templates/finance_dashboard.html:9
+#: manufacturing/templates/finance_dashboard.html:61
+#: manufacturing/templates/finance_tax_detail.html:7
+#: manufacturing/templates/finance_tax_list.html:7
+msgid "Budgets"
+msgstr "Presupuestos"
+
+#: manufacturing/menus.py:1577 manufacturing/menus.py:1586
+msgid "Budget Detail"
+msgstr "Detalle del Presupuesto"
+
+#: manufacturing/menus.py:1579 manufacturing/menus.py:1588
+msgid "Variance Report"
+msgstr "Informe de Variación"
+
+#: manufacturing/menus.py:1580
+msgid "Department Summaries"
+msgstr "Resúmenes por Departamento"
+
+#: manufacturing/menus.py:1582
+msgid "Approval Workflow"
+msgstr "Flujo de Aprobación"
+
+#: manufacturing/menus.py:1592
+msgid "Finance Main Menu"
+msgstr "Menú Principal de Finanzas"
+
+#: manufacturing/menus.py:1594 manufacturing/menus.py:1595
+msgid "Finance Manager"
+msgstr "Gerente de Finanzas"
+
+#: manufacturing/menus.py:1597
+msgid "Financial Planning"
+msgstr "Planificación Financiera"
+
+#: manufacturing/menus.py:1598
+msgid "Budget & Forecasting"
+msgstr "Presupuesto y Pronósticos"
+
+#: manufacturing/menus.py:1600
+msgid "Treasury Management"
+msgstr "Gestión de Tesorería"
+
+#: manufacturing/menus.py:1602
+msgid "Investment Management"
+msgstr "Gestión de Inversiones"
+
+#: manufacturing/menus.py:1608
+msgid "Financial Analysis"
+msgstr "Análisis Financiero"
+
+#: manufacturing/menus.py:1609
+msgid "Financial Reporting"
+msgstr "Informes Financieros"
+
+#: manufacturing/menus.py:1610
+msgid "Treasury Operations"
+msgstr "Operaciones de Tesorería"
+
+#: manufacturing/menus.py:1611
+msgid "Capital Management"
+msgstr "Gestión de Capital"
+
+#: manufacturing/menus.py:1612
+msgid "Tax Planning"
+msgstr "Planificación Fiscal"
+
+#: manufacturing/menus.py:1616
+msgid "Legal Main Menu"
+msgstr "Menú Principal Legal"
+
+#: manufacturing/menus.py:1618 manufacturing/menus.py:1619
+msgid "Legal Manager"
+msgstr "Gerente Legal"
+
+#: manufacturing/menus.py:1623
+msgid "Litigation Management"
+msgstr "Gestión de Litigios"
+
+#: manufacturing/menus.py:1625
+msgid "Compliance Management"
+msgstr "Gestión de Cumplimiento"
+
+#: manufacturing/menus.py:1627 manufacturing/templates/legal_dashboard.html:51
+#: manufacturing/templates/legal_governance_list.html:3
+#: manufacturing/templates/legal_governance_list.html:55
+msgid "Corporate Governance"
+msgstr "Gobernanza corporativa"
+
+#: manufacturing/menus.py:1632
+#: manufacturing/templates/legal_compliance_detail.html:9
+#: manufacturing/templates/legal_compliance_list.html:9
+#: manufacturing/templates/legal_contract_detail.html:9
+#: manufacturing/templates/legal_contract_list.html:9
+#: manufacturing/templates/legal_dashboard.html:48
+#: manufacturing/templates/legal_dashboard.html:88
+#: manufacturing/templates/legal_employment_list.html:9
+#: manufacturing/templates/legal_governance_list.html:9
+#: manufacturing/templates/legal_ip_list.html:9
+#: manufacturing/templates/legal_litigation_detail.html:9
+#: manufacturing/templates/legal_litigation_list.html:3
+#: manufacturing/templates/legal_litigation_list.html:9
+#: manufacturing/templates/risk_dashboard.html:45
+msgid "Litigation"
+msgstr "Litigios"
+
+#: manufacturing/menus.py:1633 manufacturing/templates/legal_dashboard.html:49
+#: manufacturing/templates/legal_ip_list.html:3
+#: manufacturing/templates/legal_ip_list.html:56
+msgid "Intellectual Property"
+msgstr "Propiedad intelectual"
+
+#: manufacturing/menus.py:1634 manufacturing/templates/legal_dashboard.html:50
+#: manufacturing/templates/legal_employment_list.html:3
+#: manufacturing/templates/legal_employment_list.html:55
+msgid "Employment Law"
+msgstr "Derecho laboral"
+
+#: manufacturing/menus.py:1638
+msgid "Risk Management Main Menu"
+msgstr "Menú Principal de Gestión de Riesgos"
+
+#: manufacturing/menus.py:1640 manufacturing/menus.py:1641
+msgid "Risk Manager"
+msgstr "Gerente de Riesgos"
+
+#: manufacturing/menus.py:1643 manufacturing/menus.py:1652
+#: manufacturing/templates/control_plan_detail.html:7
+#: manufacturing/templates/control_plan_list.html:7
+#: manufacturing/templates/risk_assessment_list.html:7
+#: manufacturing/templates/risk_audit_list.html:7
+#: manufacturing/templates/risk_continuity_list.html:7
+#: manufacturing/templates/risk_dashboard.html:7
+#: manufacturing/templates/risk_dashboard.html:112
+#: manufacturing/templates/risk_insurance_list.html:7
+#: manufacturing/templates/risk_kri_list.html:7
+#: manufacturing/templates/risk_register_list.html:3
+#: manufacturing/templates/risk_register_list.html:7
+#: manufacturing/templates/risk_register_list.html:53
+msgid "Risk Register"
+msgstr "Registro de Riesgos"
+
+#: manufacturing/menus.py:1644 manufacturing/templates/risk_kri_list.html:3
+#: manufacturing/templates/risk_kri_list.html:52
+msgid "Key Risk Indicators"
+msgstr "Indicadores Clave de Riesgo"
+
+#: manufacturing/menus.py:1645 manufacturing/menus.py:1654
+#: manufacturing/templates/risk_continuity_list.html:3
+msgid "Business Continuity"
+msgstr "Continuidad del Negocio"
+
+#: manufacturing/menus.py:1647
+msgid "Audit & Compliance"
+msgstr "Auditoría y Cumplimiento"
+
+#: manufacturing/menus.py:1651
+msgid "Risk Assessment"
+msgstr "Evaluación de Riesgos"
+
+#: manufacturing/menus.py:1653
+msgid "Insurance Management"
+msgstr "Gestión de Seguros"
+
+#: manufacturing/menus.py:1655
+msgid "Compliance & Audit"
+msgstr "Cumplimiento y Auditoría"
+
+#: manufacturing/menus.py:1659 manufacturing/menus.py:1705
 #: manufacturing/templates/ai_insights_dashboard.html:6
 #: manufacturing/templates/base.html:619
 #: manufacturing/templates/budget_dashboard.html:40
@@ -220,6 +3299,136 @@ msgstr "Gestión de riesgos"
 #: manufacturing/templates/sales_reports.html:8
 msgid "Reports"
 msgstr "Informes"
+
+#: manufacturing/menus.py:1661 manufacturing/templates/base.html:494
+#: manufacturing/templates/base_portal.html:154
+#: manufacturing/templates/base_supplier_portal.html:143
+#: manufacturing/templates/dashboard.html:4
+#: manufacturing/templates/eng_ecr_detail.html:8
+#: manufacturing/templates/eng_ecrs.html:6
+#: manufacturing/templates/eng_project_detail.html:8
+#: manufacturing/templates/eng_projects.html:6
+#: manufacturing/templates/eng_reports.html:6
+#: manufacturing/templates/maint_downtime_detail.html:7
+#: manufacturing/templates/maint_downtime_list.html:6
+#: manufacturing/templates/maint_equipment_detail.html:7
+#: manufacturing/templates/maint_equipment_list.html:6
+#: manufacturing/templates/maint_inspection_detail.html:7
+#: manufacturing/templates/maint_inspection_list.html:6
+#: manufacturing/templates/maint_labor_report.html:6
+#: manufacturing/templates/maint_mechanic_detail.html:7
+#: manufacturing/templates/maint_mechanics_list.html:6
+#: manufacturing/templates/maint_oee_report.html:6
+#: manufacturing/templates/maint_part_detail.html:7
+#: manufacturing/templates/maint_parts_list.html:6
+#: manufacturing/templates/maint_schedule_detail.html:7
+#: manufacturing/templates/maint_schedule_list.html:6
+#: manufacturing/templates/maint_wo_detail.html:7
+#: manufacturing/templates/maint_wo_list.html:6
+#: manufacturing/templates/payroll_deductions.html:6
+#: manufacturing/templates/payroll_history.html:6
+#: manufacturing/templates/payroll_pay_rates.html:6
+#: manufacturing/templates/payroll_run_detail.html:7
+#: manufacturing/templates/payroll_run_new.html:7
+#: manufacturing/templates/payroll_ytd.html:6
+#: manufacturing/templates/portal_home.html:3
+#: manufacturing/templates/prod_labor_report.html:6
+#: manufacturing/templates/qa_audit_detail.html:7
+#: manufacturing/templates/qa_audit_list.html:6
+#: manufacturing/templates/qa_capa_detail.html:7
+#: manufacturing/templates/qa_capa_list.html:6
+#: manufacturing/templates/qa_inspection_detail.html:7
+#: manufacturing/templates/qa_inspection_list.html:6
+#: manufacturing/templates/qa_ncr_detail.html:7
+#: manufacturing/templates/qa_ncr_list.html:6
+#: manufacturing/templates/qa_supplier_detail.html:7
+#: manufacturing/templates/qa_supplier_list.html:6
+#: manufacturing/templates/sales_order_detail.html:9
+#: manufacturing/templates/sales_orders.html:6
+#: manufacturing/templates/sales_quotes.html:6
+#: manufacturing/templates/sales_reports.html:6
+#: manufacturing/templates/sales_targets.html:6
+#: manufacturing/templates/supplier_portal_home.html:3
+msgid "Dashboard"
+msgstr "Panel de control"
+
+#: manufacturing/menus.py:1689 manufacturing/templates/acct_dashboard.html:6
+#: manufacturing/templates/base.html:540
+#: manufacturing/templates/budget_dashboard.html:39
+msgid "Accounting"
+msgstr "Contabilidad"
+
+#: manufacturing/menus.py:1690 manufacturing/templates/base.html:527
+#: manufacturing/templates/cs_dashboard.html:3
+#: manufacturing/templates/reports_dashboard.html:223
+msgid "Customer Service"
+msgstr "Atención al cliente"
+
+#: manufacturing/menus.py:1691 manufacturing/templates/base.html:569
+#: manufacturing/templates/base.html:571
+#: manufacturing/templates/document_list.html:7
+msgid "Engineering"
+msgstr "Ingeniería"
+
+#: manufacturing/menus.py:1692
+msgid "Information Tech"
+msgstr "Tecnología de la Información"
+
+#: manufacturing/menus.py:1694 manufacturing/templates/base.html:592
+#: manufacturing/templates/marketing_dashboard.html:6
+#: manufacturing/templates/mkt_ad_detail.html:6
+#: manufacturing/templates/mkt_ad_list.html:6
+#: manufacturing/templates/mkt_analytics.html:6
+#: manufacturing/templates/mkt_budget_list.html:6
+#: manufacturing/templates/mkt_research_detail.html:6
+#: manufacturing/templates/mkt_research_list.html:6
+msgid "Marketing"
+msgstr "Marketing"
+
+#: manufacturing/menus.py:1695 manufacturing/templates/base.html:557
+#: manufacturing/templates/exit_interview_list.html:6
+#: manufacturing/templates/offboarding_list.html:6
+#: manufacturing/templates/pers_depts.html:6
+#: manufacturing/templates/pers_review_detail.html:6
+#: manufacturing/templates/pers_reviews_list.html:6
+#: manufacturing/templates/pers_training_detail.html:6
+#: manufacturing/templates/pers_training_list.html:6
+#: manufacturing/templates/termination_detail.html:6
+#: manufacturing/templates/termination_list.html:6
+msgid "Personnel"
+msgstr "Personal"
+
+#: manufacturing/menus.py:1698 manufacturing/templates/dashboard_kpis.html:19
+#: manufacturing/templates/purch_contract_detail.html:6
+#: manufacturing/templates/purch_contracts_list.html:6
+#: manufacturing/templates/purch_reports.html:6
+#: manufacturing/templates/req_detail.html:6
+#: manufacturing/templates/req_list.html:6
+msgid "Purchasing"
+msgstr "Compras"
+
+#: manufacturing/menus.py:1699 manufacturing/templates/base.html:576
+msgid "Quality Assurance"
+msgstr "Aseguramiento de calidad"
+
+#: manufacturing/menus.py:1700 manufacturing/templates/base.html:519
+msgid "Sales"
+msgstr "Ventas"
+
+#: manufacturing/menus.py:1702 manufacturing/templates/base.html:538
+#: manufacturing/templates/budget_dashboard.html:7
+#: manufacturing/templates/dashboard_kpis.html:39
+msgid "Finance"
+msgstr "Finanzas"
+
+#: manufacturing/menus.py:1703 manufacturing/templates/base.html:589
+#: manufacturing/templates/risk_dashboard.html:13
+msgid "Legal"
+msgstr "Legal"
+
+#: manufacturing/menus.py:1704 manufacturing/templates/legal_dashboard.html:52
+msgid "Risk Management"
+msgstr "Gestión de riesgos"
 
 #: manufacturing/sales_orders_core.py:33
 #: manufacturing/templates/register.html:91
@@ -1249,62 +4458,6 @@ msgstr ""
 msgid "Accounting Dashboard"
 msgstr "Panel de Contabilidad"
 
-#: manufacturing/templates/acct_dashboard.html:7
-#: manufacturing/templates/acct_dashboard.html:23
-#: manufacturing/templates/acct_dashboard_kpis.html:2
-#: manufacturing/templates/ap_list.html:3
-#: manufacturing/templates/ap_list.html:26
-#: manufacturing/templates/ar_list.html:6 manufacturing/templates/base.html:543
-#: manufacturing/templates/finance_dashboard.html:7
-#: manufacturing/templates/finance_dashboard.html:59
-#: manufacturing/templates/finance_dashboard_kpis.html:2
-#: manufacturing/templates/gl_dashboard_kpis.html:4
-msgid "Accounts Payable"
-msgstr "Cuentas por pagar"
-
-#: manufacturing/templates/acct_dashboard.html:8
-#: manufacturing/templates/acct_dashboard.html:24
-#: manufacturing/templates/acct_dashboard_kpis.html:18
-#: manufacturing/templates/ap_list.html:6
-#: manufacturing/templates/ar_list.html:3
-#: manufacturing/templates/ar_list.html:26
-#: manufacturing/templates/base.html:546
-#: manufacturing/templates/finance_dashboard.html:8
-#: manufacturing/templates/finance_dashboard.html:60
-#: manufacturing/templates/finance_dashboard_kpis.html:18
-#: manufacturing/templates/gl_dashboard_kpis.html:16
-#: manufacturing/templates/sales_dashboard.html:68
-msgid "Accounts Receivable"
-msgstr "Cuentas por cobrar"
-
-#: manufacturing/templates/acct_dashboard.html:9
-#: manufacturing/templates/acct_dashboard.html:25
-#: manufacturing/templates/ap_list.html:7
-#: manufacturing/templates/ar_list.html:7 manufacturing/templates/base.html:549
-#: manufacturing/templates/finance_dashboard.html:6
-#: manufacturing/templates/gl_dashboard.html:3
-#: manufacturing/templates/gl_dashboard.html:44
-msgid "General Ledger"
-msgstr "Libro mayor"
-
-#: manufacturing/templates/acct_dashboard.html:10
-#: manufacturing/templates/acct_dashboard.html:31
-#: manufacturing/templates/budget_dashboard.html:6
-#: manufacturing/templates/finance_audit_detail.html:7
-#: manufacturing/templates/finance_audit_list.html:7
-#: manufacturing/templates/finance_bank_rec_detail.html:7
-#: manufacturing/templates/finance_bank_rec_list.html:7
-#: manufacturing/templates/finance_budget_detail.html:7
-#: manufacturing/templates/finance_budget_list.html:3
-#: manufacturing/templates/finance_budget_list.html:7
-#: manufacturing/templates/finance_budget_list.html:57
-#: manufacturing/templates/finance_dashboard.html:9
-#: manufacturing/templates/finance_dashboard.html:61
-#: manufacturing/templates/finance_tax_detail.html:7
-#: manufacturing/templates/finance_tax_list.html:7
-msgid "Budgets"
-msgstr "Presupuestos"
-
 #: manufacturing/templates/acct_dashboard.html:11
 #: manufacturing/templates/acct_dashboard.html:32
 #: manufacturing/templates/finance_audit_detail.html:8
@@ -1389,35 +4542,6 @@ msgstr "Asientos Contables"
 #: manufacturing/templates/gl_trial_balance.html:35
 msgid "Trial Balance"
 msgstr "Balance de Comprobación"
-
-#: manufacturing/templates/acct_dashboard.html:29
-#: manufacturing/templates/finance_dashboard.html:57
-#: manufacturing/templates/gl_cash_flow_statement.html:7
-#: manufacturing/templates/gl_dashboard_kpis.html:36
-#: manufacturing/templates/gl_income_statement.html:3
-#: manufacturing/templates/gl_income_statement.html:40
-#: manufacturing/templates/gl_income_statement.html:52
-msgid "Income Statement"
-msgstr "Estado de Resultados"
-
-#: manufacturing/templates/acct_dashboard.html:30
-#: manufacturing/templates/finance_dashboard.html:58
-#: manufacturing/templates/gl_balance_sheet.html:3
-#: manufacturing/templates/gl_balance_sheet.html:41
-#: manufacturing/templates/gl_balance_sheet.html:52
-#: manufacturing/templates/gl_cash_flow_statement.html:8
-#: manufacturing/templates/gl_dashboard.html:10
-#: manufacturing/templates/gl_dashboard_kpis.html:37
-#: manufacturing/templates/gl_income_statement.html:8
-#: manufacturing/templates/gl_trial_balance.html:8
-msgid "Balance Sheet"
-msgstr "Balance General"
-
-#: manufacturing/templates/acct_dashboard.html:33
-#: manufacturing/templates/finance_bank_rec_list.html:3
-#: manufacturing/templates/finance_dashboard.html:63
-msgid "Bank Reconciliation"
-msgstr "Conciliación Bancaria"
 
 #: manufacturing/templates/acct_dashboard.html:34
 #: manufacturing/templates/finance_audit_detail.html:10
@@ -2397,15 +5521,6 @@ msgstr "N.° de Factura"
 #: manufacturing/templates/wo_list.html:36
 msgid "Due Date"
 msgstr "Fecha de vencimiento"
-
-#: manufacturing/templates/ap_invoice_detail.html:162
-#: manufacturing/templates/ar_invoice_detail.html:162
-#: manufacturing/templates/portal_invoice_detail.html:28
-#: manufacturing/templates/sales_commission_history.html:8
-#: manufacturing/templates/sales_commission_plans.html:8
-#: manufacturing/templates/sales_commissions.html:8
-msgid "Payment History"
-msgstr "Historial de Pagos"
 
 #: manufacturing/templates/ap_invoice_detail.html:170
 #: manufacturing/templates/ar_invoice_detail.html:170
@@ -3620,13 +6735,6 @@ msgstr "Panel de Contratación"
 msgid "Hired"
 msgstr "Contratado"
 
-#: manufacturing/templates/ats_application_detail.html:29
-#: manufacturing/templates/cc_detail.html:24
-#: manufacturing/templates/cc_list.html:23
-#: manufacturing/templates/cc_list.html:47
-msgid "Rejected"
-msgstr "Rechazado"
-
 #: manufacturing/templates/ats_application_detail.html:35
 #, python-format
 msgid "Applied %(d)s"
@@ -3748,18 +6856,6 @@ msgstr "Requisición Abierta *"
 #: manufacturing/templates/tc_ot_report.html:51
 msgid "Apply"
 msgstr "Aplicar"
-
-#: manufacturing/templates/ats_candidate_list.html:7
-#: manufacturing/templates/ats_dashboard.html:7
-#: manufacturing/templates/ats_requisition_detail.html:6
-#: manufacturing/templates/ats_requisition_new.html:6
-#: manufacturing/templates/purch_contracts_list.html:9
-#: manufacturing/templates/purch_reports.html:9
-#: manufacturing/templates/purchasing_dashboard.html:10
-#: manufacturing/templates/req_detail.html:7
-#: manufacturing/templates/req_list.html:10
-msgid "Requisitions"
-msgstr "Requisiciones"
 
 #: manufacturing/templates/ats_candidate_list.html:10
 #: manufacturing/templates/ats_candidate_new.html:3
@@ -3913,14 +7009,6 @@ msgstr "Agregar Candidato"
 #: manufacturing/templates/personnel_dashboard.html:59
 msgid "Recruiting"
 msgstr "Reclutamiento"
-
-#: manufacturing/templates/ats_dashboard.html:6
-#: manufacturing/templates/ats_requisition_list.html:10
-#: manufacturing/templates/ats_requisition_new.html:3
-#: manufacturing/templates/ats_requisition_new.html:21
-#: manufacturing/templates/req_list.html:106
-msgid "New Requisition"
-msgstr "Nueva Requisición"
 
 #: manufacturing/templates/ats_dashboard.html:9
 #: manufacturing/templates/benefits_dashboard.html:7
@@ -4336,95 +7424,10 @@ msgstr "Autenticación en dos pasos"
 msgid "Logout"
 msgstr "Cerrar sesión"
 
-#: manufacturing/templates/base.html:494
-#: manufacturing/templates/base_portal.html:154
-#: manufacturing/templates/base_supplier_portal.html:143
-#: manufacturing/templates/dashboard.html:4
-#: manufacturing/templates/eng_ecr_detail.html:8
-#: manufacturing/templates/eng_ecrs.html:6
-#: manufacturing/templates/eng_project_detail.html:8
-#: manufacturing/templates/eng_projects.html:6
-#: manufacturing/templates/eng_reports.html:6
-#: manufacturing/templates/maint_downtime_detail.html:7
-#: manufacturing/templates/maint_downtime_list.html:6
-#: manufacturing/templates/maint_equipment_detail.html:7
-#: manufacturing/templates/maint_equipment_list.html:6
-#: manufacturing/templates/maint_inspection_detail.html:7
-#: manufacturing/templates/maint_inspection_list.html:6
-#: manufacturing/templates/maint_labor_report.html:6
-#: manufacturing/templates/maint_mechanic_detail.html:7
-#: manufacturing/templates/maint_mechanics_list.html:6
-#: manufacturing/templates/maint_oee_report.html:6
-#: manufacturing/templates/maint_part_detail.html:7
-#: manufacturing/templates/maint_parts_list.html:6
-#: manufacturing/templates/maint_schedule_detail.html:7
-#: manufacturing/templates/maint_schedule_list.html:6
-#: manufacturing/templates/maint_wo_detail.html:7
-#: manufacturing/templates/maint_wo_list.html:6
-#: manufacturing/templates/payroll_deductions.html:6
-#: manufacturing/templates/payroll_history.html:6
-#: manufacturing/templates/payroll_pay_rates.html:6
-#: manufacturing/templates/payroll_run_detail.html:7
-#: manufacturing/templates/payroll_run_new.html:7
-#: manufacturing/templates/payroll_ytd.html:6
-#: manufacturing/templates/portal_home.html:3
-#: manufacturing/templates/prod_labor_report.html:6
-#: manufacturing/templates/qa_audit_detail.html:7
-#: manufacturing/templates/qa_audit_list.html:6
-#: manufacturing/templates/qa_capa_detail.html:7
-#: manufacturing/templates/qa_capa_list.html:6
-#: manufacturing/templates/qa_inspection_detail.html:7
-#: manufacturing/templates/qa_inspection_list.html:6
-#: manufacturing/templates/qa_ncr_detail.html:7
-#: manufacturing/templates/qa_ncr_list.html:6
-#: manufacturing/templates/qa_supplier_detail.html:7
-#: manufacturing/templates/qa_supplier_list.html:6
-#: manufacturing/templates/sales_order_detail.html:9
-#: manufacturing/templates/sales_orders.html:6
-#: manufacturing/templates/sales_quotes.html:6
-#: manufacturing/templates/sales_reports.html:6
-#: manufacturing/templates/sales_targets.html:6
-#: manufacturing/templates/supplier_portal_home.html:3
-msgid "Dashboard"
-msgstr "Panel de control"
-
 #: manufacturing/templates/base.html:497
 #: manufacturing/templates/wo_detail.html:211
 msgid "Operations"
 msgstr "Operaciones"
-
-#: manufacturing/templates/base.html:499
-#: manufacturing/templates/maint_dashboard.html:6
-#: manufacturing/templates/maint_dashboard.html:125
-#: manufacturing/templates/maint_downtime_list.html:7
-#: manufacturing/templates/maint_equipment_list.html:7
-#: manufacturing/templates/maint_inspection_list.html:7
-#: manufacturing/templates/maint_labor_report.html:73
-#: manufacturing/templates/maint_mechanics_list.html:7
-#: manufacturing/templates/maint_parts_list.html:7
-#: manufacturing/templates/maint_schedule_list.html:7
-#: manufacturing/templates/mrp_release.html:7
-#: manufacturing/templates/prod_daily_report.html:10
-#: manufacturing/templates/prod_dashboard.html:6
-#: manufacturing/templates/prod_dashboard.html:58
-#: manufacturing/templates/prod_labor_report.html:73
-#: manufacturing/templates/prod_performance_report.html:10
-#: manufacturing/templates/prod_reports.html:8
-#: manufacturing/templates/prod_schedule.html:8
-#: manufacturing/templates/prod_schedule_gantt.html:10
-#: manufacturing/templates/prod_shipping_list.html:8
-#: manufacturing/templates/reports_dashboard.html:168
-#: manufacturing/templates/wo_list.html:4
-#: manufacturing/templates/wo_list.html:16
-msgid "Work Orders"
-msgstr "Órdenes de trabajo"
-
-#: manufacturing/templates/base.html:502
-#: manufacturing/templates/bom_list.html:3
-#: manufacturing/templates/bom_list.html:14
-#: manufacturing/templates/eng_dashboard.html:60
-msgid "Bill of Materials"
-msgstr "Lista de materiales"
 
 #: manufacturing/templates/base.html:505
 #: manufacturing/templates/prod_dashboard.html:15
@@ -4445,28 +7448,6 @@ msgstr "Centros de trabajo"
 msgid "Procurement"
 msgstr "Compras"
 
-#: manufacturing/templates/base.html:513
-#: manufacturing/templates/base_supplier_portal.html:144
-#: manufacturing/templates/mrp_release.html:8
-#: manufacturing/templates/po_approvals.html:6
-#: manufacturing/templates/po_list.html:4
-#: manufacturing/templates/po_list.html:19
-#: manufacturing/templates/purch_contract_detail.html:9
-#: manufacturing/templates/purch_contracts_list.html:10
-#: manufacturing/templates/purch_reports.html:10
-#: manufacturing/templates/purchasing_dashboard.html:6
-#: manufacturing/templates/purchasing_dashboard.html:53
-#: manufacturing/templates/reports_dashboard.html:144
-#: manufacturing/templates/req_list.html:7
-#: manufacturing/templates/rfq_list.html:6
-#: manufacturing/templates/supplier_portal_home.html:27
-#: manufacturing/templates/supplier_portal_pos.html:3
-#: manufacturing/templates/supplier_portal_pos.html:4
-#: manufacturing/templates/supplier_scorecard_list.html:8
-#: manufacturing/views/__init__.py:4555
-msgid "Purchase Orders"
-msgstr "Órdenes de compra"
-
 #: manufacturing/templates/base.html:516
 #: manufacturing/templates/purch_contracts_list.html:11
 #: manufacturing/templates/purch_reports.html:11
@@ -4477,16 +7458,6 @@ msgstr "Órdenes de compra"
 #: manufacturing/templates/supplier_scorecard_list.html:6
 msgid "Suppliers"
 msgstr "Proveedores"
-
-#: manufacturing/templates/base.html:521 manufacturing/templates/pl_list.html:7
-#: manufacturing/templates/promo_list.html:7
-#: manufacturing/templates/sales_dashboard.html:59
-#: manufacturing/templates/sales_orders.html:3
-#: manufacturing/templates/sales_orders.html:44
-#: manufacturing/templates/so_list.html:4
-#: manufacturing/templates/so_list.html:22 manufacturing/views/__init__.py:4437
-msgid "Sales Orders"
-msgstr "Pedidos de venta"
 
 #: manufacturing/templates/base.html:524
 #: manufacturing/templates/credit_dashboard.html:54
@@ -4504,16 +7475,6 @@ msgstr "Seguimiento de lotes"
 #: manufacturing/templates/base.html:555
 msgid "Human Resources"
 msgstr "Recursos humanos"
-
-#: manufacturing/templates/base.html:560
-#: manufacturing/templates/personnel_dashboard.html:19
-#: manufacturing/templates/personnel_dashboard.html:61
-#: manufacturing/templates/tc_ot_report.html:6
-#: manufacturing/templates/tc_schedule.html:6
-#: manufacturing/templates/time_clock_status.html:3
-#: manufacturing/templates/time_clock_status.html:57
-msgid "Time Clock"
-msgstr "Reloj de asistencia"
 
 #: manufacturing/templates/base.html:563
 #: manufacturing/templates/ess_home.html:7
@@ -4651,13 +7612,6 @@ msgstr "Portal de Clientes"
 #: manufacturing/templates/wms_wave_detail.html:26
 msgid "Orders"
 msgstr "Pedidos"
-
-#: manufacturing/templates/base_portal.html:156
-#: manufacturing/templates/base_supplier_portal.html:145
-#: manufacturing/templates/supplier_portal_invoices.html:3
-#: manufacturing/templates/supplier_portal_invoices.html:4
-msgid "Invoices"
-msgstr "Facturas"
 
 #: manufacturing/templates/base_portal.html:157
 #: manufacturing/templates/cs_dashboard.html:10
@@ -4875,16 +7829,6 @@ msgstr "Generado"
 #: manufacturing/templates/batch_record_list.html:73
 msgid "No batch records issued yet."
 msgstr "Aún no se han emitido registros de lote."
-
-#: manufacturing/templates/benefit_plan_detail.html:6
-#: manufacturing/templates/benefit_plan_new.html:6
-#: manufacturing/templates/benefits_dashboard.html:3
-#: manufacturing/templates/employee_benefits.html:6
-#: manufacturing/templates/people_detail.html:9
-#: manufacturing/templates/personnel_dashboard.html:12
-#: manufacturing/templates/personnel_dashboard.html:57
-msgid "Benefits"
-msgstr "Beneficios"
 
 #: manufacturing/templates/benefit_plan_detail.html:35
 msgid "Plan Details"
@@ -5989,15 +8933,6 @@ msgstr "Año Fiscal"
 msgid "No budgets found."
 msgstr "No se encontraron presupuestos."
 
-#: manufacturing/templates/capacity_planning.html:3
-#: manufacturing/templates/capacity_planning.html:42
-#: manufacturing/templates/prod_schedule_gantt.html:9
-#: manufacturing/templates/scenario_list.html:6
-#: manufacturing/templates/workcenter_calendar.html:7
-#: manufacturing/templates/workcenter_list.html:7
-msgid "Capacity Planning"
-msgstr "Planificación de Capacidad"
-
 #: manufacturing/templates/capacity_planning.html:6
 #: manufacturing/templates/prod_schedule_gantt.html:8
 #: manufacturing/templates/workcenter_list.html:6
@@ -6280,14 +9215,6 @@ msgstr "Por"
 #: manufacturing/templates/inventory_list.html:7
 msgid "Cycle Counts"
 msgstr "Conteos Cíclicos"
-
-#: manufacturing/templates/cc_detail.html:26
-#: manufacturing/templates/cc_list.html:21
-#: manufacturing/templates/cc_list.html:49
-#: manufacturing/templates/purchasing_dashboard.html:55
-#: manufacturing/templates/purchasing_dashboard_kpis.html:8
-msgid "Pending Approval"
-msgstr "Pendiente de Aprobación"
 
 #: manufacturing/templates/cc_detail.html:32
 #, python-format
@@ -6745,13 +9672,6 @@ msgstr "Seleccionar una persona…"
 msgid "Grant Access"
 msgstr "Otorgar Acceso"
 
-#: manufacturing/templates/company_list.html:3
-#: manufacturing/templates/company_list.html:15
-#: manufacturing/templates/consolidated_financials.html:6
-#: manufacturing/templates/intercompany_list.html:6
-msgid "Companies"
-msgstr "Empresas"
-
 #: manufacturing/templates/company_list.html:6
 #: manufacturing/templates/gl_accounts.html:6
 #: manufacturing/templates/gl_balance_sheet.html:6
@@ -6772,13 +9692,6 @@ msgstr "Nueva Empresa"
 #: manufacturing/templates/consolidated_financials.html:7
 msgid "Intercompany"
 msgstr "Intercompañías"
-
-#: manufacturing/templates/company_list.html:9
-#: manufacturing/templates/consolidated_financials.html:3
-#: manufacturing/templates/consolidated_financials.html:41
-#: manufacturing/templates/intercompany_list.html:8
-msgid "Consolidated Financials"
-msgstr "Estados Financieros Consolidados"
 
 #: manufacturing/templates/company_list.html:23
 #: manufacturing/templates/company_new.html:24
@@ -7617,21 +10530,6 @@ msgstr "Crear %(ct)s"
 msgid "Control Plans"
 msgstr "Planes de Control"
 
-#: manufacturing/templates/control_plan_detail.html:7
-#: manufacturing/templates/control_plan_list.html:7
-#: manufacturing/templates/risk_assessment_list.html:7
-#: manufacturing/templates/risk_audit_list.html:7
-#: manufacturing/templates/risk_continuity_list.html:7
-#: manufacturing/templates/risk_dashboard.html:7
-#: manufacturing/templates/risk_dashboard.html:112
-#: manufacturing/templates/risk_insurance_list.html:7
-#: manufacturing/templates/risk_kri_list.html:7
-#: manufacturing/templates/risk_register_list.html:3
-#: manufacturing/templates/risk_register_list.html:7
-#: manufacturing/templates/risk_register_list.html:53
-msgid "Risk Register"
-msgstr "Registro de Riesgos"
-
 #: manufacturing/templates/control_plan_detail.html:28
 #: manufacturing/templates/recipe_detail.html:23
 #, python-format
@@ -7763,11 +10661,6 @@ msgstr "Costo Estándar — %(name)s"
 #: manufacturing/templates/cost_detail.html:8
 msgid "Carbon Footprint"
 msgstr "Huella de Carbono"
-
-#: manufacturing/templates/cost_detail.html:9
-#: manufacturing/templates/inventory_detail.html:9
-msgid "FIFO/LIFO/Avg Valuation"
-msgstr "Valoración FIFO/LIFO/Promedio"
 
 #: manufacturing/templates/cost_detail.html:47
 #: manufacturing/templates/routing_detail.html:47
@@ -8325,11 +11218,6 @@ msgstr "Fecha de actividad"
 msgid "Log Activity"
 msgstr "Registrar actividad"
 
-#: manufacturing/templates/credit_dashboard.html:3
-#: manufacturing/templates/credit_dashboard.html:48
-msgid "Credit Department"
-msgstr "Departamento de crédito"
-
 #: manufacturing/templates/credit_dashboard_kpis.html:5
 msgid "Total Accounts"
 msgstr "Total de cuentas"
@@ -8377,35 +11265,6 @@ msgstr "No hay actividades de cobranza abiertas."
 #: manufacturing/templates/cs_reports.html:6
 msgid "All Tickets"
 msgstr "Todos los tickets"
-
-#: manufacturing/templates/cs_dashboard.html:7
-#: manufacturing/templates/cs_dashboard.html:44
-#: manufacturing/templates/cs_detail.html:7
-#: manufacturing/templates/cs_escalations.html:7
-#: manufacturing/templates/cs_list.html:6
-#: manufacturing/templates/it_ticket_list.html:104
-msgid "New Ticket"
-msgstr "Nuevo ticket"
-
-#: manufacturing/templates/cs_dashboard.html:8
-#: manufacturing/templates/cs_dashboard.html:45
-#: manufacturing/templates/cs_list.html:7
-#: manufacturing/templates/cs_reports.html:7
-msgid "Escalations"
-msgstr "Escalamientos"
-
-#: manufacturing/templates/cs_dashboard.html:11
-#: manufacturing/templates/cs_dashboard.html:49
-#: manufacturing/templates/cs_kb_detail.html:9
-#: manufacturing/templates/cs_kb_list.html:3
-#: manufacturing/templates/cs_kb_list.html:9
-#: manufacturing/templates/cs_kb_list.html:54
-#: manufacturing/templates/cs_returns_detail.html:9
-#: manufacturing/templates/cs_returns_list.html:9
-#: manufacturing/templates/cs_surveys_detail.html:9
-#: manufacturing/templates/cs_surveys_list.html:9
-msgid "Knowledge Base"
-msgstr "Base de conocimientos"
 
 #: manufacturing/templates/cs_dashboard.html:12
 #: manufacturing/templates/cs_kb_detail.html:10
@@ -8463,36 +11322,6 @@ msgstr "Puntuaciones de respuestas de encuestas"
 #: manufacturing/templates/cs_dashboard.html:88
 msgid "Knowledge Base Articles by Status"
 msgstr "Artículos de la base de conocimientos por estado"
-
-#: manufacturing/templates/cs_dashboard_kpis.html:4
-msgid "Open Tickets"
-msgstr "Tickets abiertos"
-
-#: manufacturing/templates/cs_dashboard_kpis.html:8
-#: manufacturing/templates/cs_list.html:25
-#: manufacturing/templates/cs_reports_kpis.html:13
-#: manufacturing/templates/cs_reports_kpis.html:43
-#: manufacturing/templates/eng_dashboard_kpis.html:5
-#: manufacturing/templates/finance_audit_detail.html:112
-#: manufacturing/templates/finance_audit_list.html:89
-#: manufacturing/templates/it_repairs_list.html:71
-#: manufacturing/templates/it_task_list.html:87
-#: manufacturing/templates/legal_compliance_list.html:85
-#: manufacturing/templates/legal_dashboard.html:83
-#: manufacturing/templates/maint_inspection_list.html:79
-#: manufacturing/templates/mkt_analytics.html:143
-#: manufacturing/templates/offboarding_list.html:74
-#: manufacturing/templates/prod_performance_report.html:60
-#: manufacturing/templates/prod_performance_report.html:83
-#: manufacturing/templates/qa_audit_list.html:70
-#: manufacturing/templates/repetitive_schedule_detail.html:88
-#: manufacturing/templates/risk_audit_list.html:74
-#: manufacturing/templates/technician_route_detail.html:29
-#: manufacturing/templates/technician_route_detail.html:42
-#: manufacturing/templates/technician_route_list.html:29
-#: manufacturing/templates/technician_route_list.html:39
-msgid "Completed"
-msgstr "Completado"
 
 #: manufacturing/templates/cs_dashboard_kpis.html:12
 msgid "Total (12 mo)"
@@ -8848,19 +11677,9 @@ msgstr "Etiquetas separadas por comas"
 msgid "Article content…"
 msgstr "Contenido del artículo…"
 
-#: manufacturing/templates/cs_kb_list.html:151
-msgid "Create Article"
-msgstr "Crear artículo"
-
 #: manufacturing/templates/cs_list.html:3
 msgid "CS Tickets"
 msgstr "Tickets de SC"
-
-#: manufacturing/templates/cs_list.html:9
-#: manufacturing/templates/cs_plans.html:57
-#: manufacturing/templates/cs_reports.html:8
-msgid "Improvement Plans"
-msgstr "Planes de mejora"
 
 #: manufacturing/templates/cs_list.html:17
 msgid "Customer Service Tickets"
@@ -9123,10 +11942,6 @@ msgstr "Monto de reembolso"
 msgid "Created By"
 msgstr "Creado por"
 
-#: manufacturing/templates/cs_returns_list.html:3
-msgid "Returns & Refunds"
-msgstr "Devoluciones y reembolsos"
-
 #: manufacturing/templates/cs_returns_list.html:68
 msgid "Search customer / reason / notes…"
 msgstr "Buscar cliente / motivo / notas…"
@@ -9135,11 +11950,6 @@ msgstr "Buscar cliente / motivo / notas…"
 #: manufacturing/templates/prod_returns_list.html:98
 msgid "No returns found."
 msgstr "No se encontraron devoluciones."
-
-#: manufacturing/templates/cs_returns_list.html:104
-#: manufacturing/templates/portal_home.html:69
-msgid "New Return"
-msgstr "Nueva devolución"
 
 #: manufacturing/templates/cs_returns_list.html:134
 msgid "Describe items…"
@@ -9231,10 +12041,6 @@ msgstr "Puntuación (0-10)"
 msgid "Customer feedback…"
 msgstr "Comentarios del cliente…"
 
-#: manufacturing/templates/cs_surveys_list.html:3
-msgid "Surveys & Feedback"
-msgstr "Encuestas y comentarios"
-
 #: manufacturing/templates/cs_surveys_list.html:67
 #: manufacturing/templates/document_list.html:47
 #: manufacturing/templates/finance_audit_list.html:70
@@ -9270,10 +12076,6 @@ msgstr "Título de la encuesta"
 msgid "Survey description…"
 msgstr "Descripción de la encuesta…"
 
-#: manufacturing/templates/cs_surveys_list.html:147
-msgid "Create Survey"
-msgstr "Crear encuesta"
-
 #: manufacturing/templates/cto_configure.html:3
 #: manufacturing/templates/cto_configure.html:20
 #, python-format
@@ -9283,16 +12085,6 @@ msgstr "Configurar — %(desc)s"
 #: manufacturing/templates/cto_configure.html:6
 msgid "Back to Order"
 msgstr "Volver al Pedido"
-
-#: manufacturing/templates/cto_configure.html:24
-#: manufacturing/templates/it_dashboard_kpis.html:9
-#: manufacturing/templates/it_task_list.html:88
-#: manufacturing/templates/prod_daily_report.html:64
-#: manufacturing/templates/prod_dashboard_kpis.html:8
-#: manufacturing/templates/technician_route_detail.html:31
-#: manufacturing/templates/technician_route_list.html:41
-msgid "In Progress"
-msgstr "En progreso"
 
 #: manufacturing/templates/cto_configure.html:32
 msgid "This product has no configurable option groups yet."
@@ -9587,10 +12379,6 @@ msgstr "Guardar Divisa"
 msgid "Quick-add:"
 msgstr "Agregado rápido:"
 
-#: manufacturing/templates/dashboard.html:14
-msgid "PO Approvals"
-msgstr "Aprobaciones de OC"
-
 #: manufacturing/templates/dashboard.html:36
 msgid "Company Main Menu"
 msgstr "Menú principal"
@@ -9625,22 +12413,6 @@ msgstr[1] ""
 #: manufacturing/templates/dashboard_kpis.html:5
 msgid "Review now →"
 msgstr "Revisar ahora →"
-
-#: manufacturing/templates/dashboard_kpis.html:12
-#: manufacturing/templates/maint_dashboard_kpis.html:5
-msgid "Open Work Orders"
-msgstr "Órdenes de trabajo abiertas"
-
-#: manufacturing/templates/dashboard_kpis.html:17
-#: manufacturing/templates/purchasing_dashboard_kpis.html:4
-msgid "Open POs"
-msgstr "OC abiertas"
-
-#: manufacturing/templates/dashboard_kpis.html:22
-#: manufacturing/templates/qa_dashboard_kpis.html:5
-#: manufacturing/templates/qa_reports.html:52
-msgid "Open NCRs"
-msgstr "NCR abiertas"
 
 #: manufacturing/templates/dashboard_kpis.html:27
 msgid "Maint. Work Orders"
@@ -9782,13 +12554,6 @@ msgstr "%(name)s (id %(pid)s)"
 msgid "No erasures recorded yet."
 msgstr "Aún no se han registrado anonimizaciones."
 
-#: manufacturing/templates/demand_forecast.html:3
-#: manufacturing/templates/demand_forecast.html:41
-#: manufacturing/templates/mrp_home.html:99
-#: manufacturing/templates/sales_demand.html:8
-msgid "AI Demand Forecast"
-msgstr "Pronóstico de Demanda IA"
-
 #: manufacturing/templates/demand_forecast.html:6
 msgid "Sales Demand"
 msgstr "Demanda de Ventas"
@@ -9849,13 +12614,6 @@ msgid "Click \"Regenerate All Forecasts\" above to build one from SO history."
 msgstr ""
 "Haga clic en \"Regenerar Todos los Pronósticos\" arriba para generar uno a "
 "partir del historial de SO."
-
-#: manufacturing/templates/document_detail.html:6
-#: manufacturing/templates/document_list.html:3
-#: manufacturing/templates/document_list.html:28
-#: manufacturing/templates/document_new.html:6
-msgid "Document Control"
-msgstr "Control de Documentos"
 
 #: manufacturing/templates/document_detail.html:33
 #: manufacturing/templates/document_list.html:82
@@ -9959,10 +12717,6 @@ msgstr "Archivo de Reemplazo (opcional)"
 msgid "Create Revision"
 msgstr "Crear Revisión"
 
-#: manufacturing/templates/document_detail.html:158
-msgid "Revision History"
-msgstr "Historial de Revisiones"
-
 #: manufacturing/templates/document_detail.html:163
 #: manufacturing/templates/document_list.html:65
 msgid "Rev"
@@ -10011,12 +12765,6 @@ msgstr "Vincular a Ruta (por ID)"
 #: manufacturing/templates/document_detail.html:285
 msgid "Routing step ID"
 msgstr "ID del paso de la ruta"
-
-#: manufacturing/templates/document_list.html:10
-#: manufacturing/templates/document_new.html:3
-#: manufacturing/templates/document_new.html:21
-msgid "New Document"
-msgstr "Nuevo Documento"
 
 #: manufacturing/templates/document_list.html:30
 msgid ""
@@ -10659,27 +13407,10 @@ msgstr "ECR / Revisiones de diseño"
 msgid "Standards &amp; Compliance"
 msgstr "Normas y cumplimiento"
 
-#: manufacturing/templates/eng_dashboard.html:59
-#: manufacturing/templates/ess_home.html:56
-msgid "Pending Reviews"
-msgstr "Revisiones pendientes"
-
-#: manufacturing/templates/eng_dashboard.html:61
-#: manufacturing/templates/eng_dashboard_kpis.html:3
-msgid "Active Projects"
-msgstr "Proyectos activos"
-
 #: manufacturing/templates/eng_dashboard.html:62
 #: manufacturing/templates/eng_ecr_detail.html:3
 msgid "New ECR"
 msgstr "Nuevo ECR"
-
-#: manufacturing/templates/eng_dashboard.html:63
-#: manufacturing/templates/eng_project_detail.html:3
-#: manufacturing/templates/eng_project_detail.html:67
-#: manufacturing/templates/eng_projects.html:95
-msgid "New Project"
-msgstr "Nuevo proyecto"
 
 #: manufacturing/templates/eng_dashboard.html:73
 #: manufacturing/templates/eng_reports_kpis.html:4
@@ -10984,11 +13715,6 @@ msgstr "Título o número…"
 #: manufacturing/templates/eng_projects.html:88
 msgid "No projects found."
 msgstr "No se encontraron proyectos."
-
-#: manufacturing/templates/eng_reports.html:3
-#: manufacturing/templates/eng_reports.html:50
-msgid "Engineering Reports"
-msgstr "Informes de ingeniería"
 
 #: manufacturing/templates/eng_reports_kpis.html:14
 msgid "No projects."
@@ -11742,25 +14468,6 @@ msgstr "Pago neto"
 msgid "No payroll history for %(year)s."
 msgstr "No hay historial de nómina para %(year)s."
 
-#: manufacturing/templates/exit_interview_list.html:3
-#: manufacturing/templates/exit_interview_list.html:8
-#: manufacturing/templates/exit_interview_list.html:45
-#: manufacturing/templates/offboarding_list.html:8
-#: manufacturing/templates/personnel_dashboard.html:16
-#: manufacturing/templates/termination_detail.html:8
-#: manufacturing/templates/termination_list.html:8
-msgid "Exit Interviews"
-msgstr "Entrevistas de Salida"
-
-#: manufacturing/templates/exit_interview_list.html:7
-#: manufacturing/templates/offboarding_list.html:7
-#: manufacturing/templates/personnel_dashboard.html:15
-#: manufacturing/templates/termination_detail.html:7
-#: manufacturing/templates/termination_list.html:3
-#: manufacturing/templates/termination_list.html:7
-msgid "Terminations"
-msgstr "Despidos"
-
 #: manufacturing/templates/exit_interview_list.html:9
 #: manufacturing/templates/offboarding_list.html:3
 #: manufacturing/templates/offboarding_list.html:9
@@ -12236,11 +14943,6 @@ msgstr "Año Fiscal *"
 #: manufacturing/templates/finance_budget_list.html:129
 msgid "Create Budget"
 msgstr "Crear Presupuesto"
-
-#: manufacturing/templates/finance_dashboard.html:13
-#: manufacturing/templates/finance_dashboard_kpis.html:34
-msgid "Cash Flow"
-msgstr "Flujo de Efectivo"
 
 #: manufacturing/templates/finance_dashboard.html:14
 #: manufacturing/templates/finance_dashboard.html:66
@@ -12760,11 +15462,6 @@ msgstr "Plan de Control"
 msgid "No items at or above this threshold."
 msgstr "No hay elementos en este umbral o por encima de él."
 
-#: manufacturing/templates/forgot_password.html:4
-#: manufacturing/templates/forgot_password_reset.html:38
-msgid "Reset Password"
-msgstr "Restablecer Contraseña"
-
 #: manufacturing/templates/forgot_password.html:19
 msgid "Reset Your Password"
 msgstr "Restablezca Su Contraseña"
@@ -13209,11 +15906,6 @@ msgstr "Verificar"
 #: manufacturing/templates/home_mfa.html:28
 msgid "Cancel and sign in again"
 msgstr "Cancelar e iniciar sesión de nuevo"
-
-#: manufacturing/templates/intercompany_list.html:3
-#: manufacturing/templates/intercompany_list.html:22
-msgid "Intercompany Transactions"
-msgstr "Transacciones Intercompañía"
 
 #: manufacturing/templates/intercompany_list.html:7
 msgid "New Transaction"
@@ -13762,10 +16454,6 @@ msgstr "Depto."
 msgid "No assets found."
 msgstr "No se encontraron activos."
 
-#: manufacturing/templates/it_asset_list.html:100
-msgid "New Asset"
-msgstr "Nuevo Activo"
-
 #: manufacturing/templates/it_asset_list.html:106
 msgid "Unique asset tag"
 msgstr "Etiqueta de activo única"
@@ -13785,10 +16473,6 @@ msgstr "Agregar Activo"
 #: manufacturing/templates/it_dashboard.html:20
 msgid "Information Technology Dashboard"
 msgstr "Panel de Tecnología de la Información"
-
-#: manufacturing/templates/it_dashboard.html:30
-msgid "Asset Inventory"
-msgstr "Inventario de Activos"
 
 #: manufacturing/templates/it_dashboard.html:41
 msgid "In Repair"
@@ -13813,10 +16497,6 @@ msgstr "Activos por Estado"
 #: manufacturing/templates/it_dashboard.html:74
 msgid "Assets by Type"
 msgstr "Activos por Tipo"
-
-#: manufacturing/templates/it_dashboard_kpis.html:2
-msgid "Help Desk Tickets"
-msgstr "Tickets de Soporte"
 
 #: manufacturing/templates/it_dashboard_kpis.html:13
 msgid "Critical (Open)"
@@ -14019,10 +16699,6 @@ msgstr "Plazas Usadas"
 msgid "Cost ($)"
 msgstr "Costo ($)"
 
-#: manufacturing/templates/it_license_list.html:3
-msgid "License Management"
-msgstr "Gestión de Licencias"
-
 #: manufacturing/templates/it_license_list.html:38
 msgid "Software License Management"
 msgstr "Gestión de Licencias de Software"
@@ -14205,11 +16881,6 @@ msgstr "Resolución"
 msgid "Edit Repair"
 msgstr "Editar Reparación"
 
-#: manufacturing/templates/it_repairs_list.html:3
-#: manufacturing/templates/it_repairs_list.html:35
-msgid "Hardware Repairs"
-msgstr "Reparaciones de Hardware"
-
 #: manufacturing/templates/it_repairs_list.html:53
 msgid "Search asset / reporter…"
 msgstr "Buscar activo / reportante…"
@@ -14221,10 +16892,6 @@ msgstr "Problema"
 #: manufacturing/templates/it_repairs_list.html:104
 msgid "No repairs found."
 msgstr "No se encontraron reparaciones."
-
-#: manufacturing/templates/it_repairs_list.html:112
-msgid "New Repair Request"
-msgstr "Nueva Solicitud de Reparación"
 
 #: manufacturing/templates/it_repairs_list.html:122
 msgid "Name of reporter"
@@ -14267,11 +16934,6 @@ msgstr "Fecha de Instalación"
 #: manufacturing/templates/it_software_list.html:125
 msgid "Installed By"
 msgstr "Instalado Por"
-
-#: manufacturing/templates/it_software_list.html:3
-#: manufacturing/templates/it_software_list.html:35
-msgid "Software Inventory"
-msgstr "Inventario de Software"
 
 #: manufacturing/templates/it_software_list.html:47
 msgid "Search software / vendor / asset…"
@@ -14328,11 +16990,6 @@ msgstr "Tipo de Tarea"
 #: manufacturing/templates/it_task_list.html:62
 msgid "Task #"
 msgstr "N.° de Tarea"
-
-#: manufacturing/templates/it_task_list.html:3
-#: manufacturing/templates/it_task_list.html:35
-msgid "IT Tasks"
-msgstr "Tareas de TI"
 
 #: manufacturing/templates/it_task_list.html:80
 msgid "High"
@@ -14424,65 +17081,6 @@ msgstr "Cumplimiento — %(requirement)s"
 #: manufacturing/templates/risk_dashboard.html:43
 msgid "Legal Dashboard"
 msgstr "Panel legal"
-
-#: manufacturing/templates/legal_compliance_detail.html:7
-#: manufacturing/templates/legal_compliance_list.html:7
-#: manufacturing/templates/legal_contract_detail.html:7
-#: manufacturing/templates/legal_contract_list.html:3
-#: manufacturing/templates/legal_contract_list.html:7
-#: manufacturing/templates/legal_contract_list.html:61
-#: manufacturing/templates/legal_dashboard.html:46
-#: manufacturing/templates/legal_dashboard.html:56
-#: manufacturing/templates/legal_employment_list.html:7
-#: manufacturing/templates/legal_governance_list.html:7
-#: manufacturing/templates/legal_ip_list.html:7
-#: manufacturing/templates/legal_litigation_detail.html:7
-#: manufacturing/templates/legal_litigation_list.html:7
-#: manufacturing/templates/purch_contract_detail.html:7
-#: manufacturing/templates/purch_contracts_list.html:7
-#: manufacturing/templates/purch_reports.html:8
-#: manufacturing/templates/purchasing_dashboard.html:8
-#: manufacturing/templates/req_list.html:8
-#: manufacturing/templates/sales_contracts_detail.html:10
-#: manufacturing/templates/sales_contracts_list.html:10
-#: manufacturing/templates/sales_dashboard.html:9
-#: manufacturing/templates/sales_dashboard.html:63
-#: manufacturing/templates/sales_leads_detail.html:10
-#: manufacturing/templates/sales_leads_list.html:10
-msgid "Contracts"
-msgstr "Contratos"
-
-#: manufacturing/templates/legal_compliance_detail.html:8
-#: manufacturing/templates/legal_compliance_list.html:3
-#: manufacturing/templates/legal_compliance_list.html:8
-#: manufacturing/templates/legal_contract_detail.html:8
-#: manufacturing/templates/legal_contract_list.html:8
-#: manufacturing/templates/legal_dashboard.html:47
-#: manufacturing/templates/legal_dashboard.html:72
-#: manufacturing/templates/legal_employment_list.html:8
-#: manufacturing/templates/legal_governance_list.html:8
-#: manufacturing/templates/legal_ip_list.html:8
-#: manufacturing/templates/legal_litigation_detail.html:8
-#: manufacturing/templates/legal_litigation_list.html:8
-#: manufacturing/templates/risk_dashboard.html:44
-msgid "Compliance"
-msgstr "Cumplimiento"
-
-#: manufacturing/templates/legal_compliance_detail.html:9
-#: manufacturing/templates/legal_compliance_list.html:9
-#: manufacturing/templates/legal_contract_detail.html:9
-#: manufacturing/templates/legal_contract_list.html:9
-#: manufacturing/templates/legal_dashboard.html:48
-#: manufacturing/templates/legal_dashboard.html:88
-#: manufacturing/templates/legal_employment_list.html:9
-#: manufacturing/templates/legal_governance_list.html:9
-#: manufacturing/templates/legal_ip_list.html:9
-#: manufacturing/templates/legal_litigation_detail.html:9
-#: manufacturing/templates/legal_litigation_list.html:3
-#: manufacturing/templates/legal_litigation_list.html:9
-#: manufacturing/templates/risk_dashboard.html:45
-msgid "Litigation"
-msgstr "Litigios"
 
 #: manufacturing/templates/legal_compliance_detail.html:58
 #: manufacturing/templates/legal_compliance_list.html:82
@@ -14592,36 +17190,6 @@ msgstr "Buscar título / parte / responsable…"
 #: manufacturing/templates/sales_contracts_list.html:104
 msgid "No contracts found."
 msgstr "No se encontraron contratos."
-
-#: manufacturing/templates/legal_contract_list.html:119
-#: manufacturing/templates/purch_contracts_list.html:110
-#: manufacturing/templates/sales_contracts_list.html:112
-msgid "New Contract"
-msgstr "Nuevo contrato"
-
-#: manufacturing/templates/legal_contract_list.html:168
-#: manufacturing/templates/purch_contracts_list.html:161
-#: manufacturing/templates/sales_contracts_list.html:157
-msgid "Create Contract"
-msgstr "Crear contrato"
-
-#: manufacturing/templates/legal_dashboard.html:49
-#: manufacturing/templates/legal_ip_list.html:3
-#: manufacturing/templates/legal_ip_list.html:56
-msgid "Intellectual Property"
-msgstr "Propiedad intelectual"
-
-#: manufacturing/templates/legal_dashboard.html:50
-#: manufacturing/templates/legal_employment_list.html:3
-#: manufacturing/templates/legal_employment_list.html:55
-msgid "Employment Law"
-msgstr "Derecho laboral"
-
-#: manufacturing/templates/legal_dashboard.html:51
-#: manufacturing/templates/legal_governance_list.html:3
-#: manufacturing/templates/legal_governance_list.html:55
-msgid "Corporate Governance"
-msgstr "Gobernanza corporativa"
 
 #: manufacturing/templates/legal_dashboard.html:59
 msgid "Total Contracts"
@@ -14901,14 +17469,6 @@ msgstr "Fecha de Recepción"
 msgid "Create Lot"
 msgstr "Crear Lote"
 
-#: manufacturing/templates/maint_dashboard.html:8
-#: manufacturing/templates/maint_dashboard.html:133
-#: manufacturing/templates/maint_equipment_list.html:8
-#: manufacturing/templates/maint_schedule_list.html:3
-#: manufacturing/templates/maint_wo_list.html:8
-msgid "PM Schedule"
-msgstr "Programa de mantenimiento preventivo"
-
 #: manufacturing/templates/maint_dashboard.html:9
 #: manufacturing/templates/maint_dashboard.html:137
 #: manufacturing/templates/qa_dashboard.html:9
@@ -14940,12 +17500,6 @@ msgstr "Mecánicos"
 #: manufacturing/templates/maint_oee_report.html:121
 msgid "OEE"
 msgstr "OEE"
-
-#: manufacturing/templates/maint_dashboard.html:14
-#: manufacturing/templates/predictive_maintenance.html:3
-#: manufacturing/templates/predictive_maintenance.html:39
-msgid "Predictive Maintenance"
-msgstr "Mantenimiento predictivo"
 
 #: manufacturing/templates/maint_dashboard.html:15
 #: manufacturing/templates/technician_route_detail.html:6
@@ -15189,11 +17743,6 @@ msgstr "Detalles de la Inspección"
 msgid "Area *"
 msgstr "Área *"
 
-#: manufacturing/templates/maint_inspection_list.html:3
-#: manufacturing/templates/maint_inspection_list.html:57
-msgid "Safety Inspections"
-msgstr "Inspecciones de Seguridad"
-
 #: manufacturing/templates/maint_inspection_list.html:78
 msgid "Area"
 msgstr "Área"
@@ -15202,10 +17751,6 @@ msgstr "Área"
 #: manufacturing/templates/qa_inspection_list.html:104
 msgid "No inspections found."
 msgstr "No se encontraron inspecciones."
-
-#: manufacturing/templates/maint_inspection_list.html:104
-msgid "Schedule Inspection"
-msgstr "Programar Inspección"
 
 #: manufacturing/templates/maint_inspection_list.html:110
 msgid "e.g. Welding Bay"
@@ -15414,10 +17959,6 @@ msgstr "No se encontraron mecánicos."
 #: manufacturing/templates/maint_mechanics_list.html:136
 msgid "Add Mechanic"
 msgstr "Agregar Mecánico"
-
-#: manufacturing/templates/maint_oee_report.html:7
-msgid "Downtime Log"
-msgstr "Registro de Inactividad"
 
 #: manufacturing/templates/maint_oee_report.html:74
 msgid "Overall OEE"
@@ -15713,10 +18254,6 @@ msgstr "Asignar A"
 msgid "Suggested/standard time"
 msgstr "Tiempo sugerido/estándar"
 
-#: manufacturing/templates/maint_wo_list.html:154
-msgid "Create Work Order"
-msgstr "Crear Orden de Trabajo"
-
 #: manufacturing/templates/marketing_dashboard.html:3
 #: manufacturing/templates/marketing_dashboard.html:49
 #: manufacturing/templates/mkt_campaign_detail.html:6
@@ -15727,28 +18264,6 @@ msgstr "Crear Orden de Trabajo"
 #: manufacturing/templates/mkt_lead_list.html:6
 msgid "Marketing Dashboard"
 msgstr "Panel de marketing"
-
-#: manufacturing/templates/marketing_dashboard.html:7
-#: manufacturing/templates/marketing_dashboard.html:52
-#: manufacturing/templates/marketing_dashboard_kpis.html:2
-#: manufacturing/templates/mkt_ad_detail.html:7
-#: manufacturing/templates/mkt_ad_list.html:7
-#: manufacturing/templates/mkt_analytics.html:7
-#: manufacturing/templates/mkt_analytics.html:53
-#: manufacturing/templates/mkt_analytics.html:140
-#: manufacturing/templates/mkt_budget_list.html:7
-#: manufacturing/templates/mkt_campaign_detail.html:7
-#: manufacturing/templates/mkt_campaign_list.html:3
-#: manufacturing/templates/mkt_campaign_list.html:7
-#: manufacturing/templates/mkt_campaign_list.html:59
-#: manufacturing/templates/mkt_content_detail.html:7
-#: manufacturing/templates/mkt_content_list.html:7
-#: manufacturing/templates/mkt_lead_detail.html:7
-#: manufacturing/templates/mkt_lead_list.html:7
-#: manufacturing/templates/mkt_research_detail.html:8
-#: manufacturing/templates/mkt_research_list.html:7
-msgid "Campaigns"
-msgstr "Campañas"
 
 #: manufacturing/templates/marketing_dashboard.html:8
 #: manufacturing/templates/marketing_dashboard.html:53
@@ -15775,19 +18290,6 @@ msgstr "Campañas"
 msgid "Leads"
 msgstr "Clientes potenciales"
 
-#: manufacturing/templates/marketing_dashboard.html:9
-#: manufacturing/templates/marketing_dashboard.html:55
-#: manufacturing/templates/mkt_ad_detail.html:8
-#: manufacturing/templates/mkt_ad_list.html:3
-#: manufacturing/templates/mkt_ad_list.html:9
-#: manufacturing/templates/mkt_ad_list.html:64
-#: manufacturing/templates/mkt_analytics.html:9
-#: manufacturing/templates/mkt_analytics.html:154
-#: manufacturing/templates/mkt_budget_list.html:9
-#: manufacturing/templates/mkt_research_list.html:9
-msgid "Advertising"
-msgstr "Publicidad"
-
 #: manufacturing/templates/marketing_dashboard.html:10
 #: manufacturing/templates/marketing_dashboard.html:56
 #: manufacturing/templates/mkt_ad_list.html:10
@@ -15797,16 +18299,6 @@ msgstr "Publicidad"
 #: manufacturing/templates/mkt_research_list.html:10
 msgid "Research"
 msgstr "Investigación"
-
-#: manufacturing/templates/marketing_dashboard.html:11
-#: manufacturing/templates/marketing_dashboard.html:57
-#: manufacturing/templates/mkt_ad_detail.html:9
-#: manufacturing/templates/mkt_ad_list.html:11
-#: manufacturing/templates/mkt_analytics.html:11
-#: manufacturing/templates/mkt_budget_list.html:11
-#: manufacturing/templates/mkt_research_list.html:11
-msgid "Analytics"
-msgstr "Análisis"
 
 #: manufacturing/templates/marketing_dashboard.html:58
 #: manufacturing/templates/marketing_dashboard_kpis.html:58
@@ -16177,11 +18669,6 @@ msgstr "Total de anuncios"
 msgid "In Draft"
 msgstr "En borrador"
 
-#: manufacturing/templates/mkt_budget_list.html:3
-#: manufacturing/templates/mkt_budget_list.html:56
-msgid "Marketing Budget"
-msgstr "Presupuesto de marketing"
-
 #: manufacturing/templates/mkt_budget_list.html:73
 msgid "Search item / campaign / requester…"
 msgstr "Buscar elemento / campaña / solicitante…"
@@ -16202,11 +18689,6 @@ msgstr "Nueva solicitud de presupuesto"
 #: manufacturing/templates/mkt_budget_list.html:113
 msgid "e.g. Trade show booth"
 msgstr "p. ej. Stand de feria comercial"
-
-#: manufacturing/templates/mkt_budget_list.html:153
-#: manufacturing/templates/time_off_form.html:65
-msgid "Submit Request"
-msgstr "Enviar solicitud"
 
 #: manufacturing/templates/mkt_campaign_detail.html:3
 #, python-format
@@ -16302,11 +18784,6 @@ msgstr "Capturado"
 msgid "No leads found."
 msgstr "No se encontraron clientes potenciales."
 
-#: manufacturing/templates/mkt_lead_list.html:116
-#: manufacturing/templates/sales_leads_list.html:115
-msgid "New Lead"
-msgstr "Nuevo cliente potencial"
-
 #: manufacturing/templates/mkt_lead_list.html:161
 msgid "Add Lead"
 msgstr "Agregar cliente potencial"
@@ -16323,11 +18800,6 @@ msgstr "Proyecto de investigación"
 #: manufacturing/templates/mkt_research_detail.html:103
 msgid "Edit Project"
 msgstr "Editar proyecto"
-
-#: manufacturing/templates/mkt_research_list.html:3
-#: manufacturing/templates/mkt_research_list.html:61
-msgid "Market Research"
-msgstr "Investigación de mercado"
 
 #: manufacturing/templates/mkt_research_list.html:79
 msgid "Search title / owner…"
@@ -16349,11 +18821,6 @@ msgstr "p. ej. Análisis de la competencia del tercer trimestre"
 msgid "What will this research cover?"
 msgstr "¿Qué cubrirá esta investigación?"
 
-#: manufacturing/templates/mrp_home.html:3
-#: manufacturing/templates/prod_dashboard.html:63
-msgid "MRP Planning"
-msgstr "Planificación MRP"
-
 #: manufacturing/templates/mrp_home.html:7
 #: manufacturing/templates/mrp_home.html:63
 #: manufacturing/templates/mrp_safety_stock.html:60
@@ -16363,10 +18830,6 @@ msgstr "Stock de Seguridad"
 #: manufacturing/templates/mrp_home.html:9
 msgid "View Current Plan"
 msgstr "Ver Plan Actual"
-
-#: manufacturing/templates/mrp_home.html:44
-msgid "Material Requirements Planning"
-msgstr "Planificación de Requerimientos de Materiales"
 
 #: manufacturing/templates/mrp_home.html:45
 msgid ""
@@ -16424,10 +18887,6 @@ msgstr "Pedidos que Contribuyen"
 #: manufacturing/templates/mrp_home.html:98
 msgid "Include forecasted demand"
 msgstr "Incluir demanda pronosticada"
-
-#: manufacturing/templates/mrp_home.html:101
-msgid "Run MRP Plan"
-msgstr "Ejecutar Plan MRP"
 
 #: manufacturing/templates/mrp_home.html:104
 msgid ""
@@ -16638,10 +19097,6 @@ msgstr "No se liberaron órdenes."
 msgid "Safety Stock Settings"
 msgstr "Configuración de Stock de Seguridad"
 
-#: manufacturing/templates/mrp_safety_stock.html:6
-msgid "MRP Home"
-msgstr "Inicio de MRP"
-
 #: manufacturing/templates/mrp_safety_stock.html:36
 msgid ""
 "Set the minimum on-hand buffer MRP must maintain after fulfilling demand.\n"
@@ -16662,10 +19117,6 @@ msgstr "No se encontraron productos."
 #: manufacturing/templates/mrp_safety_stock.html:96
 msgid "Save All"
 msgstr "Guardar Todo"
-
-#: manufacturing/templates/offboarding_list.html:53
-msgid "Offboarding Checklist"
-msgstr "Lista de Verificación de Baja"
 
 #: manufacturing/templates/offboarding_list.html:64
 msgid "Search employee / task…"
@@ -16706,10 +19157,6 @@ msgstr "Deducciones"
 #: manufacturing/templates/payroll_history.html:11
 msgid "YTD Report"
 msgstr "Informe interanual (YTD)"
-
-#: manufacturing/templates/payroll_dashboard.html:39
-msgid "Payroll Department"
-msgstr "Departamento de Nómina"
 
 #: manufacturing/templates/payroll_dashboard.html:48
 msgid "Employees with Pay Rates"
@@ -17114,14 +19561,6 @@ msgstr "Creado por:"
 msgid "Edit %(fn)s %(ln)s"
 msgstr "Editar %(fn)s %(ln)s"
 
-#: manufacturing/templates/people_form.html:4
-#: manufacturing/templates/people_form.html:39
-#: manufacturing/templates/people_list.html:8
-#: manufacturing/templates/personnel_dashboard.html:7
-#: manufacturing/templates/personnel_dashboard.html:53
-msgid "New Employee"
-msgstr "Nuevo Empleado"
-
 #: manufacturing/templates/people_form.html:48
 msgid "Identity"
 msgstr "Identidad"
@@ -17313,14 +19752,6 @@ msgstr "— Aún sin calificar —"
 msgid "View %(first)s %(last)s's profile"
 msgstr "Ver el perfil de %(first)s %(last)s"
 
-#: manufacturing/templates/pers_reviews_list.html:3
-#: manufacturing/templates/pers_reviews_list.html:58
-#: manufacturing/templates/personnel_dashboard.html:55
-#: manufacturing/templates/sales_performance_reviews.html:3
-#: manufacturing/templates/sales_performance_reviews.html:51
-msgid "Performance Reviews"
-msgstr "Evaluaciones de Desempeño"
-
 #: manufacturing/templates/pers_reviews_list.html:70
 msgid "Search employee / reviewer…"
 msgstr "Buscar empleado / evaluador…"
@@ -17328,13 +19759,6 @@ msgstr "Buscar empleado / evaluador…"
 #: manufacturing/templates/pers_reviews_list.html:98
 msgid "No reviews found."
 msgstr "No se encontraron evaluaciones."
-
-#: manufacturing/templates/pers_reviews_list.html:106
-#: manufacturing/templates/pers_reviews_list.html:157
-#: manufacturing/templates/sales_performance_reviews.html:99
-#: manufacturing/templates/sales_performance_reviews.html:144
-msgid "Schedule Review"
-msgstr "Programar Evaluación"
 
 #: manufacturing/templates/pers_reviews_list.html:113
 #: manufacturing/templates/pers_training_list.html:119
@@ -17831,12 +20255,6 @@ msgstr ""
 "Esta OC aún no tiene líneas recibidas — reciba al menos un artículo antes de "
 "agregar un costo de importación."
 
-#: manufacturing/templates/po_list.html:8
-#: manufacturing/templates/purchasing_dashboard.html:7
-#: manufacturing/templates/purchasing_dashboard.html:54
-msgid "New PO"
-msgstr "Nueva OC"
-
 #: manufacturing/templates/po_list.html:10
 msgid "Blanket POs"
 msgstr "Órdenes de Compra Globales"
@@ -17880,10 +20298,6 @@ msgstr "No hay órdenes de compra."
 #, python-format
 msgid "Welcome, %(company)s"
 msgstr "Bienvenido, %(company)s"
-
-#: manufacturing/templates/portal_home.html:9
-msgid "Open Orders"
-msgstr "Pedidos Abiertos"
 
 #: manufacturing/templates/portal_home.html:17
 #: manufacturing/templates/portal_home.html:69
@@ -18173,12 +20587,6 @@ msgstr "Transportista:"
 msgid "Tracking #:"
 msgstr "N.º de Seguimiento:"
 
-#: manufacturing/templates/portal_shipment_detail.html:19
-#: manufacturing/templates/prod_delivery_status.html:8
-#: manufacturing/templates/prod_tracking_dashboard.html:8
-msgid "Tracking"
-msgstr "Seguimiento"
-
 #: manufacturing/templates/portal_shipment_detail.html:45
 msgid "No items recorded."
 msgstr "No hay artículos registrados."
@@ -18287,11 +20695,6 @@ msgstr "Aún no hay lecturas de sensores registradas."
 msgid "Daily Production Report"
 msgstr "Informe de Producción Diaria"
 
-#: manufacturing/templates/prod_daily_report.html:8
-#: manufacturing/templates/prod_performance_report.html:8
-msgid "Daily Report"
-msgstr "Informe Diario"
-
 #: manufacturing/templates/prod_daily_report.html:52
 msgid "Report Date:"
 msgstr "Fecha del Informe:"
@@ -18325,20 +20728,6 @@ msgstr "Órdenes de Trabajo con Vencimiento %(date)s"
 msgid "No work orders due on this date."
 msgstr "No hay órdenes de trabajo con vencimiento en esta fecha."
 
-#: manufacturing/templates/prod_dashboard.html:8
-#: manufacturing/templates/prod_dashboard.html:61
-#: manufacturing/templates/prod_delivery_status.html:7
-#: manufacturing/templates/prod_reports.html:10
-#: manufacturing/templates/prod_returns_list.html:7
-#: manufacturing/templates/prod_schedule.html:10
-#: manufacturing/templates/prod_shipping_detail.html:7
-#: manufacturing/templates/prod_shipping_list.html:3
-#: manufacturing/templates/prod_shipping_list.html:9
-#: manufacturing/templates/prod_shipping_list.html:57
-#: manufacturing/templates/prod_tracking_dashboard.html:7
-msgid "Shipping"
-msgstr "Envíos"
-
 #: manufacturing/templates/prod_dashboard.html:13
 #: manufacturing/templates/recipe_detail.html:6
 #: manufacturing/templates/recipe_list.html:3
@@ -18350,22 +20739,9 @@ msgstr "Recetas"
 msgid "Repetitive Mfg"
 msgstr "Fabricación repetitiva"
 
-#: manufacturing/templates/prod_dashboard.html:60
-#: manufacturing/templates/prod_schedule.html:3
-#: manufacturing/templates/prod_schedule.html:45
-msgid "Production Schedule"
-msgstr "Programa de producción"
-
 #: manufacturing/templates/prod_dashboard.html:65
 msgid "New Inventory Item"
 msgstr "Nuevo artículo de inventario"
-
-#: manufacturing/templates/prod_dashboard.html:66
-#: manufacturing/templates/prod_reports.html:3
-#: manufacturing/templates/prod_reports.html:42
-#: manufacturing/templates/prod_returns_reports.html:9
-msgid "Production Reports"
-msgstr "Informes de producción"
 
 #: manufacturing/templates/prod_dashboard.html:76
 msgid "Daily Output Trend (last 14 days)"
@@ -18394,13 +20770,6 @@ msgstr "Órdenes de trabajo recientes"
 #: manufacturing/templates/prod_dashboard.html:127
 msgid "No work orders yet."
 msgstr "Aún no hay órdenes de trabajo."
-
-#: manufacturing/templates/prod_delivery_status.html:3
-#: manufacturing/templates/prod_delivery_status.html:9
-#: manufacturing/templates/prod_delivery_status.html:42
-#: manufacturing/templates/prod_tracking_dashboard.html:9
-msgid "Delivery Status"
-msgstr "Estado de Entrega"
 
 #: manufacturing/templates/prod_delivery_status.html:51
 msgid "Ship # / carrier / tracking…"
@@ -18474,11 +20843,6 @@ msgstr ""
 "El costo solo se muestra para empleados pagados por hora cuyo nombre "
 "coincide con «Completado Por» de la operación o «Asignado A» del orden de "
 "trabajo. El personal asalariado o no coincidente solo muestra las horas."
-
-#: manufacturing/templates/prod_performance_report.html:3
-#: manufacturing/templates/prod_performance_report.html:41
-msgid "Performance Report"
-msgstr "Informe de Rendimiento"
 
 #: manufacturing/templates/prod_performance_report.html:46
 msgid "Last 7 days"
@@ -18596,14 +20960,6 @@ msgstr "No hay órdenes de trabajo vencidas."
 #, python-format
 msgid "RMA %(num)s"
 msgstr "RMA %(num)s"
-
-#: manufacturing/templates/prod_returns_detail.html:8
-#: manufacturing/templates/prod_returns_list.html:9
-#: manufacturing/templates/prod_returns_reports.html:3
-#: manufacturing/templates/prod_returns_reports.html:8
-#: manufacturing/templates/prod_returns_reports.html:38
-msgid "Returns Reports"
-msgstr "Informes de Devoluciones"
 
 #: manufacturing/templates/prod_returns_detail.html:53
 msgid "RMA Number"
@@ -18733,10 +21089,6 @@ msgstr "— Producto (opcional) —"
 msgid "Search ship # / carrier / tracking…"
 msgstr "Buscar n.° de envío / transportista / seguimiento…"
 
-#: manufacturing/templates/prod_shipping_list.html:105
-msgid "New Shipment"
-msgstr "Nuevo Envío"
-
 #: manufacturing/templates/prod_shipping_list.html:124
 msgid "UPS, FedEx, etc."
 msgstr "UPS, FedEx, etc."
@@ -18744,11 +21096,6 @@ msgstr "UPS, FedEx, etc."
 #: manufacturing/templates/prod_shipping_list.html:143
 msgid "Create Shipment"
 msgstr "Crear Envío"
-
-#: manufacturing/templates/prod_tracking_dashboard.html:3
-#: manufacturing/templates/prod_tracking_dashboard.html:41
-msgid "Tracking Dashboard"
-msgstr "Panel de Seguimiento"
 
 #: manufacturing/templates/prod_tracking_dashboard.html:54
 #: manufacturing/templates/sales_dashboard_kpis.html:4
@@ -18869,12 +21216,6 @@ msgstr "Crear Promoción"
 msgid "Contract — %(num)s"
 msgstr "Contrato — %(num)s"
 
-#: manufacturing/templates/purch_contracts_list.html:3
-#: manufacturing/templates/purch_contracts_list.html:58
-#: manufacturing/templates/purchasing_dashboard.html:56
-msgid "Vendor Contracts"
-msgstr "Contratos de Proveedores"
-
 #: manufacturing/templates/purch_contracts_list.html:70
 msgid "Search title / contract # / supplier…"
 msgstr "Buscar título / n.º de contrato / proveedor…"
@@ -18887,12 +21228,6 @@ msgstr "N.º de Contrato"
 #: manufacturing/templates/purch_contracts_list.html:116
 msgid "Contract title"
 msgstr "Título del contrato"
-
-#: manufacturing/templates/purch_reports.html:3
-#: manufacturing/templates/purch_reports.html:46
-#: manufacturing/templates/purchasing_dashboard.html:57
-msgid "Purchasing Reports"
-msgstr "Informes de Compras"
 
 #: manufacturing/templates/purch_reports.html:51
 msgid "Open PO Value"
@@ -18933,11 +21268,6 @@ msgstr "No hay contratos que venzan en 90 días."
 #: manufacturing/templates/purchasing_dashboard.html:50
 msgid "Purchasing Dashboard"
 msgstr "Panel de Compras"
-
-#: manufacturing/templates/purchasing_dashboard.html:12
-#: manufacturing/templates/purchasing_dashboard.html:59
-msgid "Consultants"
-msgstr "Consultores"
 
 #: manufacturing/templates/purchasing_dashboard.html:71
 msgid "PO Status Breakdown"
@@ -19123,15 +21453,6 @@ msgstr "Enlace opcional a NCR"
 msgid "Create CAPA"
 msgstr "Crear CAPA"
 
-#: manufacturing/templates/qa_dashboard.html:10
-#: manufacturing/templates/qa_dashboard.html:89
-#: manufacturing/templates/qa_dashboard_kpis.html:25
-#: manufacturing/templates/qa_reports.html:12
-#: manufacturing/templates/qa_supplier_list.html:3
-#: manufacturing/templates/qa_supplier_list.html:61
-msgid "Supplier Quality"
-msgstr "Calidad de Proveedores"
-
 #: manufacturing/templates/qa_dashboard.html:42
 msgid "Quality Assurance Dashboard"
 msgstr "Panel de Aseguramiento de Calidad"
@@ -19144,21 +21465,9 @@ msgstr "Pareto de Defectos"
 msgid "NCRs by Severity (last 6 mo)"
 msgstr "NCR por Gravedad (últimos 6 meses)"
 
-#: manufacturing/templates/qa_dashboard.html:61
-msgid "Inspection Results"
-msgstr "Resultados de Inspección"
-
 #: manufacturing/templates/qa_dashboard.html:65
 msgid "NCR by Status"
 msgstr "NCR por Estado"
-
-#: manufacturing/templates/qa_dashboard.html:73
-msgid "Non-Conformance"
-msgstr "No Conformidad"
-
-#: manufacturing/templates/qa_dashboard.html:77
-msgid "Corrective Actions"
-msgstr "Acciones Correctivas"
 
 #: manufacturing/templates/qa_dashboard.html:97
 msgid "SPC"
@@ -19176,10 +21485,6 @@ msgstr "Cumplimiento Normativo"
 #: manufacturing/templates/qa_reports.html:56
 msgid "Open CAPAs"
 msgstr "CAPA Abiertas"
-
-#: manufacturing/templates/qa_dashboard_kpis.html:13
-msgid "Active Audits"
-msgstr "Auditorías Activas"
 
 #: manufacturing/templates/qa_dashboard_kpis.html:17
 msgid "Pending Inspections"
@@ -19268,14 +21573,6 @@ msgstr "Describa el defecto…"
 #: manufacturing/templates/qa_inspection_list.html:57
 msgid "QA Inspections"
 msgstr "Inspecciones de Calidad"
-
-#: manufacturing/templates/qa_inspection_list.html:9
-#: manufacturing/templates/sampling_plan_detail.html:6
-#: manufacturing/templates/sampling_plan_list.html:3
-#: manufacturing/templates/sampling_plan_list.html:19
-#: manufacturing/templates/sampling_plan_new.html:6
-msgid "Sampling Plans"
-msgstr "Planes de Muestreo"
 
 #: manufacturing/templates/qa_inspection_list.html:80
 msgid "Insp #"
@@ -19382,11 +21679,6 @@ msgstr "Producto / Pieza"
 msgid "Detected Date"
 msgstr "Fecha de Detección"
 
-#: manufacturing/templates/qa_ncr_detail.html:140
-#: manufacturing/templates/qa_ncr_list.html:138
-msgid "Disposition"
-msgstr "Disposición"
-
 #: manufacturing/templates/qa_ncr_list.html:3
 #: manufacturing/templates/qa_ncr_list.html:63
 msgid "Non-Conformance Reports"
@@ -19400,10 +21692,6 @@ msgstr "Detectado"
 msgid "No NCRs found."
 msgstr "No se encontraron NCR."
 
-#: manufacturing/templates/qa_ncr_list.html:109
-msgid "New NCR"
-msgstr "Nuevo NCR"
-
 #: manufacturing/templates/qa_ncr_list.html:115
 msgid "Description of nonconformance"
 msgstr "Descripción de la no conformidad"
@@ -19411,10 +21699,6 @@ msgstr "Descripción de la no conformidad"
 #: manufacturing/templates/qa_ncr_list.html:152
 msgid "Create NCR"
 msgstr "Crear NCR"
-
-#: manufacturing/templates/qa_reports.html:3
-msgid "QA Reports"
-msgstr "Informes de Calidad"
 
 #: manufacturing/templates/qa_reports.html:47
 msgid "Quality Assurance Reports"
@@ -20019,12 +22303,6 @@ msgstr "Solo los gerentes pueden compartir informes más allá de Privado."
 msgid "Save Report"
 msgstr "Guardar informe"
 
-#: manufacturing/templates/report_builder_list.html:3
-#: manufacturing/templates/report_builder_list.html:13
-#: manufacturing/templates/reports_dashboard.html:8
-msgid "Custom Reports"
-msgstr "Informes personalizados"
-
 #: manufacturing/templates/report_builder_list.html:50
 msgid "No custom reports yet."
 msgstr "Aún no hay informes personalizados."
@@ -20088,10 +22366,6 @@ msgstr "Precio Unit. Est."
 #: manufacturing/templates/req_detail.html:113
 msgid "Est. Unit Price ($)"
 msgstr "Precio Unit. Est. ($)"
-
-#: manufacturing/templates/req_detail.html:123
-msgid "Approval History"
-msgstr "Historial de Aprobación"
 
 #: manufacturing/templates/req_detail.html:126
 msgid "Approver"
@@ -20417,10 +22691,6 @@ msgstr "ISO 27001 / SOC 2 / …"
 msgid "Create Audit"
 msgstr "Crear Auditoría"
 
-#: manufacturing/templates/risk_continuity_list.html:3
-msgid "Business Continuity"
-msgstr "Continuidad del Negocio"
-
 #: manufacturing/templates/risk_continuity_list.html:53
 msgid "Business Continuity Plans"
 msgstr "Planes de Continuidad del Negocio"
@@ -20571,11 +22841,6 @@ msgstr "Prima ($)"
 msgid "Create Policy"
 msgstr "Crear Póliza"
 
-#: manufacturing/templates/risk_kri_list.html:3
-#: manufacturing/templates/risk_kri_list.html:52
-msgid "Key Risk Indicators"
-msgstr "Indicadores Clave de Riesgo"
-
 #: manufacturing/templates/risk_kri_list.html:63
 msgid "Search indicator / category / owner…"
 msgstr "Buscar indicador / categoría / propietario…"
@@ -20688,10 +22953,6 @@ msgstr "-- ninguno --"
 #: manufacturing/templates/routing_detail.html:125
 msgid "+ Add Step"
 msgstr "+ Agregar Paso"
-
-#: manufacturing/templates/sales_coaching.html:3
-msgid "Coaching Notes"
-msgstr "Notas de Coaching"
 
 #: manufacturing/templates/sales_coaching.html:6
 #: manufacturing/templates/sales_commission_history.html:6
@@ -20823,11 +23084,6 @@ msgstr "Comisión Pagada"
 msgid "No paid commissions found."
 msgstr "No se encontraron comisiones pagadas."
 
-#: manufacturing/templates/sales_commission_plans.html:3
-#: manufacturing/templates/sales_commission_plans.html:50
-msgid "Commission Plans"
-msgstr "Planes de Comisión"
-
 #: manufacturing/templates/sales_commission_plans.html:59
 #: manufacturing/templates/sampling_plan_list.html:31
 msgid "Plan Name"
@@ -20867,11 +23123,6 @@ msgstr "p. ej. Estándar 5%%"
 #: manufacturing/templates/sales_commission_plans.html:156
 msgid "Plan details…"
 msgstr "Detalles del plan…"
-
-#: manufacturing/templates/sales_commissions.html:3
-#: manufacturing/templates/sales_commissions.html:62
-msgid "Commission Tracking"
-msgstr "Seguimiento de Comisiones"
 
 #: manufacturing/templates/sales_commissions.html:82
 msgid "Total Sales"
@@ -20920,17 +23171,6 @@ msgstr "Agregar Registro de Comisión"
 #, python-format
 msgid "Contract — %(customer)s"
 msgstr "Contrato — %(customer)s"
-
-#: manufacturing/templates/sales_contracts_detail.html:8
-#: manufacturing/templates/sales_contracts_list.html:8
-#: manufacturing/templates/sales_dashboard.html:7
-#: manufacturing/templates/sales_dashboard.html:61
-#: manufacturing/templates/sales_leads_detail.html:8
-#: manufacturing/templates/sales_leads_list.html:8
-#: manufacturing/templates/sales_orders.html:7
-#: manufacturing/templates/sales_targets.html:8
-msgid "Quotes"
-msgstr "Cotizaciones"
 
 #: manufacturing/templates/sales_contracts_detail.html:11
 #: manufacturing/templates/sales_contracts_list.html:11
@@ -20986,11 +23226,6 @@ msgstr "Título / descripción del contrato"
 #: manufacturing/templates/sales_territory_performance.html:8
 msgid "Targets"
 msgstr "Objetivos"
-
-#: manufacturing/templates/sales_dashboard.html:60
-#: manufacturing/templates/sales_order_detail.html:4
-msgid "New Order"
-msgstr "Nuevo Pedido"
 
 #: manufacturing/templates/sales_dashboard.html:62
 #: manufacturing/templates/sales_leads_list.html:63
@@ -21329,10 +23564,6 @@ msgstr "Valor Estimado ($)"
 msgid "Est. Value"
 msgstr "Valor Est."
 
-#: manufacturing/templates/sales_leads_list.html:3
-msgid "Leads & Opportunities"
-msgstr "Prospectos y Oportunidades"
-
 #: manufacturing/templates/sales_leads_list.html:75
 msgid "Search company / contact…"
 msgstr "Buscar empresa / contacto…"
@@ -21511,15 +23742,6 @@ msgstr "Guardar Cotización"
 msgid "New Quote"
 msgstr "Nueva Cotización"
 
-#: manufacturing/templates/sales_quotes.html:145
-msgid "Create Quote"
-msgstr "Crear Cotización"
-
-#: manufacturing/templates/sales_reports.html:3
-#: manufacturing/templates/sales_reports.html:42
-msgid "Sales Reports"
-msgstr "Informes de Ventas"
-
 #: manufacturing/templates/sales_reports.html:64
 msgid "Revenue Trend"
 msgstr "Tendencia de Ingresos"
@@ -21540,10 +23762,6 @@ msgstr "No hay pedidos en este rango."
 #: manufacturing/templates/sales_reports_kpis.html:32
 msgid "Top Products"
 msgstr "Principales Productos"
-
-#: manufacturing/templates/sales_targets.html:3
-msgid "Sales Targets"
-msgstr "Objetivos de Venta"
 
 #: manufacturing/templates/sales_targets.html:50
 msgid "Sales Targets &amp; Actuals"
@@ -21584,11 +23802,6 @@ msgstr "Objetivo ($)"
 #: manufacturing/templates/sales_targets.html:159
 msgid "Add Target"
 msgstr "Agregar Objetivo"
-
-#: manufacturing/templates/sales_territories.html:3
-#: manufacturing/templates/sales_territories.html:55
-msgid "Territory Management"
-msgstr "Gestión de Territorios"
 
 #: manufacturing/templates/sales_territories.html:8
 #: manufacturing/templates/sales_territory_performance.html:7
@@ -21636,11 +23849,6 @@ msgstr "p. ej. Noreste"
 msgid "e.g. New England"
 msgstr "p. ej. Nueva Inglaterra"
 
-#: manufacturing/templates/sales_territory_performance.html:3
-#: manufacturing/templates/sales_territory_performance.html:31
-msgid "Territory Performance"
-msgstr "Desempeño de Territorios"
-
 #: manufacturing/templates/sales_territory_performance.html:37
 msgid "Territory"
 msgstr "Territorio"
@@ -21672,11 +23880,6 @@ msgstr ""
 #: manufacturing/templates/sampling_plan_detail.html:3
 msgid "Sampling Plan"
 msgstr "Plan de Muestreo"
-
-#: manufacturing/templates/sampling_plan_detail.html:7
-#: manufacturing/templates/sampling_plan_list.html:6
-msgid "Incoming Inspection"
-msgstr "Inspección de Entrada"
 
 #: manufacturing/templates/sampling_plan_detail.html:35
 #: manufacturing/templates/sampling_plan_new.html:33
@@ -21796,10 +23999,6 @@ msgstr "Orden de Compra"
 #: manufacturing/templates/scan_home.html:67
 msgid "e.g. PO-2024-001"
 msgstr "p. ej. PO-2024-001"
-
-#: manufacturing/templates/scan_home.html:68
-msgid "Receiving"
-msgstr "Recepción"
 
 #: manufacturing/templates/scan_home.html:68
 msgid "e.g. RCV-2024-001"
@@ -22072,21 +24271,10 @@ msgstr "Umbral Crítico (≥)"
 msgid "Save Thresholds"
 msgstr "Guardar Umbrales"
 
-#: manufacturing/templates/sf_dashboard.html:3
-#: manufacturing/templates/sf_dashboard.html:42
-msgid "Live OEE Dashboard"
-msgstr "Panel OEE en Vivo"
-
 #: manufacturing/templates/sf_dashboard.html:6
 #: manufacturing/templates/sf_shift_plan.html:7
 msgid "Entry"
 msgstr "Entrada"
-
-#: manufacturing/templates/sf_dashboard.html:7
-#: manufacturing/templates/sf_entry.html:7
-#: manufacturing/templates/sf_shift_plan.html:3
-msgid "Shift Plan"
-msgstr "Plan de Turno"
 
 #: manufacturing/templates/sf_dashboard.html:8
 #: manufacturing/templates/sf_entry.html:8
@@ -22704,11 +24892,6 @@ msgstr "Tendencia Mensual"
 msgid "No purchase order activity in this window."
 msgstr "Sin actividad de órdenes de compra en este período."
 
-#: manufacturing/templates/supplier_scorecard_list.html:3
-#: manufacturing/templates/supplier_scorecard_list.html:36
-msgid "Supplier Scorecards"
-msgstr "Evaluaciones de Proveedores"
-
 #: manufacturing/templates/supplier_scorecard_list.html:51
 msgid "On-Time Delivery"
 msgstr "Entrega a Tiempo"
@@ -22970,10 +25153,6 @@ msgstr "Agregue uno."
 msgid "Overtime Report"
 msgstr "Informe de horas extra"
 
-#: manufacturing/templates/tc_ot_report.html:45
-msgid "Overtime Reports"
-msgstr "Informes de horas extra"
-
 #: manufacturing/templates/tc_ot_report.html:52
 msgid "Reset"
 msgstr "Restablecer"
@@ -23152,10 +25331,6 @@ msgstr ""
 "            <a href=\"/pers/offboarding/\">lista de verificación de baja</a> "
 "desde sus páginas respectivas."
 
-#: manufacturing/templates/termination_list.html:51
-msgid "Termination Process"
-msgstr "Proceso de Terminación"
-
 #: manufacturing/templates/termination_list.html:71
 msgid "Term. Date"
 msgstr "Fecha Term."
@@ -23176,11 +25351,6 @@ msgid ""
 msgstr ""
 "Establecer una fecha de terminación también marca al empleado como terminado "
 "en su registro."
-
-#: manufacturing/templates/time_clock_attendance.html:3
-#: manufacturing/templates/time_clock_attendance.html:54
-msgid "Daily Attendance"
-msgstr "Asistencia diaria"
 
 #: manufacturing/templates/time_clock_attendance.html:73
 #: manufacturing/templates/time_clock_attendance.html:111
@@ -23206,10 +25376,6 @@ msgstr "Salida"
 #: manufacturing/templates/time_clock_status.html:98
 msgid "in progress"
 msgstr "en curso"
-
-#: manufacturing/templates/time_clock_status.html:64
-msgid "Current Status"
-msgstr "Estado actual"
 
 #: manufacturing/templates/time_clock_status.html:66
 msgid "Clocked In"
@@ -23267,10 +25433,6 @@ msgstr "Tipo de Solicitud"
 #: manufacturing/templates/time_off_list.html:16
 msgid "Time-Off Requests"
 msgstr "Solicitudes de Ausencia"
-
-#: manufacturing/templates/time_off_list.html:8
-msgid "New Request"
-msgstr "Nueva Solicitud"
 
 #: manufacturing/templates/time_off_list.html:61
 msgid "No time-off requests found."
@@ -23478,48 +25640,6 @@ msgstr "No hay existencias registradas en esta ubicación."
 msgid "Deactivate Bin"
 msgstr "Desactivar Ubicación"
 
-#: manufacturing/templates/wms_bin_list.html:3
-#: manufacturing/templates/wms_bin_list.html:20
-#: manufacturing/templates/wms_pick_list_list.html:6
-#: manufacturing/templates/wms_putaway_rule_list.html:6
-#: manufacturing/templates/wms_receive.html:6
-#: manufacturing/templates/wms_rfid_reader_list.html:6
-#: manufacturing/templates/wms_rfid_tag_list.html:6
-#: manufacturing/templates/wms_transfer_list.html:6
-#: manufacturing/templates/wms_warehouse_list.html:6
-#: manufacturing/templates/wms_wave_list.html:7
-msgid "Bin Master"
-msgstr "Maestro de Ubicaciones"
-
-#: manufacturing/templates/wms_bin_list.html:6
-#: manufacturing/templates/wms_transfer_list.html:7
-#: manufacturing/templates/wms_warehouse_list.html:3
-#: manufacturing/templates/wms_warehouse_list.html:12
-msgid "Warehouses"
-msgstr "Almacenes"
-
-#: manufacturing/templates/wms_bin_list.html:7
-#: manufacturing/templates/wms_pick_list_list.html:3
-#: manufacturing/templates/wms_pick_list_list.html:20
-#: manufacturing/templates/wms_pick_list_list.html:53
-#: manufacturing/templates/wms_wave_list.html:6
-msgid "Pick Lists"
-msgstr "Listas de Picking"
-
-#: manufacturing/templates/wms_bin_list.html:8
-#: manufacturing/templates/wms_pick_list_list.html:8
-#: manufacturing/templates/wms_wave_list.html:3
-#: manufacturing/templates/wms_wave_list.html:19
-msgid "Wave Picking"
-msgstr "Picking por Oleadas"
-
-#: manufacturing/templates/wms_bin_list.html:9
-#: manufacturing/templates/wms_putaway_rule_list.html:3
-#: manufacturing/templates/wms_putaway_rule_list.html:12
-#: manufacturing/templates/wms_receive.html:7
-msgid "Put-Away Rules"
-msgstr "Reglas de Ubicación"
-
 #: manufacturing/templates/wms_bin_list.html:10
 #: manufacturing/templates/wms_warehouse_list.html:7
 msgid "Transfers"
@@ -23580,12 +25700,6 @@ msgstr "Crear Zona"
 #: manufacturing/templates/wms_bin_new.html:47
 msgid "Create Bin"
 msgstr "Crear Ubicación"
-
-#: manufacturing/templates/wms_pack_station.html:3
-#: manufacturing/templates/wms_pack_station.html:14
-#: manufacturing/templates/wms_pick_list_detail.html:8
-msgid "Pack Station"
-msgstr "Estación de Empaque"
 
 #: manufacturing/templates/wms_pack_station.html:6
 #: manufacturing/templates/wms_ship_confirm.html:6
@@ -23825,18 +25939,6 @@ msgstr ""
 msgid "No open PO lines awaiting receipt."
 msgstr "No hay líneas de OC abiertas esperando recepción."
 
-#: manufacturing/templates/wms_rfid_reader_list.html:3
-#: manufacturing/templates/wms_rfid_reader_list.html:12
-#: manufacturing/templates/wms_rfid_tag_list.html:7
-msgid "RFID Readers"
-msgstr "Lectores RFID"
-
-#: manufacturing/templates/wms_rfid_reader_list.html:7
-#: manufacturing/templates/wms_rfid_tag_list.html:3
-#: manufacturing/templates/wms_rfid_tag_list.html:19
-msgid "RFID Tags"
-msgstr "Etiquetas RFID"
-
 #: manufacturing/templates/wms_rfid_reader_list.html:14
 msgid ""
 "A reader is a virtual antenna tied to one zone — there is no real RFID\n"
@@ -24049,11 +26151,6 @@ msgstr "¿Cancelar esta transferencia?"
 #: manufacturing/templates/wms_transfer_detail.html:110
 msgid "Cancel Transfer"
 msgstr "Cancelar Transferencia"
-
-#: manufacturing/templates/wms_transfer_list.html:3
-#: manufacturing/templates/wms_transfer_list.html:20
-msgid "Warehouse Transfers"
-msgstr "Transferencias entre Almacenes"
 
 #: manufacturing/templates/wms_transfer_list.html:8
 #: manufacturing/templates/wms_transfer_new.html:3

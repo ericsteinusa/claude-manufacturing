@@ -2912,6 +2912,132 @@ consistently across Income Statement and Balance Sheet) — all pages
 return 200 with correctly translated titles and labels, no console or
 server errors.
 
+Also fully translated: **`menus.py`'s `MENU_TREE`** — the last
+remaining i18n gap in the app, and the only one that wasn't a
+template. `MENU_TREE` is a Python dict structure (16 departments, up
+to 4 levels of nested sub-menus, several submenus like
+`_TIME_CLOCK_MENU`/`_MAINT_MENU` factored out and reused by reference
+across departments) that backs `dept_menu.html`'s drill-down grid menu
+for non-full-access users — a separate rendering path from `base.html`'s
+always-present sidebar, which has its own independently-translated
+static `{% trans %}` tags and doesn't consume this tree at all. Every
+`'title': '...'` value and every `(key, 'Label', target)` tuple's label
+across the whole file — 642 distinct strings, 486 of them genuinely new
+(156 auto-merged via exact-msgid match with labels already translated
+elsewhere, e.g. department names repeated from dashboard tiles) — needed
+wrapping in `gettext_lazy`, matching the exact pattern already
+established for this same file's `DASHBOARD_DEPARTMENTS` list (wrapped
+in an earlier pass) and the Contacts batch's `contact_type`/`order_label`
+fix just before this one.
+
+**Mechanical wrap done via a targeted regex script, not by hand or by
+subagent, given the extreme structural regularity of the file**: two
+patterns — `'title':\s*(STRING)` and `\('[a-z_0-9]+',\s*(STRING)` (the
+tuple's key-then-label position) — covering both single- and
+double-quoted strings (`"Today's Hours"` needed double quotes to avoid
+escaping its apostrophe, handled by the same pattern). The script
+skipped `DASHBOARD_DEPARTMENTS`'s 17 already-wrapped entries for free,
+since their label position no longer starts with a bare quote character
+after wrapping (`_('...')` doesn't match a pattern requiring the next
+token to be a quote) — confirmed by an exact accounting check (792 raw
+tuple-opening occurrences minus 17 already-wrapped = 775 wrapped by the
+script, plus 177 title lines = the reported 486 distinct new blanks
+after accounting for reuse across `_TIME_CLOCK_MENU`-style shared
+submenus). Verified safe before running: labels are never used as dict
+keys or lookup values anywhere in this codebase — `_walk_tree` matches
+on the tuple's first element (an id-like slug such as `'clock_in_out'`),
+and `WEB_LEAF_URLS`/`DEPT_MENU_KEY` (in `views/__init__.py`) key on
+slugs and department *display names*, never on `MENU_TREE`'s own label
+strings — so wrapping every label in a lazy translation proxy carries
+zero structural risk. Confirmed post-wrap: `ast.parse()` succeeds, the
+diff is a clean 953/953 line-for-line swap with zero non-`_(`-containing
+added lines and zero double-wrapped `_(_(` occurrences, `manage.py
+check`/`ruff check .`/the full test suite (3486) all stay green.
+
+**Translation volume (486 strings) was split across 7 parallel
+subagents** (~70 strings each, by department cluster: Time Clock/
+Maintenance, Marketing, Shipping/Receiving/Logistics, Personnel/
+Onboarding/Customer-Service, Finance/Audit/Multi-Entity/Tax,
+Engineering/Quality/IT, Purchasing/Consultants/QA) rather than
+delegating markup separately, since there was no markup step here — just
+translation of the pre-extracted blank list, the same shape as the
+long-tail sweep's translation phase. Given these are short 1-4-word
+navigation labels rather than prose, no placeholders/HTML/multi-line
+strings appeared anywhere in the batch (confirmed by inspection before
+launching), simplifying the translation task relative to every prior
+batch in this series.
+
+**Five real cross-chunk terminology inconsistencies caught and fixed
+in a dedicated post-translation consistency pass**, a new step for this
+series — with 486 strings split across 7 independent agents with no
+visibility into each other's output, this class of error (the same
+underlying concept translated two different ways in two different
+chunks, or one chunk drifting from an established prior-pass term) was
+expected and specifically checked for, rather than left to chance:
+1. **German "Engineering" collision**: this codebase's Engineering
+   department was already established as German "Konstruktion" (from
+   an earlier department pass), but the chunk translating "Engineering
+   Main Menu"/"Engineering Manager"/"Engineering Budget" independently
+   picked "Technik" (a reasonable-sounding but wrong choice — Dutch
+   "Techniek" is actually the correct established term for a *different*
+   language, which may have primed the same guess for German). Fixed to
+   "Hauptmenü Konstruktion"/"Konstruktionsleiter"/"Konstruktionsbudget".
+2. **German "Requisition" drift**: "Approved Requisitions"/"Requisition
+   History" used a newly-invented "Bestellanforderung" stem instead of
+   this codebase's already-established bare "Anforderung" (used in
+   "Requisition %(num)s" → "Anforderung %(num)s" from an earlier
+   Purchasing-adjacent pass) — fixed to reuse the established stem.
+3. **Spanish "Leads" drift**: "Active Leads"/"Lead Reports" used newly
+   -invented "Prospectos" instead of this codebase's already-established
+   "Clientes potenciales" (from the Sales department pass's "Leads" →
+   "Clientes potenciales") — fixed to reuse the established term.
+4. **Ampersand inconsistency**: one chunk correctly followed the
+   established "natural word beats literal ampersand" convention
+   ("Standards & Compliance" → "Normen und Compliance"/"Normen en
+   Compliance") while another chunk left two sibling strings
+   ("Audit & Compliance", "Compliance & Audit") with a literal `&` in
+   German/Dutch — fixed both to the natural-word form for consistency
+   with the sibling entries in the same feature area.
+5. Reconfirmed, not a bug: German/Dutch consistently keep "Compliance"
+   as an established loanword across both chunks that touched it, while
+   Spanish/French/Portuguese consistently translate it natively
+   ("Cumplimiento"/"Conformité"/"Conformidade") — both choices are
+   internally consistent within their own language, just independently
+   arrived at twice with the same result, confirming rather than
+   contradicting each other.
+
+A sixth, pre-existing inconsistency was found but deliberately **not**
+touched: `eng_reports.html`'s already-shipped "Engineering Reports" →
+German "Engineering-Berichte" (a literal, untranslated "Engineering"
+left in the German string) predates this batch entirely — it's a
+different file from an earlier, separately-merged Engineering
+department pass, out of scope for a menu-tree-only fix.
+
+Full suite 3486 passed (unchanged — `menus.py`/locale-file work only,
+no template or business-logic changes), `manage.py check` and
+`ruff check .` both clean, `msgfmt --check` clean on all 5 `.po` files,
+zero blank entries confirmed programmatically, zero placeholder
+mismatches swept across the *entire* catalog in every language (4478
+entries checked per language), zero duplicated-substring corruption
+signatures found across all 486 translated values. This was the largest
+single fuzzy-match count in this series' history (473, versus the prior
+high of 238 for the long-tail sweep) — expected, given hundreds of
+short, generic-sounding menu labels ("Reports", "History", "Schedule")
+are exactly the shape most prone to `msgmerge` guessing a wrong existing
+match; all 473 were blanked via the established
+strip-fuzzy-and-replace technique before any translation work began, so
+none of the wrong guesses ever reached a written translation. Verified
+end-to-end against the real dev server, hitting `/dept/<slug>/` and its
+sub-paths directly (this menu is normally only reached by non-full-access
+users, but the view has no access restriction of its own — full-access
+users can browse it directly) across three languages: German (Marketing
+→ Content Management, three levels deep, confirmed the "Konstruktion"
+fix on the Engineering department's top-level menu and sub-item),
+Spanish (Purchasing's manager/main sub-menus, Legal's five leaf items),
+and Dutch (IT's two-level drill-down into Budget & Procurement) — all
+pages return 200 with correctly translated titles and menu-item labels,
+no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

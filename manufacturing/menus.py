@@ -10,766 +10,766 @@ from django.utils.translation import gettext_lazy as _
 # target is a script filename (str = leaf) or a dict (sub-menu node).
 
 _TIME_CLOCK_MENU = {
-    'title': 'Time Clock Menu',
+    'title': _('Time Clock Menu'),
     'items': [
-        ('clock_in_out', 'Clock In/Out', {
-            'title': 'Clock In/Out',
+        ('clock_in_out', _('Clock In/Out'), {
+            'title': _('Clock In/Out'),
             'items': [
-                ('punch_in', 'Record Clock In', ''),
-                ('punch_out', 'Record Clock Out', ''),
-                ('cur_status', 'Current Status', ''),
+                ('punch_in', _('Record Clock In'), ''),
+                ('punch_out', _('Record Clock Out'), ''),
+                ('cur_status', _('Current Status'), ''),
             ],
         }),
-        ('view_hours', 'View Hours', {
-            'title': 'View Hours',
+        ('view_hours', _('View Hours'), {
+            'title': _('View Hours'),
             'items': [
-                ('today_hrs', "Today's Hours", ''),
-                ('week_hrs', 'Weekly Hours', ''),
-                ('month_hrs', 'Monthly Hours', ''),
-                ('period_hrs', 'Pay Period Hours', ''),
+                ('today_hrs', _("Today's Hours"), ''),
+                ('week_hrs', _('Weekly Hours'), ''),
+                ('month_hrs', _('Monthly Hours'), ''),
+                ('period_hrs', _('Pay Period Hours'), ''),
             ],
         }),
-        ('time_off', 'Time Off Requests', {
-            'title': 'Time Off Requests',
+        ('time_off', _('Time Off Requests'), {
+            'title': _('Time Off Requests'),
             'items': [
-                ('submit_req', 'Submit Request', ''),
-                ('pend_req', 'Pending Requests', ''),
-                ('appr_req', 'Approved Requests', ''),
-                ('req_hist', 'Request History', ''),
+                ('submit_req', _('Submit Request'), ''),
+                ('pend_req', _('Pending Requests'), ''),
+                ('appr_req', _('Approved Requests'), ''),
+                ('req_hist', _('Request History'), ''),
             ],
         }),
-        ('schedules', 'Schedules', {
-            'title': 'Schedules',
+        ('schedules', _('Schedules'), {
+            'title': _('Schedules'),
             'items': [
-                ('my_sched', 'My Schedule', ''),
-                ('upcoming', 'Upcoming Shifts', ''),
-                ('sched_cal', 'Schedule Calendar', ''),
-                ('swap_req', 'Swap Requests', ''),
+                ('my_sched', _('My Schedule'), ''),
+                ('upcoming', _('Upcoming Shifts'), ''),
+                ('sched_cal', _('Schedule Calendar'), ''),
+                ('swap_req', _('Swap Requests'), ''),
             ],
         }),
-        ('ot_reports', 'Overtime Reports', {
-            'title': 'Overtime Reports',
+        ('ot_reports', _('Overtime Reports'), {
+            'title': _('Overtime Reports'),
             'items': [
-                ('cur_ot', 'Current Period OT', ''),
-                ('hist_ot', 'Historical OT', ''),
-                ('ot_by_emp', 'OT by Employee', ''),
-                ('ot_appr', 'OT Approval', ''),
+                ('cur_ot', _('Current Period OT'), ''),
+                ('hist_ot', _('Historical OT'), ''),
+                ('ot_by_emp', _('OT by Employee'), ''),
+                ('ot_appr', _('OT Approval'), ''),
             ],
         }),
-        ('attend_reports', 'Attendance Reports', {
-            'title': 'Attendance Reports',
+        ('attend_reports', _('Attendance Reports'), {
+            'title': _('Attendance Reports'),
             'items': [
-                ('daily_att', 'Daily Attendance', ''),
-                ('month_sum', 'Monthly Summary', ''),
-                ('tard_rpt', 'Tardiness Report', ''),
-                ('abs_rpt', 'Absence Report', ''),
+                ('daily_att', _('Daily Attendance'), ''),
+                ('month_sum', _('Monthly Summary'), ''),
+                ('tard_rpt', _('Tardiness Report'), ''),
+                ('abs_rpt', _('Absence Report'), ''),
             ],
         }),
-        ('shift_mgmt', 'Shift Management', {
-            'title': 'Shift Management',
+        ('shift_mgmt', _('Shift Management'), {
+            'title': _('Shift Management'),
             'items': [
-                ('view_shfts', 'View Shifts', ''),
-                ('assign_emp', 'Assign Employees', ''),
-                ('shft_tmpl', 'Shift Templates', ''),
-                ('swap_mgmt', 'Swap Management', ''),
+                ('view_shfts', _('View Shifts'), ''),
+                ('assign_emp', _('Assign Employees'), ''),
+                ('shft_tmpl', _('Shift Templates'), ''),
+                ('swap_mgmt', _('Swap Management'), ''),
             ],
         }),
     ],
 }
 
 _MAINT_MENU = {
-    'title': 'Maintenance Menu',
+    'title': _('Maintenance Menu'),
     'items': [
-        ('work_orders', 'Work Orders', {
-            'title': 'Work Orders',
+        ('work_orders', _('Work Orders'), {
+            'title': _('Work Orders'),
             'items': [
-                ('create_wo', 'Create Work Order', ''),
-                ('open_wo', 'Open Work Orders', ''),
-                ('inprog_wo', 'In Progress', ''),
-                ('comp_wo', 'Completed', ''),
+                ('create_wo', _('Create Work Order'), ''),
+                ('open_wo', _('Open Work Orders'), ''),
+                ('inprog_wo', _('In Progress'), ''),
+                ('comp_wo', _('Completed'), ''),
             ],
         }),
-        ('maint_schedule', 'Maintenance Schedule', {
-            'title': 'Maintenance Schedule',
+        ('maint_schedule', _('Maintenance Schedule'), {
+            'title': _('Maintenance Schedule'),
             'items': [
-                ('daily_sched', 'Daily Schedule', ''),
-                ('week_sched', 'Weekly Schedule', ''),
-                ('month_sched', 'Monthly Schedule', ''),
-                ('annual_plan', 'Annual Plan', ''),
+                ('daily_sched', _('Daily Schedule'), ''),
+                ('week_sched', _('Weekly Schedule'), ''),
+                ('month_sched', _('Monthly Schedule'), ''),
+                ('annual_plan', _('Annual Plan'), ''),
             ],
         }),
-        ('equip_maint', 'Equipment Maintenance', {
-            'title': 'Equipment Maintenance',
+        ('equip_maint', _('Equipment Maintenance'), {
+            'title': _('Equipment Maintenance'),
             'items': [
-                ('equip_list', 'Equipment List', ''),
-                ('maint_hist', 'Maintenance History', ''),
-                ('svc_records', 'Service Records', ''),
-                ('equip_stat', 'Equipment Status', ''),
+                ('equip_list', _('Equipment List'), ''),
+                ('maint_hist', _('Maintenance History'), ''),
+                ('svc_records', _('Service Records'), ''),
+                ('equip_stat', _('Equipment Status'), ''),
             ],
         }),
-        ('parts_inv', 'Parts Inventory', {
-            'title': 'Parts Inventory',
+        ('parts_inv', _('Parts Inventory'), {
+            'title': _('Parts Inventory'),
             'items': [
-                ('view_inv', 'View Inventory', ''),
-                ('parts_req', 'Parts Request', ''),
-                ('reorder', 'Reorder List', ''),
-                ('parts_hist', 'Parts History', ''),
+                ('view_inv', _('View Inventory'), ''),
+                ('parts_req', _('Parts Request'), ''),
+                ('reorder', _('Reorder List'), ''),
+                ('parts_hist', _('Parts History'), ''),
             ],
         }),
-        ('maint_reports', 'Maintenance Reports', {
-            'title': 'Maintenance Reports',
+        ('maint_reports', _('Maintenance Reports'), {
+            'title': _('Maintenance Reports'),
             'items': [
-                ('daily_rpt', 'Daily Report', ''),
-                ('week_rpt', 'Weekly Report', ''),
-                ('cost_analy', 'Cost Analysis', ''),
-                ('down_rpt', 'Downtime Report', ''),
+                ('daily_rpt', _('Daily Report'), ''),
+                ('week_rpt', _('Weekly Report'), ''),
+                ('cost_analy', _('Cost Analysis'), ''),
+                ('down_rpt', _('Downtime Report'), ''),
             ],
         }),
-        ('safety_insp', 'Safety Inspections', {
-            'title': 'Safety Inspections',
+        ('safety_insp', _('Safety Inspections'), {
+            'title': _('Safety Inspections'),
             'items': [
-                ('sched_insp', 'Schedule Inspection', ''),
-                ('insp_chk', 'Inspection Checklist', ''),
-                ('insp_res', 'Inspection Results', ''),
-                ('corr_act', 'Corrective Actions', ''),
+                ('sched_insp', _('Schedule Inspection'), ''),
+                ('insp_chk', _('Inspection Checklist'), ''),
+                ('insp_res', _('Inspection Results'), ''),
+                ('corr_act', _('Corrective Actions'), ''),
             ],
         }),
-        ('prev_maint', 'Preventive Maintenance', {
-            'title': 'Preventive Maintenance',
+        ('prev_maint', _('Preventive Maintenance'), {
+            'title': _('Preventive Maintenance'),
             'items': [
-                ('pm_sched', 'PM Schedule', ''),
-                ('pm_chk', 'PM Checklists', ''),
-                ('pm_hist', 'PM History', ''),
-                ('pm_rpts', 'PM Reports', ''),
+                ('pm_sched', _('PM Schedule'), ''),
+                ('pm_chk', _('PM Checklists'), ''),
+                ('pm_hist', _('PM History'), ''),
+                ('pm_rpts', _('PM Reports'), ''),
             ],
         }),
     ],
 }
 
 _MKT_MENU = {
-    'title': 'Marketing Menu',
+    'title': _('Marketing Menu'),
     'items': [
-        ('campaigns', 'Campaigns', {
-            'title': 'Campaigns',
+        ('campaigns', _('Campaigns'), {
+            'title': _('Campaigns'),
             'items': [
-                ('act_camp', 'Active Campaigns', ''),
-                ('new_camp', 'Create Campaign', ''),
-                ('camp_cal', 'Campaign Calendar', ''),
-                ('camp_res', 'Campaign Results', ''),
+                ('act_camp', _('Active Campaigns'), ''),
+                ('new_camp', _('Create Campaign'), ''),
+                ('camp_cal', _('Campaign Calendar'), ''),
+                ('camp_res', _('Campaign Results'), ''),
             ],
         }),
-        ('mkt_research', 'Market Research', {
-            'title': 'Market Research',
+        ('mkt_research', _('Market Research'), {
+            'title': _('Market Research'),
             'items': [
-                ('res_proj', 'Research Projects', ''),
-                ('comp_analy', 'Competitor Analysis', ''),
-                ('surv_mgmt', 'Survey Management', ''),
-                ('mkt_trends', 'Market Trends', ''),
+                ('res_proj', _('Research Projects'), ''),
+                ('comp_analy', _('Competitor Analysis'), ''),
+                ('surv_mgmt', _('Survey Management'), ''),
+                ('mkt_trends', _('Market Trends'), ''),
             ],
         }),
-        ('advertising', 'Advertising', {
-            'title': 'Advertising',
+        ('advertising', _('Advertising'), {
+            'title': _('Advertising'),
             'items': [
-                ('ad_mgmt', 'Ad Management', ''),
-                ('ad_budget', 'Ad Budget', ''),
-                ('ad_perf', 'Ad Performance', ''),
-                ('ad_cal', 'Ad Calendar', ''),
+                ('ad_mgmt', _('Ad Management'), ''),
+                ('ad_budget', _('Ad Budget'), ''),
+                ('ad_perf', _('Ad Performance'), ''),
+                ('ad_cal', _('Ad Calendar'), ''),
             ],
         }),
-        ('analytics', 'Analytics', {
-            'title': 'Analytics',
+        ('analytics', _('Analytics'), {
+            'title': _('Analytics'),
             'items': [
-                ('web_analy', 'Website Analytics', ''),
-                ('camp_analy', 'Campaign Analytics', ''),
-                ('sales_analy', 'Sales Analytics', ''),
-                ('cust_rpts', 'Custom Reports', ''),
+                ('web_analy', _('Website Analytics'), ''),
+                ('camp_analy', _('Campaign Analytics'), ''),
+                ('sales_analy', _('Sales Analytics'), ''),
+                ('cust_rpts', _('Custom Reports'), ''),
             ],
         }),
-        ('content_mgmt', 'Content Management', {
-            'title': 'Content Management',
+        ('content_mgmt', _('Content Management'), {
+            'title': _('Content Management'),
             'items': [
-                ('cont_cal', 'Content Calendar', ''),
-                ('blog', 'Blog Posts', ''),
-                ('mkt_mat', 'Marketing Materials', ''),
-                ('cont_arch', 'Content Archive', ''),
+                ('cont_cal', _('Content Calendar'), ''),
+                ('blog', _('Blog Posts'), ''),
+                ('mkt_mat', _('Marketing Materials'), ''),
+                ('cont_arch', _('Content Archive'), ''),
             ],
         }),
-        ('social_media', 'Social Media', {
-            'title': 'Social Media',
+        ('social_media', _('Social Media'), {
+            'title': _('Social Media'),
             'items': [
-                ('post_mgmt', 'Post Management', ''),
-                ('social_cal', 'Social Calendar', ''),
-                ('eng_rpts', 'Engagement Reports', ''),
-                ('acct_mgmt', 'Account Management', ''),
+                ('post_mgmt', _('Post Management'), ''),
+                ('social_cal', _('Social Calendar'), ''),
+                ('eng_rpts', _('Engagement Reports'), ''),
+                ('acct_mgmt', _('Account Management'), ''),
             ],
         }),
-        ('email_mkt', 'Email Marketing', {
-            'title': 'Email Marketing',
+        ('email_mkt', _('Email Marketing'), {
+            'title': _('Email Marketing'),
             'items': [
-                ('email_camp', 'Email Campaigns', ''),
-                ('sub_lists', 'Subscriber Lists', ''),
-                ('email_tmpl', 'Email Templates', ''),
-                ('email_analy', 'Email Analytics', ''),
+                ('email_camp', _('Email Campaigns'), ''),
+                ('sub_lists', _('Subscriber Lists'), ''),
+                ('email_tmpl', _('Email Templates'), ''),
+                ('email_analy', _('Email Analytics'), ''),
             ],
         }),
     ],
 }
 
 _SALES_MENU = {
-    'title': 'Sales Menu',
+    'title': _('Sales Menu'),
     'items': [
-        ('sales_orders', 'Sales Orders', {
-            'title': 'Sales Orders',
+        ('sales_orders', _('Sales Orders'), {
+            'title': _('Sales Orders'),
             'items': [
-                ('new_order', 'New Order', ''),
-                ('open_orders', 'Open Orders', ''),
-                ('order_hist', 'Order History', ''),
-                ('order_stat', 'Order Status', ''),
+                ('new_order', _('New Order'), ''),
+                ('open_orders', _('Open Orders'), ''),
+                ('order_hist', _('Order History'), ''),
+                ('order_stat', _('Order Status'), ''),
             ],
         }),
-        ('cust_accounts', 'Customer Accounts', {
-            'title': 'Customer Accounts',
+        ('cust_accounts', _('Customer Accounts'), {
+            'title': _('Customer Accounts'),
             'items': [
-                ('acct_list', 'Account List', ''),
-                ('new_acct', 'New Account', ''),
-                ('acct_det', 'Account Details', ''),
-                ('acct_hist', 'Account History', ''),
+                ('acct_list', _('Account List'), ''),
+                ('new_acct', _('New Account'), ''),
+                ('acct_det', _('Account Details'), ''),
+                ('acct_hist', _('Account History'), ''),
             ],
         }),
-        ('sales_reports', 'Sales Reports', {
-            'title': 'Sales Reports',
+        ('sales_reports', _('Sales Reports'), {
+            'title': _('Sales Reports'),
             'items': [
-                ('daily_sales', 'Daily Sales', ''),
-                ('month_sales', 'Monthly Sales', ''),
-                ('annual_rpt', 'Annual Report', ''),
-                ('by_rep', 'Sales by Rep', ''),
+                ('daily_sales', _('Daily Sales'), ''),
+                ('month_sales', _('Monthly Sales'), ''),
+                ('annual_rpt', _('Annual Report'), ''),
+                ('by_rep', _('Sales by Rep'), ''),
             ],
         }),
-        ('quotes', 'Quotes', {
-            'title': 'Quotes',
+        ('quotes', _('Quotes'), {
+            'title': _('Quotes'),
             'items': [
-                ('new_quote', 'Create Quote', ''),
-                ('act_quotes', 'Active Quotes', ''),
-                ('quote_hist', 'Quote History', ''),
-                ('conv_order', 'Convert to Order', ''),
+                ('new_quote', _('Create Quote'), ''),
+                ('act_quotes', _('Active Quotes'), ''),
+                ('quote_hist', _('Quote History'), ''),
+                ('conv_order', _('Convert to Order'), ''),
             ],
         }),
-        ('leads', 'Leads & Opportunities', {
-            'title': 'Leads & Opportunities',
+        ('leads', _('Leads & Opportunities'), {
+            'title': _('Leads & Opportunities'),
             'items': [
-                ('new_lead', 'New Lead', ''),
-                ('act_leads', 'Active Leads', ''),
-                ('opp_pipe', 'Opportunities Pipeline', ''),
-                ('lead_rpts', 'Lead Reports', ''),
+                ('new_lead', _('New Lead'), ''),
+                ('act_leads', _('Active Leads'), ''),
+                ('opp_pipe', _('Opportunities Pipeline'), ''),
+                ('lead_rpts', _('Lead Reports'), ''),
             ],
         }),
-        ('contracts', 'Contracts', {
-            'title': 'Contracts',
+        ('contracts', _('Contracts'), {
+            'title': _('Contracts'),
             'items': [
-                ('act_cont', 'Active Contracts', ''),
-                ('new_cont', 'Create Contract', ''),
-                ('cont_renew', 'Contract Renewals', ''),
-                ('cont_arch', 'Contract Archive', ''),
+                ('act_cont', _('Active Contracts'), ''),
+                ('new_cont', _('Create Contract'), ''),
+                ('cont_renew', _('Contract Renewals'), ''),
+                ('cont_arch', _('Contract Archive'), ''),
             ],
         }),
-        ('forecasting', 'Sales Forecasting', {
-            'title': 'Sales Forecasting',
+        ('forecasting', _('Sales Forecasting'), {
+            'title': _('Sales Forecasting'),
             'items': [
-                ('cur_fore', 'Current Forecast', ''),
-                ('fore_rep', 'Forecast by Rep', ''),
-                ('fore_prod', 'Forecast by Product', ''),
-                ('fore_rpts', 'Forecast Reports', ''),
+                ('cur_fore', _('Current Forecast'), ''),
+                ('fore_rep', _('Forecast by Rep'), ''),
+                ('fore_prod', _('Forecast by Product'), ''),
+                ('fore_rpts', _('Forecast Reports'), ''),
             ],
         }),
     ],
 }
 
 _PROD_MENU = {
-    'title': 'Production Menu',
+    'title': _('Production Menu'),
     'items': [
-        ('work_orders', 'Work Orders', {
-            'title': 'Work Orders',
+        ('work_orders', _('Work Orders'), {
+            'title': _('Work Orders'),
             'items': [
-                ('create_wo', 'Create Work Order', ''),
-                ('open_wo', 'Open Work Orders', ''),
-                ('inprog_wo', 'In Progress', ''),
-                ('comp_wo', 'Completed', ''),
+                ('create_wo', _('Create Work Order'), ''),
+                ('open_wo', _('Open Work Orders'), ''),
+                ('inprog_wo', _('In Progress'), ''),
+                ('comp_wo', _('Completed'), ''),
             ],
         }),
-        ('mrp', 'MRP Planning', {
-            'title': 'Material Requirements Planning',
+        ('mrp', _('MRP Planning'), {
+            'title': _('Material Requirements Planning'),
             'items': [
-                ('mrp_home', 'MRP Home', ''),
-                ('run_mrp', 'Run MRP Plan', ''),
-                ('mrp_demand', 'View Demand', ''),
-                ('mrp_rpts', 'MRP Reports', ''),
+                ('mrp_home', _('MRP Home'), ''),
+                ('run_mrp', _('Run MRP Plan'), ''),
+                ('mrp_demand', _('View Demand'), ''),
+                ('mrp_rpts', _('MRP Reports'), ''),
             ],
         }),
-        ('prod_schedule', 'Production Schedule', {
-            'title': 'Production Schedule',
+        ('prod_schedule', _('Production Schedule'), {
+            'title': _('Production Schedule'),
             'items': [
-                ('daily_sched', 'Daily Schedule', ''),
-                ('week_sched', 'Weekly Schedule', ''),
-                ('month_sched', 'Monthly Schedule', ''),
-                ('sched_cal', 'Schedule Calendar', ''),
-                ('gantt_sched', 'Gantt Chart', ''),
+                ('daily_sched', _('Daily Schedule'), ''),
+                ('week_sched', _('Weekly Schedule'), ''),
+                ('month_sched', _('Monthly Schedule'), ''),
+                ('sched_cal', _('Schedule Calendar'), ''),
+                ('gantt_sched', _('Gantt Chart'), ''),
             ],
         }),
-        ('inventory', 'Inventory', {
-            'title': 'Inventory',
+        ('inventory', _('Inventory'), {
+            'title': _('Inventory'),
             'items': [
-                ('raw_mat', 'Raw Materials', ''),
-                ('fin_goods', 'Finished Goods', ''),
-                ('wip_inv', 'WIP Inventory', ''),
-                ('inv_rpts', 'Inventory Reports', ''),
-                ('cost_valuation', 'FIFO/LIFO/Avg Valuation', ''),
+                ('raw_mat', _('Raw Materials'), ''),
+                ('fin_goods', _('Finished Goods'), ''),
+                ('wip_inv', _('WIP Inventory'), ''),
+                ('inv_rpts', _('Inventory Reports'), ''),
+                ('cost_valuation', _('FIFO/LIFO/Avg Valuation'), ''),
             ],
         }),
-        ('equip_status', 'Equipment Status', {
-            'title': 'Equipment Status',
+        ('equip_status', _('Equipment Status'), {
+            'title': _('Equipment Status'),
             'items': [
-                ('equip_list', 'Equipment List', ''),
-                ('stat_dash', 'Status Dashboard', ''),
-                ('down_log', 'Downtime Log', ''),
-                ('maint_req', 'Maintenance Requests', ''),
+                ('equip_list', _('Equipment List'), ''),
+                ('stat_dash', _('Status Dashboard'), ''),
+                ('down_log', _('Downtime Log'), ''),
+                ('maint_req', _('Maintenance Requests'), ''),
             ],
         }),
-        ('quality_ctrl', 'Quality Control', {
-            'title': 'Quality Control',
+        ('quality_ctrl', _('Quality Control'), {
+            'title': _('Quality Control'),
             'items': [
-                ('insp_res', 'Inspection Results', ''),
-                ('non_conf', 'Non-Conformances', ''),
-                ('qc_rpts', 'QC Reports', ''),
-                ('rej_analy', 'Reject Analysis', ''),
+                ('insp_res', _('Inspection Results'), ''),
+                ('non_conf', _('Non-Conformances'), ''),
+                ('qc_rpts', _('QC Reports'), ''),
+                ('rej_analy', _('Reject Analysis'), ''),
             ],
         }),
-        ('prod_reports', 'Production Reports', {
-            'title': 'Production Reports',
+        ('prod_reports', _('Production Reports'), {
+            'title': _('Production Reports'),
             'items': [
-                ('daily_prod', 'Daily Production', ''),
-                ('week_sum', 'Weekly Summary', ''),
-                ('eff_rpt', 'Efficiency Report', ''),
-                ('scrap_rpt', 'Scrap Report', ''),
+                ('daily_prod', _('Daily Production'), ''),
+                ('week_sum', _('Weekly Summary'), ''),
+                ('eff_rpt', _('Efficiency Report'), ''),
+                ('scrap_rpt', _('Scrap Report'), ''),
             ],
         }),
-        ('labor_tracking', 'Labor Tracking', {
-            'title': 'Labor Tracking',
+        ('labor_tracking', _('Labor Tracking'), {
+            'title': _('Labor Tracking'),
             'items': [
-                ('cur_labor', 'Current Labor', ''),
-                ('labor_shft', 'Labor by Shift', ''),
-                ('labor_job', 'Labor by Job', ''),
-                ('labor_rpts', 'Labor Reports', ''),
+                ('cur_labor', _('Current Labor'), ''),
+                ('labor_shft', _('Labor by Shift'), ''),
+                ('labor_job', _('Labor by Job'), ''),
+                ('labor_rpts', _('Labor Reports'), ''),
             ],
         }),
     ],
 }
 
 _SHIP_MENU = {
-    'title': 'Shipping Department',
+    'title': _('Shipping Department'),
     'items': [
-        ('ship_orders', 'Shipment Orders', {
-            'title': 'Shipment Orders',
+        ('ship_orders', _('Shipment Orders'), {
+            'title': _('Shipment Orders'),
             'items': [
-                ('new_ship', 'New Shipment', ''),
-                ('pend_ship', 'Pending Shipments', ''),
-                ('shipped', 'Shipped Orders', ''),
-                ('deliv_conf', 'Delivery Confirmation', ''),
+                ('new_ship', _('New Shipment'), ''),
+                ('pend_ship', _('Pending Shipments'), ''),
+                ('shipped', _('Shipped Orders'), ''),
+                ('deliv_conf', _('Delivery Confirmation'), ''),
             ],
         }),
-        ('ship_schedule', 'Shipping Schedule', {
-            'title': 'Shipping Schedule',
+        ('ship_schedule', _('Shipping Schedule'), {
+            'title': _('Shipping Schedule'),
             'items': [
-                ('today_sched', "Today's Schedule", ''),
-                ('week_sched', 'Weekly Schedule', ''),
-                ('sched_cal', 'Schedule Calendar', ''),
-                ('rush_orders', 'Rush Orders', ''),
+                ('today_sched', _("Today's Schedule"), ''),
+                ('week_sched', _('Weekly Schedule'), ''),
+                ('sched_cal', _('Schedule Calendar'), ''),
+                ('rush_orders', _('Rush Orders'), ''),
             ],
         }),
-        ('receiving', 'Receiving', {
-            'title': 'Receiving',
+        ('receiving', _('Receiving'), {
+            'title': _('Receiving'),
             'items': [
-                ('inbound', 'Inbound Shipments', ''),
-                ('recv_items', 'Receive Items', ''),
-                ('recv_rpts', 'Receiving Reports', ''),
-                ('disc_rpts', 'Discrepancy Reports', ''),
+                ('inbound', _('Inbound Shipments'), ''),
+                ('recv_items', _('Receive Items'), ''),
+                ('recv_rpts', _('Receiving Reports'), ''),
+                ('disc_rpts', _('Discrepancy Reports'), ''),
             ],
         }),
-        ('carrier_mgmt', 'Carrier Management', {
-            'title': 'Carrier Management',
+        ('carrier_mgmt', _('Carrier Management'), {
+            'title': _('Carrier Management'),
             'items': [
-                ('carr_list', 'Carrier List', ''),
-                ('carr_rates', 'Carrier Rates', ''),
-                ('perf_rpts', 'Performance Reports', ''),
-                ('carr_cont', 'Carrier Contracts', ''),
+                ('carr_list', _('Carrier List'), ''),
+                ('carr_rates', _('Carrier Rates'), ''),
+                ('perf_rpts', _('Performance Reports'), ''),
+                ('carr_cont', _('Carrier Contracts'), ''),
             ],
         }),
-        ('tracking', 'Tracking', {
-            'title': 'Tracking',
+        ('tracking', _('Tracking'), {
+            'title': _('Tracking'),
             'items': [
-                ('track_ship', 'Track Shipment', ''),
-                ('track_dash', 'Tracking Dashboard', ''),
-                ('deliv_stat', 'Delivery Status', ''),
-                ('exc_rpts', 'Exception Reports', ''),
+                ('track_ship', _('Track Shipment'), ''),
+                ('track_dash', _('Tracking Dashboard'), ''),
+                ('deliv_stat', _('Delivery Status'), ''),
+                ('exc_rpts', _('Exception Reports'), ''),
             ],
         }),
-        ('ship_reports', 'Shipping Reports', {
-            'title': 'Shipping Reports',
+        ('ship_reports', _('Shipping Reports'), {
+            'title': _('Shipping Reports'),
             'items': [
-                ('daily_rpt', 'Daily Report', ''),
-                ('week_sum', 'Weekly Summary', ''),
-                ('cost_analy', 'Cost Analysis', ''),
-                ('perf_rpt', 'Performance Report', ''),
+                ('daily_rpt', _('Daily Report'), ''),
+                ('week_sum', _('Weekly Summary'), ''),
+                ('cost_analy', _('Cost Analysis'), ''),
+                ('perf_rpt', _('Performance Report'), ''),
             ],
         }),
-        ('returns_proc', 'Returns Processing', {
-            'title': 'Returns Processing',
+        ('returns_proc', _('Returns Processing'), {
+            'title': _('Returns Processing'),
             'items': [
-                ('new_return', 'New Return', ''),
-                ('pend_ret', 'Pending Returns', ''),
-                ('ret_hist', 'Return History', ''),
-                ('ret_rpts', 'Return Reports', ''),
+                ('new_return', _('New Return'), ''),
+                ('pend_ret', _('Pending Returns'), ''),
+                ('ret_hist', _('Return History'), ''),
+                ('ret_rpts', _('Return Reports'), ''),
             ],
         }),
-        ('wms', 'Warehouse Management', {
-            'title': 'Warehouse Management',
+        ('wms', _('Warehouse Management'), {
+            'title': _('Warehouse Management'),
             'items': [
-                ('warehouses', 'Warehouses', ''),
-                ('bin_master', 'Bin Master', ''),
-                ('putaway_rules', 'Put-Away Rules', ''),
-                ('pick_lists', 'Pick Lists', ''),
-                ('wave_picking', 'Wave Picking', ''),
-                ('pack_station', 'Pack Station', ''),
-                ('transfers', 'Warehouse Transfers', ''),
-                ('rfid_readers', 'RFID Readers', ''),
-                ('rfid_tags', 'RFID Tags', ''),
+                ('warehouses', _('Warehouses'), ''),
+                ('bin_master', _('Bin Master'), ''),
+                ('putaway_rules', _('Put-Away Rules'), ''),
+                ('pick_lists', _('Pick Lists'), ''),
+                ('wave_picking', _('Wave Picking'), ''),
+                ('pack_station', _('Pack Station'), ''),
+                ('transfers', _('Warehouse Transfers'), ''),
+                ('rfid_readers', _('RFID Readers'), ''),
+                ('rfid_tags', _('RFID Tags'), ''),
             ],
         }),
     ],
 }
 
 _QA_LAB_MENU = {
-    'title': 'QA Laboratory Menu',
+    'title': _('QA Laboratory Menu'),
     'items': [
-        ('test_requests', 'Test Requests', {
-            'title': 'Test Requests',
+        ('test_requests', _('Test Requests'), {
+            'title': _('Test Requests'),
             'items': [
-                ('new_req', 'New Request', ''),
-                ('pend_req', 'Pending Requests', ''),
-                ('inprog_req', 'In Progress', ''),
-                ('comp_tests', 'Completed Tests', ''),
+                ('new_req', _('New Request'), ''),
+                ('pend_req', _('Pending Requests'), ''),
+                ('inprog_req', _('In Progress'), ''),
+                ('comp_tests', _('Completed Tests'), ''),
             ],
         }),
-        ('lab_results', 'Lab Results', {
-            'title': 'Lab Results',
+        ('lab_results', _('Lab Results'), {
+            'title': _('Lab Results'),
             'items': [
-                ('recent_res', 'Recent Results', ''),
-                ('search_res', 'Search Results', ''),
-                ('failed', 'Failed Tests', ''),
-                ('res_rpts', 'Result Reports', ''),
+                ('recent_res', _('Recent Results'), ''),
+                ('search_res', _('Search Results'), ''),
+                ('failed', _('Failed Tests'), ''),
+                ('res_rpts', _('Result Reports'), ''),
             ],
         }),
-        ('insp_reports', 'Inspection Reports', {
-            'title': 'Inspection Reports',
+        ('insp_reports', _('Inspection Reports'), {
+            'title': _('Inspection Reports'),
             'items': [
-                ('create_rpt', 'Create Report', ''),
-                ('pend_rpts', 'Pending Reports', ''),
-                ('rpt_arch', 'Report Archive', ''),
-                ('rpt_sum', 'Report Summary', ''),
+                ('create_rpt', _('Create Report'), ''),
+                ('pend_rpts', _('Pending Reports'), ''),
+                ('rpt_arch', _('Report Archive'), ''),
+                ('rpt_sum', _('Report Summary'), ''),
             ],
         }),
-        ('non_conformance', 'Non-Conformance', {
-            'title': 'Non-Conformance',
+        ('non_conformance', _('Non-Conformance'), {
+            'title': _('Non-Conformance'),
             'items': [
-                ('new_ncr', 'New NCR', ''),
-                ('open_ncrs', 'Open NCRs', ''),
-                ('ncr_hist', 'NCR History', ''),
-                ('ncr_rpts', 'NCR Reports', ''),
+                ('new_ncr', _('New NCR'), ''),
+                ('open_ncrs', _('Open NCRs'), ''),
+                ('ncr_hist', _('NCR History'), ''),
+                ('ncr_rpts', _('NCR Reports'), ''),
             ],
         }),
-        ('calibration', 'Calibration', {
-            'title': 'Calibration',
+        ('calibration', _('Calibration'), {
+            'title': _('Calibration'),
             'items': [
-                ('cal_sched', 'Calibration Schedule', ''),
-                ('cal_records', 'Calibration Records', ''),
-                ('overdue', 'Overdue Items', ''),
-                ('cal_rpts', 'Calibration Reports', ''),
+                ('cal_sched', _('Calibration Schedule'), ''),
+                ('cal_records', _('Calibration Records'), ''),
+                ('overdue', _('Overdue Items'), ''),
+                ('cal_rpts', _('Calibration Reports'), ''),
             ],
         }),
-        ('sample_mgmt', 'Sample Management', {
-            'title': 'Sample Management',
+        ('sample_mgmt', _('Sample Management'), {
+            'title': _('Sample Management'),
             'items': [
-                ('recv_sample', 'Receive Sample', ''),
-                ('samp_track', 'Sample Tracking', ''),
-                ('samp_disp', 'Sample Disposal', ''),
-                ('samp_rpts', 'Sample Reports', ''),
+                ('recv_sample', _('Receive Sample'), ''),
+                ('samp_track', _('Sample Tracking'), ''),
+                ('samp_disp', _('Sample Disposal'), ''),
+                ('samp_rpts', _('Sample Reports'), ''),
             ],
         }),
-        ('lab_reports', 'Lab Reports', {
-            'title': 'Lab Reports',
+        ('lab_reports', _('Lab Reports'), {
+            'title': _('Lab Reports'),
             'items': [
-                ('daily_rpts', 'Daily Reports', ''),
-                ('week_sum', 'Weekly Summary', ''),
-                ('month_rpt', 'Monthly Report', ''),
-                ('cust_rpts', 'Custom Reports', ''),
+                ('daily_rpts', _('Daily Reports'), ''),
+                ('week_sum', _('Weekly Summary'), ''),
+                ('month_rpt', _('Monthly Report'), ''),
+                ('cust_rpts', _('Custom Reports'), ''),
             ],
         }),
     ],
 }
 
 _QA_MENU = {
-    'title': 'Quality Assurance Menu',
+    'title': _('Quality Assurance Menu'),
     'items': [
-        ('qa_lab', 'QA Laboratory Menu', _QA_LAB_MENU),
+        ('qa_lab', _('QA Laboratory Menu'), _QA_LAB_MENU),
     ],
 }
 
 _PERS_MENU = {
-    'title': 'Personnel Menu',
+    'title': _('Personnel Menu'),
     'items': [
-        ('pers_crm', 'Personnel CRM', ''),
-        ('reg_form', 'Registration Form', ''),
-        ('upd_pass', 'Update Password', ''),
-        ('disp_dept', 'Display Department', ''),
-        ('dept_entry', 'Dept Entry', ''),
-        ('dept_sub', 'Dept Sub Entry', ''),
-        ('time_clock', 'Time Clock', _TIME_CLOCK_MENU),
-        ('emp_records', 'Employee Records', {
-            'title': 'Employee Records',
+        ('pers_crm', _('Personnel CRM'), ''),
+        ('reg_form', _('Registration Form'), ''),
+        ('upd_pass', _('Update Password'), ''),
+        ('disp_dept', _('Display Department'), ''),
+        ('dept_entry', _('Dept Entry'), ''),
+        ('dept_sub', _('Dept Sub Entry'), ''),
+        ('time_clock', _('Time Clock'), _TIME_CLOCK_MENU),
+        ('emp_records', _('Employee Records'), {
+            'title': _('Employee Records'),
             'items': [
-                ('view_recs', 'View Records', ''),
-                ('new_emp', 'New Employee', ''),
-                ('upd_rec', 'Update Record', ''),
-                ('emp_hist', 'Employment History', ''),
+                ('view_recs', _('View Records'), ''),
+                ('new_emp', _('New Employee'), ''),
+                ('upd_rec', _('Update Record'), ''),
+                ('emp_hist', _('Employment History'), ''),
             ],
         }),
-        ('benefits', 'Benefits', {
-            'title': 'Benefits',
+        ('benefits', _('Benefits'), {
+            'title': _('Benefits'),
             'items': [
-                ('ben_enroll', 'Benefits Enrollment', ''),
-                ('ben_sum', 'Benefits Summary', ''),
-                ('cobra', 'COBRA Management', ''),
-                ('ben_rpts', 'Benefits Reports', ''),
+                ('ben_enroll', _('Benefits Enrollment'), ''),
+                ('ben_sum', _('Benefits Summary'), ''),
+                ('cobra', _('COBRA Management'), ''),
+                ('ben_rpts', _('Benefits Reports'), ''),
             ],
         }),
-        ('perf_review', 'Performance Reviews', {
-            'title': 'Performance Reviews',
+        ('perf_review', _('Performance Reviews'), {
+            'title': _('Performance Reviews'),
             'items': [
-                ('sched_rev', 'Schedule Review', ''),
-                ('pend_revs', 'Pending Reviews', ''),
-                ('rev_hist', 'Review History', ''),
-                ('perf_rpts', 'Performance Reports', ''),
+                ('sched_rev', _('Schedule Review'), ''),
+                ('pend_revs', _('Pending Reviews'), ''),
+                ('rev_hist', _('Review History'), ''),
+                ('perf_rpts', _('Performance Reports'), ''),
             ],
         }),
-        ('disc_records', 'Disciplinary Records', {
-            'title': 'Disciplinary Records',
+        ('disc_records', _('Disciplinary Records'), {
+            'title': _('Disciplinary Records'),
             'items': [
-                ('new_rec', 'New Record', ''),
-                ('view_recs', 'View Records', ''),
-                ('rec_hist', 'Record History', ''),
-                ('disc_rpts', 'Disciplinary Reports', ''),
+                ('new_rec', _('New Record'), ''),
+                ('view_recs', _('View Records'), ''),
+                ('rec_hist', _('Record History'), ''),
+                ('disc_rpts', _('Disciplinary Reports'), ''),
             ],
         }),
-        ('training', 'Training & Development', {
-            'title': 'Training & Development',
+        ('training', _('Training & Development'), {
+            'title': _('Training & Development'),
             'items': [
-                ('train_cal', 'Training Calendar', ''),
-                ('train_recs', 'Training Records', ''),
-                ('course_mgmt', 'Course Management', ''),
-                ('cert_track', 'Certification Tracking', ''),
+                ('train_cal', _('Training Calendar'), ''),
+                ('train_recs', _('Training Records'), ''),
+                ('course_mgmt', _('Course Management'), ''),
+                ('cert_track', _('Certification Tracking'), ''),
             ],
         }),
-        ('onboarding', 'Onboarding', {
-            'title': 'Onboarding',
+        ('onboarding', _('Onboarding'), {
+            'title': _('Onboarding'),
             'items': [
-                ('hire_chk', 'New Hire Checklist', ''),
-                ('onb_stat', 'Onboarding Status', ''),
-                ('doc_coll', 'Document Collection', ''),
-                ('onb_rpts', 'Onboarding Reports', ''),
+                ('hire_chk', _('New Hire Checklist'), ''),
+                ('onb_stat', _('Onboarding Status'), ''),
+                ('doc_coll', _('Document Collection'), ''),
+                ('onb_rpts', _('Onboarding Reports'), ''),
             ],
         }),
     ],
 }
 
 _CS_MENU = {
-    'title': 'Customer Service Menu',
+    'title': _('Customer Service Menu'),
     'items': [
-        ('cust_entry', 'Customer Entry Screen', ''),
-        ('open_tickets', 'Open Tickets', {
-            'title': 'Open Tickets',
+        ('cust_entry', _('Customer Entry Screen'), ''),
+        ('open_tickets', _('Open Tickets'), {
+            'title': _('Open Tickets'),
             'items': [
-                ('all_tickets', 'View All Tickets', ''),
-                ('my_tickets', 'My Tickets', ''),
-                ('hi_pri', 'High Priority', ''),
-                ('tick_search', 'Ticket Search', ''),
+                ('all_tickets', _('View All Tickets'), ''),
+                ('my_tickets', _('My Tickets'), ''),
+                ('hi_pri', _('High Priority'), ''),
+                ('tick_search', _('Ticket Search'), ''),
             ],
         }),
-        ('cust_accounts', 'Customer Accounts', {
-            'title': 'Customer Accounts',
+        ('cust_accounts', _('Customer Accounts'), {
+            'title': _('Customer Accounts'),
             'items': [
-                ('acct_list', 'Account List', ''),
-                ('new_acct', 'New Account', ''),
-                ('acct_det', 'Account Details', ''),
-                ('acct_hist', 'Account History', ''),
+                ('acct_list', _('Account List'), ''),
+                ('new_acct', _('New Account'), ''),
+                ('acct_det', _('Account Details'), ''),
+                ('acct_hist', _('Account History'), ''),
             ],
         }),
-        ('returns', 'Returns & Refunds', {
-            'title': 'Returns & Refunds',
+        ('returns', _('Returns & Refunds'), {
+            'title': _('Returns & Refunds'),
             'items': [
-                ('new_return', 'New Return', ''),
-                ('pend_ret', 'Pending Returns', ''),
-                ('refund_proc', 'Refund Processing', ''),
-                ('ret_rpts', 'Returns Reports', ''),
+                ('new_return', _('New Return'), ''),
+                ('pend_ret', _('Pending Returns'), ''),
+                ('refund_proc', _('Refund Processing'), ''),
+                ('ret_rpts', _('Returns Reports'), ''),
             ],
         }),
-        ('knowledge_base', 'Knowledge Base', {
-            'title': 'Knowledge Base',
+        ('knowledge_base', _('Knowledge Base'), {
+            'title': _('Knowledge Base'),
             'items': [
-                ('browse', 'Browse Articles', ''),
-                ('create_art', 'Create Article', ''),
-                ('art_mgmt', 'Article Management', ''),
-                ('kb_search', 'Search Knowledge Base', ''),
+                ('browse', _('Browse Articles'), ''),
+                ('create_art', _('Create Article'), ''),
+                ('art_mgmt', _('Article Management'), ''),
+                ('kb_search', _('Search Knowledge Base'), ''),
             ],
         }),
-        ('svc_reports', 'Service Reports', {
-            'title': 'Service Reports',
+        ('svc_reports', _('Service Reports'), {
+            'title': _('Service Reports'),
             'items': [
-                ('daily_rpt', 'Daily Report', ''),
-                ('week_sum', 'Weekly Summary', ''),
-                ('res_rpts', 'Resolution Reports', ''),
-                ('csat_rpts', 'Customer Satisfaction', ''),
+                ('daily_rpt', _('Daily Report'), ''),
+                ('week_sum', _('Weekly Summary'), ''),
+                ('res_rpts', _('Resolution Reports'), ''),
+                ('csat_rpts', _('Customer Satisfaction'), ''),
             ],
         }),
-        ('surveys', 'Surveys & Feedback', {
-            'title': 'Surveys & Feedback',
+        ('surveys', _('Surveys & Feedback'), {
+            'title': _('Surveys & Feedback'),
             'items': [
-                ('act_surv', 'Active Surveys', ''),
-                ('new_surv', 'Create Survey', ''),
-                ('surv_res', 'Survey Results', ''),
-                ('feed_rpts', 'Feedback Reports', ''),
+                ('act_surv', _('Active Surveys'), ''),
+                ('new_surv', _('Create Survey'), ''),
+                ('surv_res', _('Survey Results'), ''),
+                ('feed_rpts', _('Feedback Reports'), ''),
             ],
         }),
     ],
 }
 
 _IT_TECH = {
-    'title': 'IT Technician',
+    'title': _('IT Technician'),
     'items': [
-        ('it_tasks', 'IT Tasks', ''),
-        ('help_desk', 'Help Desk Tickets', {
-            'title': 'Help Desk Tickets',
+        ('it_tasks', _('IT Tasks'), ''),
+        ('help_desk', _('Help Desk Tickets'), {
+            'title': _('Help Desk Tickets'),
             'items': [
-                ('new_ticket', 'New Ticket', ''),
-                ('open_tick', 'Open Tickets', ''),
-                ('my_tickets', 'My Assigned Tickets', ''),
-                ('tick_hist', 'Ticket History', ''),
+                ('new_ticket', _('New Ticket'), ''),
+                ('open_tick', _('Open Tickets'), ''),
+                ('my_tickets', _('My Assigned Tickets'), ''),
+                ('tick_hist', _('Ticket History'), ''),
             ],
         }),
-        ('asset_mgmt', 'Asset Management', {
-            'title': 'Asset Management',
+        ('asset_mgmt', _('Asset Management'), {
+            'title': _('Asset Management'),
             'items': [
-                ('asset_inv', 'Asset Inventory', ''),
-                ('new_asset', 'New Asset', ''),
-                ('asset_hist', 'Asset History', ''),
-                ('disposition', 'Disposition', ''),
+                ('asset_inv', _('Asset Inventory'), ''),
+                ('new_asset', _('New Asset'), ''),
+                ('asset_hist', _('Asset History'), ''),
+                ('disposition', _('Disposition'), ''),
             ],
         }),
-        ('net_status', 'Network Status', {
-            'title': 'Network Status',
+        ('net_status', _('Network Status'), {
+            'title': _('Network Status'),
             'items': [
-                ('net_dash', 'Network Dashboard', ''),
-                ('bw_monitor', 'Bandwidth Monitor', ''),
-                ('net_map', 'Network Map', ''),
-                ('inc_log', 'Incident Log', ''),
+                ('net_dash', _('Network Dashboard'), ''),
+                ('bw_monitor', _('Bandwidth Monitor'), ''),
+                ('net_map', _('Network Map'), ''),
+                ('inc_log', _('Incident Log'), ''),
             ],
         }),
-        ('sw_install', 'Software Installations', {
-            'title': 'Software Installations',
+        ('sw_install', _('Software Installations'), {
+            'title': _('Software Installations'),
             'items': [
-                ('pend_inst', 'Pending Installs', ''),
-                ('sw_inv', 'Software Inventory', ''),
-                ('lic_mgmt', 'License Management', ''),
-                ('inst_hist', 'Installation History', ''),
+                ('pend_inst', _('Pending Installs'), ''),
+                ('sw_inv', _('Software Inventory'), ''),
+                ('lic_mgmt', _('License Management'), ''),
+                ('inst_hist', _('Installation History'), ''),
             ],
         }),
-        ('hw_repairs', 'Hardware Repairs', {
-            'title': 'Hardware Repairs',
+        ('hw_repairs', _('Hardware Repairs'), {
+            'title': _('Hardware Repairs'),
             'items': [
-                ('new_repair', 'New Repair Request', ''),
-                ('inprog', 'In Progress', ''),
-                ('comp_rep', 'Completed Repairs', ''),
-                ('rep_hist', 'Repair History', ''),
+                ('new_repair', _('New Repair Request'), ''),
+                ('inprog', _('In Progress'), ''),
+                ('comp_rep', _('Completed Repairs'), ''),
+                ('rep_hist', _('Repair History'), ''),
             ],
         }),
-        ('user_accts', 'User Account Management', {
-            'title': 'User Account Management',
+        ('user_accts', _('User Account Management'), {
+            'title': _('User Account Management'),
             'items': [
-                ('create_acct', 'Create Account', ''),
-                ('reset_pw', 'Reset Password', ''),
-                ('acct_stat', 'Account Status', ''),
-                ('acct_audit', 'Account Audit', ''),
+                ('create_acct', _('Create Account'), ''),
+                ('reset_pw', _('Reset Password'), ''),
+                ('acct_stat', _('Account Status'), ''),
+                ('acct_audit', _('Account Audit'), ''),
             ],
         }),
     ],
 }
 
 _PURCH_MENU = {
-    'title': 'Purchasing Menu',
+    'title': _('Purchasing Menu'),
     'items': [
-        ('prod_entry', 'Product Entry', ''),
-        ('sup_entry', 'Supplier Entry', ''),
-        ('purch_orders', 'Purchase Orders', {
-            'title': 'Purchase Orders',
+        ('prod_entry', _('Product Entry'), ''),
+        ('sup_entry', _('Supplier Entry'), ''),
+        ('purch_orders', _('Purchase Orders'), {
+            'title': _('Purchase Orders'),
             'items': [
-                ('new_po', 'New PO', ''),
-                ('open_pos', 'Open POs', ''),
-                ('po_status', 'PO Status', ''),
-                ('po_hist', 'PO History', ''),
+                ('new_po', _('New PO'), ''),
+                ('open_pos', _('Open POs'), ''),
+                ('po_status', _('PO Status'), ''),
+                ('po_hist', _('PO History'), ''),
             ],
         }),
-        ('vendor_mgmt', 'Vendor Management', {
-            'title': 'Vendor Management',
+        ('vendor_mgmt', _('Vendor Management'), {
+            'title': _('Vendor Management'),
             'items': [
-                ('vend_list', 'Vendor List', ''),
-                ('new_vend', 'New Vendor', ''),
-                ('vend_perf', 'Vendor Performance', ''),
-                ('vend_cont', 'Vendor Contracts', ''),
+                ('vend_list', _('Vendor List'), ''),
+                ('new_vend', _('New Vendor'), ''),
+                ('vend_perf', _('Vendor Performance'), ''),
+                ('vend_cont', _('Vendor Contracts'), ''),
             ],
         }),
-        ('purch_reports', 'Purchase Reports', {
-            'title': 'Purchase Reports',
+        ('purch_reports', _('Purchase Reports'), {
+            'title': _('Purchase Reports'),
             'items': [
-                ('spend_sum', 'Spending Summary', ''),
-                ('po_rpts', 'PO Reports', ''),
-                ('budg_act', 'Budget vs. Actual', ''),
-                ('cat_rpts', 'Category Reports', ''),
+                ('spend_sum', _('Spending Summary'), ''),
+                ('po_rpts', _('PO Reports'), ''),
+                ('budg_act', _('Budget vs. Actual'), ''),
+                ('cat_rpts', _('Category Reports'), ''),
             ],
         }),
-        ('receiving', 'Receiving', {
-            'title': 'Receiving',
+        ('receiving', _('Receiving'), {
+            'title': _('Receiving'),
             'items': [
-                ('pend_recv', 'Pending Receipts', ''),
-                ('recv_items', 'Receive Items', ''),
-                ('disc_rpts', 'Discrepancy Reports', ''),
-                ('recv_hist', 'Receiving History', ''),
+                ('pend_recv', _('Pending Receipts'), ''),
+                ('recv_items', _('Receive Items'), ''),
+                ('disc_rpts', _('Discrepancy Reports'), ''),
+                ('recv_hist', _('Receiving History'), ''),
             ],
         }),
-        ('contracts', 'Contract Management', {
-            'title': 'Contract Management',
+        ('contracts', _('Contract Management'), {
+            'title': _('Contract Management'),
             'items': [
-                ('act_cont', 'Active Contracts', ''),
-                ('new_cont', 'New Contract', ''),
-                ('cont_renew', 'Contract Renewals', ''),
-                ('cont_arch', 'Contract Archive', ''),
+                ('act_cont', _('Active Contracts'), ''),
+                ('new_cont', _('New Contract'), ''),
+                ('cont_renew', _('Contract Renewals'), ''),
+                ('cont_arch', _('Contract Archive'), ''),
             ],
         }),
-        ('requisitions', 'Requisitions', {
-            'title': 'Requisitions',
+        ('requisitions', _('Requisitions'), {
+            'title': _('Requisitions'),
             'items': [
-                ('new_req', 'New Requisition', ''),
-                ('pend_appr', 'Pending Approval', ''),
-                ('appr_reqs', 'Approved Requisitions',
+                ('new_req', _('New Requisition'), ''),
+                ('pend_appr', _('Pending Approval'), ''),
+                ('appr_reqs', _('Approved Requisitions'),
                  ''),
-                ('req_hist', 'Requisition History',
+                ('req_hist', _('Requisition History'),
                  ''),
             ],
         }),
@@ -778,887 +778,887 @@ _PURCH_MENU = {
 
 MENU_TREE = {
     'accounting': {
-        'title': 'Accounting Main Menu',
+        'title': _('Accounting Main Menu'),
         'items': [
-            ('acct_pay', 'Accounts Payable', ''),
-            ('acct_mgr', 'Accounting Manager', {
-                'title': 'Accounting Manager',
+            ('acct_pay', _('Accounts Payable'), ''),
+            ('acct_mgr', _('Accounting Manager'), {
+                'title': _('Accounting Manager'),
                 'items': [
-                    ('ap', 'Accounts Payable', ''),
-                    ('rcv', 'Accounts Receivable', ''),
-                    ('credit', 'Credit Department', ''),
-                    ('pay', 'Payroll Department', ''),
-                    ('fin_reports', 'Financial Reports', {
-                        'title': 'Financial Reports',
+                    ('ap', _('Accounts Payable'), ''),
+                    ('rcv', _('Accounts Receivable'), ''),
+                    ('credit', _('Credit Department'), ''),
+                    ('pay', _('Payroll Department'), ''),
+                    ('fin_reports', _('Financial Reports'), {
+                        'title': _('Financial Reports'),
                         'items': [
-                            ('inc_stmt', 'Income Statement',
+                            ('inc_stmt', _('Income Statement'),
                              ''),
-                            ('bal_sheet', 'Balance Sheet',
+                            ('bal_sheet', _('Balance Sheet'),
                              ''),
-                            ('cash_flow', 'Cash Flow', ''),
-                            ('cust_rpts', 'Custom Reports',
+                            ('cash_flow', _('Cash Flow'), ''),
+                            ('cust_rpts', _('Custom Reports'),
                              ''),
                         ],
                     }),
-                    ('budget_mgmt', 'Budget Management', {
-                        'title': 'Budget Management',
+                    ('budget_mgmt', _('Budget Management'), {
+                        'title': _('Budget Management'),
                         'items': [
-                            ('budg_plan', 'Budget Planning', ''),
-                            ('budg_act', 'Budget vs. Actual',
+                            ('budg_plan', _('Budget Planning'), ''),
+                            ('budg_act', _('Budget vs. Actual'),
                              ''),
-                            ('budg_amend', 'Budget Amendments',
+                            ('budg_amend', _('Budget Amendments'),
                              ''),
-                            ('budg_rpts', 'Budget Reports', ''),
+                            ('budg_rpts', _('Budget Reports'), ''),
                         ],
                     }),
-                    ('audit_mgmt', 'Audit Management', {
-                        'title': 'Audit Management',
+                    ('audit_mgmt', _('Audit Management'), {
+                        'title': _('Audit Management'),
                         'items': [
-                            ('audit_sched', 'Audit Schedule', ''),
-                            ('findings', 'Audit Findings', ''),
-                            ('corr_act', 'Corrective Actions',
+                            ('audit_sched', _('Audit Schedule'), ''),
+                            ('findings', _('Audit Findings'), ''),
+                            ('corr_act', _('Corrective Actions'),
                              ''),
-                            ('audit_rpts', 'Audit Reports', ''),
+                            ('audit_rpts', _('Audit Reports'), ''),
                         ],
                     }),
                 ],
             }),
-            ('acct_rcv', 'Accounts Receivable', ''),
-            ('credit', 'Credit Department', ''),
-            ('payroll', 'Payroll Department', ''),
-            ('gen_ledger', 'General Ledger', ''),
-            ('multi_entity', 'Multi-Entity', {
-                'title': 'Multi-Entity',
+            ('acct_rcv', _('Accounts Receivable'), ''),
+            ('credit', _('Credit Department'), ''),
+            ('payroll', _('Payroll Department'), ''),
+            ('gen_ledger', _('General Ledger'), ''),
+            ('multi_entity', _('Multi-Entity'), {
+                'title': _('Multi-Entity'),
                 'items': [
-                    ('companies', 'Companies', ''),
-                    ('intercompany', 'Intercompany Transactions',
+                    ('companies', _('Companies'), ''),
+                    ('intercompany', _('Intercompany Transactions'),
                      ''),
-                    ('consol_fin', 'Consolidated Financials',
+                    ('consol_fin', _('Consolidated Financials'),
                      ''),
                 ],
             }),
-            ('budget_mgmt', 'Budget Management', {
-                'title': 'Budget Management',
+            ('budget_mgmt', _('Budget Management'), {
+                'title': _('Budget Management'),
                 'items': [
-                    ('budg_plan', 'Budget Planning', ''),
-                    ('budg_act', 'Budget vs. Actual', ''),
-                    ('budg_amend', 'Budget Amendments', ''),
-                    ('budg_rpts', 'Budget Reports', ''),
+                    ('budg_plan', _('Budget Planning'), ''),
+                    ('budg_act', _('Budget vs. Actual'), ''),
+                    ('budg_amend', _('Budget Amendments'), ''),
+                    ('budg_rpts', _('Budget Reports'), ''),
                 ],
             }),
-            ('fin_reports', 'Financial Reports', {
-                'title': 'Financial Reports',
+            ('fin_reports', _('Financial Reports'), {
+                'title': _('Financial Reports'),
                 'items': [
-                    ('inc_stmt', 'Income Statement', ''),
-                    ('bal_sheet', 'Balance Sheet', ''),
-                    ('cash_flow', 'Cash Flow', ''),
-                    ('cust_rpts', 'Custom Reports', ''),
+                    ('inc_stmt', _('Income Statement'), ''),
+                    ('bal_sheet', _('Balance Sheet'), ''),
+                    ('cash_flow', _('Cash Flow'), ''),
+                    ('cust_rpts', _('Custom Reports'), ''),
                 ],
             }),
-            ('tax_mgmt', 'Tax Management', {
-                'title': 'Tax Management',
+            ('tax_mgmt', _('Tax Management'), {
+                'title': _('Tax Management'),
                 'items': [
-                    ('tax_cal', 'Tax Calendar', ''),
-                    ('tax_filing', 'Tax Filing', ''),
-                    ('tax_pay', 'Tax Payments', ''),
-                    ('tax_rpts', 'Tax Reports', ''),
+                    ('tax_cal', _('Tax Calendar'), ''),
+                    ('tax_filing', _('Tax Filing'), ''),
+                    ('tax_pay', _('Tax Payments'), ''),
+                    ('tax_rpts', _('Tax Reports'), ''),
                 ],
             }),
-            ('exp_reports', 'Expense Reports', {
-                'title': 'Expense Reports',
+            ('exp_reports', _('Expense Reports'), {
+                'title': _('Expense Reports'),
                 'items': [
-                    ('sub_exp', 'Submit Expense', ''),
-                    ('pend_appr', 'Pending Approval', ''),
-                    ('appr_exp', 'Approved Expenses', ''),
-                    ('exp_sum', 'Expense Summary', ''),
+                    ('sub_exp', _('Submit Expense'), ''),
+                    ('pend_appr', _('Pending Approval'), ''),
+                    ('appr_exp', _('Approved Expenses'), ''),
+                    ('exp_sum', _('Expense Summary'), ''),
                 ],
             }),
-            ('bank_recon', 'Bank Reconciliation', {
-                'title': 'Bank Reconciliation',
+            ('bank_recon', _('Bank Reconciliation'), {
+                'title': _('Bank Reconciliation'),
                 'items': [
-                    ('recon_acct', 'Reconcile Account', ''),
-                    ('pend_items', 'Pending Items', ''),
-                    ('recon_hist', 'Reconciliation History',
+                    ('recon_acct', _('Reconcile Account'), ''),
+                    ('pend_items', _('Pending Items'), ''),
+                    ('recon_hist', _('Reconciliation History'),
                      ''),
-                    ('bank_rpts', 'Bank Reports', ''),
+                    ('bank_rpts', _('Bank Reports'), ''),
                 ],
             }),
         ],
     },
     'customer_service': {
-        'title': 'Customer Service Main Menu',
+        'title': _('Customer Service Main Menu'),
         'items': [
-            ('cs_mgr', 'CS Manager Menu', {
-                'title': 'CS Manager Menu',
+            ('cs_mgr', _('CS Manager Menu'), {
+                'title': _('CS Manager Menu'),
                 'items': [
-                    ('cs_menu', 'Customer Service Menu', _CS_MENU),
-                    ('ticket_rpts', 'Ticket Reports', {
-                        'title': 'Ticket Reports',
+                    ('cs_menu', _('Customer Service Menu'), _CS_MENU),
+                    ('ticket_rpts', _('Ticket Reports'), {
+                        'title': _('Ticket Reports'),
                         'items': [
-                            ('daily_tick', 'Daily Ticket Report',
+                            ('daily_tick', _('Daily Ticket Report'),
                              ''),
-                            ('week_sum', 'Weekly Summary', ''),
-                            ('res_analy', 'Resolution Analysis',
+                            ('week_sum', _('Weekly Summary'), ''),
+                            ('res_analy', _('Resolution Analysis'),
                              ''),
-                            ('sla_rpts', 'SLA Reports', ''),
+                            ('sla_rpts', _('SLA Reports'), ''),
                         ],
                     }),
-                    ('staff_mgmt', 'Staff Management', {
-                        'title': 'Staff Management',
+                    ('staff_mgmt', _('Staff Management'), {
+                        'title': _('Staff Management'),
                         'items': [
-                            ('staff_sched', 'Staff Schedule',
+                            ('staff_sched', _('Staff Schedule'),
                              ''),
-                            ('perf_met', 'Performance Metrics',
+                            ('perf_met', _('Performance Metrics'),
                              ''),
-                            ('staff_train', 'Staff Training',
+                            ('staff_train', _('Staff Training'),
                              ''),
-                            ('staff_rpts', 'Staff Reports',
-                             ''),
-                        ],
-                    }),
-                    ('cust_sat', 'Customer Satisfaction', {
-                        'title': 'Customer Satisfaction',
-                        'items': [
-                            ('csat_res', 'CSAT Survey Results',
-                             ''),
-                            ('nps_rpts', 'NPS Reports', ''),
-                            ('sat_trends', 'Satisfaction Trends',
-                             ''),
-                            ('impr_plans', 'Improvement Plans',
+                            ('staff_rpts', _('Staff Reports'),
                              ''),
                         ],
                     }),
-                    ('escalations', 'Escalations', {
-                        'title': 'Escalations',
+                    ('cust_sat', _('Customer Satisfaction'), {
+                        'title': _('Customer Satisfaction'),
                         'items': [
-                            ('act_esc', 'Active Escalations',
+                            ('csat_res', _('CSAT Survey Results'),
                              ''),
-                            ('esc_hist', 'Escalation History',
+                            ('nps_rpts', _('NPS Reports'), ''),
+                            ('sat_trends', _('Satisfaction Trends'),
                              ''),
-                            ('esc_rpts', 'Escalation Reports',
+                            ('impr_plans', _('Improvement Plans'),
                              ''),
-                            ('res_track', 'Resolution Tracking',
+                        ],
+                    }),
+                    ('escalations', _('Escalations'), {
+                        'title': _('Escalations'),
+                        'items': [
+                            ('act_esc', _('Active Escalations'),
+                             ''),
+                            ('esc_hist', _('Escalation History'),
+                             ''),
+                            ('esc_rpts', _('Escalation Reports'),
+                             ''),
+                            ('res_track', _('Resolution Tracking'),
                              ''),
                         ],
                     }),
                 ],
             }),
-            ('cs_menu', 'Customer Service Menu', _CS_MENU),
+            ('cs_menu', _('Customer Service Menu'), _CS_MENU),
         ],
     },
     'engineering': {
-        'title': 'Engineering Main Menu',
+        'title': _('Engineering Main Menu'),
         'items': [
-            ('eng_mgr', 'Engineering Manager', {
-                'title': 'Engineering Manager',
+            ('eng_mgr', _('Engineering Manager'), {
+                'title': _('Engineering Manager'),
                 'items': [
-                    ('engineers', 'Engineers', ''),
-                    ('proj_appr', 'Project Approvals', {
-                        'title': 'Project Approvals',
+                    ('engineers', _('Engineers'), ''),
+                    ('proj_appr', _('Project Approvals'), {
+                        'title': _('Project Approvals'),
                         'items': [
-                            ('pend_appr', 'Pending Approvals', ''),
-                            ('appr_proj', 'Approved Projects', ''),
-                            ('rej_proj', 'Rejected Projects', ''),
-                            ('appr_hist', 'Approval History', ''),
+                            ('pend_appr', _('Pending Approvals'), ''),
+                            ('appr_proj', _('Approved Projects'), ''),
+                            ('rej_proj', _('Rejected Projects'), ''),
+                            ('appr_hist', _('Approval History'), ''),
                         ],
                     }),
-                    ('resource', 'Resource Management', {
-                        'title': 'Resource Management',
+                    ('resource', _('Resource Management'), {
+                        'title': _('Resource Management'),
                         'items': [
-                            ('res_alloc', 'Resource Allocation', ''),
-                            ('cap_plan', 'Capacity Planning', ''),
-                            ('res_rpts', 'Resource Reports', ''),
-                            ('avail_cal', 'Availability Calendar',
+                            ('res_alloc', _('Resource Allocation'), ''),
+                            ('cap_plan', _('Capacity Planning'), ''),
+                            ('res_rpts', _('Resource Reports'), ''),
+                            ('avail_cal', _('Availability Calendar'),
                              ''),
                         ],
                     }),
-                    ('budget', 'Budget Management', {
-                        'title': 'Budget Management',
+                    ('budget', _('Budget Management'), {
+                        'title': _('Budget Management'),
                         'items': [
-                            ('eng_budg', 'Engineering Budget',
+                            ('eng_budg', _('Engineering Budget'),
                              ''),
-                            ('budg_act', 'Budget vs. Actual',
+                            ('budg_act', _('Budget vs. Actual'),
                              ''),
-                            ('cost_rpts', 'Cost Reports', ''),
-                            ('budg_req', 'Budget Requests', ''),
+                            ('cost_rpts', _('Cost Reports'), ''),
+                            ('budg_req', _('Budget Requests'), ''),
                         ],
                     }),
-                    ('eng_reports', 'Engineering Reports', {
-                        'title': 'Engineering Reports',
+                    ('eng_reports', _('Engineering Reports'), {
+                        'title': _('Engineering Reports'),
                         'items': [
-                            ('proj_stat', 'Project Status', ''),
-                            ('res_util', 'Resource Utilization', ''),
-                            ('kpi_dash', 'KPI Dashboard', ''),
-                            ('month_rpts', 'Monthly Reports', ''),
+                            ('proj_stat', _('Project Status'), ''),
+                            ('res_util', _('Resource Utilization'), ''),
+                            ('kpi_dash', _('KPI Dashboard'), ''),
+                            ('month_rpts', _('Monthly Reports'), ''),
                         ],
                     }),
                 ],
             }),
-            ('engineers', 'Engineers', ''),
-            ('proj_mgmt', 'Project Management', {
-                'title': 'Project Management',
+            ('engineers', _('Engineers'), ''),
+            ('proj_mgmt', _('Project Management'), {
+                'title': _('Project Management'),
                 'items': [
-                    ('act_proj', 'Active Projects', ''),
-                    ('new_proj', 'New Project', ''),
-                    ('proj_time', 'Project Timeline', ''),
-                    ('proj_rpts', 'Project Reports', ''),
+                    ('act_proj', _('Active Projects'), ''),
+                    ('new_proj', _('New Project'), ''),
+                    ('proj_time', _('Project Timeline'), ''),
+                    ('proj_rpts', _('Project Reports'), ''),
                 ],
             }),
-            ('design_docs', 'Design Documents', {
-                'title': 'Design Documents',
+            ('design_docs', _('Design Documents'), {
+                'title': _('Design Documents'),
                 'items': [
-                    ('doc_lib', 'Document Library', ''),
-                    ('new_doc', 'New Document', ''),
-                    ('doc_review', 'Document Review', ''),
-                    ('archive', 'Archive', ''),
+                    ('doc_lib', _('Document Library'), ''),
+                    ('new_doc', _('New Document'), ''),
+                    ('doc_review', _('Document Review'), ''),
+                    ('archive', _('Archive'), ''),
                 ],
             }),
-            ('bom', 'Bill of Materials', {
-                'title': 'Bill of Materials',
+            ('bom', _('Bill of Materials'), {
+                'title': _('Bill of Materials'),
                 'items': [
-                    ('bom_list', 'BOM List', ''),
-                    ('new_bom', 'Create BOM', ''),
-                    ('bom_rev', 'BOM Revision', ''),
-                    ('bom_rpts', 'BOM Reports', ''),
+                    ('bom_list', _('BOM List'), ''),
+                    ('new_bom', _('Create BOM'), ''),
+                    ('bom_rev', _('BOM Revision'), ''),
+                    ('bom_rpts', _('BOM Reports'), ''),
                 ],
             }),
-            ('chg_orders', 'Change Orders', {
-                'title': 'Change Orders',
+            ('chg_orders', _('Change Orders'), {
+                'title': _('Change Orders'),
                 'items': [
-                    ('new_co', 'New Change Order', ''),
-                    ('pend_appr', 'Pending Approval', ''),
-                    ('appr_chg', 'Approved Changes', ''),
-                    ('chg_hist', 'Change History', ''),
+                    ('new_co', _('New Change Order'), ''),
+                    ('pend_appr', _('Pending Approval'), ''),
+                    ('appr_chg', _('Approved Changes'), ''),
+                    ('chg_hist', _('Change History'), ''),
                 ],
             }),
-            ('test_val', 'Test & Validation', {
-                'title': 'Test & Validation',
+            ('test_val', _('Test & Validation'), {
+                'title': _('Test & Validation'),
                 'items': [
-                    ('test_plans', 'Test Plans', ''),
-                    ('test_res', 'Test Results', ''),
-                    ('val_rpts', 'Validation Reports', ''),
-                    ('issue_track', 'Issue Tracking', ''),
+                    ('test_plans', _('Test Plans'), ''),
+                    ('test_res', _('Test Results'), ''),
+                    ('val_rpts', _('Validation Reports'), ''),
+                    ('issue_track', _('Issue Tracking'), ''),
                 ],
             }),
-            ('eng_reports', 'Engineering Reports', {
-                'title': 'Engineering Reports',
+            ('eng_reports', _('Engineering Reports'), {
+                'title': _('Engineering Reports'),
                 'items': [
-                    ('proj_stat', 'Project Status', ''),
-                    ('design_rev', 'Design Review', ''),
-                    ('res_rpt', 'Resource Report', ''),
-                    ('cust_rpts', 'Custom Reports', ''),
+                    ('proj_stat', _('Project Status'), ''),
+                    ('design_rev', _('Design Review'), ''),
+                    ('res_rpt', _('Resource Report'), ''),
+                    ('cust_rpts', _('Custom Reports'), ''),
                 ],
             }),
-            ('standards', 'Standards & Compliance', {
-                'title': 'Standards & Compliance',
+            ('standards', _('Standards & Compliance'), {
+                'title': _('Standards & Compliance'),
                 'items': [
-                    ('std_lib', 'Standards Library', ''),
-                    ('comp_chk', 'Compliance Checklist', ''),
-                    ('audit_res', 'Audit Results', ''),
-                    ('reg_upd', 'Regulatory Updates', ''),
+                    ('std_lib', _('Standards Library'), ''),
+                    ('comp_chk', _('Compliance Checklist'), ''),
+                    ('audit_res', _('Audit Results'), ''),
+                    ('reg_upd', _('Regulatory Updates'), ''),
                 ],
             }),
         ],
     },
     'information_tech': {
-        'title': 'Information Technology Main Menu',
+        'title': _('Information Technology Main Menu'),
         'items': [
-            ('it_mgr', 'IT Manager', {
-                'title': 'IT Manager',
+            ('it_mgr', _('IT Manager'), {
+                'title': _('IT Manager'),
                 'items': [
-                    ('it_tech', 'IT Technician', _IT_TECH),
-                    ('budget', 'Budget & Procurement', {
-                        'title': 'Budget & Procurement',
+                    ('it_tech', _('IT Technician'), _IT_TECH),
+                    ('budget', _('Budget & Procurement'), {
+                        'title': _('Budget & Procurement'),
                         'items': [
-                            ('it_budg', 'IT Budget', ''),
-                            ('hw_proc', 'Hardware Procurement',
+                            ('it_budg', _('IT Budget'), ''),
+                            ('hw_proc', _('Hardware Procurement'),
                              ''),
-                            ('sw_lic', 'Software Licensing', ''),
-                            ('proc_rpts', 'Procurement Reports',
+                            ('sw_lic', _('Software Licensing'), ''),
+                            ('proc_rpts', _('Procurement Reports'),
                              ''),
                         ],
                     }),
-                    ('vendor_con', 'Vendor Contracts', {
-                        'title': 'Vendor Contracts',
+                    ('vendor_con', _('Vendor Contracts'), {
+                        'title': _('Vendor Contracts'),
                         'items': [
-                            ('act_cont', 'Active Contracts', ''),
-                            ('cont_renew', 'Contract Renewals', ''),
-                            ('vend_perf', 'Vendor Performance', ''),
-                            ('cont_arch', 'Contract Archive', ''),
+                            ('act_cont', _('Active Contracts'), ''),
+                            ('cont_renew', _('Contract Renewals'), ''),
+                            ('vend_perf', _('Vendor Performance'), ''),
+                            ('cont_arch', _('Contract Archive'), ''),
                         ],
                     }),
-                    ('it_projects', 'IT Projects', {
-                        'title': 'IT Projects',
+                    ('it_projects', _('IT Projects'), {
+                        'title': _('IT Projects'),
                         'items': [
-                            ('act_proj', 'Active Projects', ''),
-                            ('proj_pipe', 'Project Pipeline', ''),
-                            ('proj_rpts', 'Project Reports', ''),
-                            ('res_alloc', 'Resource Allocation', ''),
+                            ('act_proj', _('Active Projects'), ''),
+                            ('proj_pipe', _('Project Pipeline'), ''),
+                            ('proj_rpts', _('Project Reports'), ''),
+                            ('res_alloc', _('Resource Allocation'), ''),
                         ],
                     }),
-                    ('security', 'Security Management', {
-                        'title': 'Security Management',
+                    ('security', _('Security Management'), {
+                        'title': _('Security Management'),
                         'items': [
-                            ('sec_dash', 'Security Dashboard', ''),
-                            ('inc_rpts', 'Incident Reports', ''),
-                            ('vuln_mgmt', 'Vulnerability Management',
+                            ('sec_dash', _('Security Dashboard'), ''),
+                            ('inc_rpts', _('Incident Reports'), ''),
+                            ('vuln_mgmt', _('Vulnerability Management'),
                              ''),
-                            ('comp_rpts', 'Compliance Reports', ''),
+                            ('comp_rpts', _('Compliance Reports'), ''),
                         ],
                     }),
                 ],
             }),
-            ('it_tech', 'IT Technician', _IT_TECH),
+            ('it_tech', _('IT Technician'), _IT_TECH),
         ],
     },
     'maintenance': {
-        'title': 'Maintenance Main Menu',
+        'title': _('Maintenance Main Menu'),
         'items': [
-            ('maint_mgr', 'Maintenance Manager', {
-                'title': 'Maintenance Manager',
+            ('maint_mgr', _('Maintenance Manager'), {
+                'title': _('Maintenance Manager'),
                 'items': [
-                    ('maint', 'Maintenance', _MAINT_MENU),
-                    ('wo_approvals', 'Work Order Approvals', {
-                        'title': 'Work Order Approvals',
+                    ('maint', _('Maintenance'), _MAINT_MENU),
+                    ('wo_approvals', _('Work Order Approvals'), {
+                        'title': _('Work Order Approvals'),
                         'items': [
-                            ('pend_appr', 'Pending Approvals',
+                            ('pend_appr', _('Pending Approvals'),
                              ''),
-                            ('appr_wo', 'Approved Work Orders',
+                            ('appr_wo', _('Approved Work Orders'),
                              ''),
-                            ('rej_wo', 'Rejected', ''),
-                            ('appr_hist', 'Approval History',
+                            ('rej_wo', _('Rejected'), ''),
+                            ('appr_hist', _('Approval History'),
                              ''),
                         ],
                     }),
-                    ('budget_mgmt', 'Budget Management', {
-                        'title': 'Budget Management',
+                    ('budget_mgmt', _('Budget Management'), {
+                        'title': _('Budget Management'),
                         'items': [
-                            ('maint_budg', 'Maintenance Budget',
+                            ('maint_budg', _('Maintenance Budget'),
                              ''),
-                            ('budg_act', 'Budget vs. Actual',
+                            ('budg_act', _('Budget vs. Actual'),
                              ''),
-                            ('cost_analy', 'Cost Analysis', ''),
-                            ('budg_req', 'Budget Requests', ''),
+                            ('cost_analy', _('Cost Analysis'), ''),
+                            ('budg_req', _('Budget Requests'), ''),
                         ],
                     }),
-                    ('maint_rpts', 'Maintenance Reports', {
-                        'title': 'Maintenance Reports',
+                    ('maint_rpts', _('Maintenance Reports'), {
+                        'title': _('Maintenance Reports'),
                         'items': [
-                            ('daily_rpt', 'Daily Report', ''),
-                            ('month_sum', 'Monthly Summary',
+                            ('daily_rpt', _('Daily Report'), ''),
+                            ('month_sum', _('Monthly Summary'),
                              ''),
-                            ('equip_rpts', 'Equipment Reports',
+                            ('equip_rpts', _('Equipment Reports'),
                              ''),
-                            ('cost_rpts', 'Cost Reports', ''),
+                            ('cost_rpts', _('Cost Reports'), ''),
                         ],
                     }),
                 ],
             }),
-            ('maint', 'Maintenance', _MAINT_MENU),
-            ('predictive_maint', 'Predictive Maintenance', ''),
+            ('maint', _('Maintenance'), _MAINT_MENU),
+            ('predictive_maint', _('Predictive Maintenance'), ''),
         ],
     },
     'marketing': {
-        'title': 'Marketing Main Menu',
+        'title': _('Marketing Main Menu'),
         'items': [
-            ('mkt_mgr', 'Marketing Manager Menu', {
-                'title': 'Marketing Manager Menu',
+            ('mkt_mgr', _('Marketing Manager Menu'), {
+                'title': _('Marketing Manager Menu'),
                 'items': [
-                    ('mkt_menu', 'Marketing Menu', _MKT_MENU),
-                    ('mkt_budget', 'Marketing Budget', {
-                        'title': 'Marketing Budget',
+                    ('mkt_menu', _('Marketing Menu'), _MKT_MENU),
+                    ('mkt_budget', _('Marketing Budget'), {
+                        'title': _('Marketing Budget'),
                         'items': [
-                            ('budg_over', 'Budget Overview', ''),
-                            ('budg_camp', 'Budget by Campaign',
+                            ('budg_over', _('Budget Overview'), ''),
+                            ('budg_camp', _('Budget by Campaign'),
                              ''),
-                            ('budg_act', 'Budget vs. Actual',
+                            ('budg_act', _('Budget vs. Actual'),
                              ''),
-                            ('budg_req', 'Budget Requests', ''),
+                            ('budg_req', _('Budget Requests'), ''),
                         ],
                     }),
-                    ('camp_appr', 'Campaign Approvals', {
-                        'title': 'Campaign Approvals',
+                    ('camp_appr', _('Campaign Approvals'), {
+                        'title': _('Campaign Approvals'),
                         'items': [
-                            ('pend_appr', 'Pending Approvals',
+                            ('pend_appr', _('Pending Approvals'),
                              ''),
-                            ('appr_camp', 'Approved Campaigns',
+                            ('appr_camp', _('Approved Campaigns'),
                              ''),
-                            ('camp_arch', 'Campaign Archive',
+                            ('camp_arch', _('Campaign Archive'),
                              ''),
-                            ('appr_hist', 'Approval History',
+                            ('appr_hist', _('Approval History'),
                              ''),
                         ],
                     }),
-                    ('mkt_reports', 'Marketing Reports', {
-                        'title': 'Marketing Reports',
+                    ('mkt_reports', _('Marketing Reports'), {
+                        'title': _('Marketing Reports'),
                         'items': [
-                            ('camp_perf', 'Campaign Performance',
+                            ('camp_perf', _('Campaign Performance'),
                              ''),
-                            ('roi_rpts', 'ROI Reports',
+                            ('roi_rpts', _('ROI Reports'),
                              ''),
-                            ('month_sum', 'Monthly Summary',
+                            ('month_sum', _('Monthly Summary'),
                              ''),
-                            ('kpi_dash', 'KPI Dashboard',
+                            ('kpi_dash', _('KPI Dashboard'),
                              ''),
                         ],
                     }),
                 ],
             }),
-            ('mkt_menu', 'Marketing Menu', _MKT_MENU),
+            ('mkt_menu', _('Marketing Menu'), _MKT_MENU),
         ],
     },
     'personnel': {
-        'title': 'Personnel Main Menu',
+        'title': _('Personnel Main Menu'),
         'items': [
-            ('pers_mgr', 'Personnel Manager Menu', {
-                'title': 'Personnel Manager Menu',
+            ('pers_mgr', _('Personnel Manager Menu'), {
+                'title': _('Personnel Manager Menu'),
                 'items': [
-                    ('pers_menu', 'Personnel Menu', _PERS_MENU),
-                    ('hiring', 'Hiring & Recruitment', {
-                        'title': 'Hiring & Recruitment',
+                    ('pers_menu', _('Personnel Menu'), _PERS_MENU),
+                    ('hiring', _('Hiring & Recruitment'), {
+                        'title': _('Hiring & Recruitment'),
                         'items': [
-                            ('open_pos', 'Open Positions',
+                            ('open_pos', _('Open Positions'),
                              ''),
-                            ('appl_track', 'Applicant Tracking',
+                            ('appl_track', _('Applicant Tracking'),
                              ''),
-                            ('int_sched', 'Interview Schedule',
+                            ('int_sched', _('Interview Schedule'),
                              ''),
-                            ('offer_mgmt', 'Offer Management',
+                            ('offer_mgmt', _('Offer Management'),
                              ''),
                         ],
                     }),
-                    ('term', 'Terminations', {
-                        'title': 'Terminations',
+                    ('term', _('Terminations'), {
+                        'title': _('Terminations'),
                         'items': [
-                            ('term_proc', 'Termination Process',
+                            ('term_proc', _('Termination Process'),
                              ''),
-                            ('exit_int', 'Exit Interviews',
+                            ('exit_int', _('Exit Interviews'),
                              ''),
-                            ('final_pay', 'Final Pay Processing',
+                            ('final_pay', _('Final Pay Processing'),
                              ''),
-                            ('offboard', 'Offboarding Checklist',
+                            ('offboard', _('Offboarding Checklist'),
                              ''),
                         ],
                     }),
-                    ('salary', 'Salary Management', {
-                        'title': 'Salary Management',
+                    ('salary', _('Salary Management'), {
+                        'title': _('Salary Management'),
                         'items': [
-                            ('sal_review', 'Salary Review',
+                            ('sal_review', _('Salary Review'),
                              ''),
-                            ('sal_adj', 'Salary Adjustments',
+                            ('sal_adj', _('Salary Adjustments'),
                              ''),
-                            ('comp_rpts', 'Compensation Reports',
+                            ('comp_rpts', _('Compensation Reports'),
                              ''),
-                            ('pay_grades', 'Pay Grades',
+                            ('pay_grades', _('Pay Grades'),
                              ''),
                         ],
                     }),
-                    ('hr_reports', 'HR Reports', {
-                        'title': 'HR Reports',
+                    ('hr_reports', _('HR Reports'), {
+                        'title': _('HR Reports'),
                         'items': [
-                            ('hd_rpt', 'Headcount Report',
+                            ('hd_rpt', _('Headcount Report'),
                              ''),
-                            ('turn_rpt', 'Turnover Report',
+                            ('turn_rpt', _('Turnover Report'),
                              ''),
-                            ('comp_rpts', 'Compliance Reports',
+                            ('comp_rpts', _('Compliance Reports'),
                              ''),
-                            ('month_sum', 'Monthly Summary',
+                            ('month_sum', _('Monthly Summary'),
                              ''),
                         ],
                     }),
                 ],
             }),
-            ('pers_menu', 'Personnel Menu', _PERS_MENU),
+            ('pers_menu', _('Personnel Menu'), _PERS_MENU),
         ],
     },
     'production': {
-        'title': 'Production Main Menu',
+        'title': _('Production Main Menu'),
         'items': [
-            ('prod_mgr', 'Production Manager', {
-                'title': 'Production Manager',
+            ('prod_mgr', _('Production Manager'), {
+                'title': _('Production Manager'),
                 'items': [
-                    ('prod', 'Production', _PROD_MENU),
-                    ('shipping', 'Shipping', _SHIP_MENU),
-                    ('prod_reports', 'Production Reports', {
-                        'title': 'Production Reports',
+                    ('prod', _('Production'), _PROD_MENU),
+                    ('shipping', _('Shipping'), _SHIP_MENU),
+                    ('prod_reports', _('Production Reports'), {
+                        'title': _('Production Reports'),
                         'items': [
-                            ('daily_prod', 'Daily Production',
+                            ('daily_prod', _('Daily Production'),
                              ''),
-                            ('week_sum', 'Weekly Summary', ''),
-                            ('eff_rpts', 'Efficiency Reports',
+                            ('week_sum', _('Weekly Summary'), ''),
+                            ('eff_rpts', _('Efficiency Reports'),
                              ''),
-                            ('kpi_dash', 'KPI Dashboard', ''),
+                            ('kpi_dash', _('KPI Dashboard'), ''),
                         ],
                     }),
-                    ('resource', 'Resource Management', {
-                        'title': 'Resource Management',
+                    ('resource', _('Resource Management'), {
+                        'title': _('Resource Management'),
                         'items': [
-                            ('res_alloc', 'Resource Allocation',
+                            ('res_alloc', _('Resource Allocation'),
                              ''),
-                            ('cap_plan', 'Capacity Planning',
+                            ('cap_plan', _('Capacity Planning'),
                              ''),
-                            ('res_rpts', 'Resource Reports',
+                            ('res_rpts', _('Resource Reports'),
                              ''),
-                            ('wf_plan', 'Workforce Planning',
+                            ('wf_plan', _('Workforce Planning'),
                              ''),
                         ],
                     }),
-                    ('budget', 'Budget Management', {
-                        'title': 'Budget Management',
+                    ('budget', _('Budget Management'), {
+                        'title': _('Budget Management'),
                         'items': [
-                            ('prod_budg', 'Production Budget',
+                            ('prod_budg', _('Production Budget'),
                              ''),
-                            ('cost_analy', 'Cost Analysis', ''),
-                            ('budg_act', 'Budget vs. Actual',
+                            ('cost_analy', _('Cost Analysis'), ''),
+                            ('budg_act', _('Budget vs. Actual'),
                              ''),
-                            ('budg_rpts', 'Budget Reports', ''),
+                            ('budg_rpts', _('Budget Reports'), ''),
                         ],
                     }),
                 ],
             }),
-            ('prod', 'Production', _PROD_MENU),
-            ('shipping', 'Shipping', _SHIP_MENU),
-            ('shop_floor', 'Shop Floor', {
-                'title': 'Shop Floor',
+            ('prod', _('Production'), _PROD_MENU),
+            ('shipping', _('Shipping'), _SHIP_MENU),
+            ('shop_floor', _('Shop Floor'), {
+                'title': _('Shop Floor'),
                 'items': [
-                    ('sf_entry', 'Production/Downtime Entry',
+                    ('sf_entry', _('Production/Downtime Entry'),
                      ''),
-                    ('sf_shift_plan', 'Shift Plan', ''),
-                    ('sf_dashboard', 'Live OEE Dashboard',
+                    ('sf_shift_plan', _('Shift Plan'), ''),
+                    ('sf_dashboard', _('Live OEE Dashboard'),
                      ''),
-                    ('sf_tv', 'Shop Floor TV Display', ''),
+                    ('sf_tv', _('Shop Floor TV Display'), ''),
                 ],
             }),
         ],
     },
     'purchasing': {
-        'title': 'Purchasing Main Menu',
+        'title': _('Purchasing Main Menu'),
         'items': [
-            ('purch_mgr', 'Purchasing Manager Menu', {
-                'title': 'Purchasing Manager Menu',
+            ('purch_mgr', _('Purchasing Manager Menu'), {
+                'title': _('Purchasing Manager Menu'),
                 'items': [
-                    ('purch', 'Purchasing Menu', _PURCH_MENU),
-                    ('po_approvals', 'PO Approvals', {
-                        'title': 'PO Approvals',
+                    ('purch', _('Purchasing Menu'), _PURCH_MENU),
+                    ('po_approvals', _('PO Approvals'), {
+                        'title': _('PO Approvals'),
                         'items': [
-                            ('pend_appr', 'Pending Approvals',
+                            ('pend_appr', _('Pending Approvals'),
                              ''),
-                            ('appr_pos', 'Approved POs',
+                            ('appr_pos', _('Approved POs'),
                              ''),
-                            ('rej_pos', 'Rejected POs',
+                            ('rej_pos', _('Rejected POs'),
                              ''),
-                            ('appr_hist', 'Approval History',
+                            ('appr_hist', _('Approval History'),
                              ''),
                         ],
                     }),
-                    ('budget', 'Budget Management', {
-                        'title': 'Budget Management',
+                    ('budget', _('Budget Management'), {
+                        'title': _('Budget Management'),
                         'items': [
-                            ('purch_budg', 'Purchasing Budget',
+                            ('purch_budg', _('Purchasing Budget'),
                              ''),
-                            ('budg_act', 'Budget vs. Actual',
+                            ('budg_act', _('Budget vs. Actual'),
                              ''),
-                            ('spend_analy', 'Spending Analysis',
+                            ('spend_analy', _('Spending Analysis'),
                              ''),
-                            ('budg_rpts', 'Budget Reports', ''),
+                            ('budg_rpts', _('Budget Reports'), ''),
                         ],
                     }),
-                    ('vendor_mgmt', 'Vendor Management', {
-                        'title': 'Vendor Management',
+                    ('vendor_mgmt', _('Vendor Management'), {
+                        'title': _('Vendor Management'),
                         'items': [
-                            ('vend_list', 'Vendor List',
+                            ('vend_list', _('Vendor List'),
                              ''),
-                            ('vend_eval', 'Vendor Evaluation',
+                            ('vend_eval', _('Vendor Evaluation'),
                              ''),
-                            ('vend_perf', 'Vendor Performance',
+                            ('vend_perf', _('Vendor Performance'),
                              ''),
-                            ('appr_vend', 'Approved Vendors',
-                             ''),
-                        ],
-                    }),
-                    ('purch_rpts', 'Purchasing Reports', {
-                        'title': 'Purchasing Reports',
-                        'items': [
-                            ('spend_rpt', 'Spending Report',
-                             ''),
-                            ('vend_rpt', 'Vendor Report',
-                             ''),
-                            ('cat_analy', 'Category Analysis',
-                             ''),
-                            ('month_sum', 'Monthly Summary',
+                            ('appr_vend', _('Approved Vendors'),
                              ''),
                         ],
                     }),
-                    ('contracts', 'Contract Management', {
-                        'title': 'Contract Management',
+                    ('purch_rpts', _('Purchasing Reports'), {
+                        'title': _('Purchasing Reports'),
                         'items': [
-                            ('act_cont', 'Active Contracts',
+                            ('spend_rpt', _('Spending Report'),
                              ''),
-                            ('pend_renew', 'Pending Renewals',
+                            ('vend_rpt', _('Vendor Report'),
                              ''),
-                            ('cont_arch', 'Contract Archive',
+                            ('cat_analy', _('Category Analysis'),
                              ''),
-                            ('cont_rpts', 'Contract Reports',
+                            ('month_sum', _('Monthly Summary'),
                              ''),
                         ],
                     }),
-                    ('consultants', 'Consultant Management', {
-                        'title': 'Consultant Management',
+                    ('contracts', _('Contract Management'), {
+                        'title': _('Contract Management'),
                         'items': [
-                            ('cons_list', 'Consultants', ''),
-                            ('cons_eng', 'Engagements', ''),
-                            ('cons_inv', 'Invoices', ''),
-                            ('cons_rpt', 'Spend Report', ''),
+                            ('act_cont', _('Active Contracts'),
+                             ''),
+                            ('pend_renew', _('Pending Renewals'),
+                             ''),
+                            ('cont_arch', _('Contract Archive'),
+                             ''),
+                            ('cont_rpts', _('Contract Reports'),
+                             ''),
+                        ],
+                    }),
+                    ('consultants', _('Consultant Management'), {
+                        'title': _('Consultant Management'),
+                        'items': [
+                            ('cons_list', _('Consultants'), ''),
+                            ('cons_eng', _('Engagements'), ''),
+                            ('cons_inv', _('Invoices'), ''),
+                            ('cons_rpt', _('Spend Report'), ''),
                         ],
                     }),
                 ],
             }),
-            ('purch', 'Purchasing Menu', _PURCH_MENU),
+            ('purch', _('Purchasing Menu'), _PURCH_MENU),
         ],
     },
     'quality_assurance': {
-        'title': 'Quality Assurance Main Menu',
+        'title': _('Quality Assurance Main Menu'),
         'items': [
-            ('qa_mgr', 'QA Manager Menu', {
-                'title': 'QA Manager Menu',
+            ('qa_mgr', _('QA Manager Menu'), {
+                'title': _('QA Manager Menu'),
                 'items': [
-                    ('qa_menu', 'Quality Assurance Menu', _QA_MENU),
-                    ('audit_mgmt', 'Audit Management', {
-                        'title': 'Audit Management',
+                    ('qa_menu', _('Quality Assurance Menu'), _QA_MENU),
+                    ('audit_mgmt', _('Audit Management'), {
+                        'title': _('Audit Management'),
                         'items': [
-                            ('audit_sched', 'Audit Schedule',
+                            ('audit_sched', _('Audit Schedule'),
                              ''),
-                            ('act_audits', 'Active Audits', ''),
-                            ('findings', 'Audit Findings', ''),
-                            ('corr_act', 'Corrective Actions',
+                            ('act_audits', _('Active Audits'), ''),
+                            ('findings', _('Audit Findings'), ''),
+                            ('corr_act', _('Corrective Actions'),
                              ''),
                         ],
                     }),
-                    ('compliance', 'Compliance', {
-                        'title': 'Compliance',
+                    ('compliance', _('Compliance'), {
+                        'title': _('Compliance'),
                         'items': [
-                            ('comp_dash', 'Compliance Dashboard',
+                            ('comp_dash', _('Compliance Dashboard'),
                              ''),
-                            ('reg_req', 'Regulatory Requirements',
+                            ('reg_req', _('Regulatory Requirements'),
                              ''),
-                            ('comp_rpts', 'Compliance Reports',
+                            ('comp_rpts', _('Compliance Reports'),
                              ''),
-                            ('non_comp', 'Non-Compliance Issues',
+                            ('non_comp', _('Non-Compliance Issues'),
                              ''),
                         ],
                     }),
-                    ('corr_action', 'Corrective Actions', {
-                        'title': 'Corrective Actions',
+                    ('corr_action', _('Corrective Actions'), {
+                        'title': _('Corrective Actions'),
                         'items': [
-                            ('open_cars', 'Open CARs', ''),
-                            ('inprog_cars', 'In Progress', ''),
-                            ('closed_cars', 'Closed CARs', ''),
-                            ('car_rpts', 'CAR Reports', ''),
+                            ('open_cars', _('Open CARs'), ''),
+                            ('inprog_cars', _('In Progress'), ''),
+                            ('closed_cars', _('Closed CARs'), ''),
+                            ('car_rpts', _('CAR Reports'), ''),
                         ],
                     }),
-                    ('qa_reports', 'QA Reports', {
-                        'title': 'QA Reports',
+                    ('qa_reports', _('QA Reports'), {
+                        'title': _('QA Reports'),
                         'items': [
-                            ('daily_qa', 'Daily QA Report', ''),
-                            ('week_sum', 'Weekly Summary', ''),
-                            ('month_rpt', 'Monthly Report', ''),
-                            ('kpi_dash', 'KPI Dashboard', ''),
+                            ('daily_qa', _('Daily QA Report'), ''),
+                            ('week_sum', _('Weekly Summary'), ''),
+                            ('month_rpt', _('Monthly Report'), ''),
+                            ('kpi_dash', _('KPI Dashboard'), ''),
                         ],
                     }),
-                    ('supp_qual', 'Supplier Quality', {
-                        'title': 'Supplier Quality',
+                    ('supp_qual', _('Supplier Quality'), {
+                        'title': _('Supplier Quality'),
                         'items': [
-                            ('supp_score', 'Supplier Scorecards',
+                            ('supp_score', _('Supplier Scorecards'),
                              ''),
-                            ('inc_insp', 'Incoming Inspection',
+                            ('inc_insp', _('Incoming Inspection'),
                              ''),
-                            ('sampling_plans', 'Sampling Plans',
+                            ('sampling_plans', _('Sampling Plans'),
                              ''),
-                            ('supp_audit', 'Supplier Audits',
+                            ('supp_audit', _('Supplier Audits'),
                              ''),
-                            ('supp_rpts', 'Supplier Reports',
-                             ''),
-                        ],
-                    }),
-                    ('cust_comp', 'Customer Complaints', {
-                        'title': 'Customer Complaints',
-                        'items': [
-                            ('new_comp', 'New Complaint', ''),
-                            ('open_comp', 'Open Complaints', ''),
-                            ('res_track', 'Resolution Tracking',
-                             ''),
-                            ('comp_rpts', 'Complaint Reports',
+                            ('supp_rpts', _('Supplier Reports'),
                              ''),
                         ],
                     }),
-                    ('doc_control', 'Document Control', {
-                        'title': 'Document Control',
+                    ('cust_comp', _('Customer Complaints'), {
+                        'title': _('Customer Complaints'),
                         'items': [
-                            ('doc_lib', 'Document Library', ''),
-                            ('new_doc', 'New Document', ''),
-                            ('doc_review', 'Document Review',
+                            ('new_comp', _('New Complaint'), ''),
+                            ('open_comp', _('Open Complaints'), ''),
+                            ('res_track', _('Resolution Tracking'),
                              ''),
-                            ('rev_hist', 'Revision History', ''),
+                            ('comp_rpts', _('Complaint Reports'),
+                             ''),
+                        ],
+                    }),
+                    ('doc_control', _('Document Control'), {
+                        'title': _('Document Control'),
+                        'items': [
+                            ('doc_lib', _('Document Library'), ''),
+                            ('new_doc', _('New Document'), ''),
+                            ('doc_review', _('Document Review'),
+                             ''),
+                            ('rev_hist', _('Revision History'), ''),
                         ],
                     }),
                 ],
             }),
-            ('qa_menu', 'Quality Assurance Menu', _QA_MENU),
+            ('qa_menu', _('Quality Assurance Menu'), _QA_MENU),
         ],
     },
     'sales': {
-        'title': 'Sales Main Menu',
+        'title': _('Sales Main Menu'),
         'items': [
-            ('sales_mgr', 'Sales Manager Menu', {
-                'title': 'Sales Manager Menu',
+            ('sales_mgr', _('Sales Manager Menu'), {
+                'title': _('Sales Manager Menu'),
                 'items': [
-                    ('sales', 'Sales Menu', _SALES_MENU),
-                    ('sales_targets', 'Sales Targets', {
-                        'title': 'Sales Targets',
+                    ('sales', _('Sales Menu'), _SALES_MENU),
+                    ('sales_targets', _('Sales Targets'), {
+                        'title': _('Sales Targets'),
                         'items': [
-                            ('set_tgt', 'Set Targets', ''),
-                            ('tgt_act', 'Target vs. Actual',
+                            ('set_tgt', _('Set Targets'), ''),
+                            ('tgt_act', _('Target vs. Actual'),
                              ''),
-                            ('tgt_rep', 'Target by Rep', ''),
-                            ('tgt_rpts', 'Target Reports',
+                            ('tgt_rep', _('Target by Rep'), ''),
+                            ('tgt_rpts', _('Target Reports'),
                              ''),
                         ],
                     }),
-                    ('territory', 'Territory Management', {
-                        'title': 'Territory Management',
+                    ('territory', _('Territory Management'), {
+                        'title': _('Territory Management'),
                         'items': [
-                            ('terr_map', 'Territory Map', ''),
-                            ('terr_assign', 'Territory Assignments',
+                            ('terr_map', _('Territory Map'), ''),
+                            ('terr_assign', _('Territory Assignments'),
                              ''),
-                            ('terr_perf', 'Territory Performance',
+                            ('terr_perf', _('Territory Performance'),
                              ''),
-                            ('terr_rpts', 'Territory Reports',
+                            ('terr_rpts', _('Territory Reports'),
                              ''),
                         ],
                     }),
-                    ('commission', 'Commission Tracking', {
-                        'title': 'Commission Tracking',
+                    ('commission', _('Commission Tracking'), {
+                        'title': _('Commission Tracking'),
                         'items': [
-                            ('comm_calc', 'Commission Calculator',
+                            ('comm_calc', _('Commission Calculator'),
                              ''),
-                            ('comm_rpts', 'Commission Reports',
+                            ('comm_rpts', _('Commission Reports'),
                              ''),
-                            ('pay_hist', 'Payment History',
+                            ('pay_hist', _('Payment History'),
                              ''),
-                            ('comm_plans', 'Commission Plans',
+                            ('comm_plans', _('Commission Plans'),
                              ''),
                         ],
                     }),
-                    ('staff_perf', 'Staff Performance', {
-                        'title': 'Staff Performance',
+                    ('staff_perf', _('Staff Performance'), {
+                        'title': _('Staff Performance'),
                         'items': [
-                            ('perf_dash', 'Performance Dashboard',
+                            ('perf_dash', _('Performance Dashboard'),
                              ''),
-                            ('rep_rank', 'Rep Rankings', ''),
-                            ('perf_revs', 'Performance Reviews',
+                            ('rep_rank', _('Rep Rankings'), ''),
+                            ('perf_revs', _('Performance Reviews'),
                              ''),
-                            ('coaching', 'Coaching Notes',
+                            ('coaching', _('Coaching Notes'),
                              ''),
                         ],
                     }),
                 ],
             }),
-            ('sales', 'Sales Menu', _SALES_MENU),
-            ('demand_forecast', 'AI Demand Forecast', ''),
+            ('sales', _('Sales Menu'), _SALES_MENU),
+            ('demand_forecast', _('AI Demand Forecast'), ''),
         ],
     },
     'budget_management': {
-        'title': 'Budget Management',
+        'title': _('Budget Management'),
         'items': [
-            ('budget_mgr', 'Budget Manager', {
-                'title': 'Budget Manager',
+            ('budget_mgr', _('Budget Manager'), {
+                'title': _('Budget Manager'),
                 'items': [
-                    ('bud_overview', 'Budgets', ''),
-                    ('bud_detail_mgr', 'Budget Detail', ''),
-                    ('bva_mgr', 'Budget vs. Actual', ''),
-                    ('variance_mgr', 'Variance Report', ''),
-                    ('dept_summary', 'Department Summaries',
+                    ('bud_overview', _('Budgets'), ''),
+                    ('bud_detail_mgr', _('Budget Detail'), ''),
+                    ('bva_mgr', _('Budget vs. Actual'), ''),
+                    ('variance_mgr', _('Variance Report'), ''),
+                    ('dept_summary', _('Department Summaries'),
                      ''),
-                    ('approval_wf', 'Approval Workflow', ''),
+                    ('approval_wf', _('Approval Workflow'), ''),
                 ],
             }),
-            ('budgets', 'Budgets', ''),
-            ('bud_detail', 'Budget Detail', ''),
-            ('bva', 'Budget vs. Actual', ''),
-            ('variance', 'Variance Report', ''),
+            ('budgets', _('Budgets'), ''),
+            ('bud_detail', _('Budget Detail'), ''),
+            ('bva', _('Budget vs. Actual'), ''),
+            ('variance', _('Variance Report'), ''),
         ],
     },
     'finance': {
-        'title': 'Finance Main Menu',
+        'title': _('Finance Main Menu'),
         'items': [
-            ('fin_mgr', 'Finance Manager', {
-                'title': 'Finance Manager',
+            ('fin_mgr', _('Finance Manager'), {
+                'title': _('Finance Manager'),
                 'items': [
-                    ('fin_plan', 'Financial Planning', ''),
-                    ('fin_forecast', 'Budget & Forecasting',
+                    ('fin_plan', _('Financial Planning'), ''),
+                    ('fin_forecast', _('Budget & Forecasting'),
                      ''),
-                    ('treasury_mgmt', 'Treasury Management',
+                    ('treasury_mgmt', _('Treasury Management'),
                      ''),
-                    ('invest_mgmt', 'Investment Management',
+                    ('invest_mgmt', _('Investment Management'),
                      ''),
-                    ('fin_rpts_mgr', 'Financial Reports',
+                    ('fin_rpts_mgr', _('Financial Reports'),
                      ''),
                 ],
             }),
-            ('fin_analysis', 'Financial Analysis', ''),
-            ('fin_reporting', 'Financial Reporting', ''),
-            ('treasury_ops', 'Treasury Operations', ''),
-            ('capital_mgmt', 'Capital Management', ''),
-            ('tax_planning', 'Tax Planning', ''),
+            ('fin_analysis', _('Financial Analysis'), ''),
+            ('fin_reporting', _('Financial Reporting'), ''),
+            ('treasury_ops', _('Treasury Operations'), ''),
+            ('capital_mgmt', _('Capital Management'), ''),
+            ('tax_planning', _('Tax Planning'), ''),
         ],
     },
     'legal': {
-        'title': 'Legal Main Menu',
+        'title': _('Legal Main Menu'),
         'items': [
-            ('legal_mgr', 'Legal Manager', {
-                'title': 'Legal Manager',
+            ('legal_mgr', _('Legal Manager'), {
+                'title': _('Legal Manager'),
                 'items': [
-                    ('contracts_mgmt', 'Contract Management',
+                    ('contracts_mgmt', _('Contract Management'),
                      ''),
-                    ('litigation_mgmt', 'Litigation Management',
+                    ('litigation_mgmt', _('Litigation Management'),
                      ''),
-                    ('compliance_mgmt', 'Compliance Management',
+                    ('compliance_mgmt', _('Compliance Management'),
                      ''),
-                    ('corp_gov', 'Corporate Governance', ''),
+                    ('corp_gov', _('Corporate Governance'), ''),
                 ],
             }),
-            ('contracts', 'Contracts', ''),
-            ('compliance', 'Compliance', ''),
-            ('litigation', 'Litigation', ''),
-            ('ip_mgmt', 'Intellectual Property', ''),
-            ('emp_law', 'Employment Law', ''),
+            ('contracts', _('Contracts'), ''),
+            ('compliance', _('Compliance'), ''),
+            ('litigation', _('Litigation'), ''),
+            ('ip_mgmt', _('Intellectual Property'), ''),
+            ('emp_law', _('Employment Law'), ''),
         ],
     },
     'risk_management': {
-        'title': 'Risk Management Main Menu',
+        'title': _('Risk Management Main Menu'),
         'items': [
-            ('risk_mgr', 'Risk Manager', {
-                'title': 'Risk Manager',
+            ('risk_mgr', _('Risk Manager'), {
+                'title': _('Risk Manager'),
                 'items': [
-                    ('risk_register_mgr', 'Risk Register', ''),
-                    ('kri', 'Key Risk Indicators', ''),
-                    ('biz_continuity', 'Business Continuity',
+                    ('risk_register_mgr', _('Risk Register'), ''),
+                    ('kri', _('Key Risk Indicators'), ''),
+                    ('biz_continuity', _('Business Continuity'),
                      ''),
-                    ('audit_compliance', 'Audit & Compliance',
+                    ('audit_compliance', _('Audit & Compliance'),
                      ''),
                 ],
             }),
-            ('risk_assess', 'Risk Assessment', ''),
-            ('risk_register', 'Risk Register', ''),
-            ('insurance', 'Insurance Management', ''),
-            ('biz_cont', 'Business Continuity', ''),
-            ('comp_audit', 'Compliance & Audit', ''),
+            ('risk_assess', _('Risk Assessment'), ''),
+            ('risk_register', _('Risk Register'), ''),
+            ('insurance', _('Insurance Management'), ''),
+            ('biz_cont', _('Business Continuity'), ''),
+            ('comp_audit', _('Compliance & Audit'), ''),
         ],
     },
     'reports': {
-        'title': 'Reports',
+        'title': _('Reports'),
         'items': [
-            ('rpt_dashboard', 'Dashboard', ''),
+            ('rpt_dashboard', _('Dashboard'), ''),
         ],
     },
 }
