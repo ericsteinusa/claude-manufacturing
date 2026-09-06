@@ -2333,6 +2333,43 @@ page (confirmed the dynamic "Gamme — {name}" title, the "3 opérations"
 plural, and all 5 table headers) — all pages return 200 with correctly
 translated titles and labels, no console or server errors.
 
+Also fully translated: **Sensor Readings/Thresholds** and **Batch
+Records** (`sensor_reading_new.html`, `sensor_threshold_set.html`,
+`batch_record_list.html`, `batch_record_detail.html` — 4 templates,
+the twenty-sixth "whole feature" pass, pairing two more small
+"translate the link, not yet the target" closures in one batch — the
+Predictive Maintenance pass already translated its own "Log Sensor
+Reading"/"Set Thresholds" toolbar links, and the Production dashboard
+already links to Batch Records, but neither destination had been
+touched). Small enough (28 strings, all simple, no plurals) to do by
+hand rather than delegating, matching ABC Costing/Auth/Risk
+Management/Cycle-Count-Sampling-Plan precedent.
+
+`batch_record_detail.html`'s "Generated {date} by {user}" line needed
+an `{% if %}/{% else %}` split rather than a bare `default:"—"`
+fallback inside the sentence, continuing the "each conditional branch
+is a complete, natural sentence" precedent first established for the
+IT Asset Depreciation Summary card — a lone em-dash mid-sentence
+("Generated {date} by —") would read as broken in every language,
+whereas dropping to a shorter complete sentence ("Generated {date}")
+when no `generated_by` value exists reads naturally in all five.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check`
+clean on all 5 `.po` files, zero fuzzy/blank entries confirmed
+programmatically. All 28 new strings are exclusive to this batch's own
+4 files — no exact-msgid auto-merge collision risk to check this time.
+Verified end-to-end against the real dev server, in French with real
+sample data: Batch Records list (confirmed the page title correctly
+auto-merging with the Production department's existing catalog entry),
+a real batch record's detail page (confirmed the three-variable "Ordre
+de Fabrication : ... · Produit : ... · Qté : ..." sentence and the
+"Généré le ... par ..." line render correctly together), Log Sensor
+Reading, and Set Sensor Thresholds (confirmed both correctly reuse the
+`predictive_maintenance.html` toolbar's already-translated link text
+for their page titles) — all pages return 200 with correctly translated
+titles and labels, no console or server errors.
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates

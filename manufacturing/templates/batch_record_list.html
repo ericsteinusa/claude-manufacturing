@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Batch Records{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Batch Records" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -17,43 +18,43 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Batch Records</div>
+    <div class="menu-title">{% trans "Batch Records" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Generate a Batch Record</h3>
+        <h3>{% trans "Generate a Batch Record" %}</h3>
         <p style="font-size:12px;color:var(--text-muted);">
-            Only completed work orders have an as-built story worth recording. Materials, cost, and
-            quality inspections are snapshotted at generation time.
+            {% blocktrans %}Only completed work orders have an as-built story worth recording. Materials, cost, and
+            quality inspections are snapshotted at generation time.{% endblocktrans %}
         </p>
         <form method="post" style="display:flex;gap:10px;align-items:end;">
             {% csrf_token %}
             <div class="form-row">
-                <label>Completed Work Order *</label>
+                <label>{% trans "Completed Work Order *" %}</label>
                 <select name="wo_id" required>
                     {% for wo in completed_wos %}
                     <option value="{{ wo.id }}">{{ wo.wo_number }} — {{ wo.product_name|default:"" }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Generate Batch Record</button>
+            <button type="submit" class="btn btn-primary">{% trans "Generate Batch Record" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Issued Records</h3>
+        <h3>{% trans "Issued Records" %}</h3>
         <form method="get" style="margin-bottom:14px;">
-            <input type="text" name="q" value="{{ q }}" placeholder="Search record #, WO #, product..."
+            <input type="text" name="q" value="{{ q }}" placeholder="{% trans 'Search record #, WO #, product...' %}"
                    style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+            <button type="submit" class="btn" style="padding:6px 12px;">{% trans "Search" %}</button>
         </form>
         {% if records %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Record #</th><th>Work Order</th><th>Product</th><th class="num">Qty</th><th class="num">Total Cost</th><th>Generated</th></tr></thead>
+                <thead><tr><th>{% trans "Record #" %}</th><th>{% trans "Work Order" %}</th><th>{% trans "Product" %}</th><th class="num">{% trans "Qty" %}</th><th class="num">{% trans "Total Cost" %}</th><th>{% trans "Generated" %}</th></tr></thead>
                 <tbody>
                     {% for r in records %}
                     <tr>
@@ -69,7 +70,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No batch records issued yet.</div>
+        <div class="empty-state">{% trans "No batch records issued yet." %}</div>
         {% endif %}
     </div>
 </div>

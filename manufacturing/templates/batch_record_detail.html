@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ record.batch_record_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/batch-records/" class="btn">Batch Records</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/batch-records/" class="btn">{% trans "Batch Records" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -16,26 +17,30 @@
 <div class="content">
 <div class="cp-wrap">
     <div class="menu-title">{{ record.batch_record_number }}
-        <a href="/batch-records/{{ record.id }}/pdf/" class="btn" style="float:right;" target="_blank">Download PDF</a>
+        <a href="/batch-records/{{ record.id }}/pdf/" class="btn" style="float:right;" target="_blank">{% trans "Download PDF" %}</a>
     </div>
     <p style="font-size:12.5px;color:var(--text-muted);">
-        Work Order: {{ record.wo_number }} · Product: {{ record.product_name }} · Qty: {{ record.quantity }}<br>
-        Generated {{ record.generated_at }} by {{ record.generated_by|default:"—" }}
+        {% blocktrans with wo=record.wo_number product=record.product_name qty=record.quantity %}Work Order: {{ wo }} · Product: {{ product }} · Qty: {{ qty }}{% endblocktrans %}<br>
+        {% if record.generated_by %}
+        {% blocktrans with dt=record.generated_at by=record.generated_by %}Generated {{ dt }} by {{ by }}{% endblocktrans %}
+        {% else %}
+        {% blocktrans with dt=record.generated_at %}Generated {{ dt }}{% endblocktrans %}
+        {% endif %}
     </p>
 
     <div class="card">
-        <h3>Cost Summary</h3>
-        <p>Material Cost: ${{ record.material_cost|floatformat:2 }}<br>
-           Labor Cost: ${{ record.labor_cost|floatformat:2 }}<br>
-           <strong>Total Cost: ${{ record.total_cost|floatformat:2 }}</strong></p>
+        <h3>{% trans "Cost Summary" %}</h3>
+        <p>{% blocktrans with cost=record.material_cost|floatformat:2 %}Material Cost: ${{ cost }}{% endblocktrans %}<br>
+           {% blocktrans with cost=record.labor_cost|floatformat:2 %}Labor Cost: ${{ cost }}{% endblocktrans %}<br>
+           <strong>{% blocktrans with cost=record.total_cost|floatformat:2 %}Total Cost: ${{ cost }}{% endblocktrans %}</strong></p>
     </div>
 
     <div class="card">
-        <h3>Materials Consumed</h3>
+        <h3>{% trans "Materials Consumed" %}</h3>
         {% if record.materials %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Component</th><th class="num">Qty Required</th><th class="num">Qty Issued</th></tr></thead>
+                <thead><tr><th>{% trans "Component" %}</th><th class="num">{% trans "Qty Required" %}</th><th class="num">{% trans "Qty Issued" %}</th></tr></thead>
                 <tbody>
                     {% for m in record.materials %}
                     <tr><td>{{ m.component_name }}</td><td class="num">{{ m.qty_required }}</td><td class="num">{{ m.qty_issued }}</td></tr>
@@ -44,16 +49,16 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No materials recorded.</div>
+        <div class="empty-state">{% trans "No materials recorded." %}</div>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Quality Inspections</h3>
+        <h3>{% trans "Quality Inspections" %}</h3>
         {% if record.inspections %}
         <div class="erp-table-wrap">
             <table class="erp-table">
-                <thead><tr><th>Inspection #</th><th>Inspector</th><th>Date</th><th>Result</th></tr></thead>
+                <thead><tr><th>{% trans "Inspection #" %}</th><th>{% trans "Inspector" %}</th><th>{% trans "Date" %}</th><th>{% trans "Result" %}</th></tr></thead>
                 <tbody>
                     {% for i in record.inspections %}
                     <tr><td>{{ i.insp_number }}</td><td>{{ i.inspector }}</td><td>{{ i.insp_date }}</td><td>{{ i.result }}</td></tr>
@@ -62,7 +67,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">No quality inspections tied to this work order.</div>
+        <div class="empty-state">{% trans "No quality inspections tied to this work order." %}</div>
         {% endif %}
     </div>
 </div>
