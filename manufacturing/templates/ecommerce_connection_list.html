@@ -1,28 +1,29 @@
 {% extends "base.html" %}
-{% block page_title %}e-Commerce Connections{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "e-Commerce Connections" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/so/" class="btn">← Back</a>
-{% if can_edit %}<a href="/ecommerce/connections/new/" class="btn btn-primary">+ New Connection</a>{% endif %}
-<a href="/ecommerce/log/" class="btn">Sync Log</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/so/" class="btn">← {% trans "Back" %}</a>
+{% if can_edit %}<a href="/ecommerce/connections/new/" class="btn btn-primary">+ {% trans "New Connection" %}</a>{% endif %}
+<a href="/ecommerce/log/" class="btn">{% trans "Sync Log" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">e-Commerce Connections</div>
+    <div class="menu-title">{% trans "e-Commerce Connections" %}</div>
 
     {% if connections %}
     <div class="erp-table-wrap">
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Store</th>
-                    <th>Platform</th>
-                    <th>Default Customer</th>
-                    <th>Price List</th>
-                    <th>Sync Endpoint</th>
-                    <th>Status</th>
+                    <th>{% trans "Store" %}</th>
+                    <th>{% trans "Platform" %}</th>
+                    <th>{% trans "Default Customer" %}</th>
+                    <th>{% trans "Price List" %}</th>
+                    <th>{% trans "Sync Endpoint" %}</th>
+                    <th>{% trans "Status" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -33,16 +34,16 @@
                     <td>{{ c.platform|capfirst }}</td>
                     <td>{{ c.company_name|default:c.first_name }} {{ c.last_name|default:"" }}</td>
                     <td>{{ c.price_list_name|default:"—" }}</td>
-                    <td>{{ c.sync_endpoint_url|default:"— (queued only)" }}</td>
-                    <td><span class="pill">{% if c.is_active %}Active{% else %}Inactive{% endif %}</span></td>
-                    <td><a href="/ecommerce/connections/{{ c.id }}/" class="btn btn-sm">Manage</a></td>
+                    <td>{% if c.sync_endpoint_url %}{{ c.sync_endpoint_url }}{% else %}— {% trans "(queued only)" %}{% endif %}</td>
+                    <td><span class="pill">{% if c.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}</span></td>
+                    <td><a href="/ecommerce/connections/{{ c.id }}/" class="btn btn-sm">{% trans "Manage" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No storefront connections configured yet.</div>
+    <div class="empty-state">{% trans "No storefront connections configured yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

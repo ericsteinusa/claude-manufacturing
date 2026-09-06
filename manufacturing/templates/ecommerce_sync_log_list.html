@@ -1,26 +1,27 @@
 {% extends "base.html" %}
-{% block page_title %}e-Commerce Sync Log{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "e-Commerce Sync Log" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ecommerce/connections/" class="btn">← Back</a>
+<a href="/ecommerce/connections/" class="btn">← {% trans "Back" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">e-Commerce Sync Log</div>
+    <div class="menu-title">{% trans "e-Commerce Sync Log" %}</div>
 
     {% if log_rows %}
     <div class="erp-table-wrap">
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Store</th>
-                    <th>Event</th>
-                    <th>Direction</th>
-                    <th>Status</th>
-                    <th>Detail</th>
-                    <th>Created By</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Store" %}</th>
+                    <th>{% trans "Event" %}</th>
+                    <th>{% trans "Direction" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Detail" %}</th>
+                    <th>{% trans "Created By" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,7 +40,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No e-commerce sync activity logged yet.</div>
+    <div class="empty-state">{% trans "No e-commerce sync activity logged yet." %}</div>
     {% endif %}
 </div>
 {% endblock %}

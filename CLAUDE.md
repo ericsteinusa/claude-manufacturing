@@ -2609,6 +2609,85 @@ Active dropdown and both "— Tous les produits —"/"— Tous les clients
 all pages return 200 with correctly translated titles and labels, no
 console or server errors.
 
+Also fully translated: the **e-Commerce Connections** feature
+(`ecommerce_connection_list.html`, `ecommerce_connection_detail.html`,
+`ecommerce_connection_new.html`, `ecommerce_sync_log_list.html` — 4
+templates, linked from `so_list.html`'s already-translated toolbar
+button and reachable via `prod_shipping_detail.html`'s "Push Shipment
+Confirmation" flow too — another "translate the link, not yet the
+target" closure, and the largest/most complex of the three candidates
+this series identified after the Recipes/Promotions passes). 40 unique
+strings across 5 languages, all simple (no plurals) — the largest
+single-batch string count since the Costing pass. Small enough to
+translate directly by hand rather than delegating, matching the ABC
+Costing/Auth/Risk Management/Scan/Recipes/Promotions precedent.
+
+Two `{{ x|default:"literal english" }}` fallback bugs fixed with the
+standard `{% if %}/{% else %}/{% trans %}` expansion, continuing the
+class first found on IT's Network Device page:
+`connection.store_name|default:"Storefront Connection"` (appearing
+twice — once in `page_title`, once in the `<h2>` — both needed the
+expansion independently since a block/tag can't share a variable
+binding across them) and the list page's
+`c.sync_endpoint_url|default:"— (queued only)"`, where only the
+"(queued only)" parenthetical is real English text needing translation
+— the leading em-dash stays a literal separator outside the
+conditional, matching the "data fields + literal separator"
+precedent.
+
+This batch had the most multi-line `{% blocktrans %}` prose blocks with
+embedded straight-quoted phrases of any single pass so far — three
+separate paragraphs (the webhook admin-instructions paragraph
+interpolating `{{ platform }}`, the "logged as 'queued' instead of
+sent" hint, and the New Connection form's near-identical "status
+'queued'" hint), plus a fourth, fully static paragraph explaining the
+storefront-SKU cross-reference mapping with no variables at all. None
+needed backslash-escaping despite the embedded quotes, since (per the
+established IT-department/WMS-pass finding) Django's tag tokenizer
+resolves `{% %}` boundaries before any surrounding quote nesting
+matters — these are template *body* text, not JS strings or HTML
+attributes, so straight `"..."` quotes inside a `{% blocktrans %}`
+block need no escaping at all. Confirmed all three interpolated/static
+paragraphs render with real newlines (not literal `\n`) and with the
+embedded quotes intact — including French's own guillemets and
+German's „…" low-quote convention, both chosen naturally by the
+translations rather than reusing the source's straight quotes — via
+direct `Template().render()` calls in all 5 languages before trusting
+the browser check, continuing the runtime-verification habit
+established after the WO/SO pass's double-escape bug.
+
+Full suite 3475 passed (unchanged — template/locale-file work only),
+`manage.py check` and `ruff check .` both clean, `msgfmt --check` clean
+on all 5 `.po` files (including the three quote-embedded multi-line
+entries), zero fuzzy/blank entries confirmed programmatically, zero
+placeholder (`%(platform)s`-style) mismatches between msgid and any of
+the 5 languages' translations. Raw DB enum values
+(`c.platform`/`l.event_type`/`l.direction`/`l.status`) all stay
+untranslated per the established precedent — `l.event_type` in
+particular reconfirms the exact "deliberately left untranslated"
+exception this file already documented for it. The auto-merged generic
+labels this batch reused (Back, Home, Date, Detail, Created By, Cancel,
+Status:) all cross-checked semantically compatible with their existing
+catalog translations — no cross-context mistranslation risk. Verified
+end-to-end against the real dev server, in French with real sample
+data: the Connections list page (confirmed the real "— (en attente
+uniquement)" queued-only fallback for a connection with no sync
+endpoint configured), a real connection's detail page (confirmed the
+dynamic "Configurez cette URL comme webhook « commande créée » dans
+l'administration de Shopify..." paragraph interpolating the real
+platform name, the Item Cross-Reference card's fully static
+explanatory paragraph, and the empty "Aucun mappage d'article pour le
+moment" state), the New Connection form (confirmed both
+"(sélectionner)"/"(aucun)" placeholder options and the sync-endpoint
+hint paragraph), and the Sync Log page (confirmed two real log rows
+with untranslated raw event-type/direction/status enum values sitting
+correctly bare next to their translated column headers) — all pages
+return 200 with correctly translated titles and labels, no console or
+server errors (one transient dev-server crash from the
+already-documented `psycopg2.errors.InternalError_: tuple concurrently
+updated` autoreload race occurred mid-verification, unrelated to this
+batch's changes, resolved by restarting the preview server).
+
 ## Web UI (Django) & menu routing
 - **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
   partial — a full SPA rewrite isn't proportionate to this codebase's size). 24 of ~450 templates
