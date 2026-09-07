@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 19:52+0000\n"
+"POT-Creation-Date: 2026-09-07 20:38+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -625,7 +625,7 @@ msgstr "Verkoopmenu"
 #: manufacturing/templates/sales_orders.html:3
 #: manufacturing/templates/sales_orders.html:44
 #: manufacturing/templates/so_list.html:4
-#: manufacturing/templates/so_list.html:22 manufacturing/views/__init__.py:4437
+#: manufacturing/templates/so_list.html:22 manufacturing/views/__init__.py:4438
 msgid "Sales Orders"
 msgstr "Verkooporders"
 
@@ -1757,7 +1757,7 @@ msgstr "Leveranciersinvoer"
 #: manufacturing/templates/supplier_portal_pos.html:3
 #: manufacturing/templates/supplier_portal_pos.html:4
 #: manufacturing/templates/supplier_scorecard_list.html:8
-#: manufacturing/views/__init__.py:4555
+#: manufacturing/views/__init__.py:4556
 msgid "Purchase Orders"
 msgstr "Inkooporders"
 
@@ -4173,12 +4173,12 @@ msgstr "bijv. per omstelling, per machine-uur"
 #: manufacturing/templates/finance_bank_rec_detail.html:155
 #: manufacturing/templates/finance_bank_rec_list.html:72
 #: manufacturing/templates/finance_bank_rec_list.html:120
-#: manufacturing/templates/finance_budget_detail.html:81
-#: manufacturing/templates/finance_budget_detail.html:94
-#: manufacturing/templates/finance_budget_detail.html:107
-#: manufacturing/templates/finance_budget_detail.html:164
-#: manufacturing/templates/finance_budget_list.html:83
-#: manufacturing/templates/finance_budget_list.html:125
+#: manufacturing/templates/finance_budget_detail.html:97
+#: manufacturing/templates/finance_budget_detail.html:111
+#: manufacturing/templates/finance_budget_detail.html:124
+#: manufacturing/templates/finance_budget_detail.html:221
+#: manufacturing/templates/finance_budget_list.html:90
+#: manufacturing/templates/finance_budget_list.html:142
 #: manufacturing/templates/finance_tax_detail.html:136
 #: manufacturing/templates/finance_tax_detail.html:149
 #: manufacturing/templates/finance_tax_list.html:157
@@ -4768,7 +4768,7 @@ msgstr "Referentie"
 #: manufacturing/templates/engagement_detail.html:121
 #: manufacturing/templates/engagement_detail.html:150
 #: manufacturing/templates/finance_audit_detail.html:124
-#: manufacturing/templates/finance_budget_detail.html:105
+#: manufacturing/templates/finance_budget_detail.html:122
 #: manufacturing/templates/finance_dashboard_kpis.html:57
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:58
@@ -4938,10 +4938,10 @@ msgstr "Totaal Debet"
 #: manufacturing/templates/finance_audit_list.html:142
 #: manufacturing/templates/finance_bank_rec_detail.html:108
 #: manufacturing/templates/finance_bank_rec_detail.html:139
-#: manufacturing/templates/finance_budget_detail.html:73
-#: manufacturing/templates/finance_budget_detail.html:92
-#: manufacturing/templates/finance_budget_list.html:81
-#: manufacturing/templates/finance_budget_list.html:117
+#: manufacturing/templates/finance_budget_detail.html:80
+#: manufacturing/templates/finance_budget_detail.html:108
+#: manufacturing/templates/finance_budget_list.html:87
+#: manufacturing/templates/finance_budget_list.html:125
 #: manufacturing/templates/finance_dashboard_kpis.html:60
 #: manufacturing/templates/finance_tax_detail.html:116
 #: manufacturing/templates/finance_tax_list.html:92
@@ -5465,7 +5465,7 @@ msgstr "Wisselkoers"
 #: manufacturing/templates/ess_profile.html:78
 #: manufacturing/templates/finance_audit_detail.html:102
 #: manufacturing/templates/finance_bank_rec_detail.html:85
-#: manufacturing/templates/finance_budget_detail.html:85
+#: manufacturing/templates/finance_budget_detail.html:101
 #: manufacturing/templates/finance_tax_detail.html:140
 #: manufacturing/templates/fixed_asset_detail.html:289
 #: manufacturing/templates/inventory_detail.html:198
@@ -5753,7 +5753,7 @@ msgstr "Tot:"
 #: manufacturing/templates/exit_interview_list.html:51
 #: manufacturing/templates/finance_audit_list.html:76
 #: manufacturing/templates/finance_bank_rec_list.html:60
-#: manufacturing/templates/finance_budget_list.html:71
+#: manufacturing/templates/finance_budget_list.html:77
 #: manufacturing/templates/finance_tax_list.html:77
 #: manufacturing/templates/fixed_asset_list.html:98
 #: manufacturing/templates/gl_journals.html:50
@@ -5831,7 +5831,7 @@ msgstr "Filteren"
 #: manufacturing/templates/exit_interview_list.html:52
 #: manufacturing/templates/finance_audit_list.html:77
 #: manufacturing/templates/finance_bank_rec_list.html:61
-#: manufacturing/templates/finance_budget_list.html:72
+#: manufacturing/templates/finance_budget_list.html:78
 #: manufacturing/templates/finance_tax_list.html:78
 #: manufacturing/templates/fixed_asset_list.html:99
 #: manufacturing/templates/gl_balance_sheet.html:47
@@ -6077,11 +6077,12 @@ msgstr "bijv. CNC-01"
 #: manufacturing/templates/employee_employment_dates.html:49
 #: manufacturing/templates/employee_gap_detail.html:99
 #: manufacturing/templates/esg_dashboard.html:183
+#: manufacturing/templates/finance_budget_detail.html:174
 #: manufacturing/templates/gl_accounts.html:113
 #: manufacturing/templates/payroll_pay_rates.html:127
 #: manufacturing/templates/people_form.html:122
-#: manufacturing/templates/pers_depts.html:67
-#: manufacturing/templates/pers_depts.html:117
+#: manufacturing/templates/pers_depts.html:114
+#: manufacturing/templates/pers_depts.html:195
 #: manufacturing/templates/pl_detail.html:105
 #: manufacturing/templates/po_detail.html:191
 #: manufacturing/templates/po_form.html:80
@@ -6275,6 +6276,10 @@ msgstr "Entiteitstype *"
 #: manufacturing/templates/finance_audit_detail.html:167
 #: manufacturing/templates/finance_audit_list.html:86
 #: manufacturing/templates/finance_audit_list.html:130
+#: manufacturing/templates/finance_budget_detail.html:88
+#: manufacturing/templates/finance_budget_detail.html:109
+#: manufacturing/templates/finance_budget_list.html:88
+#: manufacturing/templates/finance_budget_list.html:133
 #: manufacturing/templates/it_asset_detail.html:99
 #: manufacturing/templates/it_asset_detail.html:162
 #: manufacturing/templates/it_asset_list.html:141
@@ -6288,8 +6293,8 @@ msgstr "Entiteitstype *"
 #: manufacturing/templates/people_form.html:77
 #: manufacturing/templates/people_list.html:20
 #: manufacturing/templates/people_list.html:49
-#: manufacturing/templates/pers_depts.html:54
-#: manufacturing/templates/pers_depts.html:95
+#: manufacturing/templates/pers_depts.html:64
+#: manufacturing/templates/pers_depts.html:173
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/req_detail.html:70
 #: manufacturing/templates/req_list.html:81
@@ -6391,6 +6396,7 @@ msgstr ""
 "Deze regel permanent verwijderen? Dit kan niet ongedaan worden gemaakt."
 
 #: manufacturing/templates/approval_rule_edit.html:96
+#: manufacturing/templates/pers_depts.html:123
 #: manufacturing/templates/report_builder_list.html:41
 #: manufacturing/templates/retention_policy_edit.html:60
 #: manufacturing/templates/webhook_edit.html:92
@@ -6473,12 +6479,14 @@ msgstr "— Alle —"
 #: manufacturing/templates/bom_detail.html:177
 #: manufacturing/templates/data_governance_dashboard.html:99
 #: manufacturing/templates/eng_project_detail.html:142
+#: manufacturing/templates/finance_budget_detail.html:166
 #: manufacturing/templates/gl_accounts.html:64
 #: manufacturing/templates/gl_accounts.html:79
 #: manufacturing/templates/it_software_detail.html:94
 #: manufacturing/templates/payroll_pay_rates.html:65
 #: manufacturing/templates/payroll_pay_rates.html:87
 #: manufacturing/templates/people_detail.html:8
+#: manufacturing/templates/pers_depts.html:103
 #: manufacturing/templates/po_detail.html:8
 #: manufacturing/templates/report_builder_detail.html:7
 #: manufacturing/templates/report_builder_list.html:37
@@ -7605,7 +7613,7 @@ msgstr "Kwaliteit"
 #: manufacturing/templates/base.html:584
 #: manufacturing/templates/dashboard.html:68
 #: manufacturing/templates/pers_depts.html:3
-#: manufacturing/templates/pers_depts.html:52
+#: manufacturing/templates/pers_depts.html:62
 #: manufacturing/templates/pers_reviews_list.html:8
 #: manufacturing/templates/pers_training_list.html:8
 #: manufacturing/templates/personnel_dashboard.html:8
@@ -8399,7 +8407,7 @@ msgstr "Geldigheid"
 #: manufacturing/templates/cost_detail.html:111
 #: manufacturing/templates/cs_reports_kpis.html:41
 #: manufacturing/templates/engagement_list.html:54
-#: manufacturing/templates/finance_budget_detail.html:135
+#: manufacturing/templates/finance_budget_detail.html:192
 #: manufacturing/templates/marketing_dashboard_kpis.html:5
 #: manufacturing/templates/mkt_analytics.html:141
 #: manufacturing/templates/mkt_analytics.html:148
@@ -8554,6 +8562,7 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/ecommerce_connection_new.html:65
 #: manufacturing/templates/edi_partner_new.html:42
 #: manufacturing/templates/eng_project_detail.html:175
+#: manufacturing/templates/finance_budget_detail.html:175
 #: manufacturing/templates/forgot_password.html:37
 #: manufacturing/templates/forgot_password_reset.html:40
 #: manufacturing/templates/gl_accounts.html:115
@@ -8572,6 +8581,7 @@ msgstr "Raamcontract Aanmaken"
 #: manufacturing/templates/mrp_safety_stock.html:98
 #: manufacturing/templates/payroll_pay_rates.html:131
 #: manufacturing/templates/people_form.html:123
+#: manufacturing/templates/pers_depts.html:116
 #: manufacturing/templates/po_form.html:82
 #: manufacturing/templates/po_landed_cost_new.html:76
 #: manufacturing/templates/portal_rma_new.html:35
@@ -8834,8 +8844,8 @@ msgstr "optioneel"
 #: manufacturing/templates/document_detail.html:258
 #: manufacturing/templates/document_detail.html:274
 #: manufacturing/templates/document_detail.html:286
-#: manufacturing/templates/pers_depts.html:82
-#: manufacturing/templates/pers_depts.html:138
+#: manufacturing/templates/pers_depts.html:159
+#: manufacturing/templates/pers_depts.html:216
 #: manufacturing/templates/po_detail.html:283
 #: manufacturing/templates/so_detail.html:270
 #: manufacturing/templates/wo_detail.html:201
@@ -8973,7 +8983,7 @@ msgid "All Budgets"
 msgstr "Alle Budgetten"
 
 #: manufacturing/templates/budget_dashboard.html:37
-#: manufacturing/templates/finance_budget_list.html:104
+#: manufacturing/templates/finance_budget_list.html:112
 msgid "New Budget"
 msgstr "Nieuw Budget"
 
@@ -9018,15 +9028,15 @@ msgid "Total Budgeted by Fiscal Year"
 msgstr "Totaal Begroot per Boekjaar"
 
 #: manufacturing/templates/budget_dashboard.html:89
-#: manufacturing/templates/finance_budget_list.html:79
+#: manufacturing/templates/finance_budget_list.html:85
 msgid "Budget Name"
 msgstr "Budgetnaam"
 
 #: manufacturing/templates/budget_dashboard.html:89
-#: manufacturing/templates/finance_budget_detail.html:69
-#: manufacturing/templates/finance_budget_detail.html:91
+#: manufacturing/templates/finance_budget_detail.html:76
+#: manufacturing/templates/finance_budget_detail.html:107
 #: manufacturing/templates/finance_budget_list.html:69
-#: manufacturing/templates/finance_budget_list.html:80
+#: manufacturing/templates/finance_budget_list.html:86
 #: manufacturing/templates/sales_forecast_detail.html:148
 #: manufacturing/templates/sales_forecast_list.html:140
 #: manufacturing/templates/sales_forecast_list.html:212
@@ -9034,7 +9044,7 @@ msgid "Fiscal Year"
 msgstr "Boekjaar"
 
 #: manufacturing/templates/budget_dashboard.html:100
-#: manufacturing/templates/finance_budget_list.html:96
+#: manufacturing/templates/finance_budget_list.html:104
 msgid "No budgets found."
 msgstr "Geen budgetten gevonden."
 
@@ -9833,6 +9843,8 @@ msgstr "Valutacode"
 #: manufacturing/templates/contacts_new.html:72
 #: manufacturing/templates/ess_profile.html:42
 #: manufacturing/templates/people_form.html:100
+#: manufacturing/templates/pers_depts.html:84
+#: manufacturing/templates/pers_depts.html:142
 #: manufacturing/templates/register.html:58
 msgid "Address"
 msgstr "Adres"
@@ -10021,8 +10033,8 @@ msgstr "Nog geen checklists. Maak er een aan vanuit een sjabloon."
 #: manufacturing/templates/eng_specs_list.html:87
 #: manufacturing/templates/eng_specs_list.html:125
 #: manufacturing/templates/engagement_detail.html:121
-#: manufacturing/templates/finance_budget_detail.html:104
-#: manufacturing/templates/finance_budget_detail.html:152
+#: manufacturing/templates/finance_budget_detail.html:121
+#: manufacturing/templates/finance_budget_detail.html:209
 #: manufacturing/templates/legal_governance_list.html:75
 #: manufacturing/templates/legal_governance_list.html:107
 #: manufacturing/templates/maint_downtime_detail.html:70
@@ -10517,7 +10529,9 @@ msgstr "Intern — gekoppeld aan %(fn)s %(ln)s."
 msgid ""
 "Ad hoc — no linked supplier or personnel record. A supplier will be auto-"
 "created on first approved invoice."
-msgstr "Ad hoc — geen gekoppelde leverancier of personeelsdossier. Bij de eerste goedgekeurde factuur wordt automatisch een leverancier aangemaakt."
+msgstr ""
+"Ad hoc — geen gekoppelde leverancier of personeelsdossier. Bij de eerste "
+"goedgekeurde factuur wordt automatisch een leverancier aangemaakt."
 
 #: manufacturing/templates/consultant_detail.html:100
 #: manufacturing/templates/engagement_detail.html:60
@@ -10544,6 +10558,8 @@ msgstr "Gekoppelde Leverancier (extern)"
 
 #: manufacturing/templates/consultant_form.html:47
 #: manufacturing/templates/eng_tasks_list.html:127
+#: manufacturing/templates/finance_budget_detail.html:90
+#: manufacturing/templates/finance_budget_list.html:135
 #: manufacturing/templates/maint_part_detail.html:123
 #: manufacturing/templates/prod_returns_detail.html:102
 #: manufacturing/templates/prod_returns_list.html:117
@@ -10632,7 +10648,9 @@ msgstr "Wacht op goedkeuring als <strong>%(role)s</strong>."
 #: manufacturing/templates/consultant_invoice_detail.html:77
 msgid ""
 "Meaning of signature (e.g. &quot;I approve this invoice for payment&quot;)"
-msgstr "Betekenis van de handtekening (bijv. &quot;Ik keur deze factuur goed voor betaling&quot;)"
+msgstr ""
+"Betekenis van de handtekening (bijv. &quot;Ik keur deze factuur goed voor "
+"betaling&quot;)"
 
 #: manufacturing/templates/consultant_invoice_detail.html:85
 msgid ""
@@ -10640,7 +10658,11 @@ msgid ""
 "nothing is pending.\n"
 "            Add an <a href=\"/approval-rules/new/\">approval rule</a> for "
 "entity type <code>consultant_invoice</code>."
-msgstr "Ingediend — er is nog geen goedkeuringsregel geconfigureerd voor consultantfacturen, dus er is niets in behandeling.\n            Voeg een <a href=\"/approval-rules/new/\">goedkeuringsregel</a> toe voor entiteitstype <code>consultant_invoice</code>."
+msgstr ""
+"Ingediend — er is nog geen goedkeuringsregel geconfigureerd voor "
+"consultantfacturen, dus er is niets in behandeling.\n"
+"            Voeg een <a href=\"/approval-rules/new/\">goedkeuringsregel</a> "
+"toe voor entiteitstype <code>consultant_invoice</code>."
 
 #: manufacturing/templates/consultant_invoice_detail.html:92
 msgid "Itemized Time"
@@ -10817,7 +10839,11 @@ msgid ""
 "engagement, and\n"
 "            consultant defaults are all unset) — cost is withheld rather "
 "than shown as $0."
-msgstr "\"—\" betekent dat minstens één tijdregistratie geen oplosbaar uurtarief heeft (invoer, opdracht en\n            consultant-standaardwaarden zijn allemaal niet ingesteld) — de kosten worden achtergehouden in plaats van als $0 getoond."
+msgstr ""
+"\"—\" betekent dat minstens één tijdregistratie geen oplosbaar uurtarief "
+"heeft (invoer, opdracht en\n"
+"            consultant-standaardwaarden zijn allemaal niet ingesteld) — de "
+"kosten worden achtergehouden in plaats van als $0 getoond."
 
 #: manufacturing/templates/consultant_spend_report.html:77
 msgid "By Engagement"
@@ -10878,6 +10904,8 @@ msgstr "Bedrijfsnaam"
 #: manufacturing/templates/contacts_new.html:77
 #: manufacturing/templates/ess_profile.html:48
 #: manufacturing/templates/people_form.html:107
+#: manufacturing/templates/pers_depts.html:87
+#: manufacturing/templates/pers_depts.html:146
 #: manufacturing/templates/register.html:65
 #: manufacturing/templates/register.html:66
 msgid "City"
@@ -10887,6 +10915,8 @@ msgstr "Plaats"
 #: manufacturing/templates/contacts_new.html:83
 #: manufacturing/templates/ess_profile.html:52
 #: manufacturing/templates/people_form.html:111
+#: manufacturing/templates/pers_depts.html:90
+#: manufacturing/templates/pers_depts.html:150
 #: manufacturing/templates/register.html:69
 msgid "State"
 msgstr "Provincie"
@@ -10895,6 +10925,8 @@ msgstr "Provincie"
 #: manufacturing/templates/contacts_new.html:88
 #: manufacturing/templates/ess_profile.html:56
 #: manufacturing/templates/people_form.html:116
+#: manufacturing/templates/pers_depts.html:93
+#: manufacturing/templates/pers_depts.html:154
 msgid "Zip Code"
 msgstr "Postcode"
 
@@ -12396,8 +12428,8 @@ msgstr "Terugbetalingsbedrag"
 #: manufacturing/templates/eng_ecr_detail.html:77
 #: manufacturing/templates/eng_spec_detail.html:124
 #: manufacturing/templates/eng_task_detail.html:121
-#: manufacturing/templates/finance_budget_detail.html:93
-#: manufacturing/templates/finance_budget_list.html:82
+#: manufacturing/templates/finance_budget_detail.html:110
+#: manufacturing/templates/finance_budget_list.html:89
 #: manufacturing/templates/gl_journal_detail.html:59
 #: manufacturing/templates/gl_journals.html:61
 #: manufacturing/templates/it_ticket_detail.html:103
@@ -14424,7 +14456,9 @@ msgstr "Nieuwe Consultantopdracht"
 
 #: manufacturing/templates/engagement_form.html:38
 msgid "No consultants yet — <a href=\"/consultants/new/\">add one first</a>."
-msgstr "Nog geen consultants — <a href=\"/consultants/new/\">voeg er eerst een toe</a>."
+msgstr ""
+"Nog geen consultants — <a href=\"/consultants/new/\">voeg er eerst een toe</"
+"a>."
 
 #: manufacturing/templates/engagement_form.html:46
 msgid "e.g. Q3 ERP Migration Support"
@@ -15278,7 +15312,7 @@ msgid "Finding Ref"
 msgstr "Bevindingsref."
 
 #: manufacturing/templates/finance_audit_detail.html:175
-#: manufacturing/templates/finance_budget_detail.html:156
+#: manufacturing/templates/finance_budget_detail.html:213
 #: manufacturing/templates/it_ticket_list.html:141
 #: manufacturing/templates/prod_shipping_detail.html:173
 #: manufacturing/templates/qa_inspection_detail.html:240
@@ -15444,38 +15478,47 @@ msgstr "Rekening Toevoegen"
 msgid "Budget — %(name)s"
 msgstr "Budget — %(name)s"
 
-#: manufacturing/templates/finance_budget_detail.html:60
+#: manufacturing/templates/finance_budget_detail.html:61
+msgid ""
+"Delete this entire budget and all its line items? This cannot be undone."
+msgstr "Dit hele budget en alle bijbehorende regels verwijderen? Dit kan niet ongedaan worden gemaakt."
+
+#: manufacturing/templates/finance_budget_detail.html:61
+msgid "Delete Budget"
+msgstr "Budget verwijderen"
+
+#: manufacturing/templates/finance_budget_detail.html:67
 msgid "Edit Budget"
 msgstr "Budget Bewerken"
 
-#: manufacturing/templates/finance_budget_detail.html:65
-#: manufacturing/templates/finance_budget_list.html:109
+#: manufacturing/templates/finance_budget_detail.html:72
+#: manufacturing/templates/finance_budget_list.html:117
 msgid "Budget Name *"
 msgstr "Budgetnaam *"
 
-#: manufacturing/templates/finance_budget_detail.html:100
+#: manufacturing/templates/finance_budget_detail.html:117
 msgid "Budget Lines"
 msgstr "Budgetregels"
 
-#: manufacturing/templates/finance_budget_detail.html:106
+#: manufacturing/templates/finance_budget_detail.html:123
 msgid "Budgeted Amount"
 msgstr "Begroot Bedrag"
 
-#: manufacturing/templates/finance_budget_detail.html:123
+#: manufacturing/templates/finance_budget_detail.html:180
 msgid "Delete this line?"
 msgstr "Deze regel verwijderen?"
 
-#: manufacturing/templates/finance_budget_detail.html:123
+#: manufacturing/templates/finance_budget_detail.html:180
 msgid "Del"
 msgstr "Verw."
 
-#: manufacturing/templates/finance_budget_detail.html:129
+#: manufacturing/templates/finance_budget_detail.html:186
 #: manufacturing/templates/req_detail.html:94
 #: manufacturing/templates/sales_order_detail.html:148
 msgid "No line items yet."
 msgstr "Nog geen regelitems."
 
-#: manufacturing/templates/finance_budget_detail.html:147
+#: manufacturing/templates/finance_budget_detail.html:204
 #: manufacturing/templates/po_detail.html:256
 #: manufacturing/templates/rfq_detail.html:81
 #: manufacturing/templates/sales_order_detail.html:163
@@ -15483,19 +15526,19 @@ msgstr "Nog geen regelitems."
 msgid "Add Line Item"
 msgstr "Regelitem Toevoegen"
 
-#: manufacturing/templates/finance_budget_detail.html:153
+#: manufacturing/templates/finance_budget_detail.html:210
 msgid "e.g. Salaries, Equipment"
 msgstr "bijv. Salarissen, Apparatuur"
 
-#: manufacturing/templates/finance_budget_detail.html:157
+#: manufacturing/templates/finance_budget_detail.html:214
 msgid "Line item description"
 msgstr "Omschrijving van het regelitem"
 
-#: manufacturing/templates/finance_budget_detail.html:160
+#: manufacturing/templates/finance_budget_detail.html:217
 msgid "Budgeted Amount ($)"
 msgstr "Begroot Bedrag ($)"
 
-#: manufacturing/templates/finance_budget_detail.html:168
+#: manufacturing/templates/finance_budget_detail.html:225
 #: manufacturing/templates/gl_journal_detail.html:153
 #: manufacturing/templates/pl_detail.html:154
 #: manufacturing/templates/wms_transfer_detail.html:81
@@ -15503,19 +15546,24 @@ msgstr "Begroot Bedrag ($)"
 msgid "Add Line"
 msgstr "Regel Toevoegen"
 
-#: manufacturing/templates/finance_budget_list.html:70
+#: manufacturing/templates/finance_budget_list.html:71
+#: manufacturing/templates/people_list.html:22
+msgid "All Departments"
+msgstr "Alle Afdelingen"
+
+#: manufacturing/templates/finance_budget_list.html:76
 msgid "Search name…"
 msgstr "Zoek naam…"
 
-#: manufacturing/templates/finance_budget_list.html:110
+#: manufacturing/templates/finance_budget_list.html:118
 msgid "e.g. Operations FY2026"
 msgstr "bijv. Operations BJ2026"
 
-#: manufacturing/templates/finance_budget_list.html:113
+#: manufacturing/templates/finance_budget_list.html:121
 msgid "Fiscal Year *"
 msgstr "Boekjaar *"
 
-#: manufacturing/templates/finance_budget_list.html:129
+#: manufacturing/templates/finance_budget_list.html:146
 msgid "Create Budget"
 msgstr "Budget aanmaken"
 
@@ -20095,7 +20143,7 @@ msgid "Role & Department"
 msgstr "Rol en Afdeling"
 
 #: manufacturing/templates/people_form.html:88
-#: manufacturing/templates/pers_depts.html:94
+#: manufacturing/templates/pers_depts.html:172
 msgid "Sub-Department"
 msgstr "Subafdeling"
 
@@ -20107,10 +20155,6 @@ msgstr "Werknemer Toevoegen"
 #: manufacturing/templates/people_list.html:16
 msgid "Employee Directory"
 msgstr "Werknemersoverzicht"
-
-#: manufacturing/templates/people_list.html:22
-msgid "All Departments"
-msgstr "Alle Afdelingen"
 
 #: manufacturing/templates/people_list.html:48
 msgid "Emp #"
@@ -20227,31 +20271,43 @@ msgstr "%(label)s heropenen? Boekingen worden weer toegestaan."
 msgid "Reopen"
 msgstr "Heropenen"
 
-#: manufacturing/templates/pers_depts.html:43
+#: manufacturing/templates/pers_depts.html:53
 msgid "Departments &amp; Sub-Departments"
 msgstr "Afdelingen &amp; Subafdelingen"
 
-#: manufacturing/templates/pers_depts.html:73
+#: manufacturing/templates/pers_depts.html:81
+msgid "Department name"
+msgstr "Naam van de afdeling"
+
+#: manufacturing/templates/pers_depts.html:123
+msgid "Delete this department?"
+msgstr "Deze afdeling verwijderen?"
+
+#: manufacturing/templates/pers_depts.html:129
 msgid "No departments."
 msgstr "Geen afdelingen."
 
-#: manufacturing/templates/pers_depts.html:81
+#: manufacturing/templates/pers_depts.html:138
+msgid "Department Name *"
+msgstr "Naam van de Afdeling *"
+
+#: manufacturing/templates/pers_depts.html:139
 msgid "New department name"
 msgstr "Naam nieuwe afdeling"
 
-#: manufacturing/templates/pers_depts.html:90
+#: manufacturing/templates/pers_depts.html:168
 msgid "Sub-Departments"
 msgstr "Subafdelingen"
 
-#: manufacturing/templates/pers_depts.html:123
+#: manufacturing/templates/pers_depts.html:201
 msgid "No sub-departments."
 msgstr "Geen subafdelingen."
 
-#: manufacturing/templates/pers_depts.html:132
+#: manufacturing/templates/pers_depts.html:210
 msgid "— Department —"
 msgstr "— Afdeling —"
 
-#: manufacturing/templates/pers_depts.html:137
+#: manufacturing/templates/pers_depts.html:215
 msgid "Sub-department name"
 msgstr "Naam subafdeling"
 
@@ -21070,7 +21126,7 @@ msgstr "U heeft nog geen retourverzoeken."
 #: manufacturing/templates/prod_returns_list.html:115
 #: manufacturing/templates/prod_shipping_detail.html:95
 #: manufacturing/templates/prod_shipping_list.html:110
-#: manufacturing/views/__init__.py:4436
+#: manufacturing/views/__init__.py:4437
 msgid "Sales Order"
 msgstr "Verkooporder"
 
@@ -24506,7 +24562,7 @@ msgid "e.g. PART-SKU123"
 msgstr "bijv. PART-SKU123"
 
 #: manufacturing/templates/scan_home.html:67
-#: manufacturing/views/__init__.py:4554
+#: manufacturing/views/__init__.py:4555
 msgid "Purchase Order"
 msgstr "Inkooporder"
 
@@ -27239,23 +27295,23 @@ msgstr "Personeelsplan vs. Werkelijk"
 msgid "No headcount plans yet."
 msgstr "Nog geen personeelsplannen."
 
-#: manufacturing/views/__init__.py:4339 manufacturing/views/__init__.py:4376
-#: manufacturing/views/__init__.py:4432
+#: manufacturing/views/__init__.py:4340 manufacturing/views/__init__.py:4377
+#: manufacturing/views/__init__.py:4433
 msgid "customer"
 msgstr "klant"
 
-#: manufacturing/views/__init__.py:4340 manufacturing/views/__init__.py:4377
-#: manufacturing/views/__init__.py:4433
+#: manufacturing/views/__init__.py:4341 manufacturing/views/__init__.py:4378
+#: manufacturing/views/__init__.py:4434
 msgid "customers"
 msgstr "klanten"
 
-#: manufacturing/views/__init__.py:4468 manufacturing/views/__init__.py:4505
-#: manufacturing/views/__init__.py:4550
+#: manufacturing/views/__init__.py:4469 manufacturing/views/__init__.py:4506
+#: manufacturing/views/__init__.py:4551
 msgid "supplier"
 msgstr "leverancier"
 
-#: manufacturing/views/__init__.py:4469 manufacturing/views/__init__.py:4506
-#: manufacturing/views/__init__.py:4551
+#: manufacturing/views/__init__.py:4470 manufacturing/views/__init__.py:4507
+#: manufacturing/views/__init__.py:4552
 msgid "suppliers"
 msgstr "leveranciers"
 

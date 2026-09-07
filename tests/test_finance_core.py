@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 
 from manufacturing.finance_core import (
     get_finance_dashboard, get_revenue_expense_by_month, get_cash_position,
+    list_budgets, create_budget, update_budget, delete_budget,
 )
 
 _AP = {
@@ -238,3 +239,59 @@ def test_cash_position_defaults_to_zero_when_no_row():
     q.fetchone.return_value = None
     conn.execute.return_value = q
     assert get_cash_position(conn) == 0.0
+
+
+# ── Budgets ──────────────────────────────────────────────────────────────
+
+def test_list_budgets_no_filter_sql():
+    conn = MagicMock()
+    conn.execute.return_value.fetchall.return_value = []
+    list_budgets(conn)
+    sql, params = conn.execute.call_args[0]
+    assert 'AND department_id' not in sql
+    assert params == []
+
+
+def test_list_budgets_department_filter_adds_where_clause():
+    conn = MagicMock()
+    conn.execute.return_value.fetchall.return_value = []
+    list_budgets(conn, department_id=7)
+    sql, params = conn.execute.call_args[0]
+    assert 'AND department_id = %s' in sql
+    assert 7 in params
+
+
+def test_create_budget_inserts_department_id():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = [11]
+    budget_id = create_budget(
+        conn, 'Ops FY2026', 2026, 'draft', 'notes', 'a@example.com', department_id=3,
+    )
+    assert budget_id == 11
+    sql, params = conn.execute.call_args[0]
+    assert 'department_id' in sql
+    assert params[-1] == 3
+
+
+def test_update_budget_allows_department_id_field():
+    conn = MagicMock()
+    update_budget(conn, 1, department_id=9)
+    sql, params = conn.execute.call_args[0]
+    assert 'department_id = %s' in sql
+    assert params == [9, 1]
+
+
+def test_update_budget_ignores_unknown_field():
+    conn = MagicMock()
+    update_budget(conn, 1, bogus_field='x')
+    conn.execute.assert_not_called()
+
+
+def test_delete_budget_deletes_lines_then_budget():
+    conn = MagicMock()
+    delete_budget(conn, 42)
+    assert conn.execute.call_count == 2
+    first_sql = conn.execute.call_args_list[0][0][0]
+    second_sql = conn.execute.call_args_list[1][0][0]
+    assert 'DELETE FROM budget_line' in first_sql
+    assert 'DELETE FROM budget' in second_sql and 'budget_line' not in second_sql

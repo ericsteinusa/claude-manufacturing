@@ -1214,6 +1214,14 @@ _RECONCILE = {
     "dept_sub": [
         ("dept_id", "INTEGER"),
     ],
+    # Backfill a mailing address onto dept, matching the address/city/state/
+    # zip_code convention already used on people/customer/supplier.
+    "dept": [
+        ("address", "TEXT NOT NULL DEFAULT ''"),
+        ("city", "TEXT NOT NULL DEFAULT ''"),
+        ("state", "TEXT NOT NULL DEFAULT ''"),
+        ("zip_code", "TEXT NOT NULL DEFAULT ''"),
+    ],
     # Backfill lot tracking FK columns onto pre-existing tables
     "inventory_transaction": [
         ("lot_id", "INTEGER"),
@@ -1265,6 +1273,11 @@ _RECONCILE = {
     # Backfill GL account link onto budget_line (Phase 3B)
     "budget_line": [
         ("gl_account_id", "INTEGER"),
+    ],
+    # Backfill department link onto budget, so budgets can be scoped to a
+    # department (nullable — a budget can still be company-wide/unassigned)
+    "budget": [
+        ("department_id", "INTEGER"),
     ],
     # Backfill cost_center_id onto gl_journal_line (Phase 3D)
     "gl_journal_line": [
@@ -1399,6 +1412,17 @@ def init_schema():
                     conn.execute(f"RELEASE SAVEPOINT reconcile_{table}")
         for idx_sql in _AUDIT_INDEXES:
             conn.execute(idx_sql)
+        # Reconcile SERIAL sequences that can drift behind MAX(id) when rows
+        # are seeded with explicit ids (see seeds/seed_sample_data.py's own
+        # dept/dept_sub comment on this) -- otherwise the next INSERT relying
+        # on the sequence default collides with an existing row ("duplicate
+        # key value violates unique constraint"). Safe/idempotent: a no-op
+        # once the sequence has caught up.
+        for _seq_table, _seq_col in (("dept", "dept_id"), ("dept_sub", "dept_sub_id")):
+            conn.execute(
+                f"SELECT setval(pg_get_serial_sequence('{_seq_table}', '{_seq_col}'), "
+                f"GREATEST((SELECT COALESCE(MAX({_seq_col}), 0) FROM {_seq_table}), 1))"
+            )
         for name, desc in DEFAULT_ROLES:
             conn.execute(
                 "INSERT INTO roles (role_name, description) "

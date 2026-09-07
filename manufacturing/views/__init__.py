@@ -116,7 +116,7 @@ from ..personnel_core import (
     list_people, get_person, get_person_by_email,
     create_person, update_person,
     load_depts, load_dept_subs, list_dept_subs_with_dept,
-    create_dept, update_dept,
+    create_dept, update_dept, delete_dept,
     create_dept_sub, update_dept_sub,
     list_time_off_requests, get_time_off_request,
     create_time_off_request, set_time_off_status,
@@ -256,7 +256,8 @@ from ..finance_core import (
     FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
     TAX_TYPES, TAX_FILING_STATUSES, BANK_STATEMENT_STATUSES,
     list_budgets, get_budget, get_budget_lines,
-    create_budget, update_budget, create_budget_line, delete_budget_line,
+    create_budget, update_budget, delete_budget,
+    create_budget_line, update_budget_line, delete_budget_line,
     list_audits as list_fin_audits, get_audit_record, get_audit_findings,
     create_audit as create_fin_audit, update_audit_record, create_audit_finding,
     list_bank_accounts, get_bank_account, list_bank_statements,
@@ -7751,12 +7752,29 @@ def pers_depts(request):
             action = request.POST.get('action', '')
             try:
                 if action == 'new_dept':
-                    create_dept(conn, request.POST.get('dept_name', ''))
+                    create_dept(
+                        conn, request.POST.get('dept_name', ''),
+                        address=request.POST.get('address', ''),
+                        city=request.POST.get('city', ''),
+                        state=request.POST.get('state', ''),
+                        zip_code=request.POST.get('zip_code', ''),
+                    )
                     conn.commit()
                     return redirect('pers_depts')
                 elif action == 'edit_dept':
                     dept_id = int(request.POST.get('dept_id', 0))
-                    update_dept(conn, dept_id, request.POST.get('dept_name', ''))
+                    update_dept(
+                        conn, dept_id, request.POST.get('dept_name', ''),
+                        address=request.POST.get('address', ''),
+                        city=request.POST.get('city', ''),
+                        state=request.POST.get('state', ''),
+                        zip_code=request.POST.get('zip_code', ''),
+                    )
+                    conn.commit()
+                    return redirect('pers_depts')
+                elif action == 'delete_dept':
+                    dept_id = int(request.POST.get('dept_id', 0))
+                    delete_dept(conn, dept_id)
                     conn.commit()
                     return redirect('pers_depts')
                 elif action == 'new_sub':
@@ -8124,14 +8142,17 @@ def fin_budget_list(request):
     status_f = request.GET.get('status', '').strip()
     year_f = request.GET.get('fiscal_year', '').strip()
     search = request.GET.get('search', '').strip()
+    dept_f = request.GET.get('department_id', '').strip()
     error = success = None
     conn = get_db_connection()
     try:
+        depts = load_depts(conn)
         budgets = list_budgets(
             conn,
             status=status_f or None,
             fiscal_year=int(year_f) if year_f.isdigit() else None,
             search=search or None,
+            department_id=int(dept_f) if dept_f.isdigit() else None,
         )
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             try:
@@ -8142,26 +8163,34 @@ def fin_budget_list(request):
                     status=request.POST.get('status', 'draft'),
                     notes=request.POST.get('notes', ''),
                     created_by=request.session.get('user_email', ''),
+                    department_id=int(request.POST.get('department_id') or 0) or None,
                 )
                 conn.commit()
                 return redirect('fin_budget_list')
             except Exception as e:
                 conn.rollback()
                 error = str(e)
-                budgets = list_budgets(conn, status=status_f or None,
-                                       fiscal_year=int(year_f) if year_f.isdigit() else None,
-                                       search=search or None)
+                budgets = list_budgets(
+                    conn, status=status_f or None,
+                    fiscal_year=int(year_f) if year_f.isdigit() else None,
+                    search=search or None,
+                    department_id=int(dept_f) if dept_f.isdigit() else None,
+                )
+        dept_names = {d['dept_id']: d['dept_name'] for d in depts}
+        for b in budgets:
+            b['department_name'] = dept_names.get(b['department_id'])
     finally:
         conn.close()
     if 'export' in request.GET:
         return export_response(request, 'budgets', [
             ('budget_name', 'Budget Name'), ('fiscal_year', 'Fiscal Year'),
-            ('status', 'Status'), ('notes', 'Notes'),
+            ('status', 'Status'), ('department_name', 'Department'), ('notes', 'Notes'),
         ], budgets)
 
     return render(request, 'finance_budget_list.html', _fin_ctx(
         request, budgets=budgets, status_filter=status_f, year_filter=year_f,
-        search=search, budget_statuses=FIN_BUDGET_STATUSES, error=error, success=success,
+        search=search, department_filter=dept_f, depts=depts,
+        budget_statuses=FIN_BUDGET_STATUSES, error=error, success=success,
     ))
 
 
@@ -8174,7 +8203,18 @@ def fin_budget_detail(request, budget_id):
         budget = get_budget(conn, budget_id)
         if not budget:
             return redirect('fin_budget_list')
-        action = request.POST.get('action', 'update') if request.method == 'POST' else None
+        depts = load_depts(conn)
+        # The update/add_line/edit_line/del_line/delete forms on this page
+        # all signal which action to take via a `?action=` query string on
+        # the form's own action="" attribute rather than a hidden POST field
+        # -- request.POST never sees a query-string value, so this must also
+        # check request.GET or every non-default action silently falls
+        # through to 'update' (and, since each form only posts its own
+        # subset of fields, that would blank out the other budget-header
+        # fields the mis-detected 'update' call unwittingly received empty
+        # defaults for).
+        action = (request.POST.get('action') or request.GET.get('action', 'update')
+                  if request.method == 'POST' else None)
         if action == 'update' and can_edit:
             try:
                 update_budget(
@@ -8183,6 +8223,7 @@ def fin_budget_detail(request, budget_id):
                     fiscal_year=int(request.POST.get('fiscal_year') or budget['fiscal_year']),
                     status=request.POST.get('status', ''),
                     notes=request.POST.get('notes', ''),
+                    department_id=int(request.POST.get('department_id') or 0) or None,
                 )
                 conn.commit()
                 success = 'Budget updated.'
@@ -8204,6 +8245,20 @@ def fin_budget_detail(request, budget_id):
             except Exception as e:
                 conn.rollback()
                 error = str(e)
+        elif action == 'edit_line' and can_edit:
+            try:
+                update_budget_line(
+                    conn, int(request.POST.get('line_id', 0)),
+                    category=request.POST.get('category', ''),
+                    description=request.POST.get('description', ''),
+                    budgeted_amount=float(request.POST.get('budgeted_amount') or 0),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('fin_budget_detail', budget_id=budget_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
         elif action == 'del_line' and can_edit:
             try:
                 delete_budget_line(conn, int(request.POST.get('line_id', 0)))
@@ -8212,13 +8267,24 @@ def fin_budget_detail(request, budget_id):
             except Exception as e:
                 conn.rollback()
                 error = str(e)
+        elif action == 'delete' and can_edit:
+            try:
+                delete_budget(conn, budget_id)
+                conn.commit()
+                return redirect('fin_budget_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
         lines = get_budget_lines(conn, budget_id)
         total_budgeted = sum(ln['budgeted_amount'] or 0 for ln in lines)
+        dept_names = {d['dept_id']: d['dept_name'] for d in depts}
+        budget_department_name = dept_names.get(budget['department_id'])
     finally:
         conn.close()
     return render(request, 'finance_budget_detail.html', _fin_ctx(
         request, budget=budget, lines=lines, total_budgeted=total_budgeted,
-        can_edit=can_edit, budget_statuses=FIN_BUDGET_STATUSES,
+        can_edit=can_edit, budget_statuses=FIN_BUDGET_STATUSES, depts=depts,
+        budget_department_name=budget_department_name,
         error=error, success=success,
     ))
 
