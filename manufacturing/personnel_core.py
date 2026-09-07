@@ -119,9 +119,10 @@ def _upsert_position(conn, person_id, job_title):
 
 
 def load_depts(conn):
-    """Return [{dept_id, dept_name}] ordered by name."""
+    """Return [{dept_id, dept_name, address, city, state, zip_code}] ordered by name."""
     rows = conn.execute(
-        "SELECT dept_id, dept_name FROM dept ORDER BY dept_name"
+        "SELECT dept_id, dept_name, address, city, state, zip_code "
+        "FROM dept ORDER BY dept_name"
     ).fetchall()
     return [dict(r) for r in rows]
 
@@ -337,28 +338,65 @@ def update_own_contact_info(conn, people_id, address='', city='', state='',
 
 def get_dept(conn, dept_id: int) -> dict | None:
     row = conn.execute(
-        "SELECT dept_id, dept_name FROM dept WHERE dept_id = %s", (dept_id,)
+        "SELECT dept_id, dept_name, address, city, state, zip_code "
+        "FROM dept WHERE dept_id = %s", (dept_id,)
     ).fetchone()
     return dict(row) if row else None
 
 
-def create_dept(conn, dept_name: str) -> int:
+def create_dept(
+    conn, dept_name: str, address: str = '', city: str = '',
+    state: str = '', zip_code: str = '',
+) -> int:
     if not dept_name.strip():
         raise ValueError("Department name is required.")
     row = conn.execute(
-        "INSERT INTO dept (dept_name) VALUES (%s) RETURNING dept_id",
-        (dept_name.strip(),)
+        "INSERT INTO dept (dept_name, address, city, state, zip_code) "
+        "VALUES (%s, %s, %s, %s, %s) RETURNING dept_id",
+        (dept_name.strip(), address.strip(), city.strip(), state.strip(), zip_code.strip())
     ).fetchone()
     return row['dept_id']
 
 
-def update_dept(conn, dept_id: int, dept_name: str) -> None:
+def update_dept(
+    conn, dept_id: int, dept_name: str, address: str = '', city: str = '',
+    state: str = '', zip_code: str = '',
+) -> None:
     if not dept_name.strip():
         raise ValueError("Department name is required.")
     conn.execute(
-        "UPDATE dept SET dept_name = %s WHERE dept_id = %s",
-        (dept_name.strip(), dept_id)
+        "UPDATE dept SET dept_name = %s, address = %s, city = %s, state = %s, "
+        "zip_code = %s WHERE dept_id = %s",
+        (dept_name.strip(), address.strip(), city.strip(), state.strip(),
+         zip_code.strip(), dept_id)
     )
+
+
+def delete_dept(conn, dept_id: int) -> None:
+    """Hard-delete a department. Blocked if still referenced by employees,
+    sub-departments, or budgets. Does not commit."""
+    people_count = conn.execute(
+        "SELECT COUNT(*) AS c FROM people WHERE dept_id = %s", (dept_id,)
+    ).fetchone()['c']
+    if people_count:
+        raise ValueError(
+            "Cannot delete this department: it still has employees assigned to it."
+        )
+    sub_count = conn.execute(
+        "SELECT COUNT(*) AS c FROM dept_sub WHERE dept_id = %s", (dept_id,)
+    ).fetchone()['c']
+    if sub_count:
+        raise ValueError(
+            "Cannot delete this department: it still has sub-departments."
+        )
+    budget_count = conn.execute(
+        "SELECT COUNT(*) AS c FROM budget WHERE department_id = %s", (dept_id,)
+    ).fetchone()['c']
+    if budget_count:
+        raise ValueError(
+            "Cannot delete this department: it still has budgets assigned to it."
+        )
+    conn.execute("DELETE FROM dept WHERE dept_id = %s", (dept_id,))
 
 
 def get_dept_sub(conn, dept_sub_id: int) -> dict | None:

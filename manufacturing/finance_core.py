@@ -107,9 +107,9 @@ def get_revenue_expense_by_month(conn, months: int = 6) -> list[dict]:
 # Budgets
 # ---------------------------------------------------------------------------
 
-def list_budgets(conn, status=None, fiscal_year=None, search=None) -> list:
+def list_budgets(conn, status=None, fiscal_year=None, search=None, department_id=None) -> list:
     sql = (
-        "SELECT id, budget_name, fiscal_year, status, notes, created_by "
+        "SELECT id, budget_name, fiscal_year, status, notes, created_by, department_id "
         "FROM budget WHERE TRUE"
     )
     params: list = []
@@ -119,6 +119,9 @@ def list_budgets(conn, status=None, fiscal_year=None, search=None) -> list:
     if fiscal_year:
         sql += " AND fiscal_year = %s"
         params.append(fiscal_year)
+    if department_id:
+        sql += " AND department_id = %s"
+        params.append(department_id)
     if search:
         sql += " AND (budget_name ILIKE %s OR notes ILIKE %s)"
         params.extend([f"%{search}%", f"%{search}%"])
@@ -143,18 +146,18 @@ def get_budget_lines(conn, budget_id: int) -> list:
 
 def create_budget(
     conn, budget_name: str, fiscal_year: int, status: str, notes: str,
-    created_by: str,
+    created_by: str, department_id: int | None = None,
 ) -> int:
     cur = conn.execute(
-        "INSERT INTO budget (budget_name, fiscal_year, status, notes, created_by) "
-        "VALUES (%s,%s,%s,%s,%s) RETURNING id",
-        (budget_name, fiscal_year, status or 'draft', notes, created_by),
+        "INSERT INTO budget (budget_name, fiscal_year, status, notes, created_by, department_id) "
+        "VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
+        (budget_name, fiscal_year, status or 'draft', notes, created_by, department_id),
     )
     return cur.fetchone()[0]
 
 
 def update_budget(conn, budget_id: int, **fields) -> None:
-    allowed = {'budget_name', 'fiscal_year', 'status', 'notes'}
+    allowed = {'budget_name', 'fiscal_year', 'status', 'notes', 'department_id'}
     cols = {k: v for k, v in fields.items() if k in allowed}
     if not cols:
         return
@@ -193,6 +196,12 @@ def update_budget_line(
 
 def delete_budget_line(conn, line_id: int) -> None:
     conn.execute("DELETE FROM budget_line WHERE id = %s", (line_id,))
+
+
+def delete_budget(conn, budget_id: int) -> None:
+    """Delete a budget and all its line items. Does not commit."""
+    conn.execute("DELETE FROM budget_line WHERE budget_id = %s", (budget_id,))
+    conn.execute("DELETE FROM budget WHERE id = %s", (budget_id,))
 
 
 # ---------------------------------------------------------------------------

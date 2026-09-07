@@ -9,8 +9,8 @@
 <a href="/fin/bank-rec/" class="btn">{% trans "Bank Rec" %}</a>
 <a href="/fin/tax/" class="btn">{% trans "Tax Filings" %}</a>
 <a href="/dashboard/" class="btn">{% trans "Home" %}</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter|urlencode }}{% endif %}{% if department_filter %}&department_id={{ department_filter|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter|urlencode }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter|urlencode }}{% endif %}{% if department_filter %}&department_id={{ department_filter|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -67,6 +67,12 @@
             {% endfor %}
         </select>
         <input type="number" name="fiscal_year" value="{{ year_filter }}" placeholder="{% trans 'Fiscal Year' %}" style="width:120px;">
+        <select name="department_id">
+            <option value="">{% trans "All Departments" %}</option>
+            {% for d in depts %}
+            <option value="{{ d.dept_id }}"{% if department_filter == d.dept_id|stringformat:"s" %} selected{% endif %}>{{ d.dept_name }}</option>
+            {% endfor %}
+        </select>
         <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search name…' %}">
         <button type="submit">{% trans "Filter" %}</button>
         <a href="/fin/budgets/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
@@ -79,6 +85,7 @@
                     <th>{% trans "Budget Name" %}</th>
                     <th>{% trans "Fiscal Year" %}</th>
                     <th>{% trans "Status" %}</th>
+                    <th>{% trans "Department" %}</th>
                     <th>{% trans "Created By" %}</th>
                     <th>{% trans "Notes" %}</th>
                 </tr>
@@ -89,11 +96,12 @@
                 <td><a href="/fin/budgets/{{ b.id }}/">{{ b.budget_name }}</a></td>
                 <td>{{ b.fiscal_year }}</td>
                 <td><span class="badge s-{{ b.status|lower }}">{{ b.status|capfirst }}</span></td>
+                <td>{{ b.department_name|default:"—" }}</td>
                 <td>{{ b.created_by|default:"—" }}</td>
                 <td>{{ b.notes|default:"—"|truncatechars:60 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:var(--text-muted);text-align:center;">{% trans "No budgets found." %}</td></tr>
+            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">{% trans "No budgets found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -118,6 +126,15 @@
                     <select name="status">
                         {% for s in budget_statuses %}
                         <option value="{{ s }}"{% if s == 'draft' %} selected{% endif %}>{{ s|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Department" %}</label>
+                    <select name="department_id">
+                        <option value="">{% trans "— None —" %}</option>
+                        {% for d in depts %}
+                        <option value="{{ d.dept_id }}">{{ d.dept_name }}</option>
                         {% endfor %}
                     </select>
                 </div>

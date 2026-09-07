@@ -35,6 +35,16 @@
 .alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
 .alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
 .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select { padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.full-span { grid-column:1/-1; }
+.btn-del { padding:4px 10px; background:#c33; color:white;
+    border:none; border-radius:4px; font-size:12px; font-weight:bold; cursor:pointer; }
+.btn-del:hover { background:#a00; }
+.dept-addr { display:block; font-size:11px; color:var(--text-muted); margin-top:2px; }
+.dept-edit-fields { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; }
 {% endblock %}
 
 {% block body %}
@@ -55,16 +65,62 @@
                     <tbody>
                     {% for d in depts %}
                     <tr>
-                        <td>{{ d.dept_name }}</td>
+                        <td>
+                            <span class="view-{{ d.dept_id }}">
+                                {{ d.dept_name }}
+                                {% if d.address or d.city or d.state or d.zip_code %}
+                                <span class="dept-addr">{{ d.address }}{% if d.address %}, {% endif %}{{ d.city }}{% if d.city %}, {% endif %}{{ d.state }} {{ d.zip_code }}</span>
+                                {% else %}
+                                <span class="dept-addr">—</span>
+                                {% endif %}
+                            </span>
+                            {% if can_edit %}
+                            <span class="edit-{{ d.dept_id }}" style="display:none;">
+                                <input type="text" id="dept_name-{{ d.dept_id }}" value="{{ d.dept_name }}"
+                                    style="width:140px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;"
+                                    placeholder="{% trans 'Department name' %}">
+                                <div class="dept-edit-fields">
+                                    <input type="text" id="address-{{ d.dept_id }}" value="{{ d.address }}"
+                                        placeholder="{% trans 'Address' %}"
+                                        style="padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
+                                    <input type="text" id="city-{{ d.dept_id }}" value="{{ d.city }}"
+                                        placeholder="{% trans 'City' %}"
+                                        style="padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
+                                    <input type="text" id="state-{{ d.dept_id }}" value="{{ d.state }}"
+                                        placeholder="{% trans 'State' %}"
+                                        style="padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
+                                    <input type="text" id="zip_code-{{ d.dept_id }}" value="{{ d.zip_code }}"
+                                        placeholder="{% trans 'Zip Code' %}"
+                                        style="padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
+                                </div>
+                            </span>
+                            {% endif %}
+                        </td>
                         {% if can_edit %}
-                        <td style="width:60px;">
-                            <form method="post" style="display:inline;">
+                        <td style="width:120px;white-space:nowrap;">
+                            <button type="button" class="btn-sm" id="edit-btn-{{ d.dept_id }}"
+                                style="padding:3px 8px;font-size:12px;"
+                                onclick="toggleDeptEdit({{ d.dept_id }})">{% trans "Edit" %}</button>
+                            <form method="post" id="save-form-{{ d.dept_id }}" style="display:none;margin-top:4px;">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="edit_dept">
                                 <input type="hidden" name="dept_id" value="{{ d.dept_id }}">
-                                <input type="text" name="dept_name" value="{{ d.dept_name }}"
-                                    style="width:120px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
-                                <button type="submit" class="btn-sm" style="padding:3px 8px;font-size:12px;">{% trans "Save" %}</button>
+                                <input type="hidden" name="dept_name" id="h-dept_name-{{ d.dept_id }}">
+                                <input type="hidden" name="address" id="h-address-{{ d.dept_id }}">
+                                <input type="hidden" name="city" id="h-city-{{ d.dept_id }}">
+                                <input type="hidden" name="state" id="h-state-{{ d.dept_id }}">
+                                <input type="hidden" name="zip_code" id="h-zip_code-{{ d.dept_id }}">
+                                <button type="button" class="btn-sm" style="padding:3px 8px;font-size:12px;"
+                                    onclick="submitDeptEdit({{ d.dept_id }})">{% trans "Save" %}</button>
+                                <button type="button" class="btn-sm" style="padding:3px 8px;font-size:12px;"
+                                    onclick="cancelDeptEdit({{ d.dept_id }})">{% trans "Cancel" %}</button>
+                            </form>
+                            <form method="post" style="display:inline;margin-top:4px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_dept">
+                                <input type="hidden" name="dept_id" value="{{ d.dept_id }}">
+                                <button type="submit" class="btn-del"
+                                    onclick="return confirm('{% trans "Delete this department?" %}')">{% trans "Delete" %}</button>
                             </form>
                         </td>
                         {% endif %}
@@ -75,11 +131,33 @@
                     </tbody>
                 </table>
                 {% if can_edit %}
-                <form method="post" class="inline-form">
+                <form method="post" class="form-grid" style="margin-top:14px;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="new_dept">
-                    <input type="text" name="dept_name" placeholder="{% trans 'New department name' %}" required>
-                    <button type="submit" class="btn-sm">{% trans "Add" %}</button>
+                    <div class="form-group full-span">
+                        <label>{% trans "Department Name *" %}</label>
+                        <input type="text" name="dept_name" placeholder="{% trans 'New department name' %}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Address" %}</label>
+                        <input type="text" name="address">
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "City" %}</label>
+                        <input type="text" name="city">
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "State" %}</label>
+                        <input type="text" name="state">
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Zip Code" %}</label>
+                        <input type="text" name="zip_code">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn-sm">{% trans "Add" %}</button>
+                    </div>
                 </form>
                 {% endif %}
             </div>
@@ -144,4 +222,32 @@
     </div>
 </div>
 </div>
+
+<script>
+function toggleDeptEdit(id) {
+    document.querySelectorAll('.view-' + id).forEach(el => el.style.display = 'none');
+    document.querySelector('.edit-' + id).style.display = 'inline';
+    document.getElementById('edit-btn-' + id).style.display = 'none';
+    document.getElementById('save-form-' + id).style.display = 'inline';
+}
+function cancelDeptEdit(id) {
+    document.querySelectorAll('.view-' + id).forEach(el => el.style.display = '');
+    document.querySelector('.edit-' + id).style.display = 'none';
+    document.getElementById('edit-btn-' + id).style.display = '';
+    document.getElementById('save-form-' + id).style.display = 'none';
+}
+function submitDeptEdit(id) {
+    document.getElementById('h-dept_name-' + id).value =
+        document.getElementById('dept_name-' + id).value;
+    document.getElementById('h-address-' + id).value =
+        document.getElementById('address-' + id).value;
+    document.getElementById('h-city-' + id).value =
+        document.getElementById('city-' + id).value;
+    document.getElementById('h-state-' + id).value =
+        document.getElementById('state-' + id).value;
+    document.getElementById('h-zip_code-' + id).value =
+        document.getElementById('zip_code-' + id).value;
+    document.getElementById('save-form-' + id).submit();
+}
+</script>
 {% endblock %}

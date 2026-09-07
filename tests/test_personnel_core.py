@@ -12,12 +12,14 @@ from manufacturing.personnel_core import (
     TIME_OFF_STATUSES, TIME_OFF_TYPES, TIME_OFF_STATUS_COLORS,
     list_people, get_person, get_person_by_email,
     create_person, update_person, load_depts, load_dept_subs,
+    create_dept, update_dept, delete_dept,
     list_time_off_requests, get_time_off_request,
     create_time_off_request, set_time_off_status,
     DEFAULT_ANNUAL_ALLOTMENT_DAYS,
     ensure_time_off_balance_table, get_time_off_balance, set_time_off_allotment,
     ensure_contact_columns, get_own_contact_info, update_own_contact_info,
 )
+import pytest
 
 
 class _FakeCursor:
@@ -183,11 +185,88 @@ def test_update_person_updates_and_upserts():
 # ── load_depts / load_dept_subs ──────────────────────────────────────────
 
 def test_load_depts():
-    row = {'dept_id': 1, 'dept_name': 'Engineering'}
+    row = {'dept_id': 1, 'dept_name': 'Engineering', 'address': '', 'city': '',
+           'state': '', 'zip_code': ''}
     conn = _FakeConn(rows=[row])
     result = load_depts(conn)
-    assert result == [{'dept_id': 1, 'dept_name': 'Engineering'}]
+    assert len(result) == 1
+    assert result[0]['dept_id'] == 1
+    assert result[0]['dept_name'] == 'Engineering'
     assert 'ORDER BY' in conn.last_sql
+
+
+# ── Department CRUD ──────────────────────────────────────────────────────
+
+def test_create_dept_requires_name():
+    conn = _FakeConn()
+    with pytest.raises(ValueError):
+        create_dept(conn, '   ')
+
+
+def test_create_dept_inserts_address_fields():
+    conn = _FakeConn(rows=[{'dept_id': 5}])
+    create_dept(conn, 'Engineering', address='123 Main St', city='Sarasota',
+                state='FL', zip_code='34231')
+    sql, params = conn.calls[0]
+    assert 'address' in sql and 'city' in sql and 'state' in sql and 'zip_code' in sql
+    assert params == ['Engineering', '123 Main St', 'Sarasota', 'FL', '34231']
+
+
+def test_update_dept_requires_name():
+    conn = _FakeConn()
+    with pytest.raises(ValueError):
+        update_dept(conn, 1, '')
+
+
+def test_update_dept_updates_address_fields():
+    conn = _FakeConn()
+    update_dept(conn, 1, 'Engineering', address='123 Main St', city='Sarasota',
+                state='FL', zip_code='34231')
+    sql, params = conn.calls[0]
+    assert 'address' in sql and 'city' in sql and 'state' in sql and 'zip_code' in sql
+    assert params == ['Engineering', '123 Main St', 'Sarasota', 'FL', '34231', 1]
+
+
+class _SeqConn:
+    """Like _FakeConn, but replays a different canned row per execute() call
+    (in order) — needed for delete_dept's multiple sequential guard queries."""
+
+    def __init__(self, row_sequence):
+        self.row_sequence = list(row_sequence)
+        self.calls = []
+
+    def execute(self, sql, params=None):
+        self.calls.append((sql, list(params or [])))
+        rows = self.row_sequence.pop(0)
+        return _FakeCursor(rows)
+
+
+def test_delete_dept_blocked_by_people():
+    conn = _SeqConn([[{'c': 2}]])
+    with pytest.raises(ValueError, match='employees'):
+        delete_dept(conn, 1)
+    assert not any('DELETE FROM dept' in c[0] for c in conn.calls)
+
+
+def test_delete_dept_blocked_by_sub_depts():
+    conn = _SeqConn([[{'c': 0}], [{'c': 1}]])
+    with pytest.raises(ValueError, match='sub-departments'):
+        delete_dept(conn, 1)
+    assert not any('DELETE FROM dept' in c[0] for c in conn.calls)
+
+
+def test_delete_dept_blocked_by_budgets():
+    conn = _SeqConn([[{'c': 0}], [{'c': 0}], [{'c': 3}]])
+    with pytest.raises(ValueError, match='budgets'):
+        delete_dept(conn, 1)
+    assert not any('DELETE FROM dept' in c[0] for c in conn.calls)
+
+
+def test_delete_dept_succeeds_when_unused():
+    conn = _SeqConn([[{'c': 0}], [{'c': 0}], [{'c': 0}], []])
+    delete_dept(conn, 1)
+    assert 'DELETE FROM dept' in conn.calls[-1][0]
+    assert conn.calls[-1][1] == [1]
 
 
 def test_load_dept_subs_no_filter():
