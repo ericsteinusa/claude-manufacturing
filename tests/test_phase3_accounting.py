@@ -11,6 +11,7 @@ from manufacturing.accounting_core import (
 )
 from manufacturing.finance_core import (
     get_budget_vs_actual,
+    get_department_budget_vs_actual,
     update_budget_line,
     import_bank_transactions,
     auto_match_transactions,
@@ -317,6 +318,98 @@ def test_get_budget_vs_actual_with_linked_account():
     assert line['actual_amount'] == 8500.0
     assert line['variance'] == 3500.0          # budgeted - actual
     assert line['pct_used'] == 70.8
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Budget vs. Actual by Department
+# ═══════════════════════════════════════════════════════════════════════════
+
+def test_get_department_budget_vs_actual_no_departments():
+    conn = _MultiConn([[]])
+    result = get_department_budget_vs_actual(
+        conn, fiscal_year=2026, date_from='2026-01-01', date_to='2026-12-31')
+    assert result == []
+    assert len(conn.calls) == 1  # no PO query fired when there's nothing to look up
+
+
+def test_get_department_budget_vs_actual_aggregates_lines_no_gl():
+    responses = [
+        # dept/budget/budget_line join: two lines, same department, no GL account
+        [
+            {'dept_id': 1, 'dept_name': 'Engineering', 'budgeted_amount': 5000.0,
+             'gl_account_id': None, 'account_type': None},
+            {'dept_id': 1, 'dept_name': 'Engineering', 'budgeted_amount': 3000.0,
+             'gl_account_id': None, 'account_type': None},
+        ],
+        # open PO query: no open POs for dept 1
+        [],
+    ]
+    conn = _MultiConn(responses)
+    result = get_department_budget_vs_actual(
+        conn, fiscal_year=2026, date_from='2026-01-01', date_to='2026-12-31')
+    assert len(result) == 1
+    row = result[0]
+    assert row['dept_id'] == 1
+    assert row['dept_name'] == 'Engineering'
+    assert row['budgeted'] == 8000.0
+    assert row['actual'] == 0.0
+    assert row['committed'] == 0.0
+    assert row['open_pos'] == []
+    assert row['variance'] == 8000.0
+    assert row['pct_used'] == 0.0
+
+
+def test_get_department_budget_vs_actual_includes_gl_actual():
+    responses = [
+        [{'dept_id': 2, 'dept_name': 'Maintenance', 'budgeted_amount': 12000.0,
+          'gl_account_id': 5, 'account_type': 'Expense'}],
+        # GL balance query: debit=8500, credit=0 -> actual=8500
+        [{'d': 8500.0, 'c': 0.0}],
+        [],  # open PO query
+    ]
+    conn = _MultiConn(responses)
+    result = get_department_budget_vs_actual(
+        conn, fiscal_year=2026, date_from='2026-01-01', date_to='2026-12-31')
+    row = result[0]
+    assert row['actual'] == 8500.0
+    assert row['variance'] == 3500.0
+    assert row['pct_used'] == 70.8
+
+
+def test_get_department_budget_vs_actual_includes_open_pos():
+    responses = [
+        [{'dept_id': 3, 'dept_name': 'Sales', 'budgeted_amount': 10000.0,
+          'gl_account_id': None, 'account_type': None}],
+        # two open POs for dept 3
+        [
+            {'dept_id': 3, 'po_id': 101, 'po_number': 'PO-2026-0001',
+             'status': 'sent', 'amount': 2000.0},
+            {'dept_id': 3, 'po_id': 102, 'po_number': 'PO-2026-0002',
+             'status': 'partial', 'amount': 1500.0},
+        ],
+    ]
+    conn = _MultiConn(responses)
+    result = get_department_budget_vs_actual(
+        conn, fiscal_year=2026, date_from='2026-01-01', date_to='2026-12-31')
+    row = result[0]
+    assert row['committed'] == 3500.0
+    assert len(row['open_pos']) == 2
+    assert row['open_pos'][0]['po_number'] == 'PO-2026-0001'
+    assert row['variance'] == 10000.0 - 3500.0
+    assert row['pct_used'] == round(3500.0 / 10000.0 * 100, 1)
+
+
+def test_get_department_budget_vs_actual_no_date_range_skips_gl_lookup():
+    responses = [
+        [{'dept_id': 4, 'dept_name': 'IT', 'budgeted_amount': 4000.0,
+          'gl_account_id': 9, 'account_type': 'Expense'}],
+        [],  # open PO query (no date range needed for that one)
+    ]
+    conn = _MultiConn(responses)
+    result = get_department_budget_vs_actual(conn, fiscal_year=2026)
+    # no date_from/date_to given, so the GL lookup must be skipped entirely
+    assert len(conn.calls) == 2
+    assert result[0]['actual'] == 0.0
 
 
 def test_update_budget_line_includes_gl_account_id():

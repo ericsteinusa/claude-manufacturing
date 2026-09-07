@@ -156,6 +156,7 @@ from ..reports_core import (
 )
 from ..menus import (
     DASHBOARD_DEPARTMENTS,
+    DEPT_MENU_KEY,
     MANAGER_MENU_KEYS,
     _walk_tree,
 )
@@ -258,6 +259,7 @@ from ..finance_core import (
     list_budgets, get_budget, get_budget_lines,
     create_budget, update_budget, delete_budget,
     create_budget_line, update_budget_line, delete_budget_line,
+    get_department_budget_vs_actual,
     list_audits as list_fin_audits, get_audit_record, get_audit_findings,
     create_audit as create_fin_audit, update_audit_record, create_audit_finding,
     list_bank_accounts, get_bank_account, list_bank_statements,
@@ -8286,6 +8288,47 @@ def fin_budget_detail(request, budget_id):
         can_edit=can_edit, budget_statuses=FIN_BUDGET_STATUSES, depts=depts,
         budget_department_name=budget_department_name,
         error=error, success=success,
+    ))
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS | {'maintenance'}, role_keys={'Department Manager'})
+def fin_budget_by_department(request):
+    year_f = request.GET.get('fiscal_year', '').strip()
+    fiscal_year = int(year_f) if year_f.isdigit() else date.today().year
+    date_from = f'{fiscal_year}-01-01'
+    date_to = f'{fiscal_year}-12-31'
+
+    conn = get_db_connection()
+    try:
+        rows = get_department_budget_vs_actual(
+            conn, fiscal_year=fiscal_year, date_from=date_from, date_to=date_to,
+        )
+    finally:
+        conn.close()
+
+    # Accounting/Finance/Maintenance and full-access users see every
+    # department; any other Department Manager (admitted by role_keys=
+    # {'Department Manager'} above regardless of their own dept) only sees
+    # their own department's row, matched via DEPT_MENU_KEY's dept_name ->
+    # dept_key mapping (the RBAC dept_key on the session, not the dept
+    # table's own numeric dept_id).
+    can_see_all = (
+        request.session.get('user_full_access')
+        or request.session.get('user_dept_key') in (_ACCOUNTING_DEPT_KEYS | {'maintenance'})
+    )
+    if not can_see_all:
+        user_dept_key = request.session.get('user_dept_key')
+        rows = [r for r in rows if DEPT_MENU_KEY.get(r['dept_name']) == user_dept_key]
+
+    totals = {
+        'budgeted': sum(r['budgeted'] for r in rows),
+        'actual': sum(r['actual'] for r in rows),
+        'committed': sum(r['committed'] for r in rows),
+        'variance': sum(r['variance'] for r in rows),
+    }
+
+    return render(request, 'finance_budget_by_department.html', _fin_ctx(
+        request, rows=rows, totals=totals, fiscal_year=fiscal_year,
     ))
 
 

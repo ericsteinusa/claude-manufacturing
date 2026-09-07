@@ -285,6 +285,118 @@ def get_budget_vs_actual(conn, budget_id: int,
     }
 
 
+def get_department_budget_vs_actual(
+    conn, fiscal_year: int | None = None,
+    date_from: str | None = None, date_to: str | None = None,
+) -> list:
+    """Aggregate budget vs. actual GL spend (plus open PO commitments) by department.
+
+    Actual spend uses the same method as get_budget_vs_actual (posted GL
+    activity on each budget line's linked GL account within the period);
+    lines with no GL account, or no date range given, contribute 0 actual.
+
+    Open purchase orders (every PO originates from a purchase_requisition,
+    which carries the requesting department) are pulled in as a separate
+    "committed" figure -- their full line value, for any PO not yet
+    'received' or 'cancelled', so departments can see money already
+    obligated but not yet posted to the GL as an expense. Only departments
+    with at least one budget line are included.
+
+    Returns::
+
+        [{dept_id, dept_name, budgeted, actual, committed, variance,
+          pct_used, open_pos: [{po_id, po_number, status, amount}, ...]}, ...]
+        ordered by department name.
+    """
+    from .accounting_core import DEBIT_NORMAL
+
+    sql = (
+        "SELECT d.dept_id, d.dept_name, bl.budgeted_amount, "
+        "bl.gl_account_id, a.account_type "
+        "FROM dept d "
+        "JOIN budget b ON b.department_id = d.dept_id "
+        "JOIN budget_line bl ON bl.budget_id = b.id "
+        "LEFT JOIN gl_account a ON a.id = bl.gl_account_id "
+        "WHERE TRUE"
+    )
+    params: list = []
+    if fiscal_year:
+        sql += " AND b.fiscal_year = %s"
+        params.append(fiscal_year)
+    sql += " ORDER BY d.dept_name, d.dept_id"
+
+    rows = conn.execute(sql, params).fetchall()
+
+    by_dept: dict = {}
+    order: list = []
+    for row in rows:
+        dept_id = row['dept_id']
+        if dept_id not in by_dept:
+            by_dept[dept_id] = {
+                'dept_id': dept_id, 'dept_name': row['dept_name'],
+                'budgeted': 0.0, 'actual': 0.0, 'committed': 0.0,
+                'open_pos': [],
+            }
+            order.append(dept_id)
+        entry = by_dept[dept_id]
+        entry['budgeted'] += float(row['budgeted_amount'] or 0)
+
+        if row['gl_account_id'] and date_from and date_to:
+            acct_type = row['account_type'] or 'Expense'
+            gl_row = conn.execute("""
+                SELECT COALESCE(SUM(jl.debit), 0)  AS d,
+                       COALESCE(SUM(jl.credit), 0) AS c
+                FROM gl_journal_line jl
+                JOIN gl_journal j ON j.id = jl.journal_id
+                WHERE jl.account_id = %s AND j.posted = 1
+                  AND j.journal_date BETWEEN %s AND %s
+            """, (row['gl_account_id'], date_from, date_to)).fetchone()
+            if gl_row:
+                d, c = float(gl_row['d']), float(gl_row['c'])
+                entry['actual'] += (d - c) if acct_type in DEBIT_NORMAL else (c - d)
+
+    if order:
+        po_sql = (
+            "SELECT r.dept_id, po.id AS po_id, po.po_number, po.status, "
+            "COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0) AS amount "
+            "FROM purchase_requisition r "
+            "JOIN purchase_order po ON po.id = r.po_id "
+            "LEFT JOIN po_item pi ON pi.po_id = po.id "
+            "WHERE r.dept_id = ANY(%s) AND po.status NOT IN ('received', 'cancelled') "
+            "GROUP BY r.dept_id, po.id, po.po_number, po.status "
+            "ORDER BY po.po_number"
+        )
+        for po_row in conn.execute(po_sql, [order]).fetchall():
+            entry = by_dept.get(po_row['dept_id'])
+            if not entry:
+                continue
+            amount = float(po_row['amount'] or 0)
+            entry['committed'] += amount
+            entry['open_pos'].append({
+                'po_id': po_row['po_id'],
+                'po_number': po_row['po_number'],
+                'status': po_row['status'],
+                'amount': amount,
+            })
+
+    result = []
+    for dept_id in order:
+        entry = by_dept[dept_id]
+        budgeted, actual, committed = entry['budgeted'], entry['actual'], entry['committed']
+        spent = actual + committed
+        result.append({
+            'dept_id': dept_id,
+            'dept_name': entry['dept_name'],
+            'budgeted': budgeted,
+            'actual': actual,
+            'committed': committed,
+            'open_pos': entry['open_pos'],
+            'variance': budgeted - spent,
+            'pct_used': round((spent / budgeted * 100), 1) if budgeted else 0.0,
+        })
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Audits
 # ---------------------------------------------------------------------------

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block page_title %}{% trans "Budget vs. Actual by Department" %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/fin/" class="btn">{% trans "Finance Dashboard" %}</a>
+<a href="/fin/budgets/" class="btn">{% trans "Budgets" %}</a>
+<a href="/fin/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/fin/bank-rec/" class="btn">{% trans "Bank Rec" %}</a>
+<a href="/fin/tax/" class="btn">{% trans "Tax Filings" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+{% endblock %}
+
+{% block extra_styles %}
+.fn-wrap { width:100%; max-width:1200px; }
+.fn-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=number] {
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.num { text-align:right; font-variant-numeric:tabular-nums; }
+.total-row { font-weight:bold; background:#f0f4ff; }
+.over-budget { color:#a00; font-weight:bold; }
+.po-list { list-style:none; margin:0; padding:0; }
+.po-list li { font-size:12px; color:var(--text-muted); }
+.po-list a { color:var(--accent); text-decoration:none; }
+.po-list a:hover { text-decoration:underline; }
+.pill { display:inline-block; padding:1px 7px; border-radius:4px; font-size:10px; font-weight:bold; margin-left:4px; }
+.p-draft, .p-pending_approval { background:#e2e3e5; color:#383d41; }
+.p-sent { background:#d1ecf1; color:#0c5460; }
+.p-partial { background:#fff3cd; color:#856404; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="fn-wrap">
+    <h2>{% trans "Budget vs. Actual by Department" %}</h2>
+
+    <form method="get" class="filter-bar">
+        <label style="font-size:13px;">{% trans "Fiscal Year" %}</label>
+        <input type="number" name="fiscal_year" value="{{ fiscal_year }}" min="2000" max="2099" style="width:100px;">
+        <button type="submit">{% trans "Filter" %}</button>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Department" %}</th>
+                    <th class="num">{% trans "Budgeted" %}</th>
+                    <th class="num">{% trans "Actual Spent" %}</th>
+                    <th>{% trans "Open POs (Committed)" %}</th>
+                    <th class="num">{% trans "Variance" %}</th>
+                    <th class="num">{% trans "% Used" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rows %}
+            <tr>
+                <td><a href="/fin/budgets/?department_id={{ r.dept_id }}">{{ r.dept_name }}</a></td>
+                <td class="num">${{ r.budgeted|floatformat:2 }}</td>
+                <td class="num">${{ r.actual|floatformat:2 }}</td>
+                <td>
+                    {% if r.open_pos %}
+                    <ul class="po-list">
+                        {% for po in r.open_pos %}
+                        <li>
+                            <a href="/po/{{ po.po_id }}/">{{ po.po_number }}</a>
+                            ${{ po.amount|floatformat:2 }}
+                            <span class="pill p-{{ po.status }}">{{ po.status|capfirst }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div style="margin-top:4px;font-weight:bold;">{% blocktrans with amt=r.committed|floatformat:2 %}Total: ${{ amt }}{% endblocktrans %}</div>
+                    {% else %}
+                    <span style="color:var(--text-muted);">{% trans "No open POs" %}</span>
+                    {% endif %}
+                </td>
+                <td class="num{% if r.variance < 0 %} over-budget{% endif %}">${{ r.variance|floatformat:2 }}</td>
+                <td class="num{% if r.pct_used > 100 %} over-budget{% endif %}">{{ r.pct_used }}%</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">{% trans "No departments with a budget for this fiscal year." %}</td></tr>
+            {% endfor %}
+            </tbody>
+            {% if rows %}
+            <tfoot>
+                <tr class="total-row">
+                    <td>{% trans "Total" %}</td>
+                    <td class="num">${{ totals.budgeted|floatformat:2 }}</td>
+                    <td class="num">${{ totals.actual|floatformat:2 }}</td>
+                    <td class="num">${{ totals.committed|floatformat:2 }}</td>
+                    <td class="num{% if totals.variance < 0 %} over-budget{% endif %}">${{ totals.variance|floatformat:2 }}</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 20:38+0000\n"
+"POT-Creation-Date: 2026-09-07 23:17+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -627,7 +627,7 @@ msgstr "Menu des Ventes"
 #: manufacturing/templates/sales_orders.html:3
 #: manufacturing/templates/sales_orders.html:44
 #: manufacturing/templates/so_list.html:4
-#: manufacturing/templates/so_list.html:22 manufacturing/views/__init__.py:4438
+#: manufacturing/templates/so_list.html:22 manufacturing/views/__init__.py:4440
 msgid "Sales Orders"
 msgstr "Commandes clients"
 
@@ -1759,7 +1759,7 @@ msgstr "Saisie Fournisseur"
 #: manufacturing/templates/supplier_portal_pos.html:3
 #: manufacturing/templates/supplier_portal_pos.html:4
 #: manufacturing/templates/supplier_scorecard_list.html:8
-#: manufacturing/views/__init__.py:4556
+#: manufacturing/views/__init__.py:4558
 msgid "Purchase Orders"
 msgstr "Bons de commande"
 
@@ -3113,10 +3113,11 @@ msgstr "Responsable du Budget"
 #: manufacturing/templates/finance_audit_list.html:7
 #: manufacturing/templates/finance_bank_rec_detail.html:7
 #: manufacturing/templates/finance_bank_rec_list.html:7
+#: manufacturing/templates/finance_budget_by_department.html:7
 #: manufacturing/templates/finance_budget_detail.html:7
 #: manufacturing/templates/finance_budget_list.html:3
 #: manufacturing/templates/finance_budget_list.html:7
-#: manufacturing/templates/finance_budget_list.html:57
+#: manufacturing/templates/finance_budget_list.html:58
 #: manufacturing/templates/finance_dashboard.html:9
 #: manufacturing/templates/finance_dashboard.html:61
 #: manufacturing/templates/finance_tax_detail.html:7
@@ -3617,8 +3618,9 @@ msgstr "Rapport ABC vs. Traditionnel"
 #: manufacturing/templates/finance_audit_list.html:11
 #: manufacturing/templates/finance_bank_rec_detail.html:11
 #: manufacturing/templates/finance_bank_rec_list.html:11
-#: manufacturing/templates/finance_budget_detail.html:11
-#: manufacturing/templates/finance_budget_list.html:11
+#: manufacturing/templates/finance_budget_by_department.html:11
+#: manufacturing/templates/finance_budget_detail.html:12
+#: manufacturing/templates/finance_budget_list.html:12
 #: manufacturing/templates/finance_dashboard.html:16
 #: manufacturing/templates/finance_tax_detail.html:11
 #: manufacturing/templates/finance_tax_list.html:13
@@ -4175,12 +4177,12 @@ msgstr "par ex. par réglage, par heure machine"
 #: manufacturing/templates/finance_bank_rec_detail.html:155
 #: manufacturing/templates/finance_bank_rec_list.html:72
 #: manufacturing/templates/finance_bank_rec_list.html:120
-#: manufacturing/templates/finance_budget_detail.html:97
-#: manufacturing/templates/finance_budget_detail.html:111
-#: manufacturing/templates/finance_budget_detail.html:124
-#: manufacturing/templates/finance_budget_detail.html:221
-#: manufacturing/templates/finance_budget_list.html:90
-#: manufacturing/templates/finance_budget_list.html:142
+#: manufacturing/templates/finance_budget_detail.html:98
+#: manufacturing/templates/finance_budget_detail.html:112
+#: manufacturing/templates/finance_budget_detail.html:125
+#: manufacturing/templates/finance_budget_detail.html:222
+#: manufacturing/templates/finance_budget_list.html:91
+#: manufacturing/templates/finance_budget_list.html:143
 #: manufacturing/templates/finance_tax_detail.html:136
 #: manufacturing/templates/finance_tax_detail.html:149
 #: manufacturing/templates/finance_tax_list.html:157
@@ -4458,6 +4460,7 @@ msgstr "FG ABC/Unité"
 
 #: manufacturing/templates/abc_report.html:27
 #: manufacturing/templates/cc_detail.html:71
+#: manufacturing/templates/finance_budget_by_department.html:62
 #: manufacturing/templates/maint_labor_report.html:96
 #: manufacturing/templates/maint_labor_report.html:128
 #: manufacturing/templates/prod_labor_report.html:96
@@ -4507,8 +4510,9 @@ msgstr "Tableau de Bord Comptabilité"
 #: manufacturing/templates/finance_audit_list.html:57
 #: manufacturing/templates/finance_bank_rec_detail.html:8
 #: manufacturing/templates/finance_bank_rec_list.html:8
-#: manufacturing/templates/finance_budget_detail.html:8
-#: manufacturing/templates/finance_budget_list.html:8
+#: manufacturing/templates/finance_budget_by_department.html:8
+#: manufacturing/templates/finance_budget_detail.html:9
+#: manufacturing/templates/finance_budget_list.html:9
 #: manufacturing/templates/finance_dashboard.html:10
 #: manufacturing/templates/finance_dashboard.html:62
 #: manufacturing/templates/finance_tax_detail.html:8
@@ -4534,8 +4538,9 @@ msgstr "Audits"
 #: manufacturing/templates/finance_audit_list.html:9
 #: manufacturing/templates/finance_bank_rec_detail.html:9
 #: manufacturing/templates/finance_bank_rec_list.html:9
-#: manufacturing/templates/finance_budget_detail.html:9
-#: manufacturing/templates/finance_budget_list.html:9
+#: manufacturing/templates/finance_budget_by_department.html:9
+#: manufacturing/templates/finance_budget_detail.html:10
+#: manufacturing/templates/finance_budget_list.html:10
 #: manufacturing/templates/finance_dashboard.html:11
 #: manufacturing/templates/finance_tax_detail.html:9
 #: manufacturing/templates/finance_tax_list.html:9
@@ -4589,8 +4594,9 @@ msgstr "Balance Générale"
 #: manufacturing/templates/finance_audit_list.html:10
 #: manufacturing/templates/finance_bank_rec_detail.html:10
 #: manufacturing/templates/finance_bank_rec_list.html:10
-#: manufacturing/templates/finance_budget_detail.html:10
-#: manufacturing/templates/finance_budget_list.html:10
+#: manufacturing/templates/finance_budget_by_department.html:10
+#: manufacturing/templates/finance_budget_detail.html:11
+#: manufacturing/templates/finance_budget_list.html:11
 #: manufacturing/templates/finance_dashboard.html:12
 #: manufacturing/templates/finance_dashboard.html:64
 #: manufacturing/templates/finance_tax_detail.html:10
@@ -4771,7 +4777,7 @@ msgstr "Référence"
 #: manufacturing/templates/engagement_detail.html:121
 #: manufacturing/templates/engagement_detail.html:150
 #: manufacturing/templates/finance_audit_detail.html:124
-#: manufacturing/templates/finance_budget_detail.html:122
+#: manufacturing/templates/finance_budget_detail.html:123
 #: manufacturing/templates/finance_dashboard_kpis.html:57
 #: manufacturing/templates/gl_dashboard_kpis.html:46
 #: manufacturing/templates/gl_journal_detail.html:58
@@ -4941,10 +4947,10 @@ msgstr "Total Débit"
 #: manufacturing/templates/finance_audit_list.html:142
 #: manufacturing/templates/finance_bank_rec_detail.html:108
 #: manufacturing/templates/finance_bank_rec_detail.html:139
-#: manufacturing/templates/finance_budget_detail.html:80
-#: manufacturing/templates/finance_budget_detail.html:108
-#: manufacturing/templates/finance_budget_list.html:87
-#: manufacturing/templates/finance_budget_list.html:125
+#: manufacturing/templates/finance_budget_detail.html:81
+#: manufacturing/templates/finance_budget_detail.html:109
+#: manufacturing/templates/finance_budget_list.html:88
+#: manufacturing/templates/finance_budget_list.html:126
 #: manufacturing/templates/finance_dashboard_kpis.html:60
 #: manufacturing/templates/finance_tax_detail.html:116
 #: manufacturing/templates/finance_tax_list.html:92
@@ -5466,7 +5472,7 @@ msgstr "Taux de Change"
 #: manufacturing/templates/ess_profile.html:78
 #: manufacturing/templates/finance_audit_detail.html:102
 #: manufacturing/templates/finance_bank_rec_detail.html:85
-#: manufacturing/templates/finance_budget_detail.html:101
+#: manufacturing/templates/finance_budget_detail.html:102
 #: manufacturing/templates/finance_tax_detail.html:140
 #: manufacturing/templates/fixed_asset_detail.html:289
 #: manufacturing/templates/inventory_detail.html:198
@@ -5754,7 +5760,8 @@ msgstr "À :"
 #: manufacturing/templates/exit_interview_list.html:51
 #: manufacturing/templates/finance_audit_list.html:76
 #: manufacturing/templates/finance_bank_rec_list.html:60
-#: manufacturing/templates/finance_budget_list.html:77
+#: manufacturing/templates/finance_budget_by_department.html:51
+#: manufacturing/templates/finance_budget_list.html:78
 #: manufacturing/templates/finance_tax_list.html:77
 #: manufacturing/templates/fixed_asset_list.html:98
 #: manufacturing/templates/gl_journals.html:50
@@ -5832,7 +5839,7 @@ msgstr "Filtrer"
 #: manufacturing/templates/exit_interview_list.html:52
 #: manufacturing/templates/finance_audit_list.html:77
 #: manufacturing/templates/finance_bank_rec_list.html:61
-#: manufacturing/templates/finance_budget_list.html:78
+#: manufacturing/templates/finance_budget_list.html:79
 #: manufacturing/templates/finance_tax_list.html:78
 #: manufacturing/templates/fixed_asset_list.html:99
 #: manufacturing/templates/gl_balance_sheet.html:47
@@ -6079,7 +6086,7 @@ msgstr "p. ex. CNC-01"
 #: manufacturing/templates/employee_employment_dates.html:49
 #: manufacturing/templates/employee_gap_detail.html:99
 #: manufacturing/templates/esg_dashboard.html:183
-#: manufacturing/templates/finance_budget_detail.html:174
+#: manufacturing/templates/finance_budget_detail.html:175
 #: manufacturing/templates/gl_accounts.html:113
 #: manufacturing/templates/payroll_pay_rates.html:127
 #: manufacturing/templates/people_form.html:122
@@ -6279,10 +6286,11 @@ msgstr "Type d'Entité *"
 #: manufacturing/templates/finance_audit_detail.html:167
 #: manufacturing/templates/finance_audit_list.html:86
 #: manufacturing/templates/finance_audit_list.html:130
-#: manufacturing/templates/finance_budget_detail.html:88
-#: manufacturing/templates/finance_budget_detail.html:109
-#: manufacturing/templates/finance_budget_list.html:88
-#: manufacturing/templates/finance_budget_list.html:133
+#: manufacturing/templates/finance_budget_by_department.html:58
+#: manufacturing/templates/finance_budget_detail.html:89
+#: manufacturing/templates/finance_budget_detail.html:110
+#: manufacturing/templates/finance_budget_list.html:89
+#: manufacturing/templates/finance_budget_list.html:134
 #: manufacturing/templates/it_asset_detail.html:99
 #: manufacturing/templates/it_asset_detail.html:162
 #: manufacturing/templates/it_asset_list.html:141
@@ -6482,7 +6490,7 @@ msgstr "— Tous —"
 #: manufacturing/templates/bom_detail.html:177
 #: manufacturing/templates/data_governance_dashboard.html:99
 #: manufacturing/templates/eng_project_detail.html:142
-#: manufacturing/templates/finance_budget_detail.html:166
+#: manufacturing/templates/finance_budget_detail.html:167
 #: manufacturing/templates/gl_accounts.html:64
 #: manufacturing/templates/gl_accounts.html:79
 #: manufacturing/templates/it_software_detail.html:94
@@ -7303,7 +7311,7 @@ msgstr "Rechercher un intitulé..."
 #: manufacturing/templates/eng_tasks_list.html:70
 #: manufacturing/templates/engagement_list.html:40
 #: manufacturing/templates/finance_audit_list.html:64
-#: manufacturing/templates/finance_budget_list.html:64
+#: manufacturing/templates/finance_budget_list.html:65
 #: manufacturing/templates/finance_tax_list.html:65
 #: manufacturing/templates/fixed_asset_list.html:93
 #: manufacturing/templates/it_asset_list.html:41
@@ -8409,7 +8417,8 @@ msgstr "Validité"
 #: manufacturing/templates/cost_detail.html:111
 #: manufacturing/templates/cs_reports_kpis.html:41
 #: manufacturing/templates/engagement_list.html:54
-#: manufacturing/templates/finance_budget_detail.html:192
+#: manufacturing/templates/finance_budget_by_department.html:98
+#: manufacturing/templates/finance_budget_detail.html:193
 #: manufacturing/templates/marketing_dashboard_kpis.html:5
 #: manufacturing/templates/mkt_analytics.html:141
 #: manufacturing/templates/mkt_analytics.html:148
@@ -8562,7 +8571,7 @@ msgstr "Créer une Commande Ouverte"
 #: manufacturing/templates/ecommerce_connection_new.html:65
 #: manufacturing/templates/edi_partner_new.html:42
 #: manufacturing/templates/eng_project_detail.html:175
-#: manufacturing/templates/finance_budget_detail.html:175
+#: manufacturing/templates/finance_budget_detail.html:176
 #: manufacturing/templates/forgot_password.html:37
 #: manufacturing/templates/forgot_password_reset.html:40
 #: manufacturing/templates/gl_accounts.html:115
@@ -8640,7 +8649,7 @@ msgstr "BOM Éclatée"
 #: manufacturing/templates/eng_specs_list.html:13
 #: manufacturing/templates/eng_tasks_list.html:13
 #: manufacturing/templates/finance_audit_list.html:12
-#: manufacturing/templates/finance_budget_list.html:12
+#: manufacturing/templates/finance_budget_list.html:13
 #: manufacturing/templates/it_asset_list.html:16
 #: manufacturing/templates/it_incident_list.html:16
 #: manufacturing/templates/it_license_list.html:16
@@ -8687,7 +8696,7 @@ msgstr "CSV"
 #: manufacturing/templates/eng_specs_list.html:14
 #: manufacturing/templates/eng_tasks_list.html:14
 #: manufacturing/templates/finance_audit_list.html:13
-#: manufacturing/templates/finance_budget_list.html:13
+#: manufacturing/templates/finance_budget_list.html:14
 #: manufacturing/templates/it_asset_list.html:17
 #: manufacturing/templates/it_incident_list.html:17
 #: manufacturing/templates/it_license_list.html:17
@@ -8983,7 +8992,7 @@ msgid "All Budgets"
 msgstr "Tous les Budgets"
 
 #: manufacturing/templates/budget_dashboard.html:37
-#: manufacturing/templates/finance_budget_list.html:112
+#: manufacturing/templates/finance_budget_list.html:113
 msgid "New Budget"
 msgstr "Nouveau Budget"
 
@@ -8993,6 +9002,7 @@ msgstr "Nouveau Budget"
 #: manufacturing/templates/finance_audit_list.html:6
 #: manufacturing/templates/finance_bank_rec_detail.html:6
 #: manufacturing/templates/finance_bank_rec_list.html:6
+#: manufacturing/templates/finance_budget_by_department.html:6
 #: manufacturing/templates/finance_budget_detail.html:6
 #: manufacturing/templates/finance_budget_list.html:6
 #: manufacturing/templates/finance_dashboard.html:3
@@ -9028,15 +9038,16 @@ msgid "Total Budgeted by Fiscal Year"
 msgstr "Total Budgétisé par Exercice Fiscal"
 
 #: manufacturing/templates/budget_dashboard.html:89
-#: manufacturing/templates/finance_budget_list.html:85
+#: manufacturing/templates/finance_budget_list.html:86
 msgid "Budget Name"
 msgstr "Nom du Budget"
 
 #: manufacturing/templates/budget_dashboard.html:89
-#: manufacturing/templates/finance_budget_detail.html:76
-#: manufacturing/templates/finance_budget_detail.html:107
-#: manufacturing/templates/finance_budget_list.html:69
-#: manufacturing/templates/finance_budget_list.html:86
+#: manufacturing/templates/finance_budget_by_department.html:49
+#: manufacturing/templates/finance_budget_detail.html:77
+#: manufacturing/templates/finance_budget_detail.html:108
+#: manufacturing/templates/finance_budget_list.html:70
+#: manufacturing/templates/finance_budget_list.html:87
 #: manufacturing/templates/sales_forecast_detail.html:148
 #: manufacturing/templates/sales_forecast_list.html:140
 #: manufacturing/templates/sales_forecast_list.html:212
@@ -9044,7 +9055,7 @@ msgid "Fiscal Year"
 msgstr "Exercice Fiscal"
 
 #: manufacturing/templates/budget_dashboard.html:100
-#: manufacturing/templates/finance_budget_list.html:104
+#: manufacturing/templates/finance_budget_list.html:105
 msgid "No budgets found."
 msgstr "Aucun budget trouvé."
 
@@ -10035,8 +10046,8 @@ msgstr ""
 #: manufacturing/templates/eng_specs_list.html:87
 #: manufacturing/templates/eng_specs_list.html:125
 #: manufacturing/templates/engagement_detail.html:121
-#: manufacturing/templates/finance_budget_detail.html:121
-#: manufacturing/templates/finance_budget_detail.html:209
+#: manufacturing/templates/finance_budget_detail.html:122
+#: manufacturing/templates/finance_budget_detail.html:210
 #: manufacturing/templates/legal_governance_list.html:75
 #: manufacturing/templates/legal_governance_list.html:107
 #: manufacturing/templates/maint_downtime_detail.html:70
@@ -10559,8 +10570,8 @@ msgstr "Fournisseur Lié (externe)"
 
 #: manufacturing/templates/consultant_form.html:47
 #: manufacturing/templates/eng_tasks_list.html:127
-#: manufacturing/templates/finance_budget_detail.html:90
-#: manufacturing/templates/finance_budget_list.html:135
+#: manufacturing/templates/finance_budget_detail.html:91
+#: manufacturing/templates/finance_budget_list.html:136
 #: manufacturing/templates/maint_part_detail.html:123
 #: manufacturing/templates/prod_returns_detail.html:102
 #: manufacturing/templates/prod_returns_list.html:117
@@ -10859,6 +10870,8 @@ msgid "No engagements in this range."
 msgstr "Aucune mission sur cette période."
 
 #: manufacturing/templates/consultant_spend_report.html:104
+#: manufacturing/templates/finance_budget_detail.html:8
+#: manufacturing/templates/finance_budget_list.html:8
 msgid "By Department"
 msgstr "Par Département"
 
@@ -12428,8 +12441,8 @@ msgstr "Montant du remboursement"
 #: manufacturing/templates/eng_ecr_detail.html:77
 #: manufacturing/templates/eng_spec_detail.html:124
 #: manufacturing/templates/eng_task_detail.html:121
-#: manufacturing/templates/finance_budget_detail.html:110
-#: manufacturing/templates/finance_budget_list.html:89
+#: manufacturing/templates/finance_budget_detail.html:111
+#: manufacturing/templates/finance_budget_list.html:90
 #: manufacturing/templates/gl_journal_detail.html:59
 #: manufacturing/templates/gl_journals.html:61
 #: manufacturing/templates/it_ticket_detail.html:103
@@ -15318,7 +15331,7 @@ msgid "Finding Ref"
 msgstr "Réf. de Constatation"
 
 #: manufacturing/templates/finance_audit_detail.html:175
-#: manufacturing/templates/finance_budget_detail.html:213
+#: manufacturing/templates/finance_budget_detail.html:214
 #: manufacturing/templates/it_ticket_list.html:141
 #: manufacturing/templates/prod_shipping_detail.html:173
 #: manufacturing/templates/qa_inspection_detail.html:240
@@ -15479,52 +15492,89 @@ msgstr "p. ex. Première Banque Nationale"
 msgid "Add Account"
 msgstr "Ajouter un Compte"
 
+#: manufacturing/templates/finance_budget_by_department.html:3
+#: manufacturing/templates/finance_budget_by_department.html:46
+msgid "Budget vs. Actual by Department"
+msgstr "Budget vs. Réel par Département"
+
+#: manufacturing/templates/finance_budget_by_department.html:59
+msgid "Budgeted"
+msgstr "Budgété"
+
+#: manufacturing/templates/finance_budget_by_department.html:60
+msgid "Actual Spent"
+msgstr "Dépenses Réelles"
+
+#: manufacturing/templates/finance_budget_by_department.html:61
+msgid "Open POs (Committed)"
+msgstr "Commandes Ouvertes (Engagé)"
+
+#: manufacturing/templates/finance_budget_by_department.html:63
+#, python-format
+msgid "%% Used"
+msgstr "%% Utilisé"
+
+#: manufacturing/templates/finance_budget_by_department.html:83
+#, python-format
+msgid "Total: $%(amt)s"
+msgstr "Total : $%(amt)s"
+
+#: manufacturing/templates/finance_budget_by_department.html:85
+msgid "No open POs"
+msgstr "Aucune commande ouverte"
+
+#: manufacturing/templates/finance_budget_by_department.html:92
+msgid "No departments with a budget for this fiscal year."
+msgstr "Aucun département n'a de budget pour cet exercice fiscal."
+
 #: manufacturing/templates/finance_budget_detail.html:3
 #, python-format
 msgid "Budget — %(name)s"
 msgstr "Budget — %(name)s"
 
-#: manufacturing/templates/finance_budget_detail.html:61
+#: manufacturing/templates/finance_budget_detail.html:62
 msgid ""
 "Delete this entire budget and all its line items? This cannot be undone."
-msgstr "Supprimer entièrement ce budget et toutes ses lignes ? Cette action est irréversible."
+msgstr ""
+"Supprimer entièrement ce budget et toutes ses lignes ? Cette action est "
+"irréversible."
 
-#: manufacturing/templates/finance_budget_detail.html:61
+#: manufacturing/templates/finance_budget_detail.html:62
 msgid "Delete Budget"
 msgstr "Supprimer le Budget"
 
-#: manufacturing/templates/finance_budget_detail.html:67
+#: manufacturing/templates/finance_budget_detail.html:68
 msgid "Edit Budget"
 msgstr "Modifier le Budget"
 
-#: manufacturing/templates/finance_budget_detail.html:72
-#: manufacturing/templates/finance_budget_list.html:117
+#: manufacturing/templates/finance_budget_detail.html:73
+#: manufacturing/templates/finance_budget_list.html:118
 msgid "Budget Name *"
 msgstr "Nom du Budget *"
 
-#: manufacturing/templates/finance_budget_detail.html:117
+#: manufacturing/templates/finance_budget_detail.html:118
 msgid "Budget Lines"
 msgstr "Lignes Budgétaires"
 
-#: manufacturing/templates/finance_budget_detail.html:123
+#: manufacturing/templates/finance_budget_detail.html:124
 msgid "Budgeted Amount"
 msgstr "Montant Budgété"
 
-#: manufacturing/templates/finance_budget_detail.html:180
+#: manufacturing/templates/finance_budget_detail.html:181
 msgid "Delete this line?"
 msgstr "Supprimer cette ligne ?"
 
-#: manufacturing/templates/finance_budget_detail.html:180
+#: manufacturing/templates/finance_budget_detail.html:181
 msgid "Del"
 msgstr "Suppr."
 
-#: manufacturing/templates/finance_budget_detail.html:186
+#: manufacturing/templates/finance_budget_detail.html:187
 #: manufacturing/templates/req_detail.html:94
 #: manufacturing/templates/sales_order_detail.html:148
 msgid "No line items yet."
 msgstr "Aucune ligne pour le moment."
 
-#: manufacturing/templates/finance_budget_detail.html:204
+#: manufacturing/templates/finance_budget_detail.html:205
 #: manufacturing/templates/po_detail.html:256
 #: manufacturing/templates/rfq_detail.html:81
 #: manufacturing/templates/sales_order_detail.html:163
@@ -15532,19 +15582,19 @@ msgstr "Aucune ligne pour le moment."
 msgid "Add Line Item"
 msgstr "Ajouter une Ligne"
 
-#: manufacturing/templates/finance_budget_detail.html:210
+#: manufacturing/templates/finance_budget_detail.html:211
 msgid "e.g. Salaries, Equipment"
 msgstr "p. ex. Salaires, Équipement"
 
-#: manufacturing/templates/finance_budget_detail.html:214
+#: manufacturing/templates/finance_budget_detail.html:215
 msgid "Line item description"
 msgstr "Description de la ligne"
 
-#: manufacturing/templates/finance_budget_detail.html:217
+#: manufacturing/templates/finance_budget_detail.html:218
 msgid "Budgeted Amount ($)"
 msgstr "Montant Budgété ($)"
 
-#: manufacturing/templates/finance_budget_detail.html:225
+#: manufacturing/templates/finance_budget_detail.html:226
 #: manufacturing/templates/gl_journal_detail.html:153
 #: manufacturing/templates/pl_detail.html:154
 #: manufacturing/templates/wms_transfer_detail.html:81
@@ -15552,24 +15602,24 @@ msgstr "Montant Budgété ($)"
 msgid "Add Line"
 msgstr "Ajouter une Ligne"
 
-#: manufacturing/templates/finance_budget_list.html:71
+#: manufacturing/templates/finance_budget_list.html:72
 #: manufacturing/templates/people_list.html:22
 msgid "All Departments"
 msgstr "Tous les Services"
 
-#: manufacturing/templates/finance_budget_list.html:76
+#: manufacturing/templates/finance_budget_list.html:77
 msgid "Search name…"
 msgstr "Rechercher nom…"
 
-#: manufacturing/templates/finance_budget_list.html:118
+#: manufacturing/templates/finance_budget_list.html:119
 msgid "e.g. Operations FY2026"
 msgstr "p. ex. Opérations EF2026"
 
-#: manufacturing/templates/finance_budget_list.html:121
+#: manufacturing/templates/finance_budget_list.html:122
 msgid "Fiscal Year *"
 msgstr "Exercice Fiscal *"
 
-#: manufacturing/templates/finance_budget_list.html:146
+#: manufacturing/templates/finance_budget_list.html:147
 msgid "Create Budget"
 msgstr "Créer le Budget"
 
@@ -21143,7 +21193,7 @@ msgstr "Vous n'avez encore aucune demande de retour."
 #: manufacturing/templates/prod_returns_list.html:115
 #: manufacturing/templates/prod_shipping_detail.html:95
 #: manufacturing/templates/prod_shipping_list.html:110
-#: manufacturing/views/__init__.py:4437
+#: manufacturing/views/__init__.py:4439
 msgid "Sales Order"
 msgstr "Commande Client"
 
@@ -24578,7 +24628,7 @@ msgid "e.g. PART-SKU123"
 msgstr "p. ex. PART-SKU123"
 
 #: manufacturing/templates/scan_home.html:67
-#: manufacturing/views/__init__.py:4555
+#: manufacturing/views/__init__.py:4557
 msgid "Purchase Order"
 msgstr "Bon de Commande"
 
@@ -27318,23 +27368,23 @@ msgstr "Plan d'Effectifs vs Réel"
 msgid "No headcount plans yet."
 msgstr "Aucun plan d'effectifs pour l'instant."
 
-#: manufacturing/views/__init__.py:4340 manufacturing/views/__init__.py:4377
-#: manufacturing/views/__init__.py:4433
+#: manufacturing/views/__init__.py:4342 manufacturing/views/__init__.py:4379
+#: manufacturing/views/__init__.py:4435
 msgid "customer"
 msgstr "client"
 
-#: manufacturing/views/__init__.py:4341 manufacturing/views/__init__.py:4378
-#: manufacturing/views/__init__.py:4434
+#: manufacturing/views/__init__.py:4343 manufacturing/views/__init__.py:4380
+#: manufacturing/views/__init__.py:4436
 msgid "customers"
 msgstr "clients"
 
-#: manufacturing/views/__init__.py:4469 manufacturing/views/__init__.py:4506
-#: manufacturing/views/__init__.py:4551
+#: manufacturing/views/__init__.py:4471 manufacturing/views/__init__.py:4508
+#: manufacturing/views/__init__.py:4553
 msgid "supplier"
 msgstr "fournisseur"
 
-#: manufacturing/views/__init__.py:4470 manufacturing/views/__init__.py:4507
-#: manufacturing/views/__init__.py:4552
+#: manufacturing/views/__init__.py:4472 manufacturing/views/__init__.py:4509
+#: manufacturing/views/__init__.py:4554
 msgid "suppliers"
 msgstr "fournisseurs"
 
