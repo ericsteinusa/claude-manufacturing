@@ -517,6 +517,7 @@ urlpatterns = [
     path('fin/', views.fin_dashboard, name='fin_dashboard'),
     path('fin/kpis-fragment/', views.fin_dashboard_kpis_fragment, name='fin_dashboard_kpis_fragment'),
     path('fin/budgets/', views.fin_budget_list, name='fin_budget_list'),
+    path('fin/budgets/by-department/', views.fin_budget_by_department, name='fin_budget_by_department'),
     path('fin/budgets/<int:budget_id>/', views.fin_budget_detail, name='fin_budget_detail'),
     path('fin/audits/', views.fin_audit_list, name='fin_audit_list'),
     path('fin/audits/<int:audit_id>/', views.fin_audit_detail, name='fin_audit_detail'),
