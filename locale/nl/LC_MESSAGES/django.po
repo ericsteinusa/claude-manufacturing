@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 23:17+0000\n"
+"POT-Creation-Date: 2026-09-08 01:46+0000\n"
 "PO-Revision-Date: 2026-09-02 15:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
@@ -3412,6 +3412,7 @@ msgstr "Marketing"
 #: manufacturing/menus.py:1695 manufacturing/templates/base.html:557
 #: manufacturing/templates/exit_interview_list.html:6
 #: manufacturing/templates/offboarding_list.html:6
+#: manufacturing/templates/people_list.html:9
 #: manufacturing/templates/pers_depts.html:6
 #: manufacturing/templates/pers_review_detail.html:6
 #: manufacturing/templates/pers_reviews_list.html:6
@@ -3715,7 +3716,7 @@ msgstr "ABC vs. Traditioneel Rapport"
 #: manufacturing/templates/payroll_ytd.html:8
 #: manufacturing/templates/people_detail.html:14
 #: manufacturing/templates/people_form.html:8
-#: manufacturing/templates/people_list.html:9
+#: manufacturing/templates/people_list.html:14
 #: manufacturing/templates/periods.html:6
 #: manufacturing/templates/pers_depts.html:11
 #: manufacturing/templates/pers_review_detail.html:10
@@ -4009,7 +4010,7 @@ msgstr "Zoeken op naam..."
 #: manufacturing/templates/contacts_list.html:23
 #: manufacturing/templates/cs_list.html:44
 #: manufacturing/templates/data_governance_dashboard.html:41
-#: manufacturing/templates/people_list.html:31
+#: manufacturing/templates/people_list.html:36
 #: manufacturing/templates/promo_list.html:21
 #: manufacturing/templates/scenario_list.html:24
 #: manufacturing/templates/skill_list.html:21
@@ -5785,7 +5786,7 @@ msgstr "Tot:"
 #: manufacturing/templates/mkt_lead_list.html:79
 #: manufacturing/templates/mkt_research_list.html:80
 #: manufacturing/templates/offboarding_list.html:65
-#: manufacturing/templates/people_list.html:37
+#: manufacturing/templates/people_list.html:42
 #: manufacturing/templates/pers_reviews_list.html:71
 #: manufacturing/templates/pers_training_list.html:77
 #: manufacturing/templates/prod_delivery_status.html:52
@@ -5866,7 +5867,7 @@ msgstr "Filteren"
 #: manufacturing/templates/mkt_research_list.html:81
 #: manufacturing/templates/offboarding_list.html:66
 #: manufacturing/templates/payroll_pay_rates.html:58
-#: manufacturing/templates/people_list.html:38
+#: manufacturing/templates/people_list.html:43
 #: manufacturing/templates/pers_reviews_list.html:72
 #: manufacturing/templates/pers_training_list.html:78
 #: manufacturing/templates/prod_delivery_status.html:53
@@ -6299,8 +6300,8 @@ msgstr "Entiteitstype *"
 #: manufacturing/templates/it_ticket_detail.html:145
 #: manufacturing/templates/it_ticket_list.html:113
 #: manufacturing/templates/people_form.html:77
-#: manufacturing/templates/people_list.html:20
-#: manufacturing/templates/people_list.html:49
+#: manufacturing/templates/people_list.html:25
+#: manufacturing/templates/people_list.html:54
 #: manufacturing/templates/pers_depts.html:64
 #: manufacturing/templates/pers_depts.html:173
 #: manufacturing/templates/personnel_dashboard.html:122
@@ -6890,7 +6891,7 @@ msgstr "Indiensttredingsdatum *"
 
 #: manufacturing/templates/ats_application_detail.html:109
 #: manufacturing/templates/people_form.html:72
-#: manufacturing/templates/people_list.html:51
+#: manufacturing/templates/people_list.html:56
 #: manufacturing/templates/skill_requirements.html:34
 #: manufacturing/templates/skill_requirements.html:76
 #: manufacturing/templates/skills_matrix_summary.html:26
@@ -6998,7 +6999,7 @@ msgstr "Zoeken op naam of e-mail..."
 #: manufacturing/templates/mkt_lead_list.html:121
 #: manufacturing/templates/payroll_deductions.html:56
 #: manufacturing/templates/payroll_deductions.html:83
-#: manufacturing/templates/people_list.html:47
+#: manufacturing/templates/people_list.html:52
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/pl_detail.html:42
 #: manufacturing/templates/pl_list.html:23
@@ -7034,7 +7035,7 @@ msgstr "Naam"
 #: manufacturing/templates/mkt_lead_list.html:89
 #: manufacturing/templates/mkt_lead_list.html:129
 #: manufacturing/templates/people_form.html:65
-#: manufacturing/templates/people_list.html:52
+#: manufacturing/templates/people_list.html:57
 #: manufacturing/templates/personnel_dashboard.html:122
 #: manufacturing/templates/portal_login.html:18
 #: manufacturing/templates/portal_register.html:15
@@ -7588,6 +7589,7 @@ msgstr "Personeelszaken"
 
 #: manufacturing/templates/base.html:563
 #: manufacturing/templates/ess_home.html:7
+#: manufacturing/templates/people_list.html:13
 #: manufacturing/templates/pers_depts.html:10
 #: manufacturing/templates/pers_reviews_list.html:11
 #: manufacturing/templates/pers_training_list.html:11
@@ -7620,6 +7622,7 @@ msgstr "Kwaliteit"
 
 #: manufacturing/templates/base.html:584
 #: manufacturing/templates/dashboard.html:68
+#: manufacturing/templates/people_list.html:10
 #: manufacturing/templates/pers_depts.html:3
 #: manufacturing/templates/pers_depts.html:62
 #: manufacturing/templates/pers_reviews_list.html:8
@@ -8672,7 +8675,7 @@ msgstr "BOM-explosie"
 #: manufacturing/templates/mkt_campaign_list.html:12
 #: manufacturing/templates/mkt_lead_list.html:12
 #: manufacturing/templates/mkt_research_list.html:15
-#: manufacturing/templates/people_list.html:10
+#: manufacturing/templates/people_list.html:15
 #: manufacturing/templates/pers_reviews_list.html:13
 #: manufacturing/templates/pers_training_list.html:13
 #: manufacturing/templates/prod_returns_list.html:11
@@ -8718,7 +8721,7 @@ msgstr "CSV"
 #: manufacturing/templates/mkt_campaign_list.html:13
 #: manufacturing/templates/mkt_lead_list.html:13
 #: manufacturing/templates/mkt_research_list.html:16
-#: manufacturing/templates/people_list.html:11
+#: manufacturing/templates/people_list.html:16
 #: manufacturing/templates/pers_reviews_list.html:14
 #: manufacturing/templates/pers_training_list.html:14
 #: manufacturing/templates/prod_returns_list.html:12
@@ -13285,7 +13288,7 @@ msgstr "bijv. Werkinstructie Ingangscontrole"
 
 #: manufacturing/templates/document_new.html:42
 #: manufacturing/templates/it_task_list.html:132
-#: manufacturing/templates/people_list.html:33
+#: manufacturing/templates/people_list.html:38
 msgid "Name or email"
 msgstr "Naam of e-mail"
 
@@ -14618,6 +14621,7 @@ msgid "Pay Stubs"
 msgstr "Loonstroken"
 
 #: manufacturing/templates/ess_home.html:8
+#: manufacturing/templates/people_list.html:11
 #: manufacturing/templates/pers_depts.html:8
 #: manufacturing/templates/pers_review_detail.html:8
 #: manufacturing/templates/pers_reviews_list.html:9
@@ -14631,6 +14635,7 @@ msgid "Reviews"
 msgstr "Beoordelingen"
 
 #: manufacturing/templates/ess_home.html:9
+#: manufacturing/templates/people_list.html:12
 #: manufacturing/templates/pers_depts.html:9
 #: manufacturing/templates/pers_review_detail.html:9
 #: manufacturing/templates/pers_reviews_list.html:10
@@ -15597,7 +15602,7 @@ msgid "Add Line"
 msgstr "Regel Toevoegen"
 
 #: manufacturing/templates/finance_budget_list.html:72
-#: manufacturing/templates/people_list.html:22
+#: manufacturing/templates/people_list.html:27
 msgid "All Departments"
 msgstr "Alle Afdelingen"
 
@@ -16826,7 +16831,7 @@ msgstr[0] "%(counter)s product"
 msgstr[1] "%(counter)s producten"
 
 #: manufacturing/templates/inventory_list.html:112
-#: manufacturing/templates/people_list.html:71
+#: manufacturing/templates/people_list.html:76
 #, python-format
 msgid " matching \"%(s)s\""
 msgstr " overeenkomend met \"%(s)s\""
@@ -20202,23 +20207,23 @@ msgid "Add Employee"
 msgstr "Werknemer Toevoegen"
 
 #: manufacturing/templates/people_list.html:4
-#: manufacturing/templates/people_list.html:16
+#: manufacturing/templates/people_list.html:21
 msgid "Employee Directory"
 msgstr "Werknemersoverzicht"
 
-#: manufacturing/templates/people_list.html:48
+#: manufacturing/templates/people_list.html:53
 msgid "Emp #"
 msgstr "Werkn.nr."
 
-#: manufacturing/templates/people_list.html:50
+#: manufacturing/templates/people_list.html:55
 msgid "Sub-Dept"
 msgstr "Subafd."
 
-#: manufacturing/templates/people_list.html:70
+#: manufacturing/templates/people_list.html:75
 msgid "No employees found"
 msgstr "Geen werknemers gevonden"
 
-#: manufacturing/templates/people_list.html:72
+#: manufacturing/templates/people_list.html:77
 msgid " in the selected department"
 msgstr " in de geselecteerde afdeling"
 

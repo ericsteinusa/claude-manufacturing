@@ -6,6 +6,11 @@
 {% block toolbar_left %}
 <a href="{{ back_url }}" class="btn">← {% trans "Back" %}</a>
 {% if can_edit %}<a href="/people/new/" class="btn btn-primary">+ {% trans "New Employee" %}</a>{% endif %}
+<a href="/pers/" class="btn">{% trans "Personnel" %}</a>
+<a href="/pers/depts/" class="btn">{% trans "Departments" %}</a>
+<a href="/pers/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/pers/training/" class="btn">{% trans "Training" %}</a>
+<a href="/time-off/" class="btn">{% trans "Time Off" %}</a>
 {% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 <a href="?export=1{% if dept_id %}&dept_id={{ dept_id|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
 <a href="?export=1{% if dept_id %}&dept_id={{ dept_id|urlencode }}{% endif %}{% if search %}&search={{ search|urlencode }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
