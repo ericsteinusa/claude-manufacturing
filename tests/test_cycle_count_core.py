@@ -40,7 +40,7 @@ class _MultiConn:
 # ── constants ────────────────────────────────────────────────────────────
 
 def test_group_by_options():
-    assert set(GROUP_BY_OPTIONS) == {'bin', 'item_type', 'abc'}
+    assert set(GROUP_BY_OPTIONS) == {'bin', 'item_type', 'abc', 'all'}
 
 
 def test_abc_classes():
@@ -117,6 +117,11 @@ def test_list_group_values_bin():
     assert list_group_values(conn, 'bin') == ['A1', 'B2']
 
 
+def test_list_group_values_all():
+    conn = _MultiConn([[]])
+    assert list_group_values(conn, 'all') == ['all']
+
+
 def test_list_group_values_invalid_raises():
     import pytest
     conn = _MultiConn([[]])
@@ -167,6 +172,24 @@ def test_generate_sheet_by_abc_no_matches_skips_product_query():
     ])
     count_id = generate_sheet(conn, 'abc', 'A', 'eric')
     assert count_id == 7
+
+
+def test_generate_sheet_by_all_snapshots_every_product():
+    # Yearly Inventory Check: group_by='all' should snapshot every product
+    # with no WHERE filter at all, unlike 'bin'/'item_type'/'abc'.
+    conn = _MultiConn([
+        [{'id': 1, 'amount': 10.0}, {'id': 2, 'amount': 5.0}, {'id': 3, 'amount': 0.0}],
+        [],                          # existing count numbers
+        [{'id': 55}],                # header insert
+        [], [], [],                  # line inserts x3
+    ])
+    count_id = generate_sheet(conn, 'all', 'all', 'eric')
+    assert count_id == 55
+    products_query_sql, products_query_params = conn.calls[0]
+    assert 'WHERE' not in products_query_sql
+    assert products_query_params == []
+    header_call = conn.calls[2]
+    assert header_call[1][1:] == ['all', 'all', 'eric']
 
 
 def test_generate_sheet_invalid_group_by_raises():

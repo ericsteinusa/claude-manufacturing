@@ -66,6 +66,7 @@
                     <th>{% trans "Type" %}</th>
                     <th>{% trans "UOM" %}</th>
                     <th>{% trans "Bin" %}</th>
+                    <th>{% trans "WMS Bin Location(s)" %}</th>
                     <th class="num">{% trans "On Hand" %}</th>
                     <th class="num">{% trans "Reorder Pt" %}</th>
                     <th class="num">{% trans "Unit Cost" %}</th>
@@ -84,6 +85,7 @@
                     </td>
                     <td>{{ p.uom }}</td>
                     <td>{{ p.bin|default:"—" }}</td>
+                    <td style="font-size:12px;">{{ p.wms_bins|default:"—" }}</td>
                     <td class="num"><strong>{{ p.amount|floatformat:"g" }}</strong></td>
                     <td class="num">{{ p.reorder_point|floatformat:"g" }}</td>
                     <td class="num">

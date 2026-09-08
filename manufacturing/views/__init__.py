@@ -90,7 +90,10 @@ from ..purchase_orders_core import (
     can_transition as po_can_transition,
     set_po_status, receive_po_item,
 )
-from ..wms_core import ensure_wms_tables, credit_unassigned_receipt
+from ..wms_core import (
+    ensure_wms_tables, ensure_bin_tables, credit_unassigned_receipt,
+    get_product_bin_stock, get_bin_summary_by_product,
+)
 from ..landed_cost_core import ensure_landed_cost_tables, list_landed_costs
 from ..time_clock_core import (
     get_current_entry, clock_in as tc_clock_in, clock_out_entry,
@@ -294,6 +297,7 @@ from ._document_control import *  # noqa: F401,F403
 from ._ess import *  # noqa: F401,F403
 from ._capacity_planning import *  # noqa: F401,F403
 from ._wms import *  # noqa: F401,F403
+from ._receiving import *  # noqa: F401,F403
 from ._landed_cost import *  # noqa: F401,F403
 from ._consultants import *  # noqa: F401,F403
 from ._blanket_po import *  # noqa: F401,F403
@@ -568,11 +572,11 @@ WEB_LEAF_URLS = {
     ('production', 'carr_rates'):   '/prod/shipping/',
     ('production', 'perf_rpts'):    '/prod/reports/',
     ('production', 'carr_cont'):    '/prod/shipping/',
-    # Receiving → PO receipts
-    ('production', 'inbound'):      '/po/',
+    # Receiving → dock log (bin-aware); WMS put-away for PO-item receiving
+    ('production', 'inbound'):      '/receiving/',
     ('production', 'recv_items'):   '/wms/receive/',
-    ('production', 'recv_rpts'):    '/po/',
-    ('production', 'disc_rpts'):    '/po/',
+    ('production', 'recv_rpts'):    '/receiving/',
+    ('production', 'disc_rpts'):    '/receiving/',
     # Tracking
     ('production', 'track_ship'):   '/prod/shipping/',
     ('production', 'ship_hist'):    '/prod/shipping/',
@@ -777,10 +781,10 @@ WEB_LEAF_URLS = {
     ('purchasing', 'new_cont'):    '/purch/contracts/',
     ('purchasing', 'cont_renew'):  '/purch/contracts/',
     ('purchasing', 'cont_arch'):   '/purch/contracts/',
-    ('purchasing', 'pend_recv'):   '/po/',
-    ('purchasing', 'recv_items'):  '/po/',
-    ('purchasing', 'disc_rpts'):   '/po/',
-    ('purchasing', 'recv_hist'):   '/po/',
+    ('purchasing', 'pend_recv'):   '/receiving/?status=pending',
+    ('purchasing', 'recv_items'):  '/receiving/',
+    ('purchasing', 'disc_rpts'):   '/receiving/',
+    ('purchasing', 'recv_hist'):   '/receiving/?status=received',
     ('purchasing', 'req_hist'):    '/purch/requisitions/',
     ('purchasing', 'new_req'):     '/purch/requisitions/',
     ('purchasing', 'pend_appr'):   '/purch/requisitions/?status=submitted',
@@ -4119,9 +4123,13 @@ def inventory_list(request):
 
     conn = get_db_connection()
     try:
+        ensure_bin_tables(conn)
         products = inv_list_products(conn, search=search,
                                      filter_status=filter_status,
                                      item_type=item_type)
+        bin_summary = get_bin_summary_by_product(conn)
+        for p in products:
+            p['wms_bins'] = bin_summary.get(p['id'])
         alerts = get_alert_counts(conn)
     finally:
         conn.close()
@@ -4239,6 +4247,8 @@ def inventory_detail(request, product_id):
                     error = str(e)
 
         transactions = get_transactions(conn, product_id)
+        ensure_bin_tables(conn)
+        bin_stock = get_product_bin_stock(conn, product_id)
     finally:
         conn.close()
 
@@ -4257,6 +4267,7 @@ def inventory_detail(request, product_id):
         suppliers=suppliers,
         transactions=transactions,
         stock_status=stock_status,
+        bin_stock=bin_stock,
         error=error,
         success=success,
         can_edit=can_edit,

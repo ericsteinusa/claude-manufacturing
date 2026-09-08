@@ -23,7 +23,10 @@ from .inventory_core import record_transaction
 from .approval_workflow_core import submit_for_approval, decide_step
 
 STATUSES = ('open', 'submitted', 'rejected', 'posted')
-GROUP_BY_OPTIONS = ('bin', 'item_type', 'abc')
+# 'all' backs the Yearly Inventory Check: a full physical count of every
+# product in one sheet, reusing this same count/variance/approval workflow
+# rather than a separate mechanism.
+GROUP_BY_OPTIONS = ('bin', 'item_type', 'abc', 'all')
 ABC_CLASSES = ('A', 'B', 'C')
 
 
@@ -114,6 +117,8 @@ def list_group_values(conn, group_by):
         return ['make', 'buy']
     if group_by == 'abc':
         return list(ABC_CLASSES)
+    if group_by == 'all':
+        return ['all']
     raise ValueError(f"group_by must be one of {GROUP_BY_OPTIONS}")
 
 
@@ -140,6 +145,10 @@ def generate_sheet(conn, group_by, group_value, created_by):
             "SELECT id, COALESCE(amount, 0) AS amount FROM product "
             "WHERE bin = %s ORDER BY id",
             (group_value,),
+        ).fetchall()
+    elif group_by == 'all':
+        rows = conn.execute(
+            "SELECT id, COALESCE(amount, 0) AS amount FROM product ORDER BY id"
         ).fetchall()
     else:  # item_type
         rows = conn.execute(

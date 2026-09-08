@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block page_title %}{% trans "Receiving" %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/receive/" class="btn">{% trans "WMS Receive &amp; Put-Away" %}</a>
+<a href="/inventory/" class="btn">{% trans "Inventory" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rcv-wrap { width:100%; max-width:1200px; }
+.rcv-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:var(--accent-hover); }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-pending  { background:#e2e3e5; color:#383d41; }
+.s-partial  { background:#fff3cd; color:#856404; }
+.s-received { background:#d4edda; color:#0a3622; }
+.s-rejected { background:#f8d7da; color:#721c24; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rcv-wrap">
+    <h2>{% trans "Receiving" %}</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">{% trans "All Statuses" %}</option>
+            {% for s in receiving_statuses %}
+            <option value="{{ s }}"{% if status == s %} selected{% endif %}>{{ s|capfirst }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search supplier, RCV #, tracking…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/receiving/" style="font-size:13px;color:var(--accent);margin-left:4px;">{% trans "Clear" %}</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>{% trans "RCV #" %}</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th>{% trans "Carrier" %}</th>
+                    <th>{% trans "Tracking #" %}</th>
+                    <th>{% trans "Status" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in receipts %}
+            <tr>
+                <td><a href="/receiving/{{ r.id }}/">{{ r.rcv_number }}</a></td>
+                <td>{{ r.rcv_date|default:"—" }}</td>
+                <td>{{ r.supplier|default:"—" }}</td>
+                <td>{{ r.carrier|default:"—" }}</td>
+                <td>{{ r.tracking_number|default:"—" }}</td>
+                <td><span class="badge s-{{ r.status }}">{{ r.status|capfirst }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:var(--text-muted);text-align:center;">{% trans "No receipts found." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>{% trans "New Receipt" %}</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>{% trans "Supplier *" %}</label>
+                    <input type="text" name="supplier" required placeholder="{% trans 'e.g. Steel Works Inc.' %}">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Carrier" %}</label>
+                    <input type="text" name="carrier" placeholder="{% trans 'e.g. UPS, FedEx' %}">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Tracking #" %}</label>
+                    <input type="text" name="tracking_number">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Date" %}</label>
+                    <input type="date" name="rcv_date">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Linked PO" %}</label>
+                    <select name="po_id">
+                        <option value="">{% trans "— None —" %}</option>
+                        {% for po in pos %}
+                        <option value="{{ po.id }}">{{ po.po_number }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>{% trans "Notes" %}</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">{% trans "Create Receipt" %}</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

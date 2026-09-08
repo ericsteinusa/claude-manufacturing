@@ -502,6 +502,8 @@ urlpatterns = [
     path('wms/bins/<int:bin_id>/', views.wms_bin_detail, name='wms_bin_detail'),
     path('wms/putaway-rules/', views.wms_putaway_rule_list, name='wms_putaway_rule_list'),
     path('wms/receive/', views.wms_receive, name='wms_receive'),
+    path('receiving/', views.receiving_list, name='receiving_list'),
+    path('receiving/<int:receiving_id>/', views.receiving_detail, name='receiving_detail'),
     path('wms/picks/', views.wms_pick_list_list, name='wms_pick_list_list'),
     path('wms/picks/<int:pick_list_id>/', views.wms_pick_list_detail, name='wms_pick_list_detail'),
     path('wms/pack/<int:pick_list_id>/', views.wms_pack_station, name='wms_pack_station'),
@@ -708,6 +710,7 @@ urlpatterns = [
     path('label/part/<int:product_id>/', views.label_part, name='label_part'),
     path('label/po/<int:po_id>/', views.label_po, name='label_po'),
     path('label/receiving/<int:po_id>/', views.label_receiving, name='label_receiving'),
+    path('label/receiving-item/<int:item_id>/', views.label_receiving_item, name='label_receiving_item'),
     path('label/asset/<int:asset_id>/', views.label_asset, name='label_asset'),
     path('barcode/img/<path:code>/', views.barcode_img, name='barcode_img'),
     # Customer Self-Service Portal (P3-C)

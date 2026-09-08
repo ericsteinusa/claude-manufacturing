@@ -7,6 +7,7 @@
 <a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
 <a href="/inventory/cycle-counts/new/" class="btn btn-primary">+ {% trans "New Count" %}</a>
+<a href="/inventory/cycle-counts/new/?group_by=all" class="btn">{% trans "Yearly Inventory Check" %}</a>
 {% endif %}
 {% endblock %}
 
@@ -39,7 +40,7 @@
                 {% for c in counts %}
                 <tr>
                     <td><a href="/inventory/cycle-counts/{{ c.id }}/">{{ c.count_number }}</a></td>
-                    <td>{{ c.group_by|capfirst }}: {{ c.group_value }}</td>
+                    <td>{% if c.group_by == 'all' %}{% trans "Full Inventory" %}{% else %}{{ c.group_by|capfirst }}: {{ c.group_value }}{% endif %}</td>
                     <td>
                         {% if c.status == 'posted' %}
                         <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Posted" %}</span>

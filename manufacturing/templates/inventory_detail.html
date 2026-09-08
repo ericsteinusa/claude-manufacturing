@@ -217,6 +217,23 @@
     </div>
     {% endif %}
 
+    <!-- WMS bin locations -->
+    <div class="card">
+        <h3>{% trans "WMS Bin Locations" %}</h3>
+        {% if bin_stock %}
+        <table class="trans-table">
+            <thead><tr><th>{% trans "Bin" %}</th><th class="num">{% trans "Qty" %}</th></tr></thead>
+            <tbody>
+            {% for b in bin_stock %}
+            <tr><td><a href="/wms/bins/">{{ b.full_code }}</a></td><td class="num">{{ b.qty|floatformat:"g" }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:var(--text-muted);font-size:13px;">{% trans "Not yet tracked in a WMS bin — all stock is in the unassigned location." %}</p>
+        {% endif %}
+    </div>
+
     <!-- Transaction history -->
     <div class="card">
         <h3>{% trans "Transaction History (last 50)" %}</h3>

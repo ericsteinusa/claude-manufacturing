@@ -388,6 +388,17 @@ def receiving_label_pdf(po: dict) -> bytes:
     return generate_label_pdf(code, title, sub)
 
 
+def received_item_label_pdf(product: dict, bin_code: str, qty: float) -> bytes:
+    """Label for one receiving_core.py line once it's been put away: the
+    part's own barcode (same PART- scheme part_label_pdf uses, so it scans
+    into the same lookup) plus the bin it was placed in and the quantity."""
+    sku = product.get("sku") or str(product["id"])
+    code = f"PART-{sku}"
+    title = f"Part: {product.get('name') or sku}"
+    sub = f"Bin: {bin_code}  |  Qty Received: {qty:g}"
+    return generate_label_pdf(code, title, sub)
+
+
 def asset_label_pdf(asset: dict) -> bytes:
     code = f"ASSET-{asset['asset_tag']}"
     title = f"Asset: {asset['asset_tag']}"

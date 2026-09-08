@@ -138,8 +138,21 @@ UNASSIGNED_BIN_CODE = 'UNASSIGNED'
 # Setup
 # ---------------------------------------------------------------------------
 
-def ensure_wms_tables(conn):
-    """Create all WMS tables/columns if absent. Does not commit."""
+def ensure_bin_tables(conn):
+    """Create the warehouse/zone/bin/bin-stock/put-away-rule tables if
+    absent -- the subset of ensure_wms_tables() with no FK on
+    sales_order/so_item/shipment, so callers that only need bin lookups
+    and put-away suggestions (receiving_core.py, the Inventory list/detail
+    bin-location display) don't transitively require those other modules'
+    tables to already exist. Does not commit.
+
+    Split out after a fresh-CI-database load test regression: /inventory/
+    started calling ensure_wms_tables() for its new bin-location column,
+    which also creates wms_pick_list (REFERENCES sales_order) -- on a
+    database where no sales-order page had run yet, hitting /inventory/
+    first threw "relation sales_order does not exist" and 500'd, the same
+    "live schema can diverge" / FK-ordering class of bug this file's other
+    self-heal helpers already guard against."""
     conn.execute(
         "ALTER TABLE product ADD COLUMN IF NOT EXISTS category TEXT DEFAULT ''"
     )
@@ -188,6 +201,10 @@ def ensure_wms_tables(conn):
         "CREATE INDEX IF NOT EXISTS wms_bin_stock_product "
         "ON wms_bin_stock(product_id)"
     )
+    # wms_putaway_rule only FKs to wms_zone (already created above), so it's
+    # safe to include here too -- suggest_putaway_bin() (used by both the
+    # Receiving screen and the PO put-away screen) needs it and has no
+    # reason to depend on sales_order/so_item/shipment either.
     conn.execute("""
         CREATE TABLE IF NOT EXISTS wms_putaway_rule (
             id SERIAL PRIMARY KEY,
@@ -198,6 +215,11 @@ def ensure_wms_tables(conn):
             is_active BOOLEAN NOT NULL DEFAULT TRUE
         )
     """)
+
+
+def ensure_wms_tables(conn):
+    """Create all WMS tables/columns if absent. Does not commit."""
+    ensure_bin_tables(conn)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS wms_wave (
             id SERIAL PRIMARY KEY,
@@ -528,6 +550,22 @@ def get_product_bin_stock(conn, product_id):
     return [dict(r) for r in rows]
 
 
+def get_bin_summary_by_product(conn):
+    """{product_id: "CODE (qty), CODE (qty), ..."} for every product with
+    tracked WMS bin stock -- lets an inventory list annotate every row with
+    its real bin location(s) in one query instead of one per product."""
+    rows = conn.execute("""
+        SELECT s.product_id,
+               STRING_AGG(b.full_code || ' (' || trim(to_char(s.qty, 'FM999999999.##')) || ')',
+                          ', ' ORDER BY s.qty DESC) AS bins
+        FROM wms_bin_stock s
+        JOIN wms_bin b ON b.id = s.bin_id
+        WHERE s.qty > 0
+        GROUP BY s.product_id
+    """).fetchall()
+    return {r['product_id']: r['bins'] for r in rows}
+
+
 def get_warehouse_stock(conn, warehouse_id):
     """[{bin_id, full_code, product_id, product_name, qty}] for every
     tracked (bin, product) with qty > 0 anywhere in a warehouse — what's
@@ -702,6 +740,22 @@ def _apply_po_receipt(conn, po_item_id, po_id, qty):
     if rows == 0:
         raise ValueError(f"Failed to update PO item {po_item_id}")
     return delta
+
+
+def receive_into_bin(conn, product_id, qty, bin_id, created_by, reference, notes='Receiving'):
+    """Credit qty of product_id into inventory and the given bin in one step.
+
+    Generic building block for any receiving flow that wants the same
+    "credit inventory + credit bin stock" pairing receive_and_putaway uses
+    for PO items -- e.g. the standalone Receiving screen (receiving_core.py),
+    which isn't PO-item-shaped. Does not commit.
+    """
+    new_amount = record_transaction(
+        conn, product_id, 'receive', qty,
+        reference=reference, notes=notes, created_by=created_by,
+    )
+    bin_qty = _adjust_bin_stock(conn, bin_id, product_id, qty)
+    return {'new_amount': new_amount, 'bin_qty': bin_qty}
 
 
 def receive_and_putaway(conn, po_item_id, po_id, product_id, qty, bin_id, created_by):

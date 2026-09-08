@@ -12,9 +12,11 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 
 from manufacturing.wms_core import (
+    ensure_bin_tables, ensure_wms_tables,
     create_bin, get_or_create_unassigned_bin, is_unassigned_bin,
     _adjust_bin_stock, _build_full_code, _next_sequence,
     suggest_putaway_bin, receive_and_putaway, credit_unassigned_receipt,
+    receive_into_bin, get_bin_summary_by_product,
     generate_pick_list, _resequence_pick_list, record_pick,
     add_carton_item, mark_pick_list_packed, confirm_shipment,
     create_transfer, add_transfer_line, remove_transfer_line,
@@ -36,6 +38,35 @@ def _conn(fetchone_results=None, fetchall_results=None):
         cursor.fetchall.side_effect = fetchall_results
     conn.execute.return_value = cursor
     return conn
+
+
+# ── schema self-heal ─────────────────────────────────────────────────────────
+
+def test_ensure_bin_tables_has_no_sales_order_dependency():
+    # Regression coverage: ensure_bin_tables() must be safe to call before
+    # any sales-order page has run, unlike the full ensure_wms_tables()
+    # (whose wms_pick_list REFERENCES sales_order) -- callers that only
+    # need bin lookups (receiving_core.py, Inventory's bin-location column)
+    # must not transitively require that table to already exist.
+    conn = _conn()
+    ensure_bin_tables(conn)
+    sqls = [c.args[0] for c in conn.execute.call_args_list]
+    assert not any('sales_order' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_warehouse' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_zone' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_bin (' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_bin_stock' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_putaway_rule' in s for s in sqls)
+
+
+def test_ensure_wms_tables_calls_ensure_bin_tables_and_creates_the_rest():
+    conn = _conn()
+    with patch('manufacturing.wms_core.ensure_bin_tables') as mock_ensure_bin:
+        ensure_wms_tables(conn)
+    mock_ensure_bin.assert_called_once_with(conn)
+    sqls = [c.args[0] for c in conn.execute.call_args_list]
+    assert any('CREATE TABLE IF NOT EXISTS wms_pick_list (' in s for s in sqls)
+    assert any('sales_order' in s for s in sqls)
 
 
 # ── bin master ──────────────────────────────────────────────────────────────
@@ -180,6 +211,40 @@ def test_receive_and_putaway_raises_for_nonpositive_qty():
     with pytest.raises(ValueError):
         receive_and_putaway(conn, po_item_id=1, po_id=1, product_id=7, qty=0,
                             bin_id=3, created_by='eric')
+
+
+@patch('manufacturing.wms_core._adjust_bin_stock')
+@patch('manufacturing.wms_core.record_transaction')
+def test_receive_into_bin_credits_inventory_and_bin(mock_record_txn, mock_adjust):
+    conn = _conn()
+    mock_record_txn.return_value = 42.0
+    mock_adjust.return_value = 5.0
+
+    result = receive_into_bin(
+        conn, product_id=7, qty=5, bin_id=3, created_by='eric',
+        reference='Receiving item 1', notes='Receiving',
+    )
+
+    mock_record_txn.assert_called_once_with(
+        conn, 7, 'receive', 5,
+        reference='Receiving item 1', notes='Receiving', created_by='eric',
+    )
+    mock_adjust.assert_called_once_with(conn, 3, 7, 5)
+    assert result == {'new_amount': 42.0, 'bin_qty': 5.0}
+
+
+def test_get_bin_summary_by_product_maps_ids_to_formatted_string():
+    conn = _conn(fetchall_results=[[
+        {'product_id': 7, 'bins': 'A1-01 (5), A1-02 (2)'},
+        {'product_id': 9, 'bins': 'B2-01 (10)'},
+    ]])
+    summary = get_bin_summary_by_product(conn)
+    assert summary == {7: 'A1-01 (5), A1-02 (2)', 9: 'B2-01 (10)'}
+
+
+def test_get_bin_summary_by_product_empty():
+    conn = _conn(fetchall_results=[[]])
+    assert get_bin_summary_by_product(conn) == {}
 
 
 @patch('manufacturing.wms_core._adjust_bin_stock')

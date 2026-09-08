@@ -6,12 +6,14 @@ from ..db_pg import get_db_connection
 from ..barcode_core import (
     resolve_scan_url,
     wo_label_pdf, part_label_pdf, po_label_pdf,
-    receiving_label_pdf, asset_label_pdf,
+    receiving_label_pdf, received_item_label_pdf, asset_label_pdf,
 )
 from ..work_orders_core import get_wo
 from ..purchase_orders_core import get_po, get_po_items, receive_po_item
 from ..inventory_core import get_product
 from ..it_core import get_asset
+from ..receiving_core import get_receipt_items
+from ..wms_core import get_bin
 
 
 # ── Universal scan endpoint ───────────────────────────────────────────────────
@@ -91,6 +93,33 @@ def label_receiving(request, po_id):
     pdf = receiving_label_pdf(po)
     resp = HttpResponse(pdf, content_type="application/pdf")
     resp["Content-Disposition"] = f'inline; filename="RCV-{po["po_number"]}.pdf"'
+    return resp
+
+
+def label_receiving_item(request, item_id):
+    """Print label for one received receiving_core.py line: the part's own
+    barcode plus the bin it was put away into. Only meaningful for a
+    product-linked line that has actually been put away into a bin --
+    a free-text line or one with no bin chosen has nothing to print."""
+    conn = get_db_connection()
+    row = conn.execute(
+        "SELECT receiving_id FROM receiving_item WHERE id = %s", (item_id,)
+    ).fetchone()
+    item = next(
+        (i for i in get_receipt_items(conn, row['receiving_id']) if i['id'] == item_id),
+        None,
+    ) if row else None
+    if not item or not item['product_id'] or not item['bin_id']:
+        return HttpResponse("No printable label for this line.", status=404)
+
+    product = get_product(conn, item['product_id'])
+    bin_row = get_bin(conn, item['bin_id'])
+    if not product or not bin_row:
+        return HttpResponse("Not found", status=404)
+
+    pdf = received_item_label_pdf(product, bin_row['full_code'], item['qty_received'])
+    resp = HttpResponse(pdf, content_type="application/pdf")
+    resp["Content-Disposition"] = f'inline; filename="RCV-ITEM-{item_id}.pdf"'
     return resp
 
 

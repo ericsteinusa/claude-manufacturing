@@ -29,7 +29,7 @@
                 <select name="group_by" onchange="this.form.submit()">
                     {% for opt in group_by_options %}
                     <option value="{{ opt }}" {% if group_by == opt %}selected{% endif %}>
-                        {% if opt == 'bin' %}{% trans "Bin Location" %}{% elif opt == 'item_type' %}{% trans "Make / Buy" %}{% else %}{% trans "ABC Class (by value)" %}{% endif %}
+                        {% if opt == 'bin' %}{% trans "Bin Location" %}{% elif opt == 'item_type' %}{% trans "Make / Buy" %}{% elif opt == 'all' %}{% trans "All Products (Yearly Inventory Check)" %}{% else %}{% trans "ABC Class (by value)" %}{% endif %}
                     </option>
                     {% endfor %}
                 </select>
@@ -39,6 +39,10 @@
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="group_by" value="{{ group_by }}">
+            {% if group_by == 'all' %}
+            <input type="hidden" name="group_value" value="all">
+            <button type="submit" class="btn btn-primary">{% trans "Start Yearly Inventory Check" %}</button>
+            {% else %}
             <div class="form-row">
                 <label>{% trans "Value" %}</label>
                 <select name="group_value">
@@ -48,13 +52,21 @@
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">{% trans "Generate Sheet" %}</button>
+            {% endif %}
         </form>
     </div>
 
     <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">
+        {% if group_by == 'all' %}
+        {% blocktrans %}Snapshots every product currently in inventory into one full physical
+        count sheet — a complete yearly inventory check rather than a rolling
+        sample. Uses the same count/variance/approval workflow as a regular
+        cycle count.{% endblocktrans %}
+        {% else %}
         {% blocktrans %}Snapshots each matching product's current on-hand quantity into a
         count sheet. ABC class is computed on the fly by extended value
         (on-hand × unit cost) — top 20% = A, next 30% = B, remainder = C.{% endblocktrans %}
+        {% endif %}
     </p>
 </div>
 </div>
