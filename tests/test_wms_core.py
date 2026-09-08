@@ -15,6 +15,7 @@ from manufacturing.wms_core import (
     create_bin, get_or_create_unassigned_bin, is_unassigned_bin,
     _adjust_bin_stock, _build_full_code, _next_sequence,
     suggest_putaway_bin, receive_and_putaway, credit_unassigned_receipt,
+    receive_into_bin, get_bin_summary_by_product,
     generate_pick_list, _resequence_pick_list, record_pick,
     add_carton_item, mark_pick_list_packed, confirm_shipment,
     create_transfer, add_transfer_line, remove_transfer_line,
@@ -180,6 +181,40 @@ def test_receive_and_putaway_raises_for_nonpositive_qty():
     with pytest.raises(ValueError):
         receive_and_putaway(conn, po_item_id=1, po_id=1, product_id=7, qty=0,
                             bin_id=3, created_by='eric')
+
+
+@patch('manufacturing.wms_core._adjust_bin_stock')
+@patch('manufacturing.wms_core.record_transaction')
+def test_receive_into_bin_credits_inventory_and_bin(mock_record_txn, mock_adjust):
+    conn = _conn()
+    mock_record_txn.return_value = 42.0
+    mock_adjust.return_value = 5.0
+
+    result = receive_into_bin(
+        conn, product_id=7, qty=5, bin_id=3, created_by='eric',
+        reference='Receiving item 1', notes='Receiving',
+    )
+
+    mock_record_txn.assert_called_once_with(
+        conn, 7, 'receive', 5,
+        reference='Receiving item 1', notes='Receiving', created_by='eric',
+    )
+    mock_adjust.assert_called_once_with(conn, 3, 7, 5)
+    assert result == {'new_amount': 42.0, 'bin_qty': 5.0}
+
+
+def test_get_bin_summary_by_product_maps_ids_to_formatted_string():
+    conn = _conn(fetchall_results=[[
+        {'product_id': 7, 'bins': 'A1-01 (5), A1-02 (2)'},
+        {'product_id': 9, 'bins': 'B2-01 (10)'},
+    ]])
+    summary = get_bin_summary_by_product(conn)
+    assert summary == {7: 'A1-01 (5), A1-02 (2)', 9: 'B2-01 (10)'}
+
+
+def test_get_bin_summary_by_product_empty():
+    conn = _conn(fetchall_results=[[]])
+    assert get_bin_summary_by_product(conn) == {}
 
 
 @patch('manufacturing.wms_core._adjust_bin_stock')

@@ -528,6 +528,22 @@ def get_product_bin_stock(conn, product_id):
     return [dict(r) for r in rows]
 
 
+def get_bin_summary_by_product(conn):
+    """{product_id: "CODE (qty), CODE (qty), ..."} for every product with
+    tracked WMS bin stock -- lets an inventory list annotate every row with
+    its real bin location(s) in one query instead of one per product."""
+    rows = conn.execute("""
+        SELECT s.product_id,
+               STRING_AGG(b.full_code || ' (' || trim(to_char(s.qty, 'FM999999999.##')) || ')',
+                          ', ' ORDER BY s.qty DESC) AS bins
+        FROM wms_bin_stock s
+        JOIN wms_bin b ON b.id = s.bin_id
+        WHERE s.qty > 0
+        GROUP BY s.product_id
+    """).fetchall()
+    return {r['product_id']: r['bins'] for r in rows}
+
+
 def get_warehouse_stock(conn, warehouse_id):
     """[{bin_id, full_code, product_id, product_name, qty}] for every
     tracked (bin, product) with qty > 0 anywhere in a warehouse — what's
@@ -702,6 +718,22 @@ def _apply_po_receipt(conn, po_item_id, po_id, qty):
     if rows == 0:
         raise ValueError(f"Failed to update PO item {po_item_id}")
     return delta
+
+
+def receive_into_bin(conn, product_id, qty, bin_id, created_by, reference, notes='Receiving'):
+    """Credit qty of product_id into inventory and the given bin in one step.
+
+    Generic building block for any receiving flow that wants the same
+    "credit inventory + credit bin stock" pairing receive_and_putaway uses
+    for PO items -- e.g. the standalone Receiving screen (receiving_core.py),
+    which isn't PO-item-shaped. Does not commit.
+    """
+    new_amount = record_transaction(
+        conn, product_id, 'receive', qty,
+        reference=reference, notes=notes, created_by=created_by,
+    )
+    bin_qty = _adjust_bin_stock(conn, bin_id, product_id, qty)
+    return {'new_amount': new_amount, 'bin_qty': bin_qty}
 
 
 def receive_and_putaway(conn, po_item_id, po_id, product_id, qty, bin_id, created_by):

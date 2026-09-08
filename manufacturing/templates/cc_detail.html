@@ -29,7 +29,11 @@
         {% endif %}
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">
+        {% if cc.group_by == 'all' %}
+        {% blocktrans with dt=cc.created_at|date:"Y-m-d H:i" by=cc.created_by %}Full inventory (yearly check) — created {{ dt }} by {{ by }}{% endblocktrans %}
+        {% else %}
         {% blocktrans with gb=cc.group_by|capfirst gv=cc.group_value dt=cc.created_at|date:"Y-m-d H:i" by=cc.created_by %}Grouped by {{ gb }}: {{ gv }} — created {{ dt }} by {{ by }}{% endblocktrans %}
+        {% endif %}
     </p>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}

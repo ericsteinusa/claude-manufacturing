@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with n=receipt.rcv_number %}Receipt — {{ n }}{% endblocktrans %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/receiving/" class="btn">{% trans "Receiving" %}</a>
+<a href="/wms/receive/" class="btn">{% trans "WMS Receive &amp; Put-Away" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rcv-wrap { width:100%; max-width:1200px; }
+.rcv-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:var(--accent-hover); }
+.btn-sm { padding:4px 12px; background:var(--accent); color:white;
+    border:none; border-radius:4px; font-size:12px; font-weight:bold; cursor:pointer; }
+.btn-sm:hover { background:var(--accent-hover); }
+.btn-del { padding:4px 10px; background:#c33; color:white;
+    border:none; border-radius:4px; font-size:12px; font-weight:bold; cursor:pointer; }
+.btn-del:hover { background:#a00; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-pending  { background:#e2e3e5; color:#383d41; }
+.s-partial  { background:#fff3cd; color:#856404; }
+.s-received { background:#d4edda; color:#0a3622; }
+.s-rejected { background:#f8d7da; color:#721c24; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rcv-wrap">
+    <h2>{{ receipt.rcv_number }} <span class="badge s-{{ receipt.status }}" style="font-size:14px;">{{ receipt.status|capfirst }}</span></h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <table class="list-table">
+            <tr><th>{% trans "Supplier" %}</th><td>{{ receipt.supplier|default:"—" }}</td></tr>
+            <tr><th>{% trans "Carrier" %}</th><td>{{ receipt.carrier|default:"—" }}</td></tr>
+            <tr><th>{% trans "Tracking #" %}</th><td>{{ receipt.tracking_number|default:"—" }}</td></tr>
+            <tr><th>{% trans "Date" %}</th><td>{{ receipt.rcv_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Linked PO" %}</th><td>{% if receipt.po_id %}<a href="/po/{{ receipt.po_id }}/">{% blocktrans with n=receipt.po_id %}PO #{{ n }}{% endblocktrans %}</a>{% else %}—{% endif %}</td></tr>
+            <tr><th>{% trans "Notes" %}</th><td>{{ receipt.notes|default:"—" }}</td></tr>
+        </table>
+        {% if can_edit and receipt.status != 'rejected' %}
+        <form method="post" style="margin-top:12px;" onsubmit="return confirm('{% trans "Reject this entire receipt?" %}')">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+            <input type="hidden" name="notes" value="{{ receipt.notes }}">
+            <button type="submit" class="btn-del">{% trans "Reject Receipt" %}</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>{% trans "Line Items" %}</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th class="num">{% trans "Ordered" %}</th>
+                    <th class="num">{% trans "Received" %}</th>
+                    <th>{% trans "Bin" %}</th>
+                    <th></th>
+                    {% if can_edit %}<th></th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.description }}</td>
+                <td>{{ item.product_name|default:"—" }}</td>
+                <td style="text-align:right;">{{ item.qty_ordered }}</td>
+                <td style="text-align:right;">{{ item.qty_received }}</td>
+                <td>{{ item.bin_code|default:"—" }}</td>
+                <td>
+                    {% if item.product_id and item.bin_id %}
+                    <a href="/label/receiving-item/{{ item.id }}/" target="_blank" class="btn-sm" style="text-decoration:none;display:inline-block;">{% trans "Print Label" %}</a>
+                    {% endif %}
+                </td>
+                {% if can_edit %}
+                <td>
+                    {% if item.qty_received < item.qty_ordered %}
+                    <form method="post" style="display:flex;gap:6px;align-items:center;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="receive_item">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <input type="number" step="any" min="0" name="qty" style="width:70px;" required placeholder="{% trans 'qty' %}">
+                        {% if item.product_id %}
+                        <select name="bin_id">
+                            {% if item.suggested_bin %}
+                            <option value="">{% trans "Suggested:" %} {{ item.suggested_bin.full_code }}</option>
+                            {% endif %}
+                            {% for b in bins %}
+                            <option value="{{ b.id }}">{{ b.full_code }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                        <button type="submit" class="btn-sm">{% trans "Receive" %}</button>
+                    </form>
+                    {% else %}
+                    <span style="color:var(--text-muted);">{% trans "Complete" %}</span>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="{% if can_edit %}7{% else %}6{% endif %}" style="color:var(--text-muted);text-align:center;">{% trans "No line items yet." %}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>{% trans "Add Line Item" %}</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_item">
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>{% trans "Description *" %}</label>
+                    <input type="text" name="description" required placeholder="{% trans 'Line item description' %}">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Product ID (optional)" %}</label>
+                    <input type="number" name="product_id" placeholder="{% trans 'linked product id' %}">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Qty Ordered" %}</label>
+                    <input type="number" name="qty_ordered" min="1" value="1">
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">{% trans "Add Line" %}</button>
+        </form>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">
+            {% blocktrans %}A line with a linked product ID can be received into a WMS bin, crediting
+            real inventory. A free-text line (no product ID) can only have its own received
+            quantity tracked.{% endblocktrans %}
+        </p>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

@@ -20,7 +20,7 @@ from manufacturing.barcode_core import (
     PREFIXES, parse_scan, resolve_scan_url,
     _barcode_image_bytes, generate_label_pdf,
     wo_label_pdf, part_label_pdf, po_label_pdf, receiving_label_pdf,
-    asset_label_pdf,
+    received_item_label_pdf, asset_label_pdf,
 )
 
 
@@ -267,6 +267,23 @@ def test_receiving_label_pdf_uses_rcv_prefix():
         receiving_label_pdf({'po_number': '2024-001', 'notes': ''})
     gen.assert_called_once_with(
         "RCV-2024-001", "Receiving: 2024-001", "")
+
+
+def test_received_item_label_pdf_uses_part_prefix_and_sku():
+    with patch('manufacturing.barcode_core.generate_label_pdf') as gen:
+        gen.return_value = b"PDF"
+        received_item_label_pdf(
+            {'id': 5, 'sku': 'SKU-9', 'name': 'Steel Rod'}, 'A1-01', 5.0)
+    gen.assert_called_once_with(
+        "PART-SKU-9", "Part: Steel Rod", "Bin: A1-01  |  Qty Received: 5")
+
+
+def test_received_item_label_pdf_falls_back_to_id_when_no_sku():
+    with patch('manufacturing.barcode_core.generate_label_pdf') as gen:
+        gen.return_value = b"PDF"
+        received_item_label_pdf({'id': 5, 'name': 'Steel Rod'}, 'A1-01', 2.5)
+    gen.assert_called_once_with(
+        "PART-5", "Part: Steel Rod", "Bin: A1-01  |  Qty Received: 2.5")
 
 
 def test_asset_label_pdf_combines_make_and_model():
