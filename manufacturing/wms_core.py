@@ -138,8 +138,21 @@ UNASSIGNED_BIN_CODE = 'UNASSIGNED'
 # Setup
 # ---------------------------------------------------------------------------
 
-def ensure_wms_tables(conn):
-    """Create all WMS tables/columns if absent. Does not commit."""
+def ensure_bin_tables(conn):
+    """Create the warehouse/zone/bin/bin-stock/put-away-rule tables if
+    absent -- the subset of ensure_wms_tables() with no FK on
+    sales_order/so_item/shipment, so callers that only need bin lookups
+    and put-away suggestions (receiving_core.py, the Inventory list/detail
+    bin-location display) don't transitively require those other modules'
+    tables to already exist. Does not commit.
+
+    Split out after a fresh-CI-database load test regression: /inventory/
+    started calling ensure_wms_tables() for its new bin-location column,
+    which also creates wms_pick_list (REFERENCES sales_order) -- on a
+    database where no sales-order page had run yet, hitting /inventory/
+    first threw "relation sales_order does not exist" and 500'd, the same
+    "live schema can diverge" / FK-ordering class of bug this file's other
+    self-heal helpers already guard against."""
     conn.execute(
         "ALTER TABLE product ADD COLUMN IF NOT EXISTS category TEXT DEFAULT ''"
     )
@@ -188,6 +201,10 @@ def ensure_wms_tables(conn):
         "CREATE INDEX IF NOT EXISTS wms_bin_stock_product "
         "ON wms_bin_stock(product_id)"
     )
+    # wms_putaway_rule only FKs to wms_zone (already created above), so it's
+    # safe to include here too -- suggest_putaway_bin() (used by both the
+    # Receiving screen and the PO put-away screen) needs it and has no
+    # reason to depend on sales_order/so_item/shipment either.
     conn.execute("""
         CREATE TABLE IF NOT EXISTS wms_putaway_rule (
             id SERIAL PRIMARY KEY,
@@ -198,6 +215,11 @@ def ensure_wms_tables(conn):
             is_active BOOLEAN NOT NULL DEFAULT TRUE
         )
     """)
+
+
+def ensure_wms_tables(conn):
+    """Create all WMS tables/columns if absent. Does not commit."""
+    ensure_bin_tables(conn)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS wms_wave (
             id SERIAL PRIMARY KEY,

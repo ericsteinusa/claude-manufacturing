@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 
 from manufacturing.wms_core import (
+    ensure_bin_tables, ensure_wms_tables,
     create_bin, get_or_create_unassigned_bin, is_unassigned_bin,
     _adjust_bin_stock, _build_full_code, _next_sequence,
     suggest_putaway_bin, receive_and_putaway, credit_unassigned_receipt,
@@ -37,6 +38,35 @@ def _conn(fetchone_results=None, fetchall_results=None):
         cursor.fetchall.side_effect = fetchall_results
     conn.execute.return_value = cursor
     return conn
+
+
+# ── schema self-heal ─────────────────────────────────────────────────────────
+
+def test_ensure_bin_tables_has_no_sales_order_dependency():
+    # Regression coverage: ensure_bin_tables() must be safe to call before
+    # any sales-order page has run, unlike the full ensure_wms_tables()
+    # (whose wms_pick_list REFERENCES sales_order) -- callers that only
+    # need bin lookups (receiving_core.py, Inventory's bin-location column)
+    # must not transitively require that table to already exist.
+    conn = _conn()
+    ensure_bin_tables(conn)
+    sqls = [c.args[0] for c in conn.execute.call_args_list]
+    assert not any('sales_order' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_warehouse' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_zone' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_bin (' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_bin_stock' in s for s in sqls)
+    assert any('CREATE TABLE IF NOT EXISTS wms_putaway_rule' in s for s in sqls)
+
+
+def test_ensure_wms_tables_calls_ensure_bin_tables_and_creates_the_rest():
+    conn = _conn()
+    with patch('manufacturing.wms_core.ensure_bin_tables') as mock_ensure_bin:
+        ensure_wms_tables(conn)
+    mock_ensure_bin.assert_called_once_with(conn)
+    sqls = [c.args[0] for c in conn.execute.call_args_list]
+    assert any('CREATE TABLE IF NOT EXISTS wms_pick_list (' in s for s in sqls)
+    assert any('sales_order' in s for s in sqls)
 
 
 # ── bin master ──────────────────────────────────────────────────────────────

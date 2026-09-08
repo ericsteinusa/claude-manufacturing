@@ -16,7 +16,7 @@ from ..receiving_core import (
     ensure_receiving_tables, list_receipts, get_receipt, get_receipt_items,
     create_receipt, add_receipt_item, receive_item, reject_receipt,
 )
-from ..wms_core import ensure_wms_tables, list_bins, suggest_putaway_bin
+from ..wms_core import ensure_bin_tables, list_bins, suggest_putaway_bin
 from ..purchase_orders_core import list_pos
 
 _RECEIVING_DEPT_KEYS = {'production', 'purchasing', 'maintenance', 'engineering'}
@@ -81,7 +81,7 @@ def receiving_detail(request, receiving_id):
     conn = get_db_connection()
     try:
         ensure_receiving_tables(conn)
-        ensure_wms_tables(conn)
+        ensure_bin_tables(conn)
         receipt = get_receipt(conn, receiving_id)
         if not receipt:
             return redirect('receiving_list')

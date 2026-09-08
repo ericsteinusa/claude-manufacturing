@@ -91,7 +91,7 @@ from ..purchase_orders_core import (
     set_po_status, receive_po_item,
 )
 from ..wms_core import (
-    ensure_wms_tables, credit_unassigned_receipt,
+    ensure_wms_tables, ensure_bin_tables, credit_unassigned_receipt,
     get_product_bin_stock, get_bin_summary_by_product,
 )
 from ..landed_cost_core import ensure_landed_cost_tables, list_landed_costs
@@ -4123,7 +4123,7 @@ def inventory_list(request):
 
     conn = get_db_connection()
     try:
-        ensure_wms_tables(conn)
+        ensure_bin_tables(conn)
         products = inv_list_products(conn, search=search,
                                      filter_status=filter_status,
                                      item_type=item_type)
@@ -4247,7 +4247,7 @@ def inventory_detail(request, product_id):
                     error = str(e)
 
         transactions = get_transactions(conn, product_id)
-        ensure_wms_tables(conn)
+        ensure_bin_tables(conn)
         bin_stock = get_product_bin_stock(conn, product_id)
     finally:
         conn.close()
