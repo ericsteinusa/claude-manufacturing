@@ -24,7 +24,9 @@ from ..approval_core import (
     get_approval_by_id,
     APPROVAL_THRESHOLD, APPROVAL_ROLES,
 )
-from ..notify_core import notify_approval_requested, notify_approval_decided
+from ..notify_core import (
+    notify_approval_requested, notify_approval_decided, notify_password_reset,
+)
 from ..bom_web_core import (
     list_products, get_product, get_bom, explode_bom,
     add_bom_line, update_bom_line, delete_bom_line,
@@ -170,7 +172,6 @@ from ..accounts import (
     _get_user_profile,
     _is_full_access,
     _verify_login,
-    _email_exists,
     _create_user,
     _reset_password,
     _get_all_users_with_roles,
@@ -180,6 +181,11 @@ from ..accounts import (
     validate_password_strength,
     password_needs_rotation,
     PASSWORD_MAX_AGE_DAYS,
+    ensure_password_reset_token_table,
+    create_password_reset_token,
+    verify_password_reset_token,
+    consume_password_reset_token,
+    PASSWORD_RESET_TOKEN_LIFETIME_MINUTES,
 )
 from ..rbac_core import is_privileged, owns_row
 from ..api_auth import (
@@ -191,6 +197,7 @@ from ..api_auth import (
     disable_totp,
     is_rate_limited,
     record_login_attempt,
+    revoke_all_tokens,
 )
 from ..auth_decorators import (
     dept_required, dept_manager_required, login_required, role_required,
@@ -1051,6 +1058,12 @@ def _complete_login(request, email):
     Shared by the direct password path and the post-MFA-verification path
     so both end up in exactly the same state.
     """
+    # Rotate the session id on every successful login (retains existing
+    # session data, just issues a fresh key) so a session id fixed into a
+    # victim's browser before they authenticate can't be replayed by an
+    # attacker afterward -- mirrors the rotation logout() already does on
+    # the way out, which this path was missing on the way in.
+    request.session.cycle_key()
     request.session['user_email'] = email
     profile = _get_user_profile(email)
     request.session['user_role'] = profile.get('role_name', '')
@@ -1409,22 +1422,57 @@ def forgot_password(request):
                 'email_value': email,
             })
 
-        if not _email_exists(email):
-            return render(request, 'forgot_password.html', {
-                'error': 'No account found for that email address.',
-                'email_value': email,
-            })
+        # Knowing a registered email address used to be the entire
+        # "verification" step here -- request.session['reset_email'] was
+        # set and the very next screen let that email set a brand new
+        # password, no proof of ownership at all. Now a single-use,
+        # time-limited token is emailed to the account's own address
+        # instead, and the response below never reveals whether the email
+        # was actually found or the request got rate-limited -- either
+        # would otherwise be a user-enumeration oracle.
+        with get_db_connection() as conn:
+            ensure_api_token_table(conn)
+            conn.commit()
+            rate_limit_key = f'pwreset:{email}'
+            if not is_rate_limited(conn, rate_limit_key):
+                record_login_attempt(conn, rate_limit_key, success=False)
+                conn.commit()
+                people_id = _get_user_profile(email).get('people_id')
+                if people_id:
+                    ensure_password_reset_token_table(conn)
+                    token = create_password_reset_token(conn, people_id)
+                    conn.commit()
+                    reset_url = request.build_absolute_uri(
+                        reverse('forgot_password_reset') + f'?token={token}')
+                    notify_password_reset(
+                        email, reset_url,
+                        PASSWORD_RESET_TOKEN_LIFETIME_MINUTES)
 
-        request.session['reset_email'] = email
-        return redirect('forgot_password_reset')
+        return render(request, 'forgot_password.html', {
+            'success': (
+                "If that email address is registered, we've sent a "
+                "password reset link to it. The link expires in "
+                f"{PASSWORD_RESET_TOKEN_LIFETIME_MINUTES} minutes."
+            ),
+        })
 
     return render(request, 'forgot_password.html', {})
 
 
 def forgot_password_reset(request):
-    email = request.session.get('reset_email')
-    if not email:
-        return redirect('forgot_password')
+    token = request.GET.get('token', '') if request.method == 'GET' \
+        else request.POST.get('token', '')
+
+    with get_db_connection() as conn:
+        ensure_password_reset_token_table(conn)
+        conn.commit()
+        reset_target = verify_password_reset_token(conn, token)
+    if not reset_target:
+        return render(request, 'forgot_password.html', {
+            'error': 'This reset link is invalid or has expired. '
+                     'Please request a new one.',
+        })
+    email = reset_target['email']
 
     if request.method == 'POST':
         new_pw = request.POST.get('password', '')
@@ -1433,27 +1481,34 @@ def forgot_password_reset(request):
         strength_error = validate_password_strength(new_pw)
         if strength_error:
             return render(request, 'forgot_password_reset.html', {
-                'error': strength_error,
-                'email': email,
+                'error': strength_error, 'email': email, 'token': token,
             })
         if new_pw != confirm:
             return render(request, 'forgot_password_reset.html', {
                 'error': 'Passwords do not match.',
-                'email': email,
+                'email': email, 'token': token,
             })
 
         ok = _reset_password(email, new_pw)
         if ok:
-            del request.session['reset_email']
+            with get_db_connection() as conn:
+                consume_password_reset_token(conn, token)
+                # A password reset is also the account's recovery path from
+                # a compromise -- an attacker's still-valid mobile API
+                # token or open session shouldn't survive it.
+                revoke_all_tokens(conn, reset_target['people_id'])
+                conn.commit()
             return render(request, 'home.html', {
                 'success': 'Your password has been reset. You can now log in.',
             })
         return render(request, 'forgot_password_reset.html', {
             'error': 'Password reset failed. Please try again.',
-            'email': email,
+            'email': email, 'token': token,
         })
 
-    return render(request, 'forgot_password_reset.html', {'email': email})
+    return render(request, 'forgot_password_reset.html', {
+        'email': email, 'token': token,
+    })
 
 
 # ---------------------------------------------------------------------------
@@ -1495,6 +1550,11 @@ def change_password(request):
             })
 
         _reset_password(email, new_pw)
+        people_id = _get_user_profile(email).get('people_id')
+        if people_id:
+            with get_db_connection() as conn:
+                revoke_all_tokens(conn, people_id)
+                conn.commit()
         request.session.pop('password_rotation_required', None)
         return render(request, 'home.html', {
             'success': 'Your password has been changed. You can now log in.',
