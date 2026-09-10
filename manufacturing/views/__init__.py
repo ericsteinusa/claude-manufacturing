@@ -1498,7 +1498,8 @@ def change_password(request):
 
 # ---------------------------------------------------------------------------
 # Two-factor authentication (TOTP) self-service — shared with the mobile
-# API's api_totp_secret table, so enrolling here also covers mobile login.
+# API's api_totp_secret table, so enrolling here also covers mobile login
+# (api_views.api_login enforces it via api_auth.verify_totp_for_user).
 # ---------------------------------------------------------------------------
 
 @login_required

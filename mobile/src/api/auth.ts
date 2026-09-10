@@ -15,8 +15,12 @@ export interface LoginResult {
   user: User;
 }
 
-export const login = (email: string, password: string) =>
-  apiClient.post<{ ok: boolean; data: LoginResult }>('/auth/login/', { email, password });
+export const login = (email: string, password: string, totpCode?: string) =>
+  apiClient.post<{ ok: boolean; data: LoginResult }>('/auth/login/', {
+    email,
+    password,
+    ...(totpCode ? { totp_code: totpCode } : {}),
+  });
 
 export const logout = () =>
   apiClient.post('/auth/logout/');

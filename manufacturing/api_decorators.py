@@ -22,8 +22,8 @@ def api_ok(data, status: int = 200) -> JsonResponse:
     return JsonResponse({"ok": True, "data": data}, status=status)
 
 
-def api_err(message: str, status: int = 400) -> JsonResponse:
-    return JsonResponse({"ok": False, "error": message}, status=status)
+def api_err(message: str, status: int = 400, **extra) -> JsonResponse:
+    return JsonResponse({"ok": False, "error": message, **extra}, status=status)
 
 
 def api_required(view_func):

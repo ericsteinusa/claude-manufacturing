@@ -9,6 +9,12 @@ export default function LoginScreen() {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  // Set once the server rejects a correct email/password with
+  // totp_required: true (see manufacturing/api_views.py's api_login) —
+  // switches the form to prompt for the enrolled account's 6-digit code
+  // instead of resubmitting email/password.
+  const [totpRequired, setTotpRequired] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -16,10 +22,19 @@ export default function LoginScreen() {
       Alert.alert('Required', 'Enter your email and password.');
       return;
     }
+    if (totpRequired && !totpCode.trim()) {
+      Alert.alert('Required', 'Enter your 6-digit authenticator code.');
+      return;
+    }
     setLoading(true);
     try {
-      await login(email.trim().toLowerCase(), password);
+      await login(email.trim().toLowerCase(), password, totpCode.trim() || undefined);
     } catch (err: any) {
+      if (err?.response?.data?.totp_required) {
+        setTotpRequired(true);
+        Alert.alert('Verification Required', 'Enter the 6-digit code from your authenticator app.');
+        return;
+      }
       const msg = err?.response?.data?.error ?? 'Login failed. Check your credentials.';
       Alert.alert('Login Failed', msg);
     } finally {
@@ -43,6 +58,7 @@ export default function LoginScreen() {
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
+          editable={!totpRequired}
         />
         <TextInput
           style={styles.input}
@@ -51,8 +67,22 @@ export default function LoginScreen() {
           secureTextEntry
           value={password}
           onChangeText={setPassword}
-          onSubmitEditing={handleLogin}
+          onSubmitEditing={totpRequired ? undefined : handleLogin}
+          editable={!totpRequired}
         />
+        {totpRequired && (
+          <TextInput
+            style={styles.input}
+            placeholder="6-digit authenticator code"
+            placeholderTextColor="#999"
+            keyboardType="number-pad"
+            maxLength={6}
+            value={totpCode}
+            onChangeText={setTotpCode}
+            onSubmitEditing={handleLogin}
+            autoFocus
+          />
+        )}
         <TouchableOpacity
           style={[styles.btn, loading && styles.btnDisabled]}
           onPress={handleLogin}

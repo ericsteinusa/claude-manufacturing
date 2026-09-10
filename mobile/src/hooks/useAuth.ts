@@ -4,7 +4,7 @@ import type { User } from '../api/auth';
 export interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, totpCode?: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
