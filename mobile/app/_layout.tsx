@@ -50,8 +50,8 @@ export default function RootLayout() {
     return unsubscribe;
   }, [token]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const res = await apiLogin(email, password);
+  const login = useCallback(async (email: string, password: string, totpCode?: string) => {
+    const res = await apiLogin(email, password, totpCode);
     const { token: t, user: u } = res.data.data;
     await AsyncStorage.setItem('api_token', t);
     await AsyncStorage.setItem('api_user', JSON.stringify(u));

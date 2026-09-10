@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 from .accounts import _verify_login, _get_user_profile
 from .api_auth import (
     ensure_api_token_table, create_token, revoke_token, refresh_token,
-    record_login_attempt, is_rate_limited,
+    record_login_attempt, is_rate_limited, verify_totp_for_user,
 )
 from .api_decorators import api_err, api_ok, api_required
 from .db_pg import get_db_connection
@@ -69,6 +69,15 @@ def api_login(request):
         if not profile:
             conn.commit()
             return api_err('User profile not found.', 400)
+        # verify_totp_for_user() returns True (bypass) when the user has no
+        # TOTP enrolled — this is the same helper the web login flow uses
+        # (views/__init__.py's home() view), it was just never wired in here.
+        totp_code = str(body.get('totp_code', '')).strip()
+        if not verify_totp_for_user(conn, profile['people_id'], totp_code):
+            record_login_attempt(conn, email, success=False)
+            conn.commit()
+            return api_err(
+                'A valid TOTP code is required.', 401, totp_required=True)
         token = create_token(conn, profile['people_id'])
         conn.commit()
     finally:

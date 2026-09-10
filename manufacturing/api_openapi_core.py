@@ -28,7 +28,11 @@ API_VERSION = 'v1'
 # (path relative to the /api/v1 server base, [methods], summary, auth_required)
 # auth_required=False only for login, which is how a token is obtained.
 ENDPOINTS: list[tuple[str, list[str], str, bool]] = [
-    ('/auth/login/', ['post'], 'Log in with email/password, receive a bearer token.', False),
+    ('/auth/login/', ['post'],
+     'Log in with email/password, receive a bearer token. If the account has '
+     'TOTP enrolled, also requires a valid `totp_code` in the request body '
+     '(a 401 with `totp_required: true` means one is missing or wrong).',
+     False),
     ('/auth/refresh/', ['post'], "Extend the caller's current token expiry.", True),
     ('/auth/logout/', ['post'], "Revoke the caller's current token.", True),
     ('/auth/profile/', ['get'], "Get the caller's profile.", True),

@@ -303,6 +303,98 @@ def test_api_login_lowercases_and_trims_email():
     assert seen == ['a@b.com']
 
 
+def test_api_login_enrolled_totp_missing_code_returns_401_with_flag():
+    conn = _FakeConn()
+    recorded = []
+    with patch.multiple(
+        'manufacturing.api_views',
+        get_db_connection=lambda: conn,
+        ensure_api_token_table=lambda c: None,
+        is_rate_limited=lambda c, email: False,
+        _verify_login=lambda email, password: True,
+        record_login_attempt=lambda c, email, success: recorded.append((email, success)),
+        _get_user_profile=lambda email: _PROFILE,
+        verify_totp_for_user=lambda c, people_id, code: False,
+        create_token=lambda c, people_id: 'tok-123',
+    ):
+        resp = api_login(_post('/api/v1/auth/login/',
+                                {'email': 'a@b.com', 'password': 'x'}))
+    assert resp.status_code == 401
+    body = json.loads(resp.content)
+    assert body['error'] == 'A valid TOTP code is required.'
+    assert body['totp_required'] is True
+    # The password stage's success is logged, but the overall failed TOTP
+    # check also records a failure so brute-forcing the 6-digit code is
+    # rate-limited the same way brute-forcing the password already is.
+    assert recorded == [('a@b.com', True), ('a@b.com', False)]
+    assert conn.committed is True
+    assert conn.closed is True
+
+
+def test_api_login_enrolled_totp_wrong_code_returns_401():
+    conn = _FakeConn()
+    with patch.multiple(
+        'manufacturing.api_views',
+        get_db_connection=lambda: conn,
+        ensure_api_token_table=lambda c: None,
+        is_rate_limited=lambda c, email: False,
+        _verify_login=lambda email, password: True,
+        record_login_attempt=lambda c, email, success: None,
+        _get_user_profile=lambda email: _PROFILE,
+        verify_totp_for_user=lambda c, people_id, code: code == '654321',
+        create_token=lambda c, people_id: 'tok-123',
+    ):
+        resp = api_login(_post('/api/v1/auth/login/',
+                                {'email': 'a@b.com', 'password': 'x',
+                                 'totp_code': '000000'}))
+    assert resp.status_code == 401
+    assert json.loads(resp.content)['totp_required'] is True
+
+
+def test_api_login_enrolled_totp_correct_code_succeeds():
+    conn = _FakeConn()
+    seen_codes = []
+    with patch.multiple(
+        'manufacturing.api_views',
+        get_db_connection=lambda: conn,
+        ensure_api_token_table=lambda c: None,
+        is_rate_limited=lambda c, email: False,
+        _verify_login=lambda email, password: True,
+        record_login_attempt=lambda c, email, success: None,
+        _get_user_profile=lambda email: _PROFILE,
+        verify_totp_for_user=lambda c, people_id, code: seen_codes.append(code) or code == '654321',
+        create_token=lambda c, people_id: 'tok-123',
+    ):
+        resp = api_login(_post('/api/v1/auth/login/',
+                                {'email': 'a@b.com', 'password': 'x',
+                                 'totp_code': '654321'}))
+    assert resp.status_code == 200
+    assert json.loads(resp.content)['data']['token'] == 'tok-123'
+    assert seen_codes == ['654321']
+
+
+def test_api_login_not_enrolled_ignores_missing_totp_code():
+    # verify_totp_for_user() itself bypasses (returns True) when the user
+    # has no TOTP secret enrolled — not mocking it here (as the pre-existing
+    # success tests above already don't) exercises that real bypass path
+    # against _FakeConn's empty rows, confirming login still succeeds with
+    # no totp_code at all for the common (non-2FA) case.
+    conn = _FakeConn()
+    with patch.multiple(
+        'manufacturing.api_views',
+        get_db_connection=lambda: conn,
+        ensure_api_token_table=lambda c: None,
+        is_rate_limited=lambda c, email: False,
+        _verify_login=lambda email, password: True,
+        record_login_attempt=lambda c, email, success: None,
+        _get_user_profile=lambda email: _PROFILE,
+        create_token=lambda c, people_id: 'tok-123',
+    ):
+        resp = api_login(_post('/api/v1/auth/login/',
+                                {'email': 'a@b.com', 'password': 'x'}))
+    assert resp.status_code == 200
+
+
 # ── api_refresh ──────────────────────────────────────────────────────────
 
 def test_api_refresh_requires_auth():

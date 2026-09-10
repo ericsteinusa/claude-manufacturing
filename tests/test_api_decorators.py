@@ -81,6 +81,16 @@ def test_api_err_custom_status():
     assert json.loads(resp.content)['error'] == 'Not found.'
 
 
+def test_api_err_extra_kwargs_merge_into_body():
+    resp = api_err('A valid TOTP code is required.', 401, totp_required=True)
+    assert resp.status_code == 401
+    assert json.loads(resp.content) == {
+        'ok': False,
+        'error': 'A valid TOTP code is required.',
+        'totp_required': True,
+    }
+
+
 # ── api_required ─────────────────────────────────────────────────────────
 
 def test_api_required_missing_auth_header_returns_401():
