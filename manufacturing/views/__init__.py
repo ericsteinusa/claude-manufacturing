@@ -1391,6 +1391,21 @@ def register(request):
             return render(request, 'register.html', {
                           'error': error, 'form': request.POST})
 
+        # Distinct bucket from the login-lockout one -- this isn't a
+        # credential guess, it's capping how many account-creation/
+        # already-registered-enumeration attempts one email can trigger.
+        rate_limit_key = f'register:{email}'
+        with get_db_connection() as conn:
+            ensure_api_token_table(conn)
+            conn.commit()
+            if is_rate_limited(conn, rate_limit_key):
+                return render(request, 'register.html', {
+                    'error': 'Too many attempts. Try again later.',
+                    'form': request.POST,
+                })
+            record_login_attempt(conn, rate_limit_key, success=False)
+            conn.commit()
+
         emp_id = int(emp_id_text) if emp_id_text else 0
         ok = _create_user(email, password, first, last,
                           address, city, state, zip_code, emp_id)
@@ -1540,7 +1555,23 @@ def change_password(request):
                 'email_value': email,
             })
 
-        if not _verify_login(email, current):
+        # Guessing the current password here is exactly as good an oracle
+        # as guessing it on the login form -- share the same rate-limit
+        # bucket (identical to home()'s) rather than a separate one, so
+        # this endpoint can't be used to bypass the login lockout.
+        with get_db_connection() as conn:
+            ensure_api_token_table(conn)
+            conn.commit()
+            if is_rate_limited(conn, email):
+                return render(request, 'change_password.html', {
+                    'error': 'Too many failed attempts. Try again later.',
+                    'email_value': email,
+                })
+            login_ok = _verify_login(email, current)
+            record_login_attempt(conn, email, success=login_ok)
+            conn.commit()
+
+        if not login_ok:
             log.warning(
                 "Password change denied for %s: current password incorrect",
                 email)
