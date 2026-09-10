@@ -3863,6 +3863,36 @@ for the moment between spawn and the child's bind failure — so it waits
 for `active`, then re-checks a few seconds later *and* confirms
 `NRestarts` has not climbed.
 
+**A `systemctl restart` that logs `Restart OK` can still leave the old
+parent process running.** Seen live 2026-09-10: `systemctl show
+manufacture.service -p MainPID` returned a PID that had been running,
+unbroken, since the day *before* a full session's worth of deploys (5
+merges to `main`, each autopull cycle correctly logging `Restart OK --
+now serving <sha>`) — yet that exact PID never changed across any of
+them. `manage.py runserver`'s autoreloader is a parent/child pair the
+same way it is on the Windows side (see that section's `python.exe`
+process-count note); only the child actually binds the port, and each
+deploy's restart was replacing the child while the systemd-tracked parent
+silently survived underneath it. This means `/healthz/`'s `sha`/`disk_sha`
+fields (which reflect whatever the *current* child process last imported)
+can look completely correct while the actual owning parent is stale by
+days — cross-check `systemctl show manufacture.service -p MainPID` and
+`ps -o lstart -p <that PID>` against `/healthz/`'s own `started_at` if
+something feels off; they should be consistent, and if they aren't,
+something (or someone) killed the child out from under the parent's
+tracking without systemd itself ever cycling.
+
+**Killing a process to force a fresh restart does not reliably retrigger
+`Restart=on-failure`.** A clean `kill` (SIGTERM) lets `manage.py runserver`
+exit with status 0, and systemd's `on-failure` policy does not count a
+zero exit as a failure — the unit just goes `inactive (dead)` and stays
+that way, a genuine self-inflicted outage recovered live this same day.
+If you need to force a real restart by killing the tracked PID directly,
+either have `sudo`/systemctl rights ready to run `systemctl start`
+immediately after, or just use `systemctl restart` in the first place
+rather than killing anything by hand — never kill a production PID without
+an already-verified way to bring it back.
+
 **The quiet path is health-checked too.** `Restart=on-failure` recovers a
 one-off crash but cannot fix a server that fails every start for the same
 reason, and that state used to be invisible: the unit sat in `activating`
@@ -3941,10 +3971,23 @@ Django migration system. Skipping it doesn't surface until first login,
 which 500s with `relation "django_session" does not exist`.
 `manufacture-autopull.ps1` only restarts the running server if the pull is a
 clean fast-forward **and** `manage.py check` **and** the full `pytest tests/`
-suite both pass on the newly-pulled commit — a diverged `--ff-only` pull or a
+suite both pass on the newly-pulled commit — a diverged pull or a
 failing check/test leaves whatever was already running in place and just
 logs to `manufacture-autopull.log`, so a broken push to `main` never takes
 down what's live on the Windows box.
+
+**This script used to carry the exact same `git pull origin main --ff-only`
+footgun documented above for the Linux side** — it decides based on
+`rev-parse main` but pulls into whatever's actually checked out, so a
+feature branch left checked out (e.g. via an interactive RDP session
+reviewing a PR) silently stalled the deploy: `main` never advanced, and
+once that branch was squash-merged and deleted upstream the `--ff-only`
+pull couldn't fast-forward at all, freezing the box on stale code with no
+crash and no visible symptom short of `/healthz/`'s `branch`/`disk_sha`
+fields disagreeing with what's expected. Confirmed live 2026-09-10: the
+box served a pre-session commit ~23 hours stale this exact way. Fixed to
+use the same two-path logic as the Linux script (`git merge --ff-only`
+when `HEAD` is `main`, `git fetch origin main:main` otherwise).
 
 **"Pulled" is not "deployed" — check the log line, not just that one
 exists.** The box once served weeks-old code while `git log -1` on that
@@ -3998,6 +4041,27 @@ kill error and the fixed-2s race were live, either could have caused it,
 and the manual elevated restart used to recover changed process ownership
 before the fix landed — so treat the above as two real defects closed,
 not one confirmed root cause.
+
+**This "access denied" symptom recurred live on 2026-09-10**, after the
+branch-fixation bug above was fixed and the box finally had a real commit
+to pull — the server that had been running (started via an earlier
+interactive elevated RDP session, recovering from the branch-fixation
+incident) was owned by a different session/account context than the
+scheduled task runs as, so the task's own restart attempt hit the same
+permission wall again despite the box otherwise looking healthy. Re-
+enabling "Run with highest privileges" on the task did **not** visibly
+fix anything by itself: **the script only attempts a restart when it
+detects a *new* commit on `main`** (see the `$local -eq $remote` branch
+above) — once `main` was already caught up from the one pull that did
+succeed, every subsequent cycle took the quiet heartbeat path instead,
+which only starts a server if the port isn't listening at all and never
+force-restarts a merely-stale-but-live one. So the privilege fix had no
+commit left to re-trigger it against, and looked like it hadn't worked.
+The only way to actually confirm a privilege fix like this took effect is
+either wait for a genuinely new commit to deploy, or manually trigger the
+scheduled task itself (not an ad hoc elevated shell command, which
+sidesteps testing the task's own configured identity entirely) via Task
+Scheduler's own "Run."
 
 **Four `python.exe` processes on that box is normal, not a leak.** A bare
 process count is meaningless here: the venv's `Scripts\python.exe` is a
