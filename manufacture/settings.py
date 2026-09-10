@@ -40,7 +40,16 @@ _allowed_hosts_env = os.environ.get('DJANGO_ALLOWED_HOSTS')
 ALLOWED_HOSTS = (
     [h.strip() for h in _allowed_hosts_env.split(',') if h.strip()]
     if _allowed_hosts_env else
-    ['localhost', '127.0.0.1', '192.168.0.239']
+    # This box's own IP -- DHCP-assigned and drifts (see CLAUDE.md's
+    # DHCP-change incident history for the Windows box's version of the
+    # same problem). DJANGO_ALLOWED_HOSTS in .env is commented out as an
+    # example only, not actually set, so this fallback is what's live in
+    # production right now -- confirmed 2026-09-10 when the box's real
+    # address had already drifted from .239 to .231, and every request
+    # arriving via the real IP (not localhost) was getting a 400
+    # DisallowedHost. Verify against `hostname -I`/`ip addr` before
+    # trusting this value; it will drift again.
+    ['localhost', '127.0.0.1', '192.168.0.231']
 )
 
 _csrf_trusted_origins_env = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS')
