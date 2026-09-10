@@ -3912,6 +3912,29 @@ call sites so the two paths can't drift apart. A `curl` failure or
 unparseable response degrades to "assume not stale, do nothing" rather
 than forcing an unnecessary restart on a transient hiccup.
 
+**Interactive `git pull` in this checkout can silently reload the live
+server through a path that skips every safety check.** `manage.py
+runserver`'s own built-in autoreloader (`django.utils.autoreload`) watches
+source file mtimes and reloads its worker automatically the moment any
+`.py` file under `REPO_DIR` changes — completely independent of
+`manufacture.service`/`manufacture-autopull.sh`, and much faster than the
+2-minute timer. Confirmed live 2026-09-10: two commits landed via an
+interactive `git pull --ff-only` in this directory, and
+`journalctl -u manufacture.service` showed `views/__init__.py changed,
+reloading` within seconds — the running process picked up the new code
+before autopull's own timer next fired, so the timer found `local ==
+remote` and (thanks to the fix above) `/healthz/` already non-stale,
+logging nothing at all. Harmless that time only because both commits were
+already CI-green. **The autoreloader runs none of autopull's safety gate**
+— no `pip install`, no `manage.py check`, no test suite — it just
+re-imports on file change. A bad commit (or one needing a new dependency)
+pulled interactively here can go live on the running server instantly,
+with zero of the checks `manufacture-autopull.sh` exists to enforce. This
+is a second, independent reason (beyond the git-ref-fixation gotcha
+elsewhere in this file) that `REPO_DIR` is not a neutral place to do
+ordinary interactive git work — it's also the directory a live production
+`runserver` process is actively watching.
+
 **The quiet path is health-checked too.** `Restart=on-failure` recovers a
 one-off crash but cannot fix a server that fails every start for the same
 reason, and that state used to be invisible: the unit sat in `activating`
