@@ -12,6 +12,7 @@ from manufacturing.accounts import (
     validate_password_strength,
     password_needs_rotation,
     provision_sso_user,
+    totp_enrolled,
     PASSWORD_MAX_AGE_DAYS,
 )
 
@@ -165,3 +166,34 @@ def test_generated_password_is_not_predictable():
     password_arg = mock_create.call_args[0][1]
     assert len(password_arg) >= 32
     assert password_arg != 'jane@example.com'
+
+
+# ---------------------------------------------------------------------------
+# totp_enrolled
+#
+# Used by views/_sso.py and views/_saml.py to gate SSO/SAML login through
+# the same MFA challenge the password-login path uses -- see PR fixing the
+# SSO/SAML TOTP bypass (both protocols used to call apply_sso_session()
+# directly with no 2FA check at all).
+# ---------------------------------------------------------------------------
+
+def _ctx_conn(fetchone_return):
+    """A MagicMock usable as a `with get_db_connection() as conn:` context
+    manager, whose conn.execute(...).fetchone() returns *fetchone_return*."""
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = fetchone_return
+    ctx = MagicMock()
+    ctx.__enter__.return_value = conn
+    return ctx
+
+
+def test_totp_enrolled_true_when_secret_exists():
+    ctx = _ctx_conn({'secret_b32': 'ABCDEFGH'})
+    with patch.object(accounts, 'get_db_connection', return_value=ctx):
+        assert totp_enrolled(42) is True
+
+
+def test_totp_enrolled_false_when_no_secret():
+    ctx = _ctx_conn(None)
+    with patch.object(accounts, 'get_db_connection', return_value=ctx):
+        assert totp_enrolled(42) is False
