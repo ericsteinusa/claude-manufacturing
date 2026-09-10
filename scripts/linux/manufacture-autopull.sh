@@ -22,6 +22,64 @@ log_service_detail() {
         done
 }
 
+# Runs the check-then-restart safety gate against whatever is currently
+# checked out (its caller is responsible for $LOCAL already matching the
+# working tree). Shared by the "new commits, just merged" path and the
+# "nothing new to pull, but the running process is stale anyway" path
+# below -- both need the identical gate before touching the live service.
+# Exits the whole script on a hard failure (restart didn't take), same as
+# the inline logic this replaced did; returns normally when checks fail,
+# since a failed check/test suite is not itself a script failure.
+run_checks_and_restart() {
+    sudo -u eric "$VENV_PIP" install -q -r requirements.txt
+
+    if ! (sudo -u eric "$VENV_PY" manage.py check && sudo -u eric "$VENV_PY" -m pytest tests/ -q); then
+        logger -t manufacture-autopull "Checks FAILED -- service NOT restarted, still running previous commit"
+        return 0
+    fi
+
+    logger -t manufacture-autopull "Checks passed, restarting service"
+
+    # Log the OUTCOME, not just the intent. `systemctl restart` returns 0
+    # once the process has been SPAWNED, not once it is serving: for
+    # Type=simple a runserver that dies immediately (port already held, bad
+    # .env, DB auth) still exits zero here, after which Restart=on-failure
+    # cycles it forever. This message used to be the only record of a
+    # restart -- the same defect the Windows script had, where the box
+    # served stale code for weeks behind a log full of apparent successes.
+    restarts_before=$(service_restarts)
+    if ! systemctl restart manufacture.service; then
+        logger -t manufacture-autopull "Restart FAILED (systemctl restart returned non-zero) -- repo is at $LOCAL but the server may still be serving older code."
+        log_service_detail
+        exit 1
+    fi
+
+    # A single is-active sample cannot tell a healthy server from a crash
+    # loop: during auto-restart the unit reads "active" for the moment
+    # between spawn and the child's bind failure. Wait for active, then
+    # confirm it is STILL active a few seconds later and that systemd has
+    # not counted another auto-restart in the meantime.
+    up=0
+    for _ in $(seq 1 20); do
+        sleep 0.5
+        if [ "$(service_state)" = "active" ]; then up=1; break; fi
+    done
+    if [ "$up" = 1 ]; then
+        sleep 4
+        if [ "$(service_state)" != "active" ] || [ "$(service_restarts)" != "$restarts_before" ]; then
+            up=0
+        fi
+    fi
+
+    if [ "$up" = 1 ]; then
+        logger -t manufacture-autopull "Restart OK -- now serving $LOCAL"
+    else
+        logger -t manufacture-autopull "Restart FAILED -- repo is at $LOCAL but the service is not staying up (auto-restarts: $restarts_before -> $(service_restarts))."
+        log_service_detail
+        exit 1
+    fi
+}
+
 if [ "$LOCAL" = "$REMOTE" ]; then
     # Health check on the quiet path. Restart=on-failure recovers a one-off
     # crash, but it cannot fix a server that fails every start for the same
@@ -36,6 +94,34 @@ if [ "$LOCAL" = "$REMOTE" ]; then
         log_service_detail
         exit 1
     fi
+
+    # "Active" only means a process is running -- it does not mean that
+    # process is actually serving $LOCAL. If main was advanced by anything
+    # other than this script (e.g. an interactive `git pull`/`checkout` in
+    # this same working directory -- REPO_DIR is a normal working checkout,
+    # not a dedicated deploy-only clone, so this happens routinely during
+    # ordinary development), the running process can be silently stale even
+    # though there is "nothing new to pull" from this script's own point of
+    # view, since it only ever compares git refs. Observed live 2026-09-10:
+    # exactly this happened for hours with zero log symptom, because this
+    # quiet path never checked what the *running* process actually had
+    # loaded. /healthz/ already tracks that distinction (its own process
+    # sha vs. disk_sha) -- ask it rather than re-deriving the same check
+    # from raw git state.
+    code_stale=$(curl -s -m 5 http://127.0.0.1:8000/healthz/ 2>/dev/null |
+        sudo -u eric "$VENV_PY" -c \
+            "import json, sys
+try:
+    print(json.load(sys.stdin)['version']['code_stale'])
+except Exception:
+    print('unknown')" 2>/dev/null)
+
+    if [ "$code_stale" != "True" ]; then
+        exit 0
+    fi
+
+    logger -t manufacture-autopull "Nothing new on main, but /healthz/ reports the running process is stale -- restarting to catch up to $LOCAL."
+    run_checks_and_restart
     exit 0
 fi
 
@@ -75,49 +161,6 @@ if ! sudo -u eric git merge --ff-only "$REMOTE" --quiet; then
     logger -t manufacture-autopull "Could not fast-forward main (diverged?) -- service NOT restarted."
     exit 1
 fi
-sudo -u eric "$VENV_PIP" install -q -r requirements.txt
 
-if sudo -u eric "$VENV_PY" manage.py check && sudo -u eric "$VENV_PY" -m pytest tests/ -q; then
-    logger -t manufacture-autopull "Checks passed, restarting service"
-
-    # Log the OUTCOME, not just the intent. `systemctl restart` returns 0
-    # once the process has been SPAWNED, not once it is serving: for
-    # Type=simple a runserver that dies immediately (port already held, bad
-    # .env, DB auth) still exits zero here, after which Restart=on-failure
-    # cycles it forever. This message used to be the only record of a
-    # restart -- the same defect the Windows script had, where the box
-    # served stale code for weeks behind a log full of apparent successes.
-    restarts_before=$(service_restarts)
-    if ! systemctl restart manufacture.service; then
-        logger -t manufacture-autopull "Restart FAILED (systemctl restart returned non-zero) -- repo is at $REMOTE but the server may still be serving older code."
-        log_service_detail
-        exit 1
-    fi
-
-    # A single is-active sample cannot tell a healthy server from a crash
-    # loop: during auto-restart the unit reads "active" for the moment
-    # between spawn and the child's bind failure. Wait for active, then
-    # confirm it is STILL active a few seconds later and that systemd has
-    # not counted another auto-restart in the meantime.
-    up=0
-    for _ in $(seq 1 20); do
-        sleep 0.5
-        if [ "$(service_state)" = "active" ]; then up=1; break; fi
-    done
-    if [ "$up" = 1 ]; then
-        sleep 4
-        if [ "$(service_state)" != "active" ] || [ "$(service_restarts)" != "$restarts_before" ]; then
-            up=0
-        fi
-    fi
-
-    if [ "$up" = 1 ]; then
-        logger -t manufacture-autopull "Restart OK -- now serving $REMOTE"
-    else
-        logger -t manufacture-autopull "Restart FAILED -- repo is at $REMOTE but the service is not staying up (auto-restarts: $restarts_before -> $(service_restarts))."
-        log_service_detail
-        exit 1
-    fi
-else
-    logger -t manufacture-autopull "Checks FAILED after pull -- service NOT restarted, still running previous commit"
-fi
+LOCAL="$REMOTE"
+run_checks_and_restart

@@ -3893,6 +3893,22 @@ immediately after, or just use `systemctl restart` in the first place
 rather than killing anything by hand — never kill a production PID without
 an already-verified way to bring it back.
 
+**Fixed: the quiet path (`$LOCAL = $REMOTE`) used to only check "is the
+service alive," never "is the alive service serving what's actually on
+disk."** `REPO_DIR` is a normal working checkout, not a dedicated
+deploy-only clone, so interactive `git pull`/`checkout` during ordinary
+development routinely advances `main` without going through this script
+at all — when that happens, the next cycle sees `local == remote` (nothing
+"new" from its own point of view) and silently no-ops forever, even though
+the running process never picked up the change. Observed live 2026-09-10,
+harmless only by luck (the drifted commit happened to be docs-only). The
+quiet path now also asks `/healthz/` directly for its `code_stale` field
+and runs the same check-then-restart gate if it's `true`, even with
+nothing new to pull — `run_checks_and_restart()` is shared between both
+call sites so the two paths can't drift apart. A `curl` failure or
+unparseable response degrades to "assume not stale, do nothing" rather
+than forcing an unnecessary restart on a transient hiccup.
+
 **The quiet path is health-checked too.** `Restart=on-failure` recovers a
 one-off crash but cannot fix a server that fails every start for the same
 reason, and that state used to be invisible: the unit sat in `activating`
