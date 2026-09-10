@@ -7,7 +7,8 @@ import secrets
 import bcrypt
 import psycopg2
 
-from .db_pg import get_db as _get_db
+from .api_auth import get_totp_secret
+from .db_pg import get_db as _get_db, get_db_connection
 from .log_utils import get_logger
 from .menus import DEPT_MENU_KEY
 
@@ -303,7 +304,12 @@ def apply_sso_session(request, email: str, profile: dict) -> None:
     """Set the same session keys the password-login path sets, so
     dept_required/role_required keep working unchanged regardless of
     whether a user logged in with a password, OIDC, or SAML. Shared by
-    views/_sso.py and views/_saml.py so the two protocols can't drift."""
+    views/_sso.py and views/_saml.py so the two protocols can't drift.
+
+    Callers must check totp_enrolled(profile['people_id']) first and defer
+    to the mfa_pending_* challenge instead of calling this directly when
+    it's True -- this function itself completes the session unconditionally
+    and has no TOTP gate of its own."""
     request.session['user_email'] = email
     request.session['user_role'] = profile.get('role_name', '')
     request.session['user_dept_key'] = profile.get('dept_key') or ''
@@ -311,6 +317,19 @@ def apply_sso_session(request, email: str, profile: dict) -> None:
     request.session['user_full_access'] = _is_full_access(profile)
     request.session['user_is_manager'] = profile.get('is_manager', False)
     request.session['user_people_id'] = profile.get('people_id')
+
+
+def totp_enrolled(people_id: int) -> bool:
+    """True if *people_id* has an active TOTP secret enrolled.
+
+    Used by the SSO/SAML login callbacks (views/_sso.py, views/_saml.py) to
+    decide whether to defer session completion into the same
+    mfa_pending_email/mfa_pending_people_id challenge the password-login
+    path (views/__init__.py's home()) already handles, instead of calling
+    apply_sso_session() directly -- keeps 2FA enforcement identical across
+    all three login paths rather than only the password one."""
+    with get_db_connection() as conn:
+        return get_totp_secret(conn, people_id) is not None
 
 
 def _reset_password(email: str, new_password: str) -> bool:

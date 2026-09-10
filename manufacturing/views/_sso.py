@@ -13,7 +13,9 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from .. import sso_core
-from ..accounts import _get_user_profile, apply_sso_session, provision_sso_user
+from ..accounts import (
+    _get_user_profile, apply_sso_session, provision_sso_user, totp_enrolled,
+)
 from ..log_utils import get_logger
 
 log = get_logger(__name__)
@@ -75,6 +77,16 @@ def sso_callback(request, provider_key):
         return render(request, 'home.html', {
             'error': f'No account found for {email}. Contact your administrator.',
         })
+
+    people_id = profile.get('people_id')
+    if totp_enrolled(people_id):
+        # Defer into the exact same MFA challenge the password-login path
+        # uses (views/__init__.py's home()) rather than completing the
+        # session here -- otherwise SSO would let an enrolled user skip
+        # 2FA entirely just by using this login path instead.
+        request.session['mfa_pending_email'] = email
+        request.session['mfa_pending_people_id'] = people_id
+        return redirect('home')
 
     apply_sso_session(request, email, profile)
     log.info("SSO login succeeded for %s via provider %s", email, provider_key)

@@ -189,6 +189,8 @@ from ..api_auth import (
     set_totp_secret,
     get_totp_secret,
     disable_totp,
+    is_rate_limited,
+    record_login_attempt,
 )
 from ..auth_decorators import (
     dept_required, dept_manager_required, login_required, role_required,
@@ -1113,12 +1115,24 @@ def home(request):
                 'saml_providers': saml_providers,
             })
 
-        if _verify_login(email, password):
+        with get_db_connection() as conn:
+            ensure_api_token_table(conn)
+            conn.commit()
+            if is_rate_limited(conn, email):
+                return render(request, 'home.html', {
+                    'error': 'Too many failed attempts. Try again later.',
+                    'email_value': email,
+                    'sso_providers': sso_providers,
+                    'saml_providers': saml_providers,
+                })
+            login_ok = _verify_login(email, password)
+            record_login_attempt(conn, email, success=login_ok)
+            conn.commit()
+
+        if login_ok:
             profile = _get_user_profile(email)
             people_id = profile.get('people_id')
             with get_db_connection() as conn:
-                ensure_api_token_table(conn)
-                conn.commit()
                 secret = get_totp_secret(conn, people_id)
             if secret:
                 request.session['mfa_pending_email'] = email
