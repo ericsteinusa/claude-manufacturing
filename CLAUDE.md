@@ -4030,9 +4030,13 @@ once**, seen in practice when its address moved from `192.168.4.46` to
 profile still set to Private — the fix is temporarily disabling the
 firewall to confirm it's the cause, then re-enabling it with a proper
 inbound rule for the port; (2) `manufacture/settings.py`'s `ALLOWED_HOSTS`
-default (`['localhost', '127.0.0.1', '192.168.0.239']` — that last address
-is the *Linux* box's own IP, hardcoded) doesn't include whatever the
-Windows box's new address is, so requests 400 until `DJANGO_ALLOWED_HOSTS`
+default (`['localhost', '127.0.0.1', '192.168.0.231']` — that last address
+is the *Linux* box's own IP, hardcoded, and drifts too: it was `.239`
+until 2026-09-10, when it had silently drifted to `.231` and every
+request arriving via the real IP instead of `localhost` was 400ing —
+verify against `hostname -I`/`ip addr` on that box rather than trusting
+this value) doesn't include whatever the Windows box's new address is, so
+requests 400 until `DJANGO_ALLOWED_HOSTS`
 in that machine's `.env` is updated and the server restarted (env vars only
 take effect on process restart, not on save); (3) a stale Postgres
 `postgres`-user password in `.env` can surface at the exact same time by
