@@ -74,11 +74,14 @@ this section in sync when adding endpoints, it has gone stale before.
     `api_token(token, people_id, created_at, expires_at)`; `expires_at` backs
     `TOKEN_LIFETIME_HOURS` expiry checked in `verify_token`.
   - Login rate limiting: `record_login_attempt`, `is_rate_limited`,
-    `purge_old_attempts`.
+    `purge_old_attempts` (called by the `purge_stale_auth_records`
+    management command — see below; existed for a while but was never
+    actually invoked from anywhere until that command was added).
   - Per-endpoint API rate limiting (distinct from the login-attempt lockout
     above — this throttles *all* requests, not just failed logins):
-    `record_api_request`, `is_api_rate_limited`, `purge_old_api_requests`,
-    logged in `api_request_log`. Applied automatically inside
+    `record_api_request`, `is_api_rate_limited`, `purge_old_api_requests`
+    (also called by `purge_stale_auth_records`), logged in
+    `api_request_log`. Applied automatically inside
     `@api_required` to every endpoint it decorates, keyed on
     `(people_id, endpoint path)`; default `API_RATE_LIMIT_MAX_REQUESTS=120`
     per `API_RATE_LIMIT_WINDOW_SECONDS=60`, returns `429` once exceeded.
