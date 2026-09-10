@@ -205,6 +205,46 @@ def test_notify_decided_swallows_send_error():
 
 
 # ---------------------------------------------------------------------------
+# notify_password_reset
+#
+# The email this backs is the only thing that proves the requester actually
+# controls the account's address -- see accounts.py's password_reset_token
+# functions for the account-takeover bug this closed.
+# ---------------------------------------------------------------------------
+
+def test_notify_password_reset_sends_to_account_email():
+    from manufacturing.notify_core import notify_password_reset
+    with patch('django.core.mail.send_mail') as mock_send:
+        notify_password_reset(
+            'jane@example.com', 'http://localhost:8000/forgot-password/reset/?token=abc',
+            30,
+        )
+    mock_send.assert_called_once()
+    recipients = mock_send.call_args[0][3]
+    assert recipients == ['jane@example.com']
+
+
+def test_notify_password_reset_body_contains_link_and_lifetime():
+    from manufacturing.notify_core import notify_password_reset
+    with patch('django.core.mail.send_mail') as mock_send:
+        notify_password_reset(
+            'jane@example.com',
+            'http://localhost:8000/forgot-password/reset/?token=abc',
+            30,
+        )
+    body = mock_send.call_args[0][1]
+    assert 'http://localhost:8000/forgot-password/reset/?token=abc' in body
+    assert '30 minutes' in body
+
+
+def test_notify_password_reset_swallows_send_error():
+    from manufacturing.notify_core import notify_password_reset
+    with patch('django.core.mail.send_mail', side_effect=OSError("no route")):
+        # Must not raise
+        notify_password_reset('jane@example.com', 'http://x/?token=abc', 30)
+
+
+# ---------------------------------------------------------------------------
 # ensure_notification_table
 # ---------------------------------------------------------------------------
 

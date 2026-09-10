@@ -77,6 +77,8 @@ def supplier_portal_login(request):
         finally:
             conn.close()
         if profile:
+            # See views/__init__.py's _complete_login for why this is here.
+            request.session.cycle_key()
             request.session['portal_supplier_id'] = profile['supplier_id']
             request.session['portal_supplier_email'] = profile['email']
             request.session['portal_supplier_company'] = profile['display_name']

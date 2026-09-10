@@ -310,6 +310,8 @@ def apply_sso_session(request, email: str, profile: dict) -> None:
     to the mfa_pending_* challenge instead of calling this directly when
     it's True -- this function itself completes the session unconditionally
     and has no TOTP gate of its own."""
+    # See views/__init__.py's _complete_login for why this is here.
+    request.session.cycle_key()
     request.session['user_email'] = email
     request.session['user_role'] = profile.get('role_name', '')
     request.session['user_dept_key'] = profile.get('dept_key') or ''
@@ -330,6 +332,66 @@ def totp_enrolled(people_id: int) -> bool:
     all three login paths rather than only the password one."""
     with get_db_connection() as conn:
         return get_totp_secret(conn, people_id) is not None
+
+
+# ---------------------------------------------------------------------------
+# Forgot-password reset tokens
+#
+# forgot_password/forgot_password_reset (views/__init__.py) used to treat
+# "the visitor typed a registered email address" as proof of ownership --
+# no emailed link, no token, no expiry, so anyone who knew (or guessed) a
+# user's email could reset their password outright. These functions back a
+# real single-use, time-limited token emailed to the account's own address
+# instead.
+# ---------------------------------------------------------------------------
+
+PASSWORD_RESET_TOKEN_LIFETIME_MINUTES = 30
+
+
+def ensure_password_reset_token_table(conn) -> None:
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS password_reset_token (
+            token      TEXT PRIMARY KEY,
+            people_id  INTEGER NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            expires_at TIMESTAMPTZ NOT NULL,
+            used       BOOLEAN NOT NULL DEFAULT FALSE
+        )
+    """)
+
+
+def create_password_reset_token(conn, people_id: int) -> str:
+    """Insert a single-use reset token valid for
+    PASSWORD_RESET_TOKEN_LIFETIME_MINUTES and return it. Does not commit."""
+    token = secrets.token_urlsafe(32)
+    conn.execute(
+        "INSERT INTO password_reset_token (token, people_id, expires_at) "
+        "VALUES (%s, %s, NOW() + (%s * INTERVAL '1 minute'))",
+        (token, people_id, PASSWORD_RESET_TOKEN_LIFETIME_MINUTES),
+    )
+    return token
+
+
+def verify_password_reset_token(conn, token: str) -> dict | None:
+    """Return {'people_id', 'email'} for a valid, unexpired, unused token,
+    or None."""
+    if not token:
+        return None
+    row = conn.execute(
+        "SELECT prt.people_id, p.email FROM password_reset_token prt "
+        "JOIN people p ON p.id = prt.people_id "
+        "WHERE prt.token = %s AND prt.used = FALSE AND prt.expires_at > NOW()",
+        (token,),
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def consume_password_reset_token(conn, token: str) -> None:
+    """Mark a reset token used so it can't be replayed. Does not commit."""
+    conn.execute(
+        "UPDATE password_reset_token SET used = TRUE WHERE token = %s",
+        (token,),
+    )
 
 
 def _reset_password(email: str, new_password: str) -> bool:

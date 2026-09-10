@@ -81,6 +81,8 @@ def portal_login(request):
         finally:
             conn.close()
         if profile:
+            # See views/__init__.py's _complete_login for why this is here.
+            request.session.cycle_key()
             request.session['portal_customer_id'] = profile['customer_id']
             request.session['portal_customer_email'] = profile['email']
             request.session['portal_customer_company'] = profile['display_name']

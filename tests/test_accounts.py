@@ -13,6 +13,9 @@ from manufacturing.accounts import (
     password_needs_rotation,
     provision_sso_user,
     totp_enrolled,
+    create_password_reset_token,
+    verify_password_reset_token,
+    consume_password_reset_token,
     PASSWORD_MAX_AGE_DAYS,
 )
 
@@ -197,3 +200,69 @@ def test_totp_enrolled_false_when_no_secret():
     ctx = _ctx_conn(None)
     with patch.object(accounts, 'get_db_connection', return_value=ctx):
         assert totp_enrolled(42) is False
+
+
+# ---------------------------------------------------------------------------
+# Password reset tokens
+#
+# forgot_password/forgot_password_reset (views/__init__.py) used to treat
+# "the visitor typed a registered email address" as the entire proof of
+# ownership -- no emailed link, no token, no expiry. These back the real
+# single-use, time-limited token that closed that account-takeover gap.
+# ---------------------------------------------------------------------------
+
+def test_create_password_reset_token_inserts_and_returns_token():
+    conn = MagicMock()
+    token = create_password_reset_token(conn, 42)
+    assert isinstance(token, str)
+    assert len(token) >= 32
+    conn.execute.assert_called_once()
+    sql, params = conn.execute.call_args[0]
+    assert 'INSERT INTO password_reset_token' in sql
+    assert params[0] == token
+    assert params[1] == 42
+
+
+def test_create_password_reset_token_is_not_predictable():
+    conn = MagicMock()
+    t1 = create_password_reset_token(conn, 42)
+    t2 = create_password_reset_token(conn, 42)
+    assert t1 != t2
+
+
+def test_verify_password_reset_token_returns_dict_for_valid_token():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = {
+        'people_id': 42, 'email': 'jane@example.com',
+    }
+    result = verify_password_reset_token(conn, 'sometoken')
+    assert result == {'people_id': 42, 'email': 'jane@example.com'}
+
+
+def test_verify_password_reset_token_returns_none_for_unknown_token():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = None
+    assert verify_password_reset_token(conn, 'badtoken') is None
+
+
+def test_verify_password_reset_token_rejects_empty_token_without_query():
+    conn = MagicMock()
+    assert verify_password_reset_token(conn, '') is None
+    conn.execute.assert_not_called()
+
+
+def test_verify_password_reset_token_query_excludes_used_and_expired():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = None
+    verify_password_reset_token(conn, 'sometoken')
+    sql = conn.execute.call_args[0][0]
+    assert 'used = FALSE' in sql
+    assert 'expires_at > NOW()' in sql
+
+
+def test_consume_password_reset_token_marks_used():
+    conn = MagicMock()
+    consume_password_reset_token(conn, 'sometoken')
+    sql, params = conn.execute.call_args[0]
+    assert 'UPDATE password_reset_token SET used = TRUE' in sql
+    assert params == ('sometoken',)

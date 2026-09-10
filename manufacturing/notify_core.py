@@ -180,6 +180,24 @@ def notify_approval_decided(
     _send(subject, body, [requester_email])
 
 
+def notify_password_reset(email: str, reset_url: str, lifetime_minutes: int) -> None:
+    """Email a single-use password-reset link to the account's own address.
+
+    This is the only thing that proves the requester actually controls the
+    email address on file -- see accounts.py's password_reset_token
+    functions for why that step didn't exist before."""
+    subject = "Password reset request"
+    body = (
+        "A password reset was requested for your account.\n\n"
+        f"Reset your password:  {reset_url}\n\n"
+        f"This link expires in {lifetime_minutes} minutes and can only be "
+        "used once.\n\n"
+        "If you didn't request this, you can safely ignore this email --"
+        " your password will not be changed."
+    )
+    _send(subject, body, [email])
+
+
 _FALLBACK_FROM = 'manufacturing@company.local'
 
 
