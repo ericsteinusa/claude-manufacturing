@@ -57,9 +57,45 @@ if ($local -eq $remote) {
 
 Write-Log "New commits detected (was $local, now $remote), pulling"
 
-git pull origin main --ff-only
+# Never `git pull origin main --ff-only` here. That form decides based on
+# `rev-parse main` but pulls into HEAD, so whenever this checkout sits on
+# a feature branch (e.g. an RDP session checking out a branch to review a
+# PR before it merges) the pull targets that branch instead: `main` never
+# moves, the next cycle detects the identical delta, and the deploy stalls
+# silently while the log keeps announcing "New commits detected". Worse,
+# once that branch has been squash-merged and deleted upstream, the
+# --ff-only pull can't fast-forward at all and just fails every cycle,
+# freezing the disk on whatever was checked out with no crash and no
+# visible symptom short of comparing /healthz/'s branch/disk_sha fields
+# against what's expected. Observed live on this exact box on 2026-09-10:
+# a feature branch left checked out via RDP froze the deploy ~23 hours
+# behind main. Same defect, same fix, as manufacture-autopull.sh's own
+# note on the Linux side.
+#
+# The two cases need different mechanisms, and neither is `pull`:
+#   on main       -> merge --ff-only, which advances the working tree too
+#   anywhere else -> fetch main:main, which moves the ref only. (git
+#                    REFUSES this when main is checked out, so it cannot
+#                    substitute for the first case.)
+$current = (git symbolic-ref --short -q HEAD)
+if (-not $current) { $current = "DETACHED" }
+
+if ($current -ne 'main') {
+    # Keep the ref current so the box is ready to deploy the moment main
+    # is checked out again, but do NOT restart: the working tree holds
+    # someone else's branch, and serving that is not what was asked for.
+    git fetch origin main:main --quiet
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "main has diverged from origin -- left alone."
+        exit 1
+    }
+    Write-Log "main advanced to $remote but working tree is on '$current' -- not restarting; deploy resumes when main is checked out."
+    exit 0
+}
+
+git merge --ff-only $remote --quiet
 if ($LASTEXITCODE -ne 0) {
-    Write-Log "git pull --ff-only FAILED (local history has diverged?) - service NOT restarted, still running previous commit."
+    Write-Log "Could not fast-forward main (diverged?) -- service NOT restarted."
     exit 1
 }
 
