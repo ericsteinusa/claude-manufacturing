@@ -394,6 +394,20 @@ def consume_password_reset_token(conn, token: str) -> None:
     )
 
 
+def purge_expired_password_reset_tokens(conn, keep_minutes: int = 60) -> int:
+    """Delete reset tokens whose expiry passed more than keep_minutes ago.
+
+    Matches api_auth.py's purge_old_attempts/purge_old_api_requests
+    pattern -- called by the purge_stale_auth_records management command,
+    not on any request path. Does not commit. Returns row count deleted."""
+    cur = conn.execute(
+        "DELETE FROM password_reset_token "
+        "WHERE expires_at < NOW() - (%s * INTERVAL '1 minute')",
+        (keep_minutes,),
+    )
+    return cur.rowcount if hasattr(cur, 'rowcount') else 0
+
+
 def _reset_password(email: str, new_password: str) -> bool:
     conn = _get_db()
     row = conn.execute(

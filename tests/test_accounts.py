@@ -16,6 +16,7 @@ from manufacturing.accounts import (
     create_password_reset_token,
     verify_password_reset_token,
     consume_password_reset_token,
+    purge_expired_password_reset_tokens,
     PASSWORD_MAX_AGE_DAYS,
 )
 
@@ -266,3 +267,19 @@ def test_consume_password_reset_token_marks_used():
     sql, params = conn.execute.call_args[0]
     assert 'UPDATE password_reset_token SET used = TRUE' in sql
     assert params == ('sometoken',)
+
+
+def test_purge_expired_password_reset_tokens_returns_row_count():
+    conn = MagicMock()
+    conn.execute.return_value.rowcount = 3
+    assert purge_expired_password_reset_tokens(conn) == 3
+
+
+def test_purge_expired_password_reset_tokens_deletes_by_expiry():
+    conn = MagicMock()
+    conn.execute.return_value.rowcount = 0
+    purge_expired_password_reset_tokens(conn, keep_minutes=120)
+    sql, params = conn.execute.call_args[0]
+    assert 'DELETE FROM password_reset_token' in sql
+    assert 'expires_at' in sql
+    assert params == (120,)
